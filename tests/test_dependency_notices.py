@@ -134,9 +134,17 @@ class ReviewedDeclaredLicenseTests(unittest.TestCase):
         self.package.update(manifest_path=str(self.folder / 'Cargo.toml'), source='registry+https://github.com/rust-lang/crates.io-index')
         declarations = {'Cargo.toml': b'[package]\n# synthetic original author and dual-license declaration\n',
                         'Cargo.toml.orig': b'[package]\n# synthetic unnormalized manifest\n',
-                        'README.md': b'Synthetic original source declaration; not a real upstream license text.\n'}
+                        'README.md': b'Synthetic original source declaration; not a real upstream license text.\n',
+                        'Readme.markdown': b'Synthetic mixed-case original readme; not a real upstream license text.\n',
+                        'src/lib.rs': b'// Synthetic public source retained byte for byte.\n'}
         self.contents = {name: declarations[name] for name in self.pin['declarationFiles']}
         self.contents['src/lib.rs'] = b'// Synthetic public source retained byte for byte.\n'
+        if 'inlineOriginalNotice' in self.pin:
+            prefix = b'/* Synthetic original notice, preserved exactly for this unit test. */\n'
+            data = prefix + self.contents['src/lib.rs']
+            self.contents['src/lib.rs'] = data
+            self.pin['inlineOriginalNotice'].update(sourceBytes=len(data), sourceSha256=hashlib.sha256(data).hexdigest(),
+                                                     prefixBytes=len(prefix), prefixSha256=hashlib.sha256(prefix).hexdigest())
         if self.pin['vcsInfoPresent']:
             vcs = {'git': {'sha1': self.pin['commit']}}
             if self.pin['pathInVcsPresent']:
@@ -219,6 +227,7 @@ class ReviewedDeclaredLicenseTests(unittest.TestCase):
             'malloc_buf-0.0.6': ('62bb907fe88d54d8d9ce32a3cceab4218ed2f6b7d35617cafe9adf84e43919cb', None, 1239, 2),
             'simd_helpers-0.1.0': ('95890f873bec569a0362c235787f3aca6e1e887302ba4840839bcc6459c42da6', 'ca1a2f84aa386d758e98f8a609d990263932fb85', 1527, 7),
             'zune-inflate-0.2.54': ('73ab332fe2f6680068f3582b16a24f90ad7096d5d39b974d1c0aff0125116f02', '69502ce83fdfecdd0beefd677e2abb3781b29d98', 37973, 16),
+            'qrcodegen-1.8.0': ('4339fc7a1021c9c1621d87f5e3505f2805c8c105420ba2f2a4df86814590c142', '720f62bddb7226106071d4728c292cb1df519ceb', 15014, 6),
         }
         self.assertEqual(set(builder._REVIEWED_DECLARED_LICENSES), set(expected))
         declarations = {
@@ -230,16 +239,18 @@ class ReviewedDeclaredLicenseTests(unittest.TestCase):
             'malloc_buf-0.0.6': ('https://github.com/SSheldon/malloc_buf', 'MIT', None, ['Steven Sheldon'], '750a7cb75c76ac13a6448fec88535f22ca9b97432edc4f2e05e0a4b398b38130'),
             'simd_helpers-0.1.0': ('https://github.com/lu-zero/simd_helpers', 'MIT', None, ['Luca Barbato <lu_zero@gentoo.org>'], '7b361c6f6baf32d9baf33d39ec80036472a375245075b7d279cfb47eff1155bf'),
             'zune-inflate-0.2.54': (None, 'MIT OR Apache-2.0 OR Zlib', 'zune-inflate', [], 'eb32c5ed232eb27d811b9c3c662514e4a4c6a898bef7bad44a81e5c0388319df'),
+            'qrcodegen-1.8.0': ('https://github.com/nayuki/QR-Code-generator', 'MIT', None, ['Project Nayuki'], '48f3460745b4e80d5b8028c8b7a7895628f954d2f7dc83f16ae9da33a7f6e38e'),
         }
         for label, values in expected.items():
             pin = builder._REVIEWED_DECLARED_LICENSES[label]
             self.assertEqual(tuple(pin[key] for key in ('archiveSha256', 'commit', 'archiveBytes', 'fileCount')), values)
             self.assertEqual(tuple(pin[key] for key in ('repository', 'license', 'pathInVcs', 'authors', 'filesManifestSha256')), declarations[label])
-        first_four = {label: pin for label, pin in builder._REVIEWED_DECLARED_LICENSES.items() if label not in ('block-0.1.6', 'malloc_buf-0.0.6', 'simd_helpers-0.1.0', 'zune-inflate-0.2.54')}
+        first_four = {label: builder._REVIEWED_DECLARED_LICENSES[label] for label in ('cms-0.2.3', 'fmt-derive-0.1.2', 'fmt-derive-proc-0.1.2', 'rustls-cng-0.7.1')}
         self.assertEqual(sum(p['archiveBytes'] for p in first_four.values()), 217604)
-        first_seven = {label: pin for label, pin in builder._REVIEWED_DECLARED_LICENSES.items() if label != 'zune-inflate-0.2.54'}
+        first_seven = {label: pin for label, pin in builder._REVIEWED_DECLARED_LICENSES.items() if label not in ('zune-inflate-0.2.54', 'qrcodegen-1.8.0')}
         self.assertEqual(sum(p['archiveBytes'] for p in first_seven.values()), 224447)
-        self.assertEqual(sum(p['archiveBytes'] for p in builder._REVIEWED_DECLARED_LICENSES.values()), 262420)
+        self.assertEqual(sum(p['archiveBytes'] for label, p in builder._REVIEWED_DECLARED_LICENSES.items() if label != 'qrcodegen-1.8.0'), 262420)
+        self.assertEqual(sum(p['archiveBytes'] for p in builder._REVIEWED_DECLARED_LICENSES.values()), 277434)
         self.assertEqual(sum(len(p['publicTestCertificates']) for p in builder._REVIEWED_DECLARED_LICENSES.values()), 4)
         with self.assertRaisesRegex(ValueError, 'no reviewed'):
             builder.reviewed_declared_license(self.package, self.folder, self.output)
@@ -272,6 +283,13 @@ class ReviewedDeclaredLicenseTests(unittest.TestCase):
                     self.assertIsNone(proof['pathInVcs'])
                     self.assertIsNone(proof['immutableVcsUrl'])
                     self.assertEqual(proof['publishedVcsMetadata']['status'], 'absent-in-published-archive')
+                if 'inlineOriginalNotice' in self.pin:
+                    self.assertNotIn('standardMit', proof)
+                    self.assertFalse((output / 'STANDARD-MIT-TEXT.txt').exists())
+                    self.assertIs(proof['inlineOriginalNotice']['isUpstreamOriginal'], True)
+                    self.assertEqual((output / 'ORIGINAL-LICENSE-HEADER.txt').read_bytes(),
+                                     self.contents['src/lib.rs'][:self.pin['inlineOriginalNotice']['prefixBytes']])
+                    continue
                 self.assertFalse(proof['standardMit']['isUpstreamOriginal'])
                 self.assertFalse(proof['standardMit']['addsCopyrightNotice'])
                 text = (output / 'STANDARD-MIT-TEXT.txt').read_text()
@@ -710,6 +728,162 @@ class ReviewedDeclaredLicenseTests(unittest.TestCase):
         package = dict(self.package, version='0.2.55')
         with self.assertRaisesRegex(ValueError, 'no reviewed'):
             builder.reviewed_declared_license(package, self.folder, self.output)
+
+
+class QrcodegenInlineNoticeTests(unittest.TestCase):
+    """Synthetic whole-crate fixtures test the authenticated source-prefix path.
+
+    Production archive/source/prefix hashes are pinned literally; these unit
+    tests replace only their small synthetic file-tree and byte-range hashes.
+    Actual published archive verification is retained as separate QA evidence.
+    """
+    setUp = DependencyNotices.setUp
+    tearDown = DependencyNotices.tearDown
+    collect = DependencyNotices.collect
+    fixture = ReviewedDeclaredLicenseTests.fixture
+    rehash = ReviewedDeclaredLicenseTests.rehash
+    reviewed_collect = ReviewedDeclaredLicenseTests.reviewed_collect
+    notice_response = ReviewedDeclaredLicenseTests.notice_response
+    assert_refused = ReviewedDeclaredLicenseTests.assert_refused
+
+    def test_exact_published_source_and_original_prefix_are_pinned_without_new_fixture_exceptions(self):
+        pin = builder._REVIEWED_DECLARED_LICENSES['qrcodegen-1.8.0']
+        self.assertEqual((pin['fileCount'], pin['sourceBytes'], pin['archiveBytes']), (6, 49996, 15014))
+        self.assertEqual(pin['declarationFiles'], ['Cargo.toml', 'Cargo.toml.orig', 'Readme.markdown', 'src/lib.rs'])
+        self.assertIs(pin['vcsInfoPresent'], True)
+        self.assertIs(pin['pathInVcsPresent'], False)
+        self.assertEqual(pin['publicTestCertificates'], {})
+        self.assertEqual(pin['inlineOriginalNotice'], {
+            'sourcePath': 'src/lib.rs', 'sourceBytes': 46056,
+            'sourceSha256': 'a4546464799faaea27393dd60a24be08349618fb98333decbaf686d4c98ca410',
+            'prefixBytes': 1239, 'prefixSha256': '29dd69709492b2f774fc322f0c18835d26a481fb02cd225beff64e32675d5e76',
+            'officialSourceUrl': 'https://raw.githubusercontent.com/nayuki/QR-Code-generator/720f62bddb7226106071d4728c292cb1df519ceb/rust/src/lib.rs',
+        })
+        self.assertEqual([key for key, value in builder._REVIEWED_DECLARED_LICENSES.items() if 'inlineOriginalNotice' in value], ['qrcodegen-1.8.0'])
+
+    def test_exact_original_prefix_is_copied_and_indexed_without_standard_text_or_remote_fetch(self):
+        label = self.fixture('qrcodegen-1.8.0')
+        self.reviewed_collect(label)
+        output = self.output / label
+        prefix = self.contents['src/lib.rs'][:self.pin['inlineOriginalNotice']['prefixBytes']]
+        self.assertEqual((output / 'ORIGINAL-LICENSE-HEADER.txt').read_bytes(), prefix)
+        self.assertFalse((output / 'STANDARD-MIT-TEXT.txt').exists())
+        for name, content in self.contents.items():
+            self.assertEqual((output / 'original-crate' / name).read_bytes(), content)
+        proof = json.loads((output / 'REVIEWED-LICENSE-PROVENANCE.json').read_text())
+        self.assertNotIn('standardMit', proof)
+        self.assertEqual(proof['authors'], ['Project Nayuki'])
+        self.assertEqual(proof['inlineOriginalNotice'], dict(self.pin['inlineOriginalNotice'],
+                         file='ORIGINAL-LICENSE-HEADER.txt', isUpstreamOriginal=True,
+                         publishedArchiveMember='qrcodegen-1.8.0/src/lib.rs'))
+        self.assertEqual(set(json.loads((self.output / 'index.json').read_text())[0]['files']),
+                         {'ORIGINAL-LICENSE-HEADER.txt', 'REVIEWED-LICENSE-PROVENANCE.json'})
+        self.assertNotIn('Copyright (c) 2026 KIO', (output / 'ORIGINAL-LICENSE-HEADER.txt').read_text())
+
+    def test_wrong_archive_digest_or_byte_count_fails_before_output(self):
+        label = self.fixture('qrcodegen-1.8.0')
+        original = self.archive.read_bytes()
+        for wrong in (original + b'\0', bytes([original[0] ^ 1]) + original[1:]):
+            with self.subTest(length=len(wrong)):
+                self.archive.write_bytes(wrong)
+                self.assert_refused(label)
+        self.archive.write_bytes(original)
+
+    def test_source_header_or_body_changes_fail_even_with_forged_cargo_checksums(self):
+        label = self.fixture('qrcodegen-1.8.0')
+        path = self.folder / 'src/lib.rs'
+        original = path.read_bytes()
+        for index in (0, len(original) - 1):
+            with self.subTest(index=index):
+                changed = original[:index] + bytes([original[index] ^ 1]) + original[index + 1:]
+                path.write_bytes(changed)
+                checksum = json.loads((self.folder / '.cargo-checksum.json').read_text())
+                checksum['files']['src/lib.rs'] = hashlib.sha256(changed).hexdigest()
+                builder.write_json(self.folder / '.cargo-checksum.json', checksum)
+                self.assert_refused(label)
+        path.write_bytes(original)
+
+    def test_inline_descriptor_cannot_change_source_path_range_hash_or_official_identity(self):
+        label = self.fixture('qrcodegen-1.8.0')
+        original = copy.deepcopy(self.pin['inlineOriginalNotice'])
+        for field, value in [('sourcePath', 'Cargo.toml'), ('sourceBytes', original['sourceBytes'] + 1),
+                             ('sourceSha256', '0' * 64), ('prefixBytes', original['prefixBytes'] - 1),
+                             ('prefixSha256', '0' * 64), ('officialSourceUrl', 'https://example.invalid/LICENSE')]:
+            with self.subTest(field=field):
+                self.pin['inlineOriginalNotice'] = dict(original, **{field: value})
+                self.assert_refused(label)
+
+    def test_qrcode_metadata_and_vcs_identity_remain_exact(self):
+        label = self.fixture('qrcodegen-1.8.0')
+        original = dict(self.package)
+        for field, value in [('repository', 'https://github.com/other/project'), ('authors', ['Invented author']),
+                             ('license', 'MIT OR Apache-2.0'), ('source', 'git+https://github.com/nayuki/QR-Code-generator'),
+                             ('license_file', 'src/lib.rs')]:
+            with self.subTest(field=field):
+                self.package = dict(original, **{field: value})
+                self.assert_refused(label)
+        self.package = original
+        for vcs in [{'git': {'sha1': 'f' * 40}}, {'git': {'sha1': self.pin['commit']}, 'path_in_vcs': None}]:
+            self.contents['.cargo_vcs_info.json'] = json.dumps(vcs).encode()
+            (self.folder / '.cargo_vcs_info.json').write_bytes(self.contents['.cargo_vcs_info.json'])
+            self.rehash()  # A coherent forged archive/map cannot change reviewed identity.
+            self.assert_refused(label)
+
+    def test_missing_source_or_injected_private_file_remains_refused(self):
+        label = self.fixture('qrcodegen-1.8.0')
+        readme = self.folder / 'Readme.markdown'
+        original = readme.read_bytes()
+        readme.unlink()
+        self.assert_refused(label)
+        readme.write_bytes(original)
+        (self.folder / 'private.key').write_bytes(b'unreviewed private material')
+        self.assert_refused(label)
+
+    def test_unreviewed_version_and_name_still_use_missing_notice_failure(self):
+        self.fixture('qrcodegen-1.8.0')
+        original = dict(self.package)
+        for changes in ({'version': '1.8.1'}, {'name': 'other-qrcodegen'}):
+            self.package = dict(original, **changes)
+            with self.subTest(changes=changes), patch.object(builder, 'upstream_license_files', return_value=[]):
+                with self.assertRaisesRegex(ValueError, 'Dependencies without a packaged license'):
+                    self.collect()
+
+    def test_staged_missing_changed_or_forged_original_notice_is_refused(self):
+        label = self.fixture('qrcodegen-1.8.0')
+        self.reviewed_collect(label)
+        root = self.root / 'staged'
+        stage = root / 'Rust-dependencies' / label
+        shutil.copytree(self.output / label, stage)
+        path = stage / 'ORIGINAL-LICENSE-HEADER.txt'
+        original = path.read_bytes()
+        proof_path = stage / 'REVIEWED-LICENSE-PROVENANCE.json'
+        original_proof = proof_path.read_bytes()
+        with patch.dict(builder._REVIEWED_DECLARED_LICENSES, {label: self.pin}):
+            self.assertTrue(builder.regular_files(root, public=True,
+                            public_validator=builder.reviewed_notice_public_validator(root, 'Rust-dependencies')))
+            path.unlink()
+            with self.assertRaisesRegex(ValueError, 'notice missing or changed'):
+                builder.reviewed_notice_public_validator(root, 'Rust-dependencies')
+            path.write_bytes(bytes([original[0] ^ 1]) + original[1:])
+            with self.assertRaisesRegex(ValueError, 'notice missing or changed'):
+                builder.reviewed_notice_public_validator(root, 'Rust-dependencies')
+            path.write_bytes(original)
+            proof = json.loads(original_proof)
+            del proof['inlineOriginalNotice']
+            builder.write_json(proof_path, proof)
+            with self.assertRaisesRegex(ValueError, 'notice provenance differs'):
+                builder.reviewed_notice_public_validator(root, 'Rust-dependencies')
+            proof = json.loads(original_proof)
+            proof['inlineOriginalNotice']['prefixSha256'] = '0' * 64
+            builder.write_json(proof_path, proof)
+            with self.assertRaisesRegex(ValueError, 'notice provenance differs'):
+                builder.reviewed_notice_public_validator(root, 'Rust-dependencies')
+            proof_path.write_bytes(original_proof)
+            target = self.root / 'linked-notice.txt'
+            path.rename(target)
+            path.symlink_to(target)
+            with self.assertRaisesRegex(ValueError, 'notice missing or changed'):
+                builder.reviewed_notice_public_validator(root, 'Rust-dependencies')
 
 
 class StagedPublicNoticeTests(unittest.TestCase):

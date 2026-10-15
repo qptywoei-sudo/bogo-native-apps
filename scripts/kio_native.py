@@ -426,6 +426,24 @@ _REVIEWED_DECLARED_LICENSES = {
             {"path": "LICENSE-ZLIB", "bytes": 818, "sha256": "7fa429541e55b1509909e058f2d21a37467e4958ec713b357f6e0cf9dc4ee352"},
         ],
     },
+    "qrcodegen-1.8.0": {
+        "name": "qrcodegen", "version": "1.8.0", "repository": "https://github.com/nayuki/QR-Code-generator",
+        "vcsRepository": "nayuki/QR-Code-generator", "commit": "720f62bddb7226106071d4728c292cb1df519ceb", "pathInVcs": None,
+        "license": "MIT", "authors": ["Project Nayuki"],
+        "vcsInfoPresent": True, "pathInVcsPresent": False,
+        "declarationFiles": ["Cargo.toml", "Cargo.toml.orig", "Readme.markdown", "src/lib.rs"],
+        "archiveSha256": "4339fc7a1021c9c1621d87f5e3505f2805c8c105420ba2f2a4df86814590c142", "archiveBytes": 15014,
+        "filesManifestSha256": "48f3460745b4e80d5b8028c8b7a7895628f954d2f7dc83f16ae9da33a7f6e38e", "fileCount": 6, "sourceBytes": 49996,
+        "publicTestCertificates": {},
+        # The complete upstream MIT grant/copyright/disclaimer is an exact
+        # source prefix. Copy those original bytes, rather than a standard text.
+        "inlineOriginalNotice": {
+            "sourcePath": "src/lib.rs", "sourceBytes": 46056,
+            "sourceSha256": "a4546464799faaea27393dd60a24be08349618fb98333decbaf686d4c98ca410",
+            "prefixBytes": 1239, "prefixSha256": "29dd69709492b2f774fc322f0c18835d26a481fb02cd225beff64e32675d5e76",
+            "officialSourceUrl": "https://raw.githubusercontent.com/nayuki/QR-Code-generator/720f62bddb7226106071d4728c292cb1df519ceb/rust/src/lib.rs",
+        },
+    },
 }
 
 
@@ -547,8 +565,34 @@ def reviewed_pinned_upstream_notices(pin):
     return records
 
 
+def reviewed_inline_original_notice(pin, folder, hashes):
+    """Authenticate only the reviewed qrcodegen source-prefix notice; no fetch."""
+    notice = pin.get("inlineOriginalNotice")
+    if notice is None:
+        return None
+    require(pin["name"] == "qrcodegen" and pin["version"] == "1.8.0" and
+            pin["vcsRepository"] == "nayuki/QR-Code-generator" and pin["vcsInfoPresent"] and
+            isinstance(notice, dict) and set(notice) == {"sourcePath", "sourceBytes", "sourceSha256", "prefixBytes", "prefixSha256", "officialSourceUrl"} and
+            notice["sourcePath"] == "src/lib.rs" and type(notice["sourceBytes"]) is int and
+            type(notice["prefixBytes"]) is int and 0 < notice["prefixBytes"] <= notice["sourceBytes"] <= 2 * 1024 * 1024 and
+            isinstance(notice["sourceSha256"], str) and HEX.fullmatch(notice["sourceSha256"]) and
+            isinstance(notice["prefixSha256"], str) and HEX.fullmatch(notice["prefixSha256"]) and
+            notice["officialSourceUrl"] == "https://raw.githubusercontent.com/" + pin["vcsRepository"] + "/" + pin["commit"] + "/rust/src/lib.rs",
+            "Invalid reviewed inline original notice descriptor")
+    source = folder / notice["sourcePath"]
+    require(source.is_file() and not source.is_symlink() and source.stat().st_size == notice["sourceBytes"] and
+            hashes.get(notice["sourcePath"]) == notice["sourceSha256"], "Reviewed inline notice source identity mismatch")
+    content = source.read_bytes()
+    require(len(content) == notice["sourceBytes"] and hashlib.sha256(content).hexdigest() == notice["sourceSha256"],
+            "Reviewed inline notice source checksum mismatch")
+    prefix = content[:notice["prefixBytes"]]
+    require(hashlib.sha256(prefix).hexdigest() == notice["prefixSha256"], "Reviewed inline original notice prefix checksum mismatch")
+    return {**notice, "file": "ORIGINAL-LICENSE-HEADER.txt", "isUpstreamOriginal": True,
+            "publishedArchiveMember": pin["name"] + "-" + pin["version"] + "/" + notice["sourcePath"], "content": prefix}
+
+
 def reviewed_declared_license(package, folder, destination):
-    """Retain exact reviewed original crates, any pinned upstream notices and a labelled MIT body."""
+    """Retain exact original crates and original notices or a labelled MIT body."""
     label = package["name"] + "-" + package["version"]
     pin = _REVIEWED_DECLARED_LICENSES.get(label)
     require(pin is not None, "Crate has no reviewed omitted-license exception: " + label)
@@ -618,6 +662,7 @@ def reviewed_declared_license(package, folder, destination):
     require(not destination.exists() and not destination.is_symlink(), "Reviewed crate notice output must be fresh")
     # Authenticate the exact original notices before any destination is created.
     upstream_notices = reviewed_pinned_upstream_notices(pin)
+    inline_notice = reviewed_inline_original_notice(pin, folder, hashes)
     # Authenticate every input before writing anything, and verify copied bytes.
     checksum_evidence = [{"path": ".cargo-checksum.json", "bytes": checksum_path.stat().st_size, "sha256": digest(checksum_path)}] if checksum_present else []
     for item in original + checksum_evidence:
@@ -626,19 +671,25 @@ def reviewed_declared_license(package, folder, destination):
         with actual[item["path"]].open("rb") as source, output.open("xb") as target:
             shutil.copyfileobj(source, target)
         require(output.stat().st_size == item["bytes"] and digest(output) == item["sha256"], "Reviewed original source changed while copying")
-    mit = (ROOT / "LICENSE").read_text(encoding="utf-8")
-    marker = "Permission is hereby granted"
-    require(mit.count(marker) == 1, "Standard MIT source body is missing or ambiguous")
-    body = mit[mit.index(marker):].strip() + "\n"
-    require("THE SOFTWARE IS PROVIDED" in body and "KIO" not in body and "Copyright (c)" not in body, "Standard MIT body must not add KIO copyright")
-    selection = ("This exact published crate declares MIT; this redistributed copy uses that declared license.\n" if pin["license"] == "MIT" else
-                 "This exact published crate declares " + pin["license"] + "; KIO elects the MIT option for this redistributed copy.\n")
-    explanation = ("KIO-supplied standard MIT license text; this is not an upstream license file.\n" + selection +
-                   "The original authors, license declarations and complete published source bytes are preserved in original-crate/.\n"
-                   "See REVIEWED-LICENSE-PROVENANCE.json for their exact authenticated origin.\n"
-                   "The standard body below adds no copyright holder or copyright notice and does not replace original source notices.\n\n")
-    standard = destination / "STANDARD-MIT-TEXT.txt"
-    standard.write_text(explanation + body, encoding="utf-8")
+    if inline_notice:
+        notice_output = destination / inline_notice["file"]
+        notice_output.write_bytes(inline_notice["content"])
+        require(notice_output.stat().st_size == inline_notice["prefixBytes"] and digest(notice_output) == inline_notice["prefixSha256"],
+                "Copied inline original notice changed")
+    else:
+        mit = (ROOT / "LICENSE").read_text(encoding="utf-8")
+        marker = "Permission is hereby granted"
+        require(mit.count(marker) == 1, "Standard MIT source body is missing or ambiguous")
+        body = mit[mit.index(marker):].strip() + "\n"
+        require("THE SOFTWARE IS PROVIDED" in body and "KIO" not in body and "Copyright (c)" not in body, "Standard MIT body must not add KIO copyright")
+        selection = ("This exact published crate declares MIT; this redistributed copy uses that declared license.\n" if pin["license"] == "MIT" else
+                     "This exact published crate declares " + pin["license"] + "; KIO elects the MIT option for this redistributed copy.\n")
+        explanation = ("KIO-supplied standard MIT license text; this is not an upstream license file.\n" + selection +
+                       "The original authors, license declarations and complete published source bytes are preserved in original-crate/.\n"
+                       "See REVIEWED-LICENSE-PROVENANCE.json for their exact authenticated origin.\n"
+                       "The standard body below adds no copyright holder or copyright notice and does not replace original source notices.\n\n")
+        standard = destination / "STANDARD-MIT-TEXT.txt"
+        standard.write_text(explanation + body, encoding="utf-8")
     archive_url = "https://static.crates.io/crates/" + pin["name"] + "/" + label + ".crate"
     immutable_vcs_url = ("https://github.com/" + pin["vcsRepository"] + "/tree/" + pin["commit"] +
                          ("/" + pin["pathInVcs"] if pin["pathInVcs"] else "")) if pin["vcsInfoPresent"] else None
@@ -661,11 +712,16 @@ def reviewed_declared_license(package, folder, destination):
                                            "status": "published-immutable-commit" if pin["vcsInfoPresent"] else "absent-in-published-archive"},
                   "sourceAuthority": "Exact checksum-authenticated published crate archive; VCS identity is supplementary only when published",
                   "reviewedPublicTestCertificates": pin["publicTestCertificates"],
-                  "omission": ("This published crate omits standalone license files and its repository metadata; the reviewed immutable VCS-root originals are retained separately" if upstream_notices else
+                  "omission": ("This published crate has no standalone license file; its complete original MIT source-prefix notice is retained unchanged as ORIGINAL-LICENSE-HEADER.txt" if inline_notice else
+                               "This published crate omits standalone license files and its repository metadata; the reviewed immutable VCS-root originals are retained separately" if upstream_notices else
                                "No standalone upstream license file exists in this published crate or its reviewed immutable source location" if pin["vcsInfoPresent"] else
                                "No standalone license file or immutable VCS metadata exists in this exact published crate; the reviewed source authority is its published archive"),
-                  "standardMit": {"file": standard.name, "sha256": digest(standard), "bodySha256": hashlib.sha256(body.encode("utf-8")).hexdigest(),
-                                  "providedBy": "KIO", "isUpstreamOriginal": False, "addsCopyrightNotice": False}}
+                  }
+    if inline_notice:
+        provenance["inlineOriginalNotice"] = {key: value for key, value in inline_notice.items() if key != "content"}
+    else:
+        provenance["standardMit"] = {"file": standard.name, "sha256": digest(standard), "bodySha256": hashlib.sha256(body.encode("utf-8")).hexdigest(),
+                                     "providedBy": "KIO", "isUpstreamOriginal": False, "addsCopyrightNotice": False}
     proof = destination / "REVIEWED-LICENSE-PROVENANCE.json"
     if upstream_notices:
         provenance["upstreamNotices"] = []
@@ -675,9 +731,11 @@ def reviewed_declared_license(package, folder, destination):
             require(output.stat().st_size == notice["bytes"] and digest(output) == notice["sha256"], "Copied original upstream notice changed")
             provenance["upstreamNotices"].append({key: notice[key] for key in ("path", "url", "bytes", "sha256")})
     write_json(proof, provenance)
-    return [{"file": path.name, "url": None, "sha256": digest(path), "originalCrateFiles": len(original),
-             "reason": "Exact reviewed published crate omits a standalone license; complete source/declarations retained and the declared MIT license explicitly selected"}
-            for path in (standard, proof)] + [{"file": "UPSTREAM-" + notice["path"], "url": notice["url"], "sha256": notice["sha256"],
+    retrieved = [{"file": path.name, "url": None, "sha256": digest(path), "originalCrateFiles": len(original),
+                  "reason": "Exact authenticated original MIT source-prefix notice and complete published source retained" if inline_notice else
+                            "Exact reviewed published crate omits a standalone license; complete source/declarations retained and the declared MIT license explicitly selected"}
+                 for path in ((notice_output, proof) if inline_notice else (standard, proof))]
+    return retrieved + [{"file": "UPSTREAM-" + notice["path"], "url": notice["url"], "sha256": notice["sha256"],
                                               "reason": "Exact reviewed immutable VCS-root original notice"} for notice in upstream_notices]
 
 
@@ -746,6 +804,13 @@ def reviewed_notice_public_validator(root, dependency_prefix):
                     _reviewed_json(path) == {"files": hashes, "package": pin["archiveSha256"]}, "Staged Cargo checksum metadata changed")
         else:
             require(proof.get("cargoChecksumFileSha256") is None, "Invented staged Cargo checksum metadata")
+        if "inlineOriginalNotice" in pin:
+            notice = reviewed_inline_original_notice(pin, original, hashes)
+            require(proof.get("inlineOriginalNotice") == {key: value for key, value in notice.items() if key != "content"} and
+                    "standardMit" not in proof, "Staged inline original notice provenance differs from its exact pin")
+            path = folder / notice["file"]
+            require(path.is_file() and not path.is_symlink() and path.stat().st_size == notice["prefixBytes"] and digest(path) == notice["prefixSha256"],
+                    "Staged inline original notice missing or changed")
         authenticated.add(label)
 
     def validate(relative):
