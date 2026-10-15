@@ -70,10 +70,38 @@ def load_lock(app):
     return lock
 
 
+def vector_functional_paths(meta):
+    """Keep the complete published crate; permit only the reviewed token reader fix."""
+    dependency = meta['dependency']
+    inventory = dependency['originalInventory']
+    encoded = json.dumps(inventory, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode()
+    require(dependency['name'] == 'hayro-syntax' and dependency['version'] == '0.8.0' and
+            dependency['archiveUrl'] == 'https://static.crates.io/crates/hayro-syntax/hayro-syntax-0.8.0.crate' and
+            dependency['archiveSha256'] == '6cdc818d8d265dcb42081d488f7599df4f73fb79e9d347ecedcd3c23809d2026' and
+            dependency['archiveBytes'] == 114123, 'Vector parser original crate pin changed')
+    require(dependency['originalInventorySha256'] == hashlib.sha256(encoded).hexdigest() ==
+            'c54c281427542e5f74afca4c96141f33ea7ef16f98ead161fe4ff1d4431d78fb' and
+            len(inventory) == 59 and sum(row['bytes'] for row in inventory.values()) == 519602,
+            'Vector complete original parser inventory changed')
+    allowed = {'Cargo.toml', 'Cargo.lock', 'crates/pdf/tests/hayro_number_tokens.rs'}
+    for name in inventory:
+        common.check_public_path(name)
+        allowed.add('vendor/hayro-syntax/' + name)
+    require({row['path'] for row in meta['files']} == allowed and len(meta['files']) == 62,
+            'Vector parser fix must retain every original crate file and only its reviewed integration')
+    for row in meta['files']:
+        if row['path'].startswith('vendor/hayro-syntax/'):
+            name = row['path'][len('vendor/hayro-syntax/'):]
+            require(row['before'] is None, 'Vector vendored original unexpectedly replaced existing app source')
+            if name != 'src/object/number.rs':
+                require(row['after'] == inventory[name], 'Vector changed an unreviewed original parser file')
+    return allowed
+
+
 def functional_fixes(lock):
     result = []
     for fix in lock.get('functionalFixes', []):
-        require(lock['id'] in ('word', 'effect', 'sound', 'design'), 'Functional fixes require an explicit application review')
+        require(lock['id'] in ('word', 'effect', 'sound', 'design', 'vector'), 'Functional fixes require an explicit application review')
         for key, sha_key in (('patch', 'sha256'), ('manifest', 'manifestSha256')):
             relative = common.check_public_path(fix[key])
             require(str(relative).startswith('patches/' + lock['id'] + '/functional-'), 'Functional fix outside its reviewed path')
@@ -87,7 +115,10 @@ def functional_fixes(lock):
                    'effect': {'crates/engine/src/' + name for name in ('tests_frame_export.rs', 'tests_m137.rs', 'tests_essential.rs', 'tests_import_project.rs', 'commands/relink_moved.rs', 'footage_check.rs')},
                    'sound': {'crates/engine/src/file_access.rs'},
                    'design': {'Cargo.lock', 'crates/engine/Cargo.toml', 'crates/engine/src/recovery.rs',
-                              'crates/engine/src/cmd/book/safety_tests.rs'}}[lock['id']]
+                              'crates/engine/src/cmd/book/safety_tests.rs'},
+                   'vector': set()}[lock['id']]
+        if lock['id'] == 'vector':
+            allowed = vector_functional_paths(meta)
         require(meta['files'] and {x['path'] for x in meta['files']} <= allowed, 'Functional fix changed an unreviewed engine or legal file')
         result.append((fix, meta))
     return result
@@ -338,6 +369,10 @@ def build(args, lock):
     for package in lock['testPackages']:
         command += ['-p', package]
     run(command, cwd=source, env=env)
+    if lock['id'] == 'vector':
+        # Keep the original engine suite and additionally verify the complete
+        # vendored PDF number parser through the real application dependency.
+        run(cargo + ['test', '--release', '--locked', '--target', target, '-p', 'vectorcraft-pdf', '--test', 'hayro_number_tokens'], cwd=source, env=env)
     if lock['id'] == 'light':
         # Keep the original engine suites and exercise KIO Photo discovery in
         # the native host too, without launching a graphical window.
@@ -354,7 +389,7 @@ def build(args, lock):
     record = {'schema': 1, 'app': lock['id'], 'version': lock['version'], 'platform': args.platform, 'target': target, 'rustc': rustc,
               'inputs': inputs, 'cargoArgs': lock['cargoArgs'], 'features': lock['features'],
               'binaries': {key: {'sha256': digest(p), 'bytes': p.stat().st_size} for key, p in binaries.items()},
-              'checks': {'nativeArchitecture': 'passed', 'originalCoreTests': 'passed', 'testPackages': lock['testPackages'], 'kioLightEditorRegressionTests': 'passed' if lock['id'] == 'light' else 'not-applicable', 'kioPdfUpdateRegressionTests': 'passed' if lock['id'] == 'pdf' else 'not-applicable', 'binaryVersions': versions, 'cliProbe': cli_probe, 'guiLaunch': 'not-performed-by-orchestrator'}}
+              'checks': {'nativeArchitecture': 'passed', 'originalCoreTests': 'passed', 'testPackages': lock['testPackages'], 'kioVectorPdfNumberRegressionTests': 'passed' if lock['id'] == 'vector' else 'not-applicable', 'kioLightEditorRegressionTests': 'passed' if lock['id'] == 'light' else 'not-applicable', 'kioPdfUpdateRegressionTests': 'passed' if lock['id'] == 'pdf' else 'not-applicable', 'binaryVersions': versions, 'cliProbe': cli_probe, 'guiLaunch': 'not-performed-by-orchestrator'}}
     write_json(work / ('build-' + args.platform + '.json'), record)
 
 

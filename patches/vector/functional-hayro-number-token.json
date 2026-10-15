@@ -1,0 +1,832 @@
+{
+  "schema": "kio.native-functional-patch.v1",
+  "programId": "vector",
+  "stage": "reviewed-integrated-CI-pending",
+  "upstream": {
+    "repository": "https://github.com/storytold/vectorcraft",
+    "commit": "0a33cff3f6e2a1e9e672f4c3816f58cd8d3d032e",
+    "tag": "v0.11.0"
+  },
+  "base": {
+    "brandingPatch": "vectorcraft-v0.11.0-kio-vector.patch",
+    "brandingPatchSha256": "3697d801a00c7063da185d784bf14563d997dccac7f8eac368b8531581f094e1"
+  },
+  "patch": {
+    "file": "functional-hayro-number-token.patch",
+    "sha256": "79426aae933d271d108a0c731c01a1359fe0e292a3d71b94f5c9978ff0a1ff3c",
+    "bytes": 561856
+  },
+  "files": [
+    {
+      "path": "Cargo.lock",
+      "before": {
+        "sha256": "1df75bba0f9c20607bc4bb0a84060d7dcbee31d859b6db9b8dc08cf214b2a9be",
+        "bytes": 153839
+      },
+      "after": {
+        "sha256": "86f72db5ac2e3e36c8c78f63f9feb1e127deb78f33dbb676f2d304e031ee16ff",
+        "bytes": 153696
+      }
+    },
+    {
+      "path": "Cargo.toml",
+      "before": {
+        "sha256": "2c12bf60f50b030ad2300adf91b956a0a718f90699c8af62bbc7dd825e6077ca",
+        "bytes": 4588
+      },
+      "after": {
+        "sha256": "91f0f527b224799216c9198f093d1b8cb810716e785d7175eba157c6fbafe15a",
+        "bytes": 4751
+      }
+    },
+    {
+      "path": "crates/pdf/tests/hayro_number_tokens.rs",
+      "before": null,
+      "after": {
+        "sha256": "3718d1eaaa31bf4522fdd8f120e098de21fe39534403b79efe7963669635b3da",
+        "bytes": 7580
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/.cargo_vcs_info.json",
+      "before": null,
+      "after": {
+        "sha256": "847f5bc4b06a185d98540452cdbf60426d48691e158548f39120c0ac98cef5fb",
+        "bytes": 106
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/Cargo.lock",
+      "before": null,
+      "after": {
+        "sha256": "3bfe388380555c9c2a4e3d9dff1c331a4e09730c17075f962d5cb33f3dc73d8d",
+        "bytes": 7266
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/Cargo.toml",
+      "before": null,
+      "after": {
+        "sha256": "8a9e3e40b1572e75ef7c36ffb3bbaebf5ba0b33875f791f409562161633b287b",
+        "bytes": 3264
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/Cargo.toml.orig",
+      "before": null,
+      "after": {
+        "sha256": "d90777aab6530afe5086f14368cb6fa7484d3e1223495fe2f24fe491f1904dfc",
+        "bytes": 1282
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/LICENSE-APACHE",
+      "before": null,
+      "after": {
+        "sha256": "0cec06e0e55fbc3dc5cee4fca9b607f66cb8f4e4dbcf3b3c013594dd156732e9",
+        "bytes": 10173
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/LICENSE-MIT",
+      "before": null,
+      "after": {
+        "sha256": "51b50e6120c344dcc146bbd6375ca1c78e079d97c8bea76e67a53d6ff0efebac",
+        "bytes": 1063
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/README.md",
+      "before": null,
+      "after": {
+        "sha256": "c044c14cbe64cedb030f4bd687c0010e92476214990d2a44bdee4f9c24407b42",
+        "bytes": 3555
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/examples/iterate.rs",
+      "before": null,
+      "after": {
+        "sha256": "356f3891eace764a6bd1cde10eb3c445c594c1bdeb8bb57018f63cd55f95fcb1",
+        "bytes": 852
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/bit_reader.rs",
+      "before": null,
+      "after": {
+        "sha256": "ed776feb5048a26e45661e1d35c92b9d20faa8b7bcb0e92b36b0872d532cc6b1",
+        "bytes": 18604
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/byte_reader.rs",
+      "before": null,
+      "after": {
+        "sha256": "fa76c87843da98d84eceb58eb34bb3dca84414767467e0a474e3161f656e6fbe",
+        "bytes": 5695
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/content/gen_ops.py",
+      "before": null,
+      "after": {
+        "sha256": "44c2b67960dd887bc27c04fe5b542dde4f923745ea9b61a0f7bee40a5af8c540",
+        "bytes": 8240
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/content/mod.rs",
+      "before": null,
+      "after": {
+        "sha256": "cb987e122707ce98d014da3f89285a70c31a53f114513c033452ffc525efea0a",
+        "bytes": 25590
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/content/ops.rs",
+      "before": null,
+      "after": {
+        "sha256": "e873d00a56f4291801293d5e0eced74f86df77741380ac9f10a5f345a3e9ee1a",
+        "bytes": 9802
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/content/ops_generated.rs",
+      "before": null,
+      "after": {
+        "sha256": "1b7ed640a0f352177a78d0daa12c44c8ca770b9556a04de4164405876f3023a0",
+        "bytes": 22196
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/crypto/aes.rs",
+      "before": null,
+      "after": {
+        "sha256": "a3180d6245b0339c840ae2b2becd814e2ca4908985e666af15847a0a2330715b",
+        "bytes": 35662
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/crypto/md5.rs",
+      "before": null,
+      "after": {
+        "sha256": "619d740c54d70adb98ceb45a163df0197b54e74d5ed7a4d4ef4081f9992030f7",
+        "bytes": 4031
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/crypto/mod.rs",
+      "before": null,
+      "after": {
+        "sha256": "4d41713e81352bf26ac0014e9b834e78b2ce820a93db0be9a578daad54267fc5",
+        "bytes": 25379
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/crypto/rc4.rs",
+      "before": null,
+      "after": {
+        "sha256": "4a37d4a2fc75663a280d4d17197d326696f29dd300b5c066d5d9c73431ed220b",
+        "bytes": 3619
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/crypto/sha256.rs",
+      "before": null,
+      "after": {
+        "sha256": "fb87c10a1c658916e7eef01934a26666529f08d70be4de4531e33c9d4308f3ae",
+        "bytes": 4279
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/crypto/sha384.rs",
+      "before": null,
+      "after": {
+        "sha256": "a0653063b53dd65cc9e487c5f91a800ca6282b1077873f5e4a68523ed6e21e2d",
+        "bytes": 1283
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/crypto/sha512.rs",
+      "before": null,
+      "after": {
+        "sha256": "e6cdb0d530a2d424199437a75ce4a97471090b3ef3d5a2d572778caa04fb61c8",
+        "bytes": 5922
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/data.rs",
+      "before": null,
+      "after": {
+        "sha256": "6ce1a7914b550c1741ea8fbf5c61147ad1abb604f26b977db2acdb0abda3c0ce",
+        "bytes": 3519
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/filter/ascii_85.rs",
+      "before": null,
+      "after": {
+        "sha256": "df32c6783b1c1969f9b6b03de3bf204384dfdba767f7beefdd8baa8590387d24",
+        "bytes": 2893
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/filter/ascii_hex.rs",
+      "before": null,
+      "after": {
+        "sha256": "3943384166df1f81f76c8f64a28766131dc947311d672d01ffa5fef05b0a30c8",
+        "bytes": 2931
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/filter/ccitt.rs",
+      "before": null,
+      "after": {
+        "sha256": "aa1e293e0ed53032e211bccaa34316f3c2864b35401532f73761d1093b42acc9",
+        "bytes": 6092
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/filter/dct.rs",
+      "before": null,
+      "after": {
+        "sha256": "48452c1817b0a95b079aff068c8a625078c90354978af1de4ff97142e6bb0dd2",
+        "bytes": 6496
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/filter/jbig2.rs",
+      "before": null,
+      "after": {
+        "sha256": "72510774071f51f6e7e652d8f1cbfd45cc0b869e5ff0623808264d870f37a768",
+        "bytes": 3374
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/filter/jpx.rs",
+      "before": null,
+      "after": {
+        "sha256": "e9514d7c085227cc065d11bca37c1e24c2ab3b5f9daffc35beaee38d88999f92",
+        "bytes": 4064
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/filter/lzw_flate.rs",
+      "before": null,
+      "after": {
+        "sha256": "662c69fd6d715791ab122f3abde7fd45a0e7f29f9a6ce3749d7f0e23befcd14b",
+        "bytes": 41152
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/filter/mod.rs",
+      "before": null,
+      "after": {
+        "sha256": "c922a32e6cceadf63ff48fa88322ba7a877f18591b8679dcbd762faac36b7ef3",
+        "bytes": 4818
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/filter/png/mod.rs",
+      "before": null,
+      "after": {
+        "sha256": "810dd3a7c24a4fcc7309f0aef9ceff023b1ab03f713c6252dd5f5a62f165ac37",
+        "bytes": 13291
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/filter/png/paeth.rs",
+      "before": null,
+      "after": {
+        "sha256": "095ff6a37ebf2263aa127cdf6c5313a708a89ac19070c530e1697173678c52eb",
+        "bytes": 11534
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/filter/run_length.rs",
+      "before": null,
+      "after": {
+        "sha256": "8f25d6d2398c2574f642b78eadcc6c0b36b1e2053ee3b1ea874d000a1c8ee3c7",
+        "bytes": 1053
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/lib.rs",
+      "before": null,
+      "after": {
+        "sha256": "9fc619e4791ffb30c59ce441e6e0434c04051c95b082881a363a887b8434bcb6",
+        "bytes": 3675
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/log.rs",
+      "before": null,
+      "after": {
+        "sha256": "f32705bc40d499540f2d473087b75db707e4ce4c0f80d6f997432dfa64e4dba2",
+        "bytes": 916
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/math.rs",
+      "before": null,
+      "after": {
+        "sha256": "df8573f9147368f464d35ba40a02cfbd388d68bc7b18a046afdc55131cc1177b",
+        "bytes": 1232
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/metadata.rs",
+      "before": null,
+      "after": {
+        "sha256": "e7324559c77181ffd297f877f5eb00222ee0739ff8f2a83d1ebd4a948383af6d",
+        "bytes": 1505
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/object/array.rs",
+      "before": null,
+      "after": {
+        "sha256": "5494a150e2a6c1f28cc14f3638a1bc7ecdfdc0396f1abb474d6823f88189a721",
+        "bytes": 12123
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/object/bool.rs",
+      "before": null,
+      "after": {
+        "sha256": "67089f2d24e281a2106a8e2ab1bb452edaabf8f406ba31605fd9b62c88b3094a",
+        "bytes": 1355
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/object/date.rs",
+      "before": null,
+      "after": {
+        "sha256": "3a6361f527f94c68d77c8164ab5286f78e669310adf9f034dc0eed88375ef213",
+        "bytes": 5460
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/object/dict.rs",
+      "before": null,
+      "after": {
+        "sha256": "0353f469eff237ab9814077b9233a2fe1f00bfbe7944b6958f7dccdd85baf13f",
+        "bytes": 35123
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/object/indirect.rs",
+      "before": null,
+      "after": {
+        "sha256": "4058b7f23880aab1cb0149fcfae225904afec180af521885608e0543c2dffc50",
+        "bytes": 1541
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/object/mod.rs",
+      "before": null,
+      "after": {
+        "sha256": "01665bcc411c96878c300dc5336f7d1d0076f5cab6b4e46248545bebbfb69509",
+        "bytes": 12859
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/object/name.rs",
+      "before": null,
+      "after": {
+        "sha256": "e8568327866a5f9cdd7c847bbd540b14bf5e8bc2f2b9cef9c91be3f11a9939e4",
+        "bytes": 8765
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/object/null.rs",
+      "before": null,
+      "after": {
+        "sha256": "496d5ac107c5eb80085c4e00df35665c45d0d3364e75a9c4a453eca667d36c0e",
+        "bytes": 1370
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/object/number.rs",
+      "before": null,
+      "after": {
+        "sha256": "4255561334d9bcf6fc519b6efb947f7625dcac9c5aad12e7735c104c926a3d83",
+        "bytes": 17251
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/object/rect.rs",
+      "before": null,
+      "after": {
+        "sha256": "0deae0ab94968507764d1943d5380289e84881e2994152f933bcdcf1d1495992",
+        "bytes": 2081
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/object/ref.rs",
+      "before": null,
+      "after": {
+        "sha256": "142a8526c8ab9329304f0728973f2b90cc39335e63d6e003c6522728b571b55b",
+        "bytes": 5233
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/object/stream.rs",
+      "before": null,
+      "after": {
+        "sha256": "9b3c8f02be8c1674460b03b8a81002f89e5babada625913ac86f4a5e262f340c",
+        "bytes": 12093
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/object/string.rs",
+      "before": null,
+      "after": {
+        "sha256": "524df70328b3fd7c1daaeb68780a39ae5b30bcb226418fff98d518d8d5e1f61f",
+        "bytes": 14680
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/object/tuple.rs",
+      "before": null,
+      "after": {
+        "sha256": "eeaf3f14a962fc98a109d1a74d7e70e069816d909e5e55766361658ef7b26aea",
+        "bytes": 4730
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/page.rs",
+      "before": null,
+      "after": {
+        "sha256": "ab7daecb8577edc930ccc375499bb2c37750fd7d89d2b5f7068800668296094d",
+        "bytes": 16467
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/pdf.rs",
+      "before": null,
+      "after": {
+        "sha256": "b6938cd27757a20dca83b49db46d73ab32a0ca2a474a0c4517d1d82b71a1be1c",
+        "bytes": 4867
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/reader.rs",
+      "before": null,
+      "after": {
+        "sha256": "df4c382a103e9ac16dc334555c74bca895a3a6df63e4cf641ab3bd0d8c0e4aff",
+        "bytes": 7939
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/sync.rs",
+      "before": null,
+      "after": {
+        "sha256": "dca31dec87ec6def80582f852e475b0899cfbc0110fe0cd78c968a0fbfbade4b",
+        "bytes": 2498
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/transform.rs",
+      "before": null,
+      "after": {
+        "sha256": "40cf670b296220e7a7737dacc80eff888d42275d026fe17269a2458866a60fc8",
+        "bytes": 1526
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/trivia.rs",
+      "before": null,
+      "after": {
+        "sha256": "0e90f8a7c82627cfeb2cbe0922bff15a9a2a1929da5f59549cfdd09792df357e",
+        "bytes": 2089
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/util.rs",
+      "before": null,
+      "after": {
+        "sha256": "11b6575e6482a184f35e1cce81d64eb39420fbe4e79fde97f63d37884a7cdaa7",
+        "bytes": 5588
+      }
+    },
+    {
+      "path": "vendor/hayro-syntax/src/xref.rs",
+      "before": null,
+      "after": {
+        "sha256": "d47d685393a65ecaacc8b6ee3ab5d7bd3e659e84e6a5ae855de8c41c20a66bd0",
+        "bytes": 37967
+      }
+    }
+  ],
+  "summary": "Preserve hayro-syntax PDF number skip/read extent invariant, including original PDFJS zero-sign and trailing-minus quirks.",
+  "dependency": {
+    "name": "hayro-syntax",
+    "version": "0.8.0",
+    "archiveUrl": "https://static.crates.io/crates/hayro-syntax/hayro-syntax-0.8.0.crate",
+    "archiveSha256": "6cdc818d8d265dcb42081d488f7599df4f73fb79e9d347ecedcd3c23809d2026",
+    "archiveBytes": 114123,
+    "originalFileCount": 59,
+    "originalExtractedBytes": 519602,
+    "repository": "https://github.com/LaurenzV/hayro",
+    "vcsCommit": "ea9c81dc70cde40c64205986fdcfcd481fe934d8",
+    "pathInVcs": "hayro-syntax",
+    "license": "Apache-2.0 OR MIT",
+    "originalInventorySha256": "c54c281427542e5f74afca4c96141f33ea7ef16f98ead161fe4ff1d4431d78fb",
+    "modifiedOriginalFiles": [
+      "src/object/number.rs"
+    ],
+    "unchangedOriginalFiles": 58,
+    "originalInventory": {
+      ".cargo_vcs_info.json": {
+        "sha256": "847f5bc4b06a185d98540452cdbf60426d48691e158548f39120c0ac98cef5fb",
+        "bytes": 106
+      },
+      "Cargo.lock": {
+        "sha256": "3bfe388380555c9c2a4e3d9dff1c331a4e09730c17075f962d5cb33f3dc73d8d",
+        "bytes": 7266
+      },
+      "Cargo.toml": {
+        "sha256": "8a9e3e40b1572e75ef7c36ffb3bbaebf5ba0b33875f791f409562161633b287b",
+        "bytes": 3264
+      },
+      "Cargo.toml.orig": {
+        "sha256": "d90777aab6530afe5086f14368cb6fa7484d3e1223495fe2f24fe491f1904dfc",
+        "bytes": 1282
+      },
+      "LICENSE-APACHE": {
+        "sha256": "0cec06e0e55fbc3dc5cee4fca9b607f66cb8f4e4dbcf3b3c013594dd156732e9",
+        "bytes": 10173
+      },
+      "LICENSE-MIT": {
+        "sha256": "51b50e6120c344dcc146bbd6375ca1c78e079d97c8bea76e67a53d6ff0efebac",
+        "bytes": 1063
+      },
+      "README.md": {
+        "sha256": "c044c14cbe64cedb030f4bd687c0010e92476214990d2a44bdee4f9c24407b42",
+        "bytes": 3555
+      },
+      "examples/iterate.rs": {
+        "sha256": "356f3891eace764a6bd1cde10eb3c445c594c1bdeb8bb57018f63cd55f95fcb1",
+        "bytes": 852
+      },
+      "src/bit_reader.rs": {
+        "sha256": "ed776feb5048a26e45661e1d35c92b9d20faa8b7bcb0e92b36b0872d532cc6b1",
+        "bytes": 18604
+      },
+      "src/byte_reader.rs": {
+        "sha256": "fa76c87843da98d84eceb58eb34bb3dca84414767467e0a474e3161f656e6fbe",
+        "bytes": 5695
+      },
+      "src/content/gen_ops.py": {
+        "sha256": "44c2b67960dd887bc27c04fe5b542dde4f923745ea9b61a0f7bee40a5af8c540",
+        "bytes": 8240
+      },
+      "src/content/mod.rs": {
+        "sha256": "cb987e122707ce98d014da3f89285a70c31a53f114513c033452ffc525efea0a",
+        "bytes": 25590
+      },
+      "src/content/ops.rs": {
+        "sha256": "e873d00a56f4291801293d5e0eced74f86df77741380ac9f10a5f345a3e9ee1a",
+        "bytes": 9802
+      },
+      "src/content/ops_generated.rs": {
+        "sha256": "1b7ed640a0f352177a78d0daa12c44c8ca770b9556a04de4164405876f3023a0",
+        "bytes": 22196
+      },
+      "src/crypto/aes.rs": {
+        "sha256": "a3180d6245b0339c840ae2b2becd814e2ca4908985e666af15847a0a2330715b",
+        "bytes": 35662
+      },
+      "src/crypto/md5.rs": {
+        "sha256": "619d740c54d70adb98ceb45a163df0197b54e74d5ed7a4d4ef4081f9992030f7",
+        "bytes": 4031
+      },
+      "src/crypto/mod.rs": {
+        "sha256": "4d41713e81352bf26ac0014e9b834e78b2ce820a93db0be9a578daad54267fc5",
+        "bytes": 25379
+      },
+      "src/crypto/rc4.rs": {
+        "sha256": "4a37d4a2fc75663a280d4d17197d326696f29dd300b5c066d5d9c73431ed220b",
+        "bytes": 3619
+      },
+      "src/crypto/sha256.rs": {
+        "sha256": "fb87c10a1c658916e7eef01934a26666529f08d70be4de4531e33c9d4308f3ae",
+        "bytes": 4279
+      },
+      "src/crypto/sha384.rs": {
+        "sha256": "a0653063b53dd65cc9e487c5f91a800ca6282b1077873f5e4a68523ed6e21e2d",
+        "bytes": 1283
+      },
+      "src/crypto/sha512.rs": {
+        "sha256": "e6cdb0d530a2d424199437a75ce4a97471090b3ef3d5a2d572778caa04fb61c8",
+        "bytes": 5922
+      },
+      "src/data.rs": {
+        "sha256": "6ce1a7914b550c1741ea8fbf5c61147ad1abb604f26b977db2acdb0abda3c0ce",
+        "bytes": 3519
+      },
+      "src/filter/ascii_85.rs": {
+        "sha256": "df32c6783b1c1969f9b6b03de3bf204384dfdba767f7beefdd8baa8590387d24",
+        "bytes": 2893
+      },
+      "src/filter/ascii_hex.rs": {
+        "sha256": "3943384166df1f81f76c8f64a28766131dc947311d672d01ffa5fef05b0a30c8",
+        "bytes": 2931
+      },
+      "src/filter/ccitt.rs": {
+        "sha256": "aa1e293e0ed53032e211bccaa34316f3c2864b35401532f73761d1093b42acc9",
+        "bytes": 6092
+      },
+      "src/filter/dct.rs": {
+        "sha256": "48452c1817b0a95b079aff068c8a625078c90354978af1de4ff97142e6bb0dd2",
+        "bytes": 6496
+      },
+      "src/filter/jbig2.rs": {
+        "sha256": "72510774071f51f6e7e652d8f1cbfd45cc0b869e5ff0623808264d870f37a768",
+        "bytes": 3374
+      },
+      "src/filter/jpx.rs": {
+        "sha256": "e9514d7c085227cc065d11bca37c1e24c2ab3b5f9daffc35beaee38d88999f92",
+        "bytes": 4064
+      },
+      "src/filter/lzw_flate.rs": {
+        "sha256": "662c69fd6d715791ab122f3abde7fd45a0e7f29f9a6ce3749d7f0e23befcd14b",
+        "bytes": 41152
+      },
+      "src/filter/mod.rs": {
+        "sha256": "c922a32e6cceadf63ff48fa88322ba7a877f18591b8679dcbd762faac36b7ef3",
+        "bytes": 4818
+      },
+      "src/filter/png/mod.rs": {
+        "sha256": "810dd3a7c24a4fcc7309f0aef9ceff023b1ab03f713c6252dd5f5a62f165ac37",
+        "bytes": 13291
+      },
+      "src/filter/png/paeth.rs": {
+        "sha256": "095ff6a37ebf2263aa127cdf6c5313a708a89ac19070c530e1697173678c52eb",
+        "bytes": 11534
+      },
+      "src/filter/run_length.rs": {
+        "sha256": "8f25d6d2398c2574f642b78eadcc6c0b36b1e2053ee3b1ea874d000a1c8ee3c7",
+        "bytes": 1053
+      },
+      "src/lib.rs": {
+        "sha256": "9fc619e4791ffb30c59ce441e6e0434c04051c95b082881a363a887b8434bcb6",
+        "bytes": 3675
+      },
+      "src/log.rs": {
+        "sha256": "f32705bc40d499540f2d473087b75db707e4ce4c0f80d6f997432dfa64e4dba2",
+        "bytes": 916
+      },
+      "src/math.rs": {
+        "sha256": "df8573f9147368f464d35ba40a02cfbd388d68bc7b18a046afdc55131cc1177b",
+        "bytes": 1232
+      },
+      "src/metadata.rs": {
+        "sha256": "e7324559c77181ffd297f877f5eb00222ee0739ff8f2a83d1ebd4a948383af6d",
+        "bytes": 1505
+      },
+      "src/object/array.rs": {
+        "sha256": "5494a150e2a6c1f28cc14f3638a1bc7ecdfdc0396f1abb474d6823f88189a721",
+        "bytes": 12123
+      },
+      "src/object/bool.rs": {
+        "sha256": "67089f2d24e281a2106a8e2ab1bb452edaabf8f406ba31605fd9b62c88b3094a",
+        "bytes": 1355
+      },
+      "src/object/date.rs": {
+        "sha256": "3a6361f527f94c68d77c8164ab5286f78e669310adf9f034dc0eed88375ef213",
+        "bytes": 5460
+      },
+      "src/object/dict.rs": {
+        "sha256": "0353f469eff237ab9814077b9233a2fe1f00bfbe7944b6958f7dccdd85baf13f",
+        "bytes": 35123
+      },
+      "src/object/indirect.rs": {
+        "sha256": "4058b7f23880aab1cb0149fcfae225904afec180af521885608e0543c2dffc50",
+        "bytes": 1541
+      },
+      "src/object/mod.rs": {
+        "sha256": "01665bcc411c96878c300dc5336f7d1d0076f5cab6b4e46248545bebbfb69509",
+        "bytes": 12859
+      },
+      "src/object/name.rs": {
+        "sha256": "e8568327866a5f9cdd7c847bbd540b14bf5e8bc2f2b9cef9c91be3f11a9939e4",
+        "bytes": 8765
+      },
+      "src/object/null.rs": {
+        "sha256": "496d5ac107c5eb80085c4e00df35665c45d0d3364e75a9c4a453eca667d36c0e",
+        "bytes": 1370
+      },
+      "src/object/number.rs": {
+        "sha256": "a5d047e721210f115d371efd9da7831f4db6ae24c2c2acde83936cf2128d4a92",
+        "bytes": 16840
+      },
+      "src/object/rect.rs": {
+        "sha256": "0deae0ab94968507764d1943d5380289e84881e2994152f933bcdcf1d1495992",
+        "bytes": 2081
+      },
+      "src/object/ref.rs": {
+        "sha256": "142a8526c8ab9329304f0728973f2b90cc39335e63d6e003c6522728b571b55b",
+        "bytes": 5233
+      },
+      "src/object/stream.rs": {
+        "sha256": "9b3c8f02be8c1674460b03b8a81002f89e5babada625913ac86f4a5e262f340c",
+        "bytes": 12093
+      },
+      "src/object/string.rs": {
+        "sha256": "524df70328b3fd7c1daaeb68780a39ae5b30bcb226418fff98d518d8d5e1f61f",
+        "bytes": 14680
+      },
+      "src/object/tuple.rs": {
+        "sha256": "eeaf3f14a962fc98a109d1a74d7e70e069816d909e5e55766361658ef7b26aea",
+        "bytes": 4730
+      },
+      "src/page.rs": {
+        "sha256": "ab7daecb8577edc930ccc375499bb2c37750fd7d89d2b5f7068800668296094d",
+        "bytes": 16467
+      },
+      "src/pdf.rs": {
+        "sha256": "b6938cd27757a20dca83b49db46d73ab32a0ca2a474a0c4517d1d82b71a1be1c",
+        "bytes": 4867
+      },
+      "src/reader.rs": {
+        "sha256": "df4c382a103e9ac16dc334555c74bca895a3a6df63e4cf641ab3bd0d8c0e4aff",
+        "bytes": 7939
+      },
+      "src/sync.rs": {
+        "sha256": "dca31dec87ec6def80582f852e475b0899cfbc0110fe0cd78c968a0fbfbade4b",
+        "bytes": 2498
+      },
+      "src/transform.rs": {
+        "sha256": "40cf670b296220e7a7737dacc80eff888d42275d026fe17269a2458866a60fc8",
+        "bytes": 1526
+      },
+      "src/trivia.rs": {
+        "sha256": "0e90f8a7c82627cfeb2cbe0922bff15a9a2a1929da5f59549cfdd09792df357e",
+        "bytes": 2089
+      },
+      "src/util.rs": {
+        "sha256": "11b6575e6482a184f35e1cce81d64eb39420fbe4e79fde97f63d37884a7cdaa7",
+        "bytes": 5588
+      },
+      "src/xref.rs": {
+        "sha256": "d47d685393a65ecaacc8b6ee3ab5d7bd3e659e84e6a5ae855de8c41c20a66bd0",
+        "bytes": 37967
+      }
+    }
+  },
+  "behavior": [
+    "Keep complete original crate and original Cargo feature/dependency/default settings, VCS metadata and both license texts.",
+    "Record the initial sign so + and - PDFJS zero tokens read consistently.",
+    "Consume the existing skip-compatible minus suffix and optional first decimal point without incorporating suffix digits into the numeric value.",
+    "Keep number_end at the first trailing minus for overflow fallback; preserve integer/real prefix and ordinary numeric values.",
+    "Apply issue994 regular-character rejection before returning zero; invalid +abc/-abc/-.abc do not bypass token validation.",
+    "Keep Number::skip and ArrayIter unchanged. Do not catch, ignore or hide iterator panics.",
+    "Patch app Cargo.toml to exact-version local crate and remove only this one package registry source/checksum from Cargo.lock."
+  ],
+  "tests": {
+    "schema": 1,
+    "stage": "parser-probe-passed-full-native-CI-pending",
+    "originalCrateFiles": 59,
+    "originalCrateExtractedBytes": 519602,
+    "vendoredUnchangedFiles": 58,
+    "changedPaths": 62,
+    "baselineSourceFiles": 1645,
+    "baselineSourceBytes": 41139969,
+    "patchForwardReverseExact": true,
+    "unrelatedSourceByteIdentical": true,
+    "originalNumberTestsByteIdentical": 29,
+    "originalArrayTestsByteIdentical": 14,
+    "newParserTestsPassed": 8,
+    "boundedGrammarCases": 1098056,
+    "originalNewRegressionFailures": 7,
+    "originalNewRegressionSuccesses": 1,
+    "fullApplicationBuildRun": false,
+    "fullApplicationTestsRun": false,
+    "originalCrateAllFeatureTestsRun": false,
+    "offlineLockedMetadata": "passed; no lock rewrite",
+    "changedDeltaWhitespaceCheck": "passed",
+    "vendoredOriginalWhitespace": "18 pre-existing trailing-whitespace lines retained unchanged in 5 original files",
+    "added": [
+      "number_skip_read_regressions::bare_sign_zero_preserves_pdfjs_operand_boundaries",
+      "number_skip_read_regressions::trailing_minus_quirks_keep_prefix_value_and_consume_whole_token",
+      "number_skip_read_regressions::ordinary_numeric_values_remain_unchanged",
+      "number_skip_read_regressions::invalid_regular_boundaries_reject_and_restore_reader",
+      "number_skip_read_regressions::accepted_numeric_grammar_always_reads_the_same_extent",
+      "array_number_skip_read_regressions::validated_numeric_quirks_iterate_as_one_item_each",
+      "array_number_skip_read_regressions::bare_signs_before_pdfjs_string_operands_preserve_following_items",
+      "array_number_skip_read_regressions::nested_validated_arrays_preserve_numeric_item_counts"
+    ],
+    "commands": [
+      "cargo test --release --locked --target <target> -p vectorcraft-pdf --test hayro_number_tokens",
+      "Keep and run the original full native build/core test commands unchanged."
+    ]
+  },
+  "integrationNotes": [
+    "Reviewed whole original crate vendored with exact published archive and full original license/source inventory.",
+    "Original engine suite retained; native build additionally runs cargo test --release --locked --target <target> -p vectorcraft-pdf --test hayro_number_tokens.",
+    "Original vendored crate dev-dependencies retained; complete hayro crate unit suites were not run by the minimal parser probe."
+  ]
+}

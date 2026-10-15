@@ -246,7 +246,15 @@
         "app": "vectorcraft",
         "cli": "vectorcraft-cli"
       },
-      "windowsGuiVersionCheck": "stdout"
+      "windowsGuiVersionCheck": "stdout",
+      "functionalFixes": [
+        {
+          "patch": "patches/vector/functional-hayro-number-token.patch",
+          "sha256": "79426aae933d271d108a0c731c01a1359fe0e292a3d71b94f5c9978ff0a1ff3c",
+          "manifest": "patches/vector/functional-hayro-number-token.json",
+          "manifestSha256": "9c23dd7fd39e9018b50fed8056d2c41d0ac2fa9274469667df15a08484ae80a2"
+        }
+      ]
     },
     {
       "id": "film",
