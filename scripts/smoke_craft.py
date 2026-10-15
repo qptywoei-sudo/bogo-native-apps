@@ -32,6 +32,24 @@ APPS = {
  'cad':('cadcraft','0.7.0','fc4e98315a8d771b5ab832f0ade0b5e7b106df7f','editable DXF geometry; exact coordinates/radius after reopen and SVG/PDF/PNG export'),
 }
 
+def pinned_cli_version(app, output, expected_name, expected_version, source_commit):
+ """Normalize only the exact pinned PDF footer; retain strict CLI identity checks."""
+ if not isinstance(output,str) or len(output)>4096 or app not in set(APPS)|{'word','grid','deck'}:return None
+ if app=='pdf':
+  stem,version,commit,_=APPS['pdf']
+  if (expected_name,expected_version,source_commit)!=(stem+'-cli',version,commit):return None
+  first=expected_name+' '+expected_version
+  # Original pdfcraft 9931329b main.rs::version() and engine/src/links.rs.
+  # Every line/link is required. Arbitrary footers, extra lines and credits from
+  # another source pin must not be treated as an acceptable native identity.
+  original=(first+'\nDiscord: https://discord.gg/artcraft  (help and feedback)\n'
+            'Web:     https://getartcraft.com/apps/pdfcraft\n'
+            'Source:  https://github.com/storytold/pdfcraft\n')
+  return first if output.replace('\r\n','\n')==original else None
+ candidate=output.strip()
+ expected=re.escape(expected_name)+' '+re.escape(expected_version)+r'(?: \([0-9a-f]+\))?'
+ return candidate if re.fullmatch(expected,candidate) is not None else None
+
 def compact(value):
  return json.dumps(value,ensure_ascii=False,separators=(',',':'))
 
@@ -378,8 +396,9 @@ def main(argv=None):
  if out.is_symlink() or (out.exists() and (not out.is_dir() or any(out.iterdir()))):parser.error('choose a fresh, empty output directory; no previous files are replaced')
  out.mkdir(parents=True,exist_ok=True);out=out.resolve();s=Smoke(args.app,cli,out);error=None
  try:
-  version=s.call('00-version',['--version']).strip();stem,want,_,_=APPS[args.app];prefix='SoundCraft CLI' if args.app=='sound' else stem+'-cli'
-  s.check('Actual pinned native CLI version',re.fullmatch(re.escape(prefix)+' '+re.escape(want)+r'(?: \([0-9a-f]+\))?',version) is not None,version)
+  raw_version=s.call('00-version',['--version']);stem,want,commit,_=APPS[args.app];prefix='SoundCraft CLI' if args.app=='sound' else stem+'-cli'
+  version=pinned_cli_version(args.app,raw_version,prefix,want,commit)
+  s.check('Actual pinned native CLI version',version is not None,raw_version)
   if args.app in ('light','pdf'):
    from smoke_craft_documents import light,pdf
    function={'light':light,'pdf':pdf}[args.app]

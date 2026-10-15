@@ -359,6 +359,15 @@ class NativeFileQATests(unittest.TestCase):
         with patch.object(qa.full, 'assert_host'), self.assertRaisesRegex(ValueError, 'never reuse'):
             qa.smoke(RUN, 'word', 'windows-x64', root)
 
+    def test_native_qa_uses_the_same_shared_strict_version_helper_with_lock_identity(self):
+        root, _ = self.collection()
+        with patch.object(qa.smoke_craft, 'pinned_cli_version', wraps=qa.smoke_craft.pinned_cli_version) as helper:
+            result, _ = self.simulate(root)
+        version = 'wordcraft-cli ' + self.lock['upstreamVersion']
+        helper.assert_called_once_with('word', version, self.lock['versionOutputNames']['cli'],
+                                       self.lock['upstreamVersion'], self.lock['source']['commit'])
+        self.assertEqual(result['cliVersion'], version)
+
     def test_plan_failed_content_command_and_wrong_native_version_never_pass(self):
         for options in [dict(native_status='not_run'), dict(native_status='failed'), dict(bad_check=True),
                         dict(wrong_version=True), dict(command_failure=True)]:

@@ -8,6 +8,7 @@ import struct
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 import zlib
 from pathlib import Path
 
@@ -35,6 +36,67 @@ def wav(audio, encoding=1, bits=24):
 
 
 class CraftSmokeChecks(unittest.TestCase):
+    def pdf_version_output(self):
+        return ('pdfcraft-cli 0.8.0\n'
+                'Discord: https://discord.gg/artcraft  (help and feedback)\n'
+                'Web:     https://getartcraft.com/apps/pdfcraft\n'
+                'Source:  https://github.com/storytold/pdfcraft\n')
+
+    def test_exact_pinned_pdf_original_four_lines_normalize_only_after_full_validation(self):
+        raw = self.pdf_version_output()
+        commit = '9931329b9fae0b05373b4dc3ac7c58541f0891a4'
+        self.assertEqual(smoke.pinned_cli_version('pdf', raw, 'pdfcraft-cli', '0.8.0', commit), 'pdfcraft-cli 0.8.0')
+        self.assertEqual(smoke.pinned_cli_version('pdf', raw.replace('\n', '\r\n'), 'pdfcraft-cli', '0.8.0', commit), 'pdfcraft-cli 0.8.0')
+        for name, version, source in [('KIO PDF', '0.8.0', commit), ('pdfcraft-cli', '0.8.1', commit),
+                                      ('pdfcraft-cli', '0.8.0', '0' * 40)]:
+            with self.subTest(name=name, version=version, source=source):
+                self.assertIsNone(smoke.pinned_cli_version('pdf', raw, name, version, source))
+
+    def test_pdf_missing_arbitrary_or_modified_footer_and_extra_lines_are_rejected(self):
+        raw = self.pdf_version_output()
+        invalid = [raw.splitlines()[0], raw.splitlines()[0] + '\n', raw[:-1], '\n' + raw, raw + '\n', raw + 'extra\n',
+                   raw.replace('0.8.0', '0.8.1'), raw.replace('pdfcraft-cli', 'other-cli'),
+                   raw.replace('0.8.0\n', '0.8.0 (123abc)\n'), raw.replace('0.8.0\n', '0.8.0 secret-token\n'),
+                   raw.replace('https://discord.gg/artcraft', 'https://discord.gg/other'),
+                   raw.replace('https://getartcraft.com/apps/pdfcraft', 'https://getartcraft.com/apps/pdfcraft?token=private'),
+                   raw.replace('https://github.com/storytold/pdfcraft', 'https://unrelated.example/source'),
+                   raw.replace('  (help and feedback)', ' (help and feedback)'),
+                   raw.replace('Web:     ', 'Web: '), raw.replace('Source:', 'Source: ' + chr(27) + '[31m'),
+                   raw + '\0', raw.replace('Discord:', 'Discord:\r'), raw + 'Authorization: Bearer private\n',
+                   raw + raw, 'pdfcraft-cli 0.8.0\nSome unrelated footer\n']
+        for output in invalid:
+            with self.subTest(output=repr(output)):
+                self.assertIsNone(smoke.pinned_cli_version('pdf', output, 'pdfcraft-cli', '0.8.0', smoke.APPS['pdf'][2]))
+
+    def test_other_app_lock_names_versions_and_single_line_contract_stay_strict(self):
+        root = Path(__file__).resolve().parents[1]
+        locks = json.loads((root / 'manifests/full-native-apps.json').read_text())['applications']
+        for lock in locks:
+            if lock['id'] == 'pdf':
+                continue
+            app, name, version, commit = lock['id'], lock['versionOutputNames']['cli'], lock['upstreamVersion'], lock['source']['commit']
+            raw = name + ' ' + version
+            with self.subTest(app=app):
+                self.assertEqual(smoke.pinned_cli_version(app, raw + '\n', name, version, commit), raw)
+                self.assertEqual(smoke.pinned_cli_version(app, raw + ' (123abc)\n', name, version, commit), raw + ' (123abc)')
+                for invalid in [raw + '\nDiscord: https://discord.gg/artcraft\n', raw + '\nextra\n', raw + ' token',
+                                raw.replace(version, '99.0.0'), raw.replace(name, 'wrong-cli'), raw + '\0']:
+                    self.assertIsNone(smoke.pinned_cli_version(app, invalid, name, version, commit))
+                self.assertIsNone(smoke.pinned_cli_version(app, self.pdf_version_output(), name, version, commit))
+        self.assertIsNone(smoke.pinned_cli_version('unknown', 'unknown-cli 0.8.0', 'unknown-cli', '0.8.0', '0' * 40))
+
+    def test_main_uses_shared_pinned_version_check_and_keeps_raw_stdout_evidence(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / 'version-check'
+            with patch.object(smoke, 'pinned_cli_version', wraps=smoke.pinned_cli_version) as helper, contextlib.redirect_stdout(io.StringIO()):
+                result = smoke.main(['--app', 'photo', '--cli', str(Path(sys.executable).resolve()), '--output', str(output)])
+            self.assertEqual(result, 1)
+            raw = (output / '00-version.stdout.txt').read_text()
+            helper.assert_called_once_with('photo', raw, 'photocraft-cli', '0.9.0', smoke.APPS['photo'][2])
+            report = json.loads((output / 'report.json').read_text())
+            self.assertEqual(report['checks'][0]['detail'], raw)
+            self.assertFalse(report['checks'][0]['passed'])
+
     def test_plans_match_all_ten_immutable_native_sources_without_claiming_execution(self):
         root = Path(__file__).resolve().parents[1]
         locks = {row['id']: row for row in json.loads((root / 'manifests/full-native-apps.json').read_text())['applications']}

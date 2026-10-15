@@ -20,6 +20,7 @@ import zipfile
 
 import collect_ci_artifact as collector
 import full_native as full
+import smoke_craft
 
 ROOT = Path(__file__).resolve().parents[1]
 APPS = full.IDS
@@ -243,9 +244,9 @@ def smoke(run, app, platform, output):
                       bundleManifestSha256=full.digest(root / 'bundle-manifest.json'), tokenPassedToNative=False)
         save_report(root, report)
         report['executedNativeBinaries'] = True
-        version = run_process([cli, '--version'], env, root / 'runtime-profile', root / 'version.stdout.txt', root / 'version.stderr.txt', 60).strip()
-        expected = re.escape(lock['versionOutputNames']['cli']) + ' ' + re.escape(lock['upstreamVersion']) + r'(?: \([0-9a-f]+\))?'
-        require(re.fullmatch(expected, version) is not None, 'Actual native CLI version differs from the pinned source contract')
+        raw_version = run_process([cli, '--version'], env, root / 'runtime-profile', root / 'version.stdout.txt', root / 'version.stderr.txt', 60)
+        version = smoke_craft.pinned_cli_version(app, raw_version, lock['versionOutputNames']['cli'], lock['upstreamVersion'], lock['source']['commit'])
+        require(version is not None, 'Actual native CLI version differs from the pinned source contract')
         helper = 'smoke_word.py' if app == 'word' else 'smoke_office.py' if app in ('grid', 'deck') else 'smoke_craft.py'
         command = [sys.executable, ROOT / 'scripts' / helper]
         if app != 'word':
