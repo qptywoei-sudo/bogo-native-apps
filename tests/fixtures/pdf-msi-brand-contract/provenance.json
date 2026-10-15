@@ -1,0 +1,57 @@
+{
+  "schema": "kio.pdf-msi-brand-contract-fixtures.v1",
+  "upstreamSource": {
+    "kind": "source",
+    "repository": "storytold/pdfcraft",
+    "commit": "9931329b9fae0b05373b4dc3ac7c58541f0891a4",
+    "tag": "v0.8.0",
+    "url": "https://codeload.github.com/storytold/pdfcraft/tar.gz/9931329b9fae0b05373b4dc3ac7c58541f0891a4",
+    "root": "pdfcraft-9931329b9fae0b05373b4dc3ac7c58541f0891a4",
+    "sha256": "953f32944503e09323c4d66aac2528974cb04f94acfc1a4dfe50c1a86f0091ed",
+    "bytes": 14600876,
+    "archiveMembers": 1550,
+    "localCacheFile": ".cache/archives/pdfcraft-9931329b9fae0b05373b4dc3ac7c58541f0891a4.tar.gz",
+    "reuse": "downloaded pinned public codeload source",
+    "verifiedAgainstPriorLock": true,
+    "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+  },
+  "brandingPatchSha256": "c3a7a7302acfb8c357e6524a6bc454e7b0108ae9117c24649072e65f4e927d5e",
+  "files": [
+    {
+      "file": "before/packaging/windows/pdfcraft.wxs",
+      "sourcePath": "packaging/windows/pdfcraft.wxs",
+      "bytes": 16873,
+      "sha256": "0be7eb9beb2b8ad3e266c5a6951424acc4a22c5a05bb72bf85a5369a2bd65f40",
+      "originalUpstreamBytes": 16954,
+      "originalUpstreamSha256": "68e1269ba3340bc105a01863687bea6fc67a15303a9cb6ca5ceddd0f727bedea",
+      "originalArchiveMember": "pdfcraft-9931329b9fae0b05373b4dc3ac7c58541f0891a4/packaging/windows/pdfcraft.wxs"
+    },
+    {
+      "file": "before/packaging/windows/test-msi.ps1",
+      "sourcePath": "packaging/windows/test-msi.ps1",
+      "bytes": 14496,
+      "sha256": "f631acf80a2ee1d14b0fb493fd2c18fdd0fbcc983e0f2ab30867780758578103",
+      "originalUpstreamBytes": 14506,
+      "originalUpstreamSha256": "0234bf90f87de956ed5e683e0958c1d6a474273da0f63d4816976acc94650c4b",
+      "originalArchiveMember": "pdfcraft-9931329b9fae0b05373b4dc3ac7c58541f0891a4/packaging/windows/test-msi.ps1"
+    },
+    {
+      "file": "before/packaging/windows/installer-ui.wxs",
+      "sourcePath": "packaging/windows/installer-ui.wxs",
+      "bytes": 8444,
+      "sha256": "ab02462f1e12c09f2bbd912035ec8cf13537390f756a8ea060db9e3d96af6627",
+      "originalUpstreamBytes": 8444,
+      "originalUpstreamSha256": "ab02462f1e12c09f2bbd912035ec8cf13537390f756a8ea060db9e3d96af6627",
+      "originalArchiveMember": "pdfcraft-9931329b9fae0b05373b4dc3ac7c58541f0891a4/packaging/windows/installer-ui.wxs"
+    },
+    {
+      "file": "upstream-test-msi.ps1",
+      "sourcePath": "packaging/windows/test-msi.ps1",
+      "bytes": 14506,
+      "sha256": "0234bf90f87de956ed5e683e0958c1d6a474273da0f63d4816976acc94650c4b",
+      "originalArchiveMember": "pdfcraft-9931329b9fae0b05373b4dc3ac7c58541f0891a4/packaging/windows/test-msi.ps1"
+    }
+  ],
+  "upstreamTestBodyOnlyPreviouslyRebrandedDisplayNames": true,
+  "nativeApplicationExecuted": false
+}

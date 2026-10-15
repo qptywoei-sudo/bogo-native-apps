@@ -540,6 +540,81 @@ def add_msi_notices(original, lock, license_dir):
     return original.replace('</Wix>', fragment + '</Wix>'), len(components)
 
 
+_PDF_MSI_BRAND_CONTRACT = (
+    ('packaging/windows/pdfcraft.wxs',
+     16873, '0be7eb9beb2b8ad3e266c5a6951424acc4a22c5a05bb72bf85a5369a2bd65f40',
+     16870, 'f35f1b3371bc5667e12247475e2c77d3e1f677712d97f5e30b832295f7af0885', (
+         ('Message="PdfCraft must be installed for all users.', 'Message="KIO PDF must be installed for all users.'),
+         ('DowngradeErrorMessage="A newer version of PdfCraft is already installed."', 'DowngradeErrorMessage="A newer version of KIO PDF is already installed."'),
+         ('Title="PdfCraft" Level="1"', 'Title="KIO PDF" Level="1"'))),
+    ('packaging/windows/test-msi.ps1',
+     14496, 'f631acf80a2ee1d14b0fb493fd2c18fdd0fbcc983e0f2ab30867780758578103',
+     14478, 'a73eac48220b234d863a7793ca5c8d01a93f2d8689759e953f8ad9cb4895f4d8', (
+         ("Assert-Equal $manufacturer[0] 'Learning Machines LLC' 'MSI manufacturer'", "Assert-Equal $manufacturer[0] 'KIO' 'MSI manufacturer'"),
+         ('\\shell\\KIO PDF.CreatePdf', '\\shell\\KIO.PDF.CreatePdf'),
+         ('\\shell\\KIO PDF.Edit', '\\shell\\KIO.PDF.Edit'))),
+    ('packaging/windows/installer-ui.wxs',
+     8444, 'ab02462f1e12c09f2bbd912035ec8cf13537390f756a8ea060db9e3d96af6627',
+     8443, '92e54b5ea2430e227217c590c332d2f8763ac695e1e7c54e2753549dc08f8625', (
+         ('Text="Add &quot;&amp;Edit with PdfCraft&quot; to the right-click menu of PDF files"',
+          'Text="Add &quot;&amp;Edit with KIO PDF&quot; to the right-click menu of PDF files"'),)),
+)
+
+
+def pdf_msi_brand_contract(lock, source, project):
+    """Correct seven authenticated installer-identity strings in the Windows copy only.
+
+    Keep the prepared workspace, compiled inputs, original MSI evaluator and all
+    eight scope cases intact. Unknown source/branding/file bytes fail closed.
+    """
+    if lock['id'] != 'pdf':
+        return {'status': 'not-applicable'}
+    require(lock['upstreamVersion'] == '0.8.0' and lock['name'] == 'KIO PDF'
+            and lock['source']['commit'] == '9931329b9fae0b05373b4dc3ac7c58541f0891a4'
+            and lock['branding']['sha256'] == 'c3a7a7302acfb8c357e6524a6bc454e7b0108ae9117c24649072e65f4e927d5e',
+            'Unreviewed PDF MSI source or branding contract')
+    source, project = Path(source), Path(project)
+    require(project.name == 'original-msi-project' and project.is_dir() and not project.is_symlink()
+            and not project.resolve().is_relative_to(source.resolve())
+            and not source.resolve().is_relative_to(project.resolve()),
+            'PDF MSI repair requires a separate original-msi-project copy')
+    pending, records = [], []
+    for relative, before_bytes, before_sha, after_bytes, after_sha, replacements in _PDF_MSI_BRAND_CONTRACT:
+        path, original = project / relative, source / relative
+        for root, item in ((project, path), (source, original)):
+            require(item.is_file() and not item.is_symlink(), 'PDF MSI input must be a regular file: ' + relative)
+            for parent in item.parents:
+                require(not parent.is_symlink(), 'PDF MSI input has a symlink ancestor')
+                if parent == root:
+                    break
+        data = path.read_bytes()
+        require(len(data) == before_bytes and hashlib.sha256(data).hexdigest() == before_sha
+                and original.read_bytes() == data, 'PDF MSI exact before bytes differ: ' + relative)
+        text, changes = data.decode('utf-8'), []
+        for before, after in replacements:
+            require(text.count(before) == 1, 'PDF MSI identity replacement count differs: ' + relative)
+            text = text.replace(before, after)
+            changes.append({'before': before, 'after': after, 'count': 1})
+        result = text.encode('utf-8')
+        require(len(result) == after_bytes and hashlib.sha256(result).hexdigest() == after_sha,
+                'PDF MSI exact after bytes differ: ' + relative)
+        pending.append((path, original, data, result))
+        records.append({'path': relative, 'beforeBytes': before_bytes, 'beforeSha256': before_sha,
+                        'afterBytes': after_bytes, 'afterSha256': after_sha,
+                        'replacementCount': len(changes), 'replacements': changes})
+    require(sum(row['replacementCount'] for row in records) == 7, 'PDF MSI requires exactly seven identity corrections')
+    # Authenticate every input and computed output before changing any stage file.
+    for path, _, _, result in pending:
+        path.write_bytes(result)
+    require(all(original.read_bytes() == before for _, original, before, _ in pending),
+            'Prepared PDF MSI inputs changed unexpectedly')
+    return {'status': 'applied-to-windows-copy-only', 'sourceCommit': lock['source']['commit'],
+            'brandingPatchSha256': lock['branding']['sha256'], 'files': records,
+            'replacementCount': 7, 'phase': 'before-additional-license-components',
+            'preparedSourceFilesUnchanged': True,
+            'originalMsiEvaluatorAndEightScopeCases': 'retained'}
+
+
 def original_windows_msi(lock, source, license_dir, stage, env, destination):
     # Use a separate full project copy so the prepared, fingerprinted source remains immutable.
     project = stage / 'original-msi-project'
@@ -548,6 +623,7 @@ def original_windows_msi(lock, source, license_dir, stage, env, destination):
         out = project / relative
         out.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(p, out)
+    pdf_brand_contract = pdf_msi_brand_contract(lock, source, project)
     wxs = project / 'packaging/windows' / (lock['binaries']['app'] + '.wxs')
     text, count = add_msi_notices(wxs.read_text(encoding='utf-8'), lock, license_dir)
     wxs.write_text(text, encoding='utf-8')
@@ -562,7 +638,7 @@ def original_windows_msi(lock, source, license_dir, stage, env, destination):
     require(len(candidates) == 1 and candidates[0].is_file() and not candidates[0].is_symlink(), 'Original native MSI was not produced')
     require(candidates[0].read_bytes()[:8] == b'\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1', 'Invalid MSI container')
     shutil.copyfile(candidates[0], destination)
-    return {'originalScript': 'packaging/windows/package.ps1', 'skipBuild': True, 'architecture': 'x64', 'addedOriginalLicenseFiles': count, 'upstreamInstallerBehavior': 'retained', 'publisherCertificate': False}
+    return {'originalScript': 'packaging/windows/package.ps1', 'skipBuild': True, 'architecture': 'x64', 'addedOriginalLicenseFiles': count, 'upstreamInstallerBehavior': 'retained', 'publisherCertificate': False, 'stagedPdfBrandContract': pdf_brand_contract}
 
 
 def artifact_base(lock, kind):
@@ -621,6 +697,12 @@ def public_files(lock):
                   'tests/fixtures/cad-plotter-api/crates/doc/src/lib.rs',
                   'tests/fixtures/cad-plotter-api/crates/doc/src/plotter.rs'})
     files.add('tests/test_design_recovery_fix.py')
+    files.update({'tests/test_pdf_msi_brand_contract.py',
+                  'tests/fixtures/pdf-msi-brand-contract/provenance.json',
+                  'tests/fixtures/pdf-msi-brand-contract/upstream-test-msi.ps1',
+                  'tests/fixtures/pdf-msi-brand-contract/before/packaging/windows/pdfcraft.wxs',
+                  'tests/fixtures/pdf-msi-brand-contract/before/packaging/windows/test-msi.ps1',
+                  'tests/fixtures/pdf-msi-brand-contract/before/packaging/windows/installer-ui.wxs'})
     # Small original XML fixtures make the installer collision tests independent
     # of the source archive cache. Include the exact Launcher branding input too.
     files.update('tests/fixtures/windows-identity/' + app + '.wxs' for app in (*IDS, 'launcher'))
