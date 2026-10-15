@@ -337,6 +337,169 @@ def copy_license_tree(source, destination, public_validator=None):
 
 _UPSTREAM_NOTICE_CACHE = {}
 
+# Reviewed published archives contain a dual-license declaration but omit a
+# standalone license even at their exact VCS revision. These are not general
+# license-expression exceptions: every original file is authenticated below.
+# Archive SHA/bytes and canonical path->SHA maps came from the four published
+# .crate files (217,604 compressed bytes in total), not mutable repository HEADs.
+_REVIEWED_DECLARED_LICENSES = {
+    "cms-0.2.3": {
+        "name": "cms", "version": "0.2.3", "repository": "https://github.com/RustCrypto/formats/tree/master/cms",
+        "vcsRepository": "RustCrypto/formats", "commit": "5821a21553509dbd03eae593b0a1fad4e2083d4e", "pathInVcs": "cms",
+        "license": "Apache-2.0 OR MIT", "authors": ["RustCrypto Developers"],
+        "archiveSha256": "7b77c319abfd5219629c45c34c89ba945ed3c5e49fcde9d16b6c3885f118a730", "archiveBytes": 179143,
+        "filesManifestSha256": "3566b00b46b7b42cc0d6ed4424764f7d60db435144b2b68d2ae9671bb501caca", "fileCount": 62, "sourceBytes": 538193,
+        "publicTestCertificates": {"tests/examples/example.pfx": {"bytes": 1516, "sha256": "94e84d9a00ed9545104823d95aab3741bb1544197f282e4031844f9ef40a05a6"}},
+    },
+    "fmt-derive-0.1.2": {
+        "name": "fmt-derive", "version": "0.1.2", "repository": "https://github.com/danielschemmel/fmt-derive",
+        "vcsRepository": "danielschemmel/fmt-derive", "commit": "3f1abe44dc5e36e467565d3bf636faba5193f2a1", "pathInVcs": "fmt-derive",
+        "license": "MIT OR Apache-2.0", "authors": ["Daniel Schemmel <daniel@schemmel.net>"],
+        "archiveSha256": "1cb4a4b45c26455885f8b462db12978e51f60cc914337bccb9a36faf93410169", "archiveBytes": 5201,
+        "filesManifestSha256": "b35a3d17158fbc7ab8c2419e88b3bd582d78371b871e6f8a9e09830742ee7439", "fileCount": 14, "sourceBytes": 20515,
+        "publicTestCertificates": {},
+    },
+    "fmt-derive-proc-0.1.2": {
+        "name": "fmt-derive-proc", "version": "0.1.2", "repository": "https://github.com/danielschemmel/fmt-derive",
+        "vcsRepository": "danielschemmel/fmt-derive", "commit": "3f1abe44dc5e36e467565d3bf636faba5193f2a1", "pathInVcs": "fmt-derive-proc",
+        "license": "MIT OR Apache-2.0", "authors": ["Daniel Schemmel <daniel@schemmel.net>"],
+        "archiveSha256": "7704da0760734344ce8753f15b21e97c6be85dc5a8f2c3a963fbd042b3380d23", "archiveBytes": 4154,
+        "filesManifestSha256": "d7018a1d32aeed2ada20bbf7111847a834df461d6d31eeb70785542163c89101", "fileCount": 12, "sourceBytes": 24276,
+        "publicTestCertificates": {},
+    },
+    "rustls-cng-0.7.1": {
+        "name": "rustls-cng", "version": "0.7.1", "repository": "https://github.com/rustls/rustls-cng",
+        "vcsRepository": "rustls/rustls-cng", "commit": "b9126716029a105a08c1786993922103d9865bad", "pathInVcs": "",
+        "license": "MIT/Apache-2.0", "authors": ["Dmitry Pankratov <dmitry@pankratov.net>"],
+        "archiveSha256": "3eeed9c3e96253f36d1cfdd593388ecca775b532b6ff0c649a3010f6af60fe70", "archiveBytes": 29106,
+        "filesManifestSha256": "1cf3147636b5ca0f8d1e9bcf88cddb6527dc8fb6630cfe741b175c22ab9b85b9", "fileCount": 24, "sourceBytes": 87184,
+        "publicTestCertificates": {
+            "tests/assets/rustls-client.pfx": {"bytes": 2193, "sha256": "34fc3c153299596d2670c03aeb66dc272470e88453f60b3b0df54e7d0eb90164"},
+            "tests/assets/rustls-ec.p12": {"bytes": 2249, "sha256": "189ffc17f91de863c32623757201684dfae1ac08017d5ecd180d066c5eaacd2c"},
+            "tests/assets/rustls-server.pfx": {"bytes": 2257, "sha256": "4e0d0154a09176d129a6c3cacb82024409b6fe4fe541b3c1af9bfb1e60ea54ff"},
+        },
+    },
+}
+
+
+def _reviewed_json(path):
+    require(path.is_file() and not path.is_symlink() and 0 < path.stat().st_size <= 1024 * 1024, "Invalid reviewed crate metadata")
+
+    def unique(pairs):
+        result = {}
+        for key, value in pairs:
+            require(key not in result, "Duplicate reviewed crate JSON key")
+            result[key] = value
+        return result
+
+    return json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=unique)
+
+
+def reviewed_declared_license(package, folder, destination):
+    """Retain four reviewed, byte-authenticated original crates and a labelled MIT body."""
+    label = package["name"] + "-" + package["version"]
+    pin = _REVIEWED_DECLARED_LICENSES.get(label)
+    require(pin is not None, "Crate has no reviewed omitted-license exception: " + label)
+    require(all(package.get(key) == pin[key] for key in ("name", "version", "repository", "license", "authors")) and
+            package.get("source") == "registry+https://github.com/rust-lang/crates.io-index" and not package.get("license_file"),
+            "Reviewed crate metadata differs from its exact published declaration: " + label)
+    require(folder.is_dir() and not folder.is_symlink(), "Invalid reviewed crate source directory")
+    checksum_path = folder / ".cargo-checksum.json"
+    checksum = _reviewed_json(checksum_path)
+    require(isinstance(checksum, dict) and set(checksum) == {"files", "package"} and checksum["package"] == pin["archiveSha256"],
+            "Reviewed crate package checksum mismatch: " + label)
+    hashes = checksum["files"]
+    require(isinstance(hashes, dict) and len(hashes) == pin["fileCount"] and
+            all(isinstance(name, str) and isinstance(value, str) and HEX.fullmatch(value) for name, value in hashes.items()),
+            "Invalid reviewed crate file checksum map: " + label)
+    canonical = json.dumps(hashes, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    require(hashlib.sha256(canonical).hexdigest() == pin["filesManifestSha256"], "Reviewed crate published file manifest mismatch: " + label)
+    require(all(name in hashes for name in ("Cargo.toml", "Cargo.toml.orig", ".cargo_vcs_info.json", "README.md")),
+            "Reviewed declaration source files missing")
+    vcs = _reviewed_json(folder / ".cargo_vcs_info.json")
+    require(isinstance(vcs, dict) and isinstance(vcs.get("git"), dict) and vcs["git"].get("sha1") == pin["commit"] and vcs.get("path_in_vcs") == pin["pathInVcs"],
+            "Reviewed crate immutable VCS identity mismatch: " + label)
+    # Do not use regular_files() here: it intentionally skips .git/__pycache__,
+    # whereas an exact published-crate copy must reject every extra path.
+    actual = {}
+    for base, directories, filenames in os.walk(folder, followlinks=False):
+        for name in directories:
+            require(not (Path(base) / name).is_symlink(), "Reviewed crate directory symlink refused")
+            check_public_path((Path(base) / name).relative_to(folder).as_posix())
+        for name in filenames:
+            path = Path(base) / name
+            require(path.is_file() and not path.is_symlink(), "Reviewed crate link or special file refused")
+            relative = path.relative_to(folder).as_posix()
+            safe_relative(relative)
+            actual[relative] = path
+    # Cargo creates .cargo-ok after unpacking. It is not published source and
+    # is never copied. The generated checksum file is retained as evidence.
+    allowed = set(hashes) | {".cargo-checksum.json"}
+    if ".cargo-ok" in actual:
+        require(actual[".cargo-ok"].stat().st_size <= 1024, "Unexpected Cargo unpack marker size")
+        allowed.add(".cargo-ok")
+    require(set(actual) == allowed, "Reviewed crate has missing or additional source files: " + label)
+    original, total = [], 0
+    for relative, expected in sorted(hashes.items()):
+        path = actual[relative]
+        size = path.stat().st_size
+        require(size <= 2 * 1024 * 1024 and digest(path) == expected, "Reviewed crate source checksum mismatch: " + relative)
+        total += size
+        try:
+            check_public_path(relative)
+        except ValueError:
+            certificate = pin["publicTestCertificates"].get(relative)
+            require(certificate is not None and certificate == {"bytes": size, "sha256": expected},
+                    "Unreviewed private filename in original crate: " + relative)
+        original.append({"path": relative, "bytes": size, "sha256": expected})
+    require(total == pin["sourceBytes"] and total <= 2 * 1024 * 1024, "Reviewed crate complete source byte count mismatch")
+    for relative, certificate in pin["publicTestCertificates"].items():
+        require(relative in hashes and hashes[relative] == certificate["sha256"] and actual[relative].stat().st_size == certificate["bytes"],
+                "Reviewed public test certificate checksum mismatch")
+    require(not destination.exists() and not destination.is_symlink(), "Reviewed crate notice output must be fresh")
+    # Authenticate every input before writing anything, and verify copied bytes.
+    for item in original + [{"path": ".cargo-checksum.json", "bytes": checksum_path.stat().st_size, "sha256": digest(checksum_path)}]:
+        output = destination / "original-crate" / item["path"]
+        output.parent.mkdir(parents=True, exist_ok=True)
+        with actual[item["path"]].open("rb") as source, output.open("xb") as target:
+            shutil.copyfileobj(source, target)
+        require(output.stat().st_size == item["bytes"] and digest(output) == item["sha256"], "Reviewed original source changed while copying")
+    mit = (ROOT / "LICENSE").read_text(encoding="utf-8")
+    marker = "Permission is hereby granted"
+    require(mit.count(marker) == 1, "Standard MIT source body is missing or ambiguous")
+    body = mit[mit.index(marker):].strip() + "\n"
+    require("THE SOFTWARE IS PROVIDED" in body and "KIO" not in body and "Copyright (c)" not in body, "Standard MIT body must not add KIO copyright")
+    explanation = ("KIO-supplied standard MIT license text; this is not an upstream license file.\n"
+                   "This exact published crate declares " + pin["license"] + "; KIO elects the MIT option for this redistributed copy.\n"
+                   "The original authors, license declarations and complete published source bytes are preserved in original-crate/.\n"
+                   "See REVIEWED-LICENSE-PROVENANCE.json for their exact authenticated origin.\n"
+                   "The standard body below adds no copyright holder or copyright notice and does not replace original source notices.\n\n")
+    standard = destination / "STANDARD-MIT-TEXT.txt"
+    standard.write_text(explanation + body, encoding="utf-8")
+    archive_url = "https://static.crates.io/crates/" + pin["name"] + "/" + label + ".crate"
+    provenance = {"schema": "kio.reviewed-declared-license.v1", "name": pin["name"], "version": pin["version"],
+                  "repository": pin["repository"], "source": package["source"], "authors": pin["authors"],
+                  "declaredLicense": pin["license"], "selectedLicense": "MIT", "commit": pin["commit"], "pathInVcs": pin["pathInVcs"],
+                  "publishedArchive": {"url": archive_url,
+                                       "bytes": pin["archiveBytes"], "sha256": pin["archiveSha256"]},
+                  "sourceVerification": "Cargo package checksum plus pinned published path-to-SHA manifest and every original file SHA/byte count",
+                  "filesManifestSha256": pin["filesManifestSha256"], "cargoChecksumFileSha256": digest(checksum_path),
+                  "originalFiles": original, "sourceBytes": total, "excludedGeneratedFiles": [".cargo-ok"] if ".cargo-ok" in actual else [],
+                  "originalDeclarationFiles": [{"path": "original-crate/" + name, "sha256": hashes[name],
+                                                "publishedArchiveMember": label + "/" + name, "publishedArchiveUrl": archive_url}
+                                               for name in ("Cargo.toml", "Cargo.toml.orig", "README.md")],
+                  "immutableVcsUrl": "https://github.com/" + pin["vcsRepository"] + "/tree/" + pin["commit"] +
+                                     ("/" + pin["pathInVcs"] if pin["pathInVcs"] else ""),
+                  "reviewedPublicTestCertificates": pin["publicTestCertificates"],
+                  "omission": "No standalone upstream license file exists in this published crate or its reviewed immutable source location",
+                  "standardMit": {"file": standard.name, "sha256": digest(standard), "bodySha256": hashlib.sha256(body.encode("utf-8")).hexdigest(),
+                                  "providedBy": "KIO", "isUpstreamOriginal": False, "addsCopyrightNotice": False}}
+    proof = destination / "REVIEWED-LICENSE-PROVENANCE.json"
+    write_json(proof, provenance)
+    return [{"file": path.name, "url": None, "sha256": digest(path), "originalCrateFiles": len(original),
+             "reason": "Exact reviewed published dual-license crate omits a standalone license; original source/declarations retained and MIT option explicitly selected"}
+            for path in (standard, proof)]
+
 
 def upstream_license_files(package, folder, cache):
     """Some published crates omit workspace-root licenses. Fetch only their immutable VCS root."""
@@ -415,7 +578,10 @@ def dependency_licenses(lock, source, env, target, destination):
                     if names:
                         break
         retrieved = []
-        if not names:
+        if label in _REVIEWED_DECLARED_LICENSES:
+            require(not names, "Reviewed omitted-license crate unexpectedly has a standalone notice")
+            retrieved = reviewed_declared_license(package, folder, destination / label)
+        elif not names:
             try:
                 for filename, p, url in upstream_license_files(package, folder, ROOT / ".cache/upstream-licenses"):
                     out = destination / label / ("UPSTREAM-" + filename)
