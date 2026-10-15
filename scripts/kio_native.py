@@ -410,6 +410,21 @@ _REVIEWED_DECLARED_LICENSES = {
         "filesManifestSha256": "7b361c6f6baf32d9baf33d39ec80036472a375245075b7d279cfb47eff1155bf", "fileCount": 7, "sourceBytes": 2500,
         "publicTestCertificates": {},
     },
+    "zune-inflate-0.2.54": {
+        "name": "zune-inflate", "version": "0.2.54", "repository": None,
+        "vcsRepository": "etemesi254/zune-image", "commit": "69502ce83fdfecdd0beefd677e2abb3781b29d98", "pathInVcs": "zune-inflate",
+        "license": "MIT OR Apache-2.0 OR Zlib", "authors": [],
+        "vcsInfoPresent": True, "pathInVcsPresent": True, "declarationFiles": ["Cargo.toml", "Cargo.toml.orig", "README.md"],
+        "archiveSha256": "73ab332fe2f6680068f3582b16a24f90ad7096d5d39b974d1c0aff0125116f02", "archiveBytes": 37973,
+        "filesManifestSha256": "eb32c5ed232eb27d811b9c3c662514e4a4c6a898bef7bad44a81e5c0388319df", "fileCount": 16, "sourceBytes": 129125,
+        "publicTestCertificates": {},
+        # The published manifests omit repository/authors. Do not infer either
+        # field from a homepage; authenticate these reviewed VCS-root originals.
+        "upstreamNotices": [
+            {"path": "LICENSE.md", "bytes": 384, "sha256": "e870d7fd7819a9f0453c62798cb52ae95d148a8c91dc2de1d983f997143c72de"},
+            {"path": "LICENSE-ZLIB", "bytes": 818, "sha256": "7fa429541e55b1509909e058f2d21a37467e4958ec713b357f6e0cf9dc4ee352"},
+        ],
+    },
 }
 
 
@@ -426,8 +441,36 @@ def _reviewed_json(path):
     return json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=unique)
 
 
+def reviewed_pinned_upstream_notices(pin):
+    """Return only reviewed original notice bytes, authenticated even on cache hits."""
+    records = []
+    for notice in pin.get("upstreamNotices", []):
+        require(set(notice) == {"path", "bytes", "sha256"} and notice["path"] in ("LICENSE.md", "LICENSE-ZLIB") and
+                isinstance(notice["bytes"], int) and 20 <= notice["bytes"] <= 65536 and HEX.fullmatch(notice["sha256"]),
+                "Invalid pinned original notice descriptor")
+        require(pin["vcsInfoPresent"] and re.fullmatch(r"[a-f0-9]{40}", pin["commit"]), "Pinned notice needs an immutable VCS commit")
+        url = "https://raw.githubusercontent.com/" + pin["vcsRepository"] + "/" + pin["commit"] + "/" + notice["path"]
+        cache = ROOT / ".cache/upstream-licenses" / (hashlib.sha256(url.encode("ascii")).hexdigest() + ".txt")
+        if cache.exists() or cache.is_symlink():
+            require(cache.is_file() and not cache.is_symlink() and cache.stat().st_size == notice["bytes"], "Invalid pinned original notice cache")
+            content = cache.read_bytes()
+        else:
+            request = urllib.request.Request(url, headers={"User-Agent": "KIO-native-license-collector"})
+            with urllib.request.urlopen(request, timeout=30) as result:
+                require(result.url == url, "Pinned original notice redirect refused")
+                content = result.read(notice["bytes"] + 1)
+        require(len(content) == notice["bytes"] and hashlib.sha256(content).hexdigest() == notice["sha256"],
+                "Pinned original upstream notice checksum mismatch: " + notice["path"])
+        # Never retain an unverified network response, even as a cache entry.
+        if not cache.exists():
+            cache.parent.mkdir(parents=True, exist_ok=True)
+            cache.write_bytes(content)
+        records.append({**notice, "url": url, "content": content})
+    return records
+
+
 def reviewed_declared_license(package, folder, destination):
-    """Retain seven reviewed, byte-authenticated original crates and a labelled MIT body."""
+    """Retain exact reviewed original crates, any pinned upstream notices and a labelled MIT body."""
     label = package["name"] + "-" + package["version"]
     pin = _REVIEWED_DECLARED_LICENSES.get(label)
     require(pin is not None, "Crate has no reviewed omitted-license exception: " + label)
@@ -497,6 +540,8 @@ def reviewed_declared_license(package, folder, destination):
         require(relative in hashes and hashes[relative] == certificate["sha256"] and actual[relative].stat().st_size == certificate["bytes"],
                 "Reviewed public test certificate checksum mismatch")
     require(not destination.exists() and not destination.is_symlink(), "Reviewed crate notice output must be fresh")
+    # Authenticate the exact original notices before any destination is created.
+    upstream_notices = reviewed_pinned_upstream_notices(pin)
     # Authenticate every input before writing anything, and verify copied bytes.
     for item in original + [{"path": ".cargo-checksum.json", "bytes": checksum_path.stat().st_size, "sha256": digest(checksum_path)}]:
         output = destination / "original-crate" / item["path"]
@@ -536,15 +581,24 @@ def reviewed_declared_license(package, folder, destination):
                                            "status": "published-immutable-commit" if pin["vcsInfoPresent"] else "absent-in-published-archive"},
                   "sourceAuthority": "Exact checksum-authenticated published crate archive; VCS identity is supplementary only when published",
                   "reviewedPublicTestCertificates": pin["publicTestCertificates"],
-                  "omission": ("No standalone upstream license file exists in this published crate or its reviewed immutable source location" if pin["vcsInfoPresent"] else
+                  "omission": ("This published crate omits standalone license files and its repository metadata; the reviewed immutable VCS-root originals are retained separately" if upstream_notices else
+                               "No standalone upstream license file exists in this published crate or its reviewed immutable source location" if pin["vcsInfoPresent"] else
                                "No standalone license file or immutable VCS metadata exists in this exact published crate; the reviewed source authority is its published archive"),
                   "standardMit": {"file": standard.name, "sha256": digest(standard), "bodySha256": hashlib.sha256(body.encode("utf-8")).hexdigest(),
                                   "providedBy": "KIO", "isUpstreamOriginal": False, "addsCopyrightNotice": False}}
     proof = destination / "REVIEWED-LICENSE-PROVENANCE.json"
+    if upstream_notices:
+        provenance["upstreamNotices"] = []
+        for notice in upstream_notices:
+            output = destination / ("UPSTREAM-" + notice["path"])
+            output.write_bytes(notice["content"])
+            require(output.stat().st_size == notice["bytes"] and digest(output) == notice["sha256"], "Copied original upstream notice changed")
+            provenance["upstreamNotices"].append({key: notice[key] for key in ("path", "url", "bytes", "sha256")})
     write_json(proof, provenance)
     return [{"file": path.name, "url": None, "sha256": digest(path), "originalCrateFiles": len(original),
              "reason": "Exact reviewed published crate omits a standalone license; complete source/declarations retained and the declared MIT license explicitly selected"}
-            for path in (standard, proof)]
+            for path in (standard, proof)] + [{"file": "UPSTREAM-" + notice["path"], "url": notice["url"], "sha256": notice["sha256"],
+                                              "reason": "Exact reviewed immutable VCS-root original notice"} for notice in upstream_notices]
 
 
 def upstream_license_files(package, folder, cache):

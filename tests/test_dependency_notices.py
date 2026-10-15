@@ -106,7 +106,7 @@ class ReviewedDeclaredLicenseTests(unittest.TestCase):
     """Small synthetic fixtures exercise guards; real archive verification is separate.
 
     Only the synthetic file-tree pin is substituted. Public production pins are
-    tested literally below and the seven real checksum-authenticated published
+    tested literally below and the real checksum-authenticated published
     archives are used for the explicit packaging review, never downloaded here.
     """
     setUp = DependencyNotices.setUp
@@ -115,6 +115,11 @@ class ReviewedDeclaredLicenseTests(unittest.TestCase):
 
     def fixture(self, label='cms-0.2.3'):
         self.pin = copy.deepcopy(builder._REVIEWED_DECLARED_LICENSES[label])
+        self.notice_contents = {}
+        for notice in self.pin.get('upstreamNotices', []):
+            data = ('Synthetic original upstream notice for ' + notice['path'] + '; tests never download a license.\n').encode()
+            notice.update(bytes=len(data), sha256=hashlib.sha256(data).hexdigest())
+            self.notice_contents[notice['path']] = data
         self.folder = self.cargo / 'registry/src' / label
         self.folder.mkdir(parents=True)
         self.package = {key: copy.deepcopy(self.pin[key]) for key in ('name', 'version', 'repository', 'license', 'authors')}
@@ -147,8 +152,26 @@ class ReviewedDeclaredLicenseTests(unittest.TestCase):
         builder.write_json(self.folder / '.cargo-checksum.json', {'files': self.hashes, 'package': self.pin['archiveSha256']})
 
     def reviewed_collect(self, label):
-        with patch.dict(builder._REVIEWED_DECLARED_LICENSES, {label: self.pin}), patch.object(builder, 'upstream_license_files', side_effect=AssertionError('Known omission must not fetch mutable licenses')):
+        (self.root / 'LICENSE').write_bytes((builder.ROOT / 'LICENSE').read_bytes())
+        with patch.dict(builder._REVIEWED_DECLARED_LICENSES, {label: self.pin}), patch.object(builder, 'upstream_license_files', side_effect=AssertionError('Known omission must not fetch mutable licenses')), \
+                patch.object(builder, 'ROOT', self.root), patch.object(builder.urllib.request, 'urlopen', side_effect=self.notice_response):
             self.collect()
+
+    def notice_response(self, request, timeout):
+        root = 'https://raw.githubusercontent.com/' + self.pin['vcsRepository'] + '/' + self.pin['commit'] + '/'
+        url = request.full_url
+        name = url.removeprefix(root)
+        self.assertTrue(url.startswith(root))
+        self.assertIn(name, self.notice_contents)
+
+        class Response:
+            def __enter__(response): return response
+            def __exit__(response, *args): pass
+            def read(response, limit): return self.notice_contents[name][:limit]
+
+        response = Response()
+        response.url = url
+        return response
 
     def assert_refused(self, label):
         with self.assertRaises(ValueError):
@@ -164,6 +187,7 @@ class ReviewedDeclaredLicenseTests(unittest.TestCase):
             'block-0.1.6': ('0d8c1fef690941d3e7788d328517591fecc684c084084702d6ff1641e993699a', None, 4077, 4),
             'malloc_buf-0.0.6': ('62bb907fe88d54d8d9ce32a3cceab4218ed2f6b7d35617cafe9adf84e43919cb', None, 1239, 2),
             'simd_helpers-0.1.0': ('95890f873bec569a0362c235787f3aca6e1e887302ba4840839bcc6459c42da6', 'ca1a2f84aa386d758e98f8a609d990263932fb85', 1527, 7),
+            'zune-inflate-0.2.54': ('73ab332fe2f6680068f3582b16a24f90ad7096d5d39b974d1c0aff0125116f02', '69502ce83fdfecdd0beefd677e2abb3781b29d98', 37973, 16),
         }
         self.assertEqual(set(builder._REVIEWED_DECLARED_LICENSES), set(expected))
         declarations = {
@@ -174,14 +198,17 @@ class ReviewedDeclaredLicenseTests(unittest.TestCase):
             'block-0.1.6': ('http://github.com/SSheldon/rust-block', 'MIT', None, ['Steven Sheldon'], '438aeb0004ae316f4618bf6597c498043e4b6a0640dd1b57e6c2e9e72d0807d3'),
             'malloc_buf-0.0.6': ('https://github.com/SSheldon/malloc_buf', 'MIT', None, ['Steven Sheldon'], '750a7cb75c76ac13a6448fec88535f22ca9b97432edc4f2e05e0a4b398b38130'),
             'simd_helpers-0.1.0': ('https://github.com/lu-zero/simd_helpers', 'MIT', None, ['Luca Barbato <lu_zero@gentoo.org>'], '7b361c6f6baf32d9baf33d39ec80036472a375245075b7d279cfb47eff1155bf'),
+            'zune-inflate-0.2.54': (None, 'MIT OR Apache-2.0 OR Zlib', 'zune-inflate', [], 'eb32c5ed232eb27d811b9c3c662514e4a4c6a898bef7bad44a81e5c0388319df'),
         }
         for label, values in expected.items():
             pin = builder._REVIEWED_DECLARED_LICENSES[label]
             self.assertEqual(tuple(pin[key] for key in ('archiveSha256', 'commit', 'archiveBytes', 'fileCount')), values)
             self.assertEqual(tuple(pin[key] for key in ('repository', 'license', 'pathInVcs', 'authors', 'filesManifestSha256')), declarations[label])
-        first_four = {label: pin for label, pin in builder._REVIEWED_DECLARED_LICENSES.items() if label not in ('block-0.1.6', 'malloc_buf-0.0.6', 'simd_helpers-0.1.0')}
+        first_four = {label: pin for label, pin in builder._REVIEWED_DECLARED_LICENSES.items() if label not in ('block-0.1.6', 'malloc_buf-0.0.6', 'simd_helpers-0.1.0', 'zune-inflate-0.2.54')}
         self.assertEqual(sum(p['archiveBytes'] for p in first_four.values()), 217604)
-        self.assertEqual(sum(p['archiveBytes'] for p in builder._REVIEWED_DECLARED_LICENSES.values()), 224447)
+        first_seven = {label: pin for label, pin in builder._REVIEWED_DECLARED_LICENSES.items() if label != 'zune-inflate-0.2.54'}
+        self.assertEqual(sum(p['archiveBytes'] for p in first_seven.values()), 224447)
+        self.assertEqual(sum(p['archiveBytes'] for p in builder._REVIEWED_DECLARED_LICENSES.values()), 262420)
         self.assertEqual(sum(len(p['publicTestCertificates']) for p in builder._REVIEWED_DECLARED_LICENSES.values()), 4)
         with self.assertRaisesRegex(ValueError, 'no reviewed'):
             builder.reviewed_declared_license(self.package, self.folder, self.output)
@@ -419,6 +446,107 @@ class ReviewedDeclaredLicenseTests(unittest.TestCase):
         (self.folder / '.cargo-checksum.json').write_text(
             '{"files":' + files + ',"files":' + files + ',"package":' + json.dumps(self.pin['archiveSha256']) + '}')
         self.assert_refused(label)
+
+    def test_zune_exact_original_notice_pins_and_missing_metadata_are_honest(self):
+        pin = builder._REVIEWED_DECLARED_LICENSES['zune-inflate-0.2.54']
+        self.assertIsNone(pin['repository'])
+        self.assertEqual(pin['authors'], [])
+        self.assertEqual(pin['vcsRepository'], 'etemesi254/zune-image')
+        self.assertEqual(pin['upstreamNotices'], [
+            {'path': 'LICENSE.md', 'bytes': 384, 'sha256': 'e870d7fd7819a9f0453c62798cb52ae95d148a8c91dc2de1d983f997143c72de'},
+            {'path': 'LICENSE-ZLIB', 'bytes': 818, 'sha256': '7fa429541e55b1509909e058f2d21a37467e4958ec713b357f6e0cf9dc4ee352'},
+        ])
+        self.assertFalse(any('upstreamNotices' in value for key, value in builder._REVIEWED_DECLARED_LICENSES.items()
+                             if key != 'zune-inflate-0.2.54'))
+
+    def test_zune_original_notices_are_retained_and_indexed_beside_all_source(self):
+        label = self.fixture('zune-inflate-0.2.54')
+        self.reviewed_collect(label)
+        output = self.output / label
+        proof = json.loads((output / 'REVIEWED-LICENSE-PROVENANCE.json').read_text())
+        self.assertIsNone(proof['repository'])
+        self.assertEqual(proof['authors'], [])
+        self.assertEqual(proof['selectedLicense'], 'MIT')
+        self.assertIn('VCS-root originals are retained separately', proof['omission'])
+        self.assertEqual(proof['declaredLicense'], 'MIT OR Apache-2.0 OR Zlib')
+        index = json.loads((self.output / 'index.json').read_text())[0]
+        self.assertEqual(set(index['files']), {'UPSTREAM-LICENSE.md', 'UPSTREAM-LICENSE-ZLIB',
+                                               'STANDARD-MIT-TEXT.txt', 'REVIEWED-LICENSE-PROVENANCE.json'})
+        for original in proof['upstreamNotices']:
+            self.assertEqual((output / ('UPSTREAM-' + original['path'])).read_bytes(), self.notice_contents[original['path']])
+            self.assertEqual(original['url'], 'https://raw.githubusercontent.com/etemesi254/zune-image/' + self.pin['commit'] + '/' + original['path'])
+            self.assertEqual(hashlib.sha256(self.notice_contents[original['path']]).hexdigest(), original['sha256'])
+        for path, contents in self.contents.items():
+            self.assertEqual((output / 'original-crate' / path).read_bytes(), contents)
+
+    def test_zune_cannot_gain_invented_repository_authors_or_different_license(self):
+        label = self.fixture('zune-inflate-0.2.54')
+        original = copy.deepcopy(self.package)
+        for key, value in [('repository', 'https://github.com/etemesi254/zune-image'),
+                           ('authors', ['Invented author']), ('license', 'MIT'), ('license_file', 'LICENSE')]:
+            with self.subTest(key=key):
+                self.package = dict(original, **{key: value})
+                self.assert_refused(label)
+
+    def test_zune_published_vcs_identity_and_path_cannot_be_rewritten(self):
+        label = self.fixture('zune-inflate-0.2.54')
+        for vcs in [{'git': {'sha1': 'f' * 40}, 'path_in_vcs': 'zune-inflate'},
+                    {'git': {'sha1': self.pin['commit']}, 'path_in_vcs': 'other-crate'},
+                    {'git': {'sha1': self.pin['commit']}}]:
+            with self.subTest(vcs=vcs):
+                self.contents['.cargo_vcs_info.json'] = json.dumps(vcs).encode()
+                (self.folder / '.cargo_vcs_info.json').write_bytes(self.contents['.cargo_vcs_info.json'])
+                self.rehash()
+                self.assert_refused(label)
+
+    def test_zune_rejects_changed_second_upstream_notice_before_creating_output(self):
+        label = self.fixture('zune-inflate-0.2.54')
+        self.notice_contents['LICENSE-ZLIB'] = b'changed or truncated upstream license'
+        self.assert_refused(label)
+        # The first successfully authenticated original may be cached; no
+        # unverified response or partial notice output may be retained.
+        cache = self.root / '.cache/upstream-licenses'
+        self.assertEqual(len(list(cache.glob('*.txt'))), 1)
+        self.assertEqual(next(cache.glob('*.txt')).read_bytes(), self.notice_contents['LICENSE.md'])
+
+    def test_zune_rejects_redirects_before_retaining_original_notices(self):
+        label = self.fixture('zune-inflate-0.2.54')
+        original = self.notice_response
+
+        def redirect(request, timeout):
+            result = original(request, timeout)
+            result.url = 'https://example.invalid/replacement-license'
+            return result
+
+        with patch.object(self, 'notice_response', side_effect=redirect):
+            self.assert_refused(label)
+        self.assertFalse((self.root / '.cache/upstream-licenses').exists())
+
+    def test_zune_revalidates_cached_notice_bytes_and_refuses_file_links(self):
+        label = self.fixture('zune-inflate-0.2.54')
+        self.reviewed_collect(label)
+        import shutil
+        shutil.rmtree(self.output / label)
+        cache = next((self.root / '.cache/upstream-licenses').glob('*.txt'))
+        original = cache.read_bytes()
+        cache.write_bytes(bytes([original[0] ^ 1]) + original[1:])
+        self.assert_refused(label)
+        cache.unlink()
+        target = self.root / 'replacement-original.txt'
+        target.write_bytes(original)
+        cache.symlink_to(target)
+        self.assert_refused(label)
+
+    def test_zune_rejects_forged_source_checksum_and_unreviewed_version(self):
+        label = self.fixture('zune-inflate-0.2.54')
+        (self.folder / 'src/lib.rs').write_bytes(b'changed original source')
+        checksum = json.loads((self.folder / '.cargo-checksum.json').read_text())
+        checksum['files']['src/lib.rs'] = builder.digest(self.folder / 'src/lib.rs')
+        builder.write_json(self.folder / '.cargo-checksum.json', checksum)
+        self.assert_refused(label)
+        package = dict(self.package, version='0.2.55')
+        with self.assertRaisesRegex(ValueError, 'no reviewed'):
+            builder.reviewed_declared_license(package, self.folder, self.output)
 
 
 if __name__ == '__main__':
