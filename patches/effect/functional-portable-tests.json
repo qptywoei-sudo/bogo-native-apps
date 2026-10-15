@@ -1,0 +1,100 @@
+{
+  "schema": "kio.native-functional-patch.v1",
+  "programId": "effect",
+  "upstream": {
+    "repository": "https://github.com/storytold/effectcraft",
+    "commit": "05955c08b4fd025f1a09882df72e6dbff1a8148a",
+    "tag": "v0.10.0"
+  },
+  "base": {
+    "brandingPatch": "effectcraft-v0.10.0-kio-effect.patch",
+    "brandingPatchSha256": "b4f0adb7ff63ec467c98c29f2c624fd8e123349b4c41efcd0c9536fae18f80a2"
+  },
+  "patch": {
+    "file": "functional-portable-tests.patch",
+    "sha256": "8594f3f0cd788a189ffc446412d48c2a5941950b89c4d0234380d87ddc6df3c3",
+    "bytes": 4313
+  },
+  "files": [
+    {
+      "path": "crates/engine/src/tests_frame_export.rs",
+      "before": {
+        "sha256": "1f647efb9eafbacd12792ce0c14df8f7aeeb1f2b84eab0942cca05520344ebd7",
+        "bytes": 7911
+      },
+      "after": {
+        "sha256": "efedbdb76fdf9c4ecf05ffb993366aa16d393fbf9757ab6639d34f03f63cc2aa",
+        "bytes": 7909
+      }
+    },
+    {
+      "path": "crates/engine/src/tests_m137.rs",
+      "before": {
+        "sha256": "d5f4bc82fd9c4149fe45aba4dab1c3b1de4e5a237b33759968bd332030597b39",
+        "bytes": 9195
+      },
+      "after": {
+        "sha256": "d19041cc223e223562eb9de5ac92e4c01eaf915ace2875f6d011687443682b2e",
+        "bytes": 9193
+      }
+    },
+    {
+      "path": "crates/engine/src/tests_essential.rs",
+      "before": {
+        "sha256": "8e1d537112521dff005072aebe9efbc37d8f3bb43487ceb011886e26f7bcfa36",
+        "bytes": 24247
+      },
+      "after": {
+        "sha256": "5c20d3e14d2c8047fff6c3e6fb4bffc3a8a240fd4e613af87c98f646ff643a55",
+        "bytes": 24245
+      }
+    },
+    {
+      "path": "crates/engine/src/tests_import_project.rs",
+      "before": {
+        "sha256": "1478db346ec294a95cf1ac58c5a50ad2334d4e580e5a0371f7e512a3605c4750",
+        "bytes": 7851
+      },
+      "after": {
+        "sha256": "7e40f051d4aa153fd577274ea8bb8acc8e34daf61819e2ffd5d414fffff69984",
+        "bytes": 7849
+      }
+    },
+    {
+      "path": "crates/engine/src/commands/relink_moved.rs",
+      "before": {
+        "sha256": "18deb8d45f861b4f9e28bb6fac14a38a0137cf437c33210a6c707c561b232772",
+        "bytes": 14246
+      },
+      "after": {
+        "sha256": "b1e5ce5ecb9837aede0e102c108c1db520a872c2702b29178f8400e18a8c7b20",
+        "bytes": 14251
+      }
+    },
+    {
+      "path": "crates/engine/src/footage_check.rs",
+      "before": {
+        "sha256": "3b14bd8be23b82d47cdbd1b7eeb842ace6156a2a53189495b46bd819c3c35030",
+        "bytes": 13295
+      },
+      "after": {
+        "sha256": "6ff7130759997980896ac2ddcdbb5b4046a4287ad4950f6ec6d8eb610ced39a3",
+        "bytes": 13297
+      }
+    }
+  ],
+  "summary": "Keep original Effect tests portable without changing application behavior.",
+  "behavior": [
+    "Four original test helpers write generated outputs to a process-specific OS temporary folder instead of adding build output inside the immutable source tree.",
+    "Two original path assertions compare complete Path components, retaining exact file identity across Windows separator spellings.",
+    "All assertions, test bodies, production algorithms, dependency locks and original two ignored tests are retained."
+  ],
+  "tests": {
+    "nativeBuildRun": false,
+    "nativeTestsRun": false,
+    "ciFailuresAddressed": [
+      "Mac core tests succeeded before strict prepared-source verification refused generated target/test-out files.",
+      "Windows core tests: 610 passed, two assertions failed only on forward/backslash spelling; two original tests ignored."
+    ]
+  }
+}

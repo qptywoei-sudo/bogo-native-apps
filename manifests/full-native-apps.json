@@ -866,7 +866,15 @@
         "app": "effectcraft",
         "cli": "effectcraft-cli"
       },
-      "windowsGuiVersionCheck": "stdout"
+      "windowsGuiVersionCheck": "stdout",
+      "functionalFixes": [
+        {
+          "patch": "patches/effect/functional-portable-tests.patch",
+          "sha256": "8594f3f0cd788a189ffc446412d48c2a5941950b89c4d0234380d87ddc6df3c3",
+          "manifest": "patches/effect/functional-portable-tests.json",
+          "manifestSha256": "469c4bea1e1e3fe555891e27b435b924864fba4aba054505c55ef879370b12a7"
+        }
+      ]
     },
     {
       "id": "design",

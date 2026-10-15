@@ -72,17 +72,18 @@ def load_lock(app):
 def functional_fixes(lock):
     result = []
     for fix in lock.get('functionalFixes', []):
-        require(lock['id'] == 'word', 'Functional fixes require an explicit application review')
+        require(lock['id'] in ('word', 'effect'), 'Functional fixes require an explicit application review')
         for key, sha_key in (('patch', 'sha256'), ('manifest', 'manifestSha256')):
             relative = common.check_public_path(fix[key])
-            require(str(relative).startswith('patches/word/functional-'), 'Functional fix outside its reviewed path')
+            require(str(relative).startswith('patches/' + lock['id'] + '/functional-'), 'Functional fix outside its reviewed path')
             path = ROOT / relative
             require(path.is_file() and not path.is_symlink() and digest(path) == fix[sha_key], 'Functional fix bytes changed')
         meta = json.loads((ROOT / fix['manifest']).read_text(encoding='utf-8'))
         require(meta['schema'] == 'kio.native-functional-patch.v1' and meta['programId'] == lock['id'] and meta['upstream']['commit'] == lock['source']['commit'], 'Functional fix source identity mismatch')
         require(meta['base']['brandingPatchSha256'] == lock['branding']['sha256'], 'Functional fix branding base mismatch')
         require(meta['patch']['sha256'] == fix['sha256'] and meta['patch']['bytes'] == (ROOT / fix['patch']).stat().st_size, 'Functional fix patch mismatch')
-        allowed = {'crates/engine/src/io.rs', 'crates/engine/src/cmd/file.rs', 'crates/engine/tests/wordml2003_save.rs'}
+        allowed = {'word': {'crates/engine/src/io.rs', 'crates/engine/src/cmd/file.rs', 'crates/engine/tests/wordml2003_save.rs'},
+                   'effect': {'crates/engine/src/' + name for name in ('tests_frame_export.rs', 'tests_m137.rs', 'tests_essential.rs', 'tests_import_project.rs', 'commands/relink_moved.rs', 'footage_check.rs')}}[lock['id']]
         require(meta['files'] and {x['path'] for x in meta['files']} <= allowed, 'Functional fix changed an unreviewed engine or legal file')
         result.append((fix, meta))
     return result
@@ -190,6 +191,8 @@ def prepare(args, lock):
             require((declared is None and item['path'] not in actual) or (declared is not None and actual.get(item['path']) == declared['sha256']), 'Patch roundtrip hash mismatch')
     for r, sha in meta.get('protectedFileHashes', {}).items():
         require(after.get(r) == sha, 'Original protected engine bytes changed: ' + r)
+    for item in meta.get('protectedFiles', []):
+        require(after.get(item['path']) == item['sha256'], 'Original protected source bytes changed: ' + item['path'])
     if lock['id'] == 'light':
         light_format_contract(source)
     # Compare actual WiX XML to the hash-locked upstream before permitting any

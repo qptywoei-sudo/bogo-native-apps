@@ -1,0 +1,78 @@
+diff --git a/crates/engine/src/commands/relink_moved.rs b/crates/engine/src/commands/relink_moved.rs
+index 4f70dd6eebf92d25ff7b39311f5dbcbdf9d6cd4c..af5735c7f085c0be52d76447396965d075671e45 100644
+--- a/crates/engine/src/commands/relink_moved.rs
++++ b/crates/engine/src/commands/relink_moved.rs
+@@ -306,7 +306,7 @@ mod tests {
+         let r = s.execute("footage.relink", json!({"item": a.0, "path": target})).unwrap();
+         assert_eq!(r["relinked"], json!([a.0, b.0, m.0]), "{r}");
+         assert_eq!(r["stillMissing"], 1);
+-        assert_eq!(path_of(&s, m), new.join("audio/m.wav").to_string_lossy());
++        assert_eq!(std::path::Path::new(&path_of(&s, m)), new.join("audio/m.wav"));
+         assert_eq!(path_of(&s, other), "/elsewhere/c.mov");
+         // One undo step brings every path back.
+         s.execute("edit.undo", json!({})).unwrap();
+diff --git a/crates/engine/src/footage_check.rs b/crates/engine/src/footage_check.rs
+index de14b06ca8b1abe0d45f6fc3155136997ac93f01..da8016d0539bad66ae67e0b0dd108272c2084ec5 100644
+--- a/crates/engine/src/footage_check.rs
++++ b/crates/engine/src/footage_check.rs
+@@ -269,7 +269,7 @@ mod tests {
+                 _ => None,
+             })
+             .collect();
+-        assert!(paths.contains(&d.join("Job/shots/a.png").to_string_lossy().to_string()), "{paths:?}");
++        assert!(paths.iter().any(|p| std::path::Path::new(p) == d.join("Job/shots/a.png")), "{paths:?}");
+         assert!(!o.is_dirty(), "finding the files is not an edit");
+         let _ = std::fs::remove_dir_all(d);
+     }
+diff --git a/crates/engine/src/tests_essential.rs b/crates/engine/src/tests_essential.rs
+index 0732020ae5d1c666d5ad7c56821649d0be0c64f8..23589c2e4207216427c120dd62845d2bf4171441 100644
+--- a/crates/engine/src/tests_essential.rs
++++ b/crates/engine/src/tests_essential.rs
+@@ -10,7 +10,7 @@ use crate::Session;
+ use crate::render::RenderOpts;
+ 
+ fn out_dir(name: &str) -> std::path::PathBuf {
+-    let d = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../target/test-out").join(name);
++    let d = std::env::temp_dir().join(format!("kio-effect-test-{}", std::process::id())).join(name);
+     let _ = std::fs::remove_dir_all(&d);
+     std::fs::create_dir_all(&d).unwrap();
+     d
+diff --git a/crates/engine/src/tests_frame_export.rs b/crates/engine/src/tests_frame_export.rs
+index 87b0864acad6373218b7015197754808f88d924a..b28b8083456dde1ebb7a70575025e5bb98fe6c3b 100644
+--- a/crates/engine/src/tests_frame_export.rs
++++ b/crates/engine/src/tests_frame_export.rs
+@@ -5,7 +5,7 @@ use serde_json::json;
+ use crate::Session;
+ 
+ fn out_dir(name: &str) -> std::path::PathBuf {
+-    let d = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../target/test-out").join(name);
++    let d = std::env::temp_dir().join(format!("kio-effect-test-{}", std::process::id())).join(name);
+     let _ = std::fs::remove_dir_all(&d);
+     std::fs::create_dir_all(&d).unwrap();
+     d
+diff --git a/crates/engine/src/tests_import_project.rs b/crates/engine/src/tests_import_project.rs
+index 6aa52b411e742cf51695dfdcc6646a786fea51b6..69bae4ae2cf5fbf8ea4c5c46178c659dc0f70b70 100644
+--- a/crates/engine/src/tests_import_project.rs
++++ b/crates/engine/src/tests_import_project.rs
+@@ -9,7 +9,7 @@ use serde_json::json;
+ use crate::Session;
+ 
+ fn out_dir(name: &str) -> std::path::PathBuf {
+-    let d = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../target/test-out").join(name);
++    let d = std::env::temp_dir().join(format!("kio-effect-test-{}", std::process::id())).join(name);
+     let _ = std::fs::remove_dir_all(&d);
+     std::fs::create_dir_all(&d).unwrap();
+     d
+diff --git a/crates/engine/src/tests_m137.rs b/crates/engine/src/tests_m137.rs
+index 13abe9c6451263191fd591e40140747c5fc5b86e..3f4f3dbb01438dfea4014d441eec453dd2d0e5ef 100644
+--- a/crates/engine/src/tests_m137.rs
++++ b/crates/engine/src/tests_m137.rs
+@@ -9,7 +9,7 @@ use crate::rq_tests::MockExporter;
+ use crate::{Event, Session};
+ 
+ fn out_dir(name: &str) -> std::path::PathBuf {
+-    let d = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../target/test-out").join(name);
++    let d = std::env::temp_dir().join(format!("kio-effect-test-{}", std::process::id())).join(name);
+     let _ = std::fs::remove_dir_all(&d);
+     std::fs::create_dir_all(&d).unwrap();
+     d

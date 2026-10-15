@@ -18,6 +18,30 @@ spec.loader.exec_module(builder)
 
 
 class FullNativeGuards(unittest.TestCase):
+    def test_effect_portability_fix_is_scoped_to_original_test_helpers_and_path_assertions(self):
+        lock = builder.load_lock('effect')
+        fixes = builder.functional_fixes(lock)
+        self.assertEqual(len(fixes), 1)
+        fix, meta = fixes[0]
+        self.assertEqual(len(meta['files']), 6)
+        text = (builder.ROOT / fix['patch']).read_text()
+        removed = [line[1:] for line in text.splitlines() if line.startswith('-') and not line.startswith('---')]
+        added = [line[1:] for line in text.splitlines() if line.startswith('+') and not line.startswith('+++')]
+        self.assertEqual(len(removed), 6)
+        self.assertEqual(len(added), 6)
+        self.assertEqual(sum('target/test-out' in line for line in removed), 4)
+        self.assertEqual(sum('std::env::temp_dir()' in line for line in added), 4)
+        self.assertEqual(sum('assert' in line for line in removed), 2)
+        self.assertEqual(sum('assert' in line for line in added), 2)
+        self.assertNotIn('#[ignore]', '\n'.join(added))
+        self.assertNotIn('#[cfg', '\n'.join(added))
+        # This review does not authorize changes to production path discovery.
+        with patch.object(builder, 'ROOT', builder.ROOT):
+            tampered = json.loads(json.dumps(lock))
+            tampered['id'] = 'cad'
+            with self.assertRaisesRegex(ValueError, 'explicit application review'):
+                builder.functional_fixes(tampered)
+
     def test_light_build_runs_original_engine_and_native_editor_discovery_tests(self):
         lock = builder.load_lock('light')
         with tempfile.TemporaryDirectory() as temporary:
