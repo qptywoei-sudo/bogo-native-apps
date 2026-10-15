@@ -1,5 +1,26 @@
 # Full native KIO applications
 
+## Downloads
+
+Open the [KIO app store](https://kio-library.vercel.app/) for the measured installers, portable packages and matching complete source. The table records published files as of 2026-10-16; a prepared source or running build is not a published download.
+
+| Application | Version | macOS Apple Silicon | Windows x64 | Release and matching source |
+|---|---|---|---|---|
+| Word | 0.7.0-kio.2 | DMG / ZIP | MSI / ZIP | [Download](https://github.com/qptywoei777-rgb/kio-native-apps/releases/tag/word-v0.7.0-kio.2) |
+| Grid | 0.7.0-kio.1 | DMG / ZIP | MSI / ZIP | [Download](https://github.com/qptywoei777-rgb/kio-native-apps/releases/tag/grid-v0.7.0-kio.1) |
+| Deck | 0.7.0-kio.2 | DMG / ZIP | MSI / ZIP | [Download](https://github.com/qptywoei777-rgb/kio-native-apps/releases/tag/deck-v0.7.0-kio.2) |
+| Film | 0.8.0-kio.1 | DMG / ZIP | MSI / ZIP | [Download](https://github.com/qptywoei777-rgb/kio-native-apps/releases/tag/film-v0.8.0-kio.1) |
+| Sound | 0.7.0-kio.1 | DMG / ZIP | MSI / ZIP | [Download](https://github.com/qptywoei777-rgb/kio-native-apps/releases/tag/sound-v0.7.0-kio.1) |
+| UI | 0.6.0-kio.1 | DMG / ZIP | MSI / ZIP | [Download](https://github.com/qptywoei777-rgb/kio-native-apps/releases/tag/ui-v0.6.0-kio.1) |
+| Light | 0.8.0-kio.1 | DMG / ZIP | MSI / ZIP | [Download](https://github.com/qptywoei777-rgb/kio-native-apps/releases/tag/light-v0.8.0-kio.1) |
+| Effect | 0.10.0-kio.1 | DMG / ZIP | MSI / ZIP | [Download](https://github.com/qptywoei777-rgb/kio-native-apps/releases/tag/effect-v0.10.0-kio.1) |
+| Launcher | 0.4.1-kio.1 | DMG / ZIP | MSI / ZIP | [Download](https://github.com/qptywoei777-rgb/kio-native-apps/releases/tag/launcher-v0.4.1-kio.1) |
+| PDF | 0.8.0-kio.1 | DMG / ZIP | New 0.8.0-kio.2 build in progress | [Current download](https://github.com/qptywoei777-rgb/kio-native-apps/releases/tag/pdf-v0.8.0-kio.1) |
+
+Photo, Vector, Design and CAD are still completing their native builds and file QA. Studio is distributed separately as an owner-only private test build. Each release explains the actual engine/file checks and remaining interactive GUI/installation work. Development packages have ad-hoc Mac signatures without notarization and no Windows publisher certificate. Complete upstream functionality is retained; full commercial-product feature or format parity is not claimed.
+
+## Build project
+
 This separate build project packages complete upstream applications. It does not use the earlier KIO Apps 0.1 Electron editor prototype. The Word pipeline and the generic 13-application pipeline use independently pinned complete native workspaces. Source/patch readiness is not a record of successful binary builds or GUI validation. Preparing these files never creates or dispatches a remote release.
 
 KIO Word is based on the **entire WordCraft v0.7.0 workspace**, commit `fc41918814f62645b6746ed68e71e8c2c2e85d6f`, and craft-fonts commit `8dcdacd5153e64560d109541a47d806f26f048c0`. Source/font compressed bytes and SHA-256, Rust `1.95.0`, the exact binary branding patch and both native Cargo packages are locked in `manifests/word.lock.json`. Engine source, Cargo manifests/lock, MIT/Apache licenses and NOTICE are protected against branding changes. The patch removes upstream trademark artwork, changes the display identity/profile/icons, and retains original commands and crate names.
