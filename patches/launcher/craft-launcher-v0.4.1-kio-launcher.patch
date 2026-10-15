@@ -145820,7 +145820,7 @@ index 0beceef15a3c2396b4e5784ece23759ca2b04d2d..599af8ae4454c2432279e730d049a225
          assert_eq!(p("garbage"), None);
          // The bug this guards: 0.5.0-1 used to read as a pre-release, so an installed .deb of the
 diff --git a/crates/native/src/backend.rs b/crates/native/src/backend.rs
-index 04d78f52e772112ccd8308fdce2c84a1b0026a64..576abeebbc2aa668625331ed00fc00818f8bf866 100644
+index 04d78f52e772112ccd8308fdce2c84a1b0026a64..52dcb3d44dbfacb85d34f0dcd4c9ffbdb279b40d 100644
 --- a/crates/native/src/backend.rs
 +++ b/crates/native/src/backend.rs
 @@ -20,7 +20,7 @@ use crate::http::{self, Http, Stop};
@@ -145860,7 +145860,18 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..576abeebbc2aa668625331ed00fc0081
          let now = crate::now();
          for app in &SUITE {
              let answer = match feed.as_ref().map(|f| f.answer(app, now)) {
-@@ -232,9 +231,6 @@ impl NativeBackend {
+@@ -155,9 +154,7 @@ impl NativeBackend {
+                 _ => self.source.as_ref().and_then(|s| s.cached(&feed_repo(feed.as_ref(), app), pre)).map(|l| (l, Origin::GitHub)),
+             };
+             if let Some((latest, from)) = answer {
+-                if let LatestRelease::Found(r) = &latest {
+-                    self.shared.latest.lock().unwrap_or_else(PoisonError::into_inner).insert(app.id.to_string(), r.clone());
+-                }
++                remember_release(&self.shared, app, &latest);
+                 self.shared.emit(Event::Latest { app: app.id.to_string(), latest, from });
+             }
+         }
+@@ -232,9 +229,6 @@ impl NativeBackend {
              let (feed, fallback) = if let Some(base) = &mirror {
                  // A local mirror answers for everything: GitHub is never asked.
                  (local_feed(&http, base), Fallback { trust_feed: true, github_every: GITHUB_FALLBACK_EVERY })
@@ -145870,7 +145881,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..576abeebbc2aa668625331ed00fc0081
              } else {
                  feed_and_fallback(&http, &paths, &shared)
              };
-@@ -251,13 +247,14 @@ impl NativeBackend {
+@@ -251,13 +245,14 @@ impl NativeBackend {
                              let Some(app) = queue.lock().unwrap_or_else(PoisonError::into_inner).pop() else { break };
                              let (latest, from, used) = match &mirror {
                                  Some(_) => mirror_latest(app, feed.as_ref(), now),
@@ -145886,7 +145897,18 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..576abeebbc2aa668625331ed00fc0081
                                  if let Some(LatestRelease::Found(r)) = latest
                                      && let (Some(newest), Some(current)) = (r.version.as_ref(), crate::self_update::current_version())
                                      && version::is_newer(newest, &current)
-@@ -326,7 +323,7 @@ impl NativeBackend {
+@@ -269,9 +264,7 @@ impl NativeBackend {
+                                 continue;
+                             }
+                             let Some(latest) = latest else { continue };
+-                            if let LatestRelease::Found(r) = &latest {
+-                                shared.latest.lock().unwrap_or_else(PoisonError::into_inner).insert(app.id.to_string(), r.clone());
+-                            }
++                            remember_release(&shared, app, &latest);
+                             if !matches!(latest, LatestRelease::Failed(_)) {
+                                 shared.answered.lock().unwrap_or_else(PoisonError::into_inner).insert(app.id.to_string());
+                             }
+@@ -326,7 +319,7 @@ impl NativeBackend {
              restarting
          };
          if restarting {
@@ -145895,7 +145917,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..576abeebbc2aa668625331ed00fc0081
              self.shared.emit(Event::JobFinished { app: app.id.to_string(), result });
              return;
          }
-@@ -344,7 +341,9 @@ impl NativeBackend {
+@@ -344,7 +337,9 @@ impl NativeBackend {
                  match &existing {
                      Some(inst) => install::uninstall(app, inst, record.as_ref(), &paths, &stop, &mut phase).map(|()| {
                          let mut m = shared.manifest.lock().unwrap_or_else(PoisonError::into_inner);
@@ -145906,7 +145928,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..576abeebbc2aa668625331ed00fc0081
                              let _ = m.save(&paths.manifest());
                          }
                          format!("{} was removed", app.name)
-@@ -395,7 +394,7 @@ impl NativeBackend {
+@@ -395,7 +390,7 @@ impl NativeBackend {
          let (Some(install), Some(platform)) = (self.self_install.clone(), self.platform) else {
              self.shared.emit(Event::JobFinished {
                  app: id,
@@ -145915,7 +145937,29 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..576abeebbc2aa668625331ed00fc0081
              });
              return;
          };
-@@ -482,7 +481,7 @@ fn run_install(
+@@ -443,6 +438,21 @@ impl NativeBackend {
+     }
+ }
+ 
++/// A valid registry withdrawal revokes the old install plan. A network failure keeps the
++/// last verified release available offline; it cannot add or substitute any release.
++fn remember_release(shared: &Shared, app: &CraftApp, latest: &LatestRelease) {
++    let mut known = shared.latest.lock().unwrap_or_else(PoisonError::into_inner);
++    match latest {
++        LatestRelease::Found(release) => {
++            known.insert(app.id.into(), release.clone());
++        }
++        LatestRelease::None => {
++            known.remove(app.id);
++        }
++        LatestRelease::Failed(_) => {}
++    }
++}
++
+ #[allow(clippy::too_many_arguments)]
+ fn run_install(
+     app: &CraftApp,
+@@ -482,7 +492,7 @@ fn run_install(
      let new_record = install::install(app, &release, &asset, kind, existing, record, &mut job)?;
      {
          let mut m = shared.manifest.lock().unwrap_or_else(PoisonError::into_inner);
@@ -145924,7 +145968,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..576abeebbc2aa668625331ed00fc0081
              Some(r) => {
                  m.apps.insert(app.id.to_string(), r);
                  true
-@@ -490,6 +489,19 @@ fn run_install(
+@@ -490,6 +500,19 @@ fn run_install(
              // Installed the platform's own way: any old launcher record is stale.
              None => m.apps.remove(app.id).is_some(),
          };
@@ -145944,7 +145988,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..576abeebbc2aa668625331ed00fc0081
          if changed && let Err(e) = m.save(&paths.manifest()) {
              log::warn!("couldn't save the install record: {e}");
          }
-@@ -561,7 +573,7 @@ fn restart_blocked(mut busy: Vec<&str>) -> String {
+@@ -561,7 +584,7 @@ fn restart_blocked(mut busy: Vec<&str>) -> String {
          _ => (busy.join(", "), "were", "them"),
      };
      format!(
@@ -145953,7 +145997,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..576abeebbc2aa668625331ed00fc0081
           let {them} finish or cancel {them}, then press Update and restart again."
      )
  }
-@@ -745,14 +757,14 @@ fn fetch_feed(http: &Http, paths: &Paths, url: &str, throttle: &Mutex<FeedThrott
+@@ -745,14 +768,14 @@ fn fetch_feed(http: &Http, paths: &Paths, url: &str, throttle: &Mutex<FeedThrott
          asked = true;
          let outcome = match http.get_feed(url) {
              Ok(body) => match Feed::parse(&body) {
@@ -145970,7 +146014,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..576abeebbc2aa668625331ed00fc0081
                      log::warn!("the release feed answered with something unreadable (try {})", attempt + 1);
                      Outcome::Failed { retry_after: None }
                  }
-@@ -777,10 +789,11 @@ fn fetch_feed(http: &Http, paths: &Paths, url: &str, throttle: &Mutex<FeedThrott
+@@ -777,10 +800,11 @@ fn fetch_feed(http: &Http, paths: &Paths, url: &str, throttle: &Mutex<FeedThrott
  /// The feed's address. `ARTCRAFT_LAUNCHER_FEED_URL` points at a staging server or a local copy
  /// (only `https://`, or plain `http://` on localhost).
  fn feed_url() -> String {
@@ -145986,7 +146030,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..576abeebbc2aa668625331ed00fc0081
  }
  
  /// `http://<loopback host>:<port>` and an optional path: the host must be exactly 127.0.0.1,
-@@ -843,7 +856,7 @@ fn mirror_latest(app: &CraftApp, feed: Option<&Feed>, now: i64) -> (Option<Lates
+@@ -843,7 +867,7 @@ fn mirror_latest(app: &CraftApp, feed: Option<&Feed>, now: i64) -> (Option<Lates
  
  /// The last saved feed answer, if any.
  fn load_feed(paths: &Paths) -> Option<Feed> {
@@ -145995,7 +146039,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..576abeebbc2aa668625331ed00fc0081
  }
  
  /// The machine's real architecture: an x64 launcher on Windows on ARM should still pick ARM64
-@@ -1104,7 +1117,7 @@ mod tests {
+@@ -1104,7 +1128,7 @@ mod tests {
      fn feed() -> Feed {
          Feed::parse(
              r#"{"release_info": {"apps": {
@@ -146004,7 +146048,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..576abeebbc2aa668625331ed00fc0081
          }}}"#,
          )
          .unwrap()
-@@ -1179,13 +1192,13 @@ mod tests {
+@@ -1179,13 +1203,13 @@ mod tests {
          let word = CraftApp::by_id("wordcraft").unwrap();
          let feed = feed();
  
@@ -146020,8 +146064,22 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..576abeebbc2aa668625331ed00fc0081
          let (_, _, used) = latest_for(word, Some(&feed), LOADED, &github, &shared, false, false, NOW);
          assert_eq!(used, Some(Source::GitHubApi));
          assert_eq!(github.0.load(Ordering::SeqCst), 1);
-@@ -1212,7 +1225,7 @@ mod tests {
+@@ -1210,9 +1234,21 @@ mod tests {
+         assert_eq!(used, Some(Source::GitHubApi));
+     }
  
++    #[test]
++    fn registry_withdrawal_revokes_the_previous_install_plan_while_offline_failure_cannot_substitute_it() {
++        let shared = shared();
++        let app = CraftApp::by_id("photocraft").unwrap();
++        remember_release(&shared, app, &LatestRelease::Found(release("0.6.0")));
++        assert!(shared.latest.lock().unwrap().contains_key(app.id));
++        remember_release(&shared, app, &LatestRelease::Failed("offline".into()));
++        assert!(shared.latest.lock().unwrap().contains_key(app.id));
++        remember_release(&shared, app, &LatestRelease::None);
++        assert!(!shared.latest.lock().unwrap().contains_key(app.id));
++    }
++
      const APP: &str = "photocraft";
  
 -    /// A PhotoCraft release with one file per platform and format, so whichever this machine
@@ -146029,7 +146087,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..576abeebbc2aa668625331ed00fc0081
      /// installs is there.
      fn release(version: &str) -> Release {
          let suffixes = ["-portable.zip", ".tar.gz", ".msi", ".dmg", ".AppImage", ".deb", ".rpm", ".flatpak"];
-@@ -1304,7 +1317,8 @@ mod tests {
+@@ -1304,7 +1340,8 @@ mod tests {
          let Some(platform) = native_platform() else { return };
          let dir = tempfile::tempdir().unwrap();
          let mut backend = backend(dir.path(), platform, Some(Arc::new(Newer)));
@@ -146039,7 +146097,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..576abeebbc2aa668625331ed00fc0081
          backend.http = Some(Http::new().unwrap());
          backend.shared.options.lock().unwrap().prereleases = true;
          keep_file(&backend);
-@@ -1365,9 +1379,9 @@ mod tests {
+@@ -1365,9 +1402,9 @@ mod tests {
          }
          let restarting = AtomicBool::new(false);
          let error = claim_restart(&jobs, &restarting, &Stop::default(), Duration::from_millis(300), &mut || {}).unwrap_err();

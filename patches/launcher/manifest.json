@@ -15,8 +15,8 @@
   },
   "patch": {
     "file": "craft-launcher-v0.4.1-kio-launcher.patch",
-    "sha256": "9d17378861e0e8ed305ab78eda52c0c5ef6cb49acbbc8317122ed1836c44b642",
-    "bytes": 11725204
+    "sha256": "0aeb23a75fa2178cbe2ead80fb3a8b29fd9889a45d3fc0d9c367cc183c96cd21",
+    "bytes": 11728018
   },
   "counts": {
     "upstreamFiles": 198,
@@ -738,8 +738,8 @@
         "bytes": 69156
       },
       "after": {
-        "sha256": "06e3ba53ea97c0271c07c6fc09ece184f57e0a699fe937c386512fce9db7b1f3",
-        "bytes": 70104
+        "sha256": "29041aa498a5202619231fb27871f209e9879473bf86387697545ddb2d346b58",
+        "bytes": 71041
       }
     },
     {
