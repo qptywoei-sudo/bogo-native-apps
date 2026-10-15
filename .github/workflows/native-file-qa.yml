@@ -34,7 +34,6 @@ jobs:
       KIO_QA_APP: ${{ inputs.app }}
       KIO_QA_PLATFORM: ${{ inputs.platform }}
       KIO_QA_PYTHON: ${{ fromJSON('{"macos-arm64":"python3","windows-x64":"python"}')[inputs.platform] }}
-      KIO_QA_ROOT: ${{ runner.temp }}/kio-native-file-qa
       PYTHONUTF8: '1'
     defaults:
       run:
@@ -46,6 +45,14 @@ jobs:
           repository: qptywoei777-rgb/kio-native-apps
           ref: main
           persist-credentials: false
+      - name: Choose an isolated output folder on the actual native runner
+        run: |
+          "$KIO_QA_PYTHON" - <<'PY'
+          import os
+          from pathlib import Path
+          with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as output:
+              output.write('KIO_QA_ROOT=' + str(Path(os.environ['RUNNER_TEMP']) / 'kio-native-file-qa') + '\n')
+          PY
       - name: Verify runner utility guards without running a native application
         run: |
           "$KIO_QA_PYTHON" -m unittest discover -s tests -p 'test_native_file_qa.py' -v
