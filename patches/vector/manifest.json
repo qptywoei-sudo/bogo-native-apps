@@ -14,17 +14,17 @@
   },
   "patch": {
     "file": "vectorcraft-v0.11.0-kio-vector.patch",
-    "sha256": "a9d8d399483481efd0a33758ac11b9030d5d6e34f67ad0f620c7d731d3f6047a",
-    "bytes": 9384927
+    "sha256": "32680ebf1b82f547e4e21febdc6a3db7a248aea535e4d9ac60d298037bdd9c39",
+    "bytes": 9383877
   },
   "counts": {
     "upstreamFiles": 1649,
     "forkFiles": 1645,
-    "changedPaths": 103,
+    "changedPaths": 102,
     "added": 18,
     "removed": 22,
-    "modified": 63,
-    "protectedFilesByteIdentical": 922
+    "modified": 62,
+    "protectedFilesByteIdentical": 923
   },
   "checks": {
     "originalArchivePatchRoundtrip": true,
@@ -80,17 +80,6 @@
       "after": {
         "sha256": "8e0a9db550e49ec053988ccd7abcde58a104bb5071a671b73f9ad0d15e0e9848",
         "bytes": 23017
-      }
-    },
-    {
-      "path": "apps/vectorcraft-cli/src/main.rs",
-      "before": {
-        "sha256": "db1a0db26a5aba3e6e6a855bbbe993b3d03f181f0010699d98425695f7b99e2a",
-        "bytes": 19570
-      },
-      "after": {
-        "sha256": "8ba04c21cedd0ac36792559feaf95f6be12ff38104ebc85dc2c21507c3f85dec",
-        "bytes": 19579
       }
     },
     {
@@ -1991,7 +1980,8 @@
     "crates/trace/tests/quality/measure.rs": "5bd061ea13e56bb13d4d1064bc09ffa18966d859913eb81ed499ec6b73b34e51",
     "crates/trace/tests/quality/raster.rs": "0a09e668ad4987dcc0b8a4c8ed96efed6a845616276e3ab4152ec8589165d100",
     "crates/ui-egui/src/credits.rs": "3e5568eae4603d95275be05750ac7ae43b2f15502ac8f187c2ed880dbcd4eb34",
-    "docs/contributors.md": "3a6836e000fc9ca052cede9f13f65147ae495ae667c8239a633482f7bfceeedf"
+    "docs/contributors.md": "3a6836e000fc9ca052cede9f13f65147ae495ae667c8239a633482f7bfceeedf",
+    "apps/vectorcraft-cli/src/main.rs": "db1a0db26a5aba3e6e6a855bbbe993b3d03f181f0010699d98425695f7b99e2a"
   },
   "removedTrademarkAssets": [
     "docs/brand/artcraft-logo-white.png",
@@ -2002,5 +1992,17 @@
     "docs/brand/artcraft-logo.png",
     "docs/brand/artcraft-logo.svg",
     "docs/brand/artcraft-mark.png"
-  ]
+  ],
+  "sourcePathCorrection": {
+    "reason": "Restore original Rust module locations accidentally changed by branding; no module or engine feature removed.",
+    "supersededPatchSha256": "a9d8d399483481efd0a33758ac11b9030d5d6e34f67ad0f620c7d731d3f6047a",
+    "file": "apps/vectorcraft-cli/src/main.rs",
+    "originalAndCorrectedSha256": "db1a0db26a5aba3e6e6a855bbbe993b3d03f181f0010699d98425695f7b99e2a",
+    "originalAndCorrectedBytes": 19570,
+    "restoredLiteralModulePaths": [
+      "../../vectorcraft/src/mac_fonts.rs",
+      "../../vectorcraft/src/prefs_dir.rs",
+      "../../vectorcraft/src/system_fonts.rs"
+    ]
+  }
 }

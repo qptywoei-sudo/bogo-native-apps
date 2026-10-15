@@ -1,6 +1,7 @@
 import importlib.util
 import json
 import os
+import re
 import sys
 import tempfile
 import unittest
@@ -59,6 +60,21 @@ class FullNativeGuards(unittest.TestCase):
         self.assertEqual(photo['cargoArgs'][-2:], ['--features', 'heif'])
         self.assertEqual(light['cargoArgs'][-2:], ['--features', 'lightcraft/heif,lightcraft-cli/heif'])
         self.assertIn('denoise', light['features']['appDefaultFeatures'])
+
+    def test_branding_preserves_original_rust_module_source_locations(self):
+        # These identify source modules, not profile or application display names.
+        # Replacing a crate directory here breaks the full native CLI on its target OS.
+        literal = re.compile(r'^[-+]\s*#\[\s*path\s*=\s*"([^"\n]+)"\s*\]', re.M)
+        for app in builder.IDS:
+            lock = builder.load_lock(app)
+            branding = (builder.ROOT / lock['branding']['patch']).read_text(encoding='utf-8')
+            for section in re.split(r'(?=^diff --git )', branding, flags=re.M):
+                header = section.split('\n', 1)[0]
+                if not header.endswith('.rs'):
+                    continue
+                paths = literal.findall(section)
+                with self.subTest(app=app, file=header):
+                    self.assertEqual(paths, [], 'Branding must preserve original Rust module paths')
 
     def test_source_and_patch_tampering_or_feature_removal_is_refused(self):
         original = json.loads(builder.CATALOG.read_text())

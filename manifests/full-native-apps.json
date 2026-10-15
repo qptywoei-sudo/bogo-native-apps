@@ -167,9 +167,9 @@
       },
       "branding": {
         "patch": "patches/vector/vectorcraft-v0.11.0-kio-vector.patch",
-        "sha256": "a9d8d399483481efd0a33758ac11b9030d5d6e34f67ad0f620c7d731d3f6047a",
+        "sha256": "32680ebf1b82f547e4e21febdc6a3db7a248aea535e4d9ac60d298037bdd9c39",
         "manifest": "patches/vector/manifest.json",
-        "manifestSha256": "b7d4dae4e8ff57f0442cff84d814ed3701588435475e44a1770573f5cb2cb4f1"
+        "manifestSha256": "362b7ff1c73588bfdb230baa5d6f52e9565f3e204fd96deba4e747835a929be0"
       },
       "cargoPackages": [
         "vectorcraft",
