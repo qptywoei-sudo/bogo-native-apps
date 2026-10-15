@@ -342,6 +342,14 @@ def audit_native_dependencies(binaries, kind):
 
 
 def check_cli_probe(lock, binary, source, env):
+    if lock['id'] == 'cad':
+        # Original CAD CLI sends unsupported --help to stderr and exits 1.
+        # Its supported commands endpoint exposes the actual complete engine registry.
+        value = json.loads(run([binary, 'commands'], cwd=source, env=env, capture=True, timeout=60))
+        require(isinstance(value, list) and value and all(isinstance(item, dict) and isinstance(item.get('id'), str) for item in value), 'Invalid original CAD command registry')
+        ids = [item['id'] for item in value]
+        require({'new', 'open', 'qsave', 'saveas', 'line', 'circle', 'ellipse', 'drawing.inspect', 'dist', 'area'} <= set(ids), 'Incomplete original CAD command registry')
+        return {'mode': 'original-command-registry', 'arguments': ['commands'], 'commands': len(ids), 'status': 'passed'}
     if lock['id'] == 'deck':
         # Original Deck CLI has no --help branch; unknown arguments correctly exit1.
         # Exercise the real headless registry and require complete essential commands instead.

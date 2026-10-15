@@ -152,5 +152,81 @@ class DeckRegistry(unittest.TestCase):
             result = full.check_cli_probe({'id': 'grid'}, Path('gridcraft-cli'), Path('source'), {})
         self.assertEqual(run.call_args.args[0], [Path('gridcraft-cli'), '--help'])
         self.assertEqual(result['mode'], 'original-help')
+
+class CadRegistry(unittest.TestCase):
+    IDS = ['new', 'open', 'qsave', 'saveas', 'line', 'circle', 'ellipse', 'drawing.inspect', 'dist', 'area']
+
+    def registry(self):
+        return [{'id': command} for command in self.IDS]
+
+    def probe(self, data):
+        environment = {'CARGO_BUILD_JOBS': '7', 'KIO_RELEASE_VERSION': 'fixture'}
+        with patch.object(full, 'run', return_value=json.dumps(data)) as invoke:
+            result = full.check_cli_probe({'id': 'cad'}, Path('cadcraft-cli'), Path('source'), environment)
+        invoke.assert_called_once_with([Path('cadcraft-cli'), 'commands'], cwd=Path('source'), env=environment, capture=True, timeout=60)
+        self.assertIs(invoke.call_args.kwargs['env'], environment)
+        return result
+
+    def test_cad_uses_the_original_successful_engine_registry_endpoint(self):
+        self.assertEqual(self.probe(self.registry()), {'mode': 'original-command-registry', 'arguments': ['commands'], 'commands': 10, 'status': 'passed'})
+
+    def test_every_essential_file_drawing_and_measurement_command_is_required(self):
+        for command in self.IDS:
+            with self.subTest(missing=command), self.assertRaisesRegex(ValueError, 'Incomplete original CAD'):
+                self.probe([item for item in self.registry() if item['id'] != command])
+
+    def test_empty_or_non_array_or_malformed_cad_registry_is_rejected(self):
+        for data in [[], {}, None, True, 'commands', [1], [{'id': 7}], [{'label': 'Line'}], self.registry() + [None]]:
+            with self.subTest(data=data), self.assertRaisesRegex(ValueError, 'Invalid original CAD'):
+                self.probe(data)
+
+    def test_deck_registry_cannot_substitute_for_the_cad_registry(self):
+        with self.assertRaisesRegex(ValueError, 'Incomplete original CAD'):
+            self.probe(COMMANDS)
+
+    def test_extra_original_commands_and_alias_rows_are_not_removed(self):
+        rows = self.registry() + [{'id': 'mleader'}, {'id': 'new'}]
+        self.assertEqual(self.probe(rows)['commands'], 12)
+        self.assertEqual(len(rows), 12)
+
+    def test_usage_or_malformed_json_cannot_be_treated_as_success(self):
+        for output in ['usage:\n  cadcraft-cli commands [FILTER]\n', '[', '']:
+            with self.subTest(output=output), patch.object(full, 'run', return_value=output), self.assertRaises(ValueError):
+                full.check_cli_probe({'id': 'cad'}, Path('cadcraft-cli'), Path('source'), {})
+
+    def test_nonzero_exit_and_its_stderr_remain_fatal(self):
+        failure = subprocess.CalledProcessError(1, ['cadcraft-cli', 'commands'], output=b'', stderr=b'original failure\n')
+        with patch.object(full, 'run', side_effect=failure), self.assertRaises(subprocess.CalledProcessError) as raised:
+            full.check_cli_probe({'id': 'cad'}, Path('cadcraft-cli'), Path('source'), {})
+        self.assertIs(raised.exception, failure)
+        self.assertEqual(raised.exception.stderr, b'original failure\n')
+
+    def test_command_timeout_remains_fatal(self):
+        failure = subprocess.TimeoutExpired(['cadcraft-cli', 'commands'], 60)
+        with patch.object(full, 'run', side_effect=failure), self.assertRaises(subprocess.TimeoutExpired) as raised:
+            full.check_cli_probe({'id': 'cad'}, Path('cadcraft-cli'), Path('source'), {})
+        self.assertIs(raised.exception, failure)
+
+    def test_real_process_boundary_still_checks_exit_and_captures_both_streams(self):
+        environment = {'KIO_RELEASE_VERSION': 'fixture'}
+        completed = subprocess.CompletedProcess(['cadcraft-cli', 'commands'], 0, json.dumps(self.registry()).encode(), b'')
+        with patch.object(full.common.subprocess, 'run', return_value=completed) as process:
+            result = full.check_cli_probe({'id': 'cad'}, Path('cadcraft-cli'), Path('source'), environment)
+        process.assert_called_once_with(['cadcraft-cli', 'commands'], cwd=Path('source'), env=environment, check=True, timeout=60, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        self.assertEqual(result['status'], 'passed')
+
+    def test_all_other_original_cli_probe_contracts_are_unchanged(self):
+        for app in sorted(set(full.IDS) - {'cad'}):
+            with self.subTest(app=app):
+                output = json.dumps(COMMANDS) if app == 'deck' else 'original help'
+                expected = 'commands' if app == 'deck' else '--help'
+                with patch.object(full, 'run', return_value=output) as invoke:
+                    result = full.check_cli_probe({'id': app}, Path(app + '-cli'), Path('source'), {})
+                invoke.assert_called_once_with([Path(app + '-cli'), expected], cwd=Path('source'), env={}, capture=True, timeout=60)
+                self.assertEqual(result['mode'], 'original-command-registry' if app == 'deck' else 'original-help')
+                failure = subprocess.CalledProcessError(1, [app + '-cli', expected])
+                with patch.object(full, 'run', side_effect=failure), self.assertRaises(subprocess.CalledProcessError):
+                    full.check_cli_probe({'id': app}, Path(app + '-cli'), Path('source'), {})
+
 if __name__ == '__main__':
     unittest.main()
