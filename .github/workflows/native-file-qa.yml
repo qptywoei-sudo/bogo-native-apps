@@ -1,0 +1,82 @@
+name: Native file QA (manual, verified CI package)
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: Successful native build run ID in this repository
+        type: string
+        required: true
+      app:
+        description: Full native Craft CLI to test
+        type: choice
+        options: [photo, vector, film, light, pdf, effect, design, ui, word, sound, deck, cad, grid]
+        required: true
+        default: photo
+      platform:
+        description: Actual operating system and architecture of the package
+        type: choice
+        options: [macos-arm64, windows-x64]
+        required: true
+        default: windows-x64
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  native-file-qa:
+    if: github.repository == 'qptywoei777-rgb/kio-native-apps' && github.ref == 'refs/heads/main'
+    runs-on: ${{ fromJSON('{"macos-arm64":"macos-15","windows-x64":"windows-2022"}')[inputs.platform] }}
+    timeout-minutes: 45
+    env:
+      KIO_QA_RUN: ${{ inputs.run_id }}
+      KIO_QA_APP: ${{ inputs.app }}
+      KIO_QA_PLATFORM: ${{ inputs.platform }}
+      KIO_QA_PYTHON: ${{ fromJSON('{"macos-arm64":"python3","windows-x64":"python"}')[inputs.platform] }}
+      KIO_QA_ROOT: ${{ runner.temp }}/kio-native-file-qa
+      PYTHONUTF8: '1'
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout reviewed current main; never execute code from the artifact run
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: qptywoei777-rgb/kio-native-apps
+          ref: main
+          persist-credentials: false
+      - name: Verify runner utility guards without running a native application
+        run: |
+          "$KIO_QA_PYTHON" -m unittest discover -s tests -p 'test_native_file_qa.py' -v
+      - name: Collect exactly one successful native artifact through fixed repository GETs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          "$KIO_QA_PYTHON" - <<'PY'
+          import os, subprocess, sys
+          subprocess.run([sys.executable, 'scripts/native_file_qa.py', 'collect', '--run', os.environ['KIO_QA_RUN'], '--app', os.environ['KIO_QA_APP'], '--platform', os.environ['KIO_QA_PLATFORM'], '--output', os.environ['KIO_QA_ROOT']], check=True)
+          PY
+      - name: Extract the whole verified portable bundle and run real file QA without a token
+        run: |
+          "$KIO_QA_PYTHON" - <<'PY'
+          import os, subprocess, sys
+          assert not os.environ.get('GH_TOKEN') and not os.environ.get('GITHUB_TOKEN'), 'Artifact token must be scoped only to the previous GET step'
+          subprocess.run([sys.executable, 'scripts/native_file_qa.py', 'smoke', '--run', os.environ['KIO_QA_RUN'], '--app', os.environ['KIO_QA_APP'], '--platform', os.environ['KIO_QA_PLATFORM'], '--output', os.environ['KIO_QA_ROOT']], check=True)
+          PY
+      - name: Retain QA reports, synthetic files and command logs on success or failure
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: file-qa-${{ inputs.app }}-${{ inputs.platform }}-${{ inputs.run_id }}
+          path: |
+            ${{ runner.temp }}/kio-native-file-qa/report.json
+            ${{ runner.temp }}/kio-native-file-qa/bundle-manifest.json
+            ${{ runner.temp }}/kio-native-file-qa/collection/collection.json
+            ${{ runner.temp }}/kio-native-file-qa/collection/selected-lock.json
+            ${{ runner.temp }}/kio-native-file-qa/*.stdout.txt
+            ${{ runner.temp }}/kio-native-file-qa/*.stderr.txt
+            ${{ runner.temp }}/kio-native-file-qa/smoke/**
+          if-no-files-found: warn
+          retention-days: 14
+          include-hidden-files: false
