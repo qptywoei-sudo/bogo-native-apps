@@ -365,22 +365,22 @@ def build(args, lock):
     require(rustc.startswith('rustc ' + lock['rust'] + ' '), 'Wrong Rust compiler')
     run(cargo + lock['cargoArgs'] + ['--target', target], cwd=source, env=env)
     require(lock['testPackages'], 'No original core tests selected')
-    # Match CAD's original `cargo xtask ci` unit-test profile. The shipped
+    # Match CAD/Photo's original `cargo xtask ci` unit-test profile. The shipped
     # GUI/CLI above and the actual packaged-file QA remain full release builds.
-    original_cad_test_profile = lock['id'] == 'cad'
-    serial_cad_windows = original_cad_test_profile and args.platform == 'windows-x64'
-    command = cargo + ['test'] + ([] if original_cad_test_profile else ['--release']) + ['--locked', '--target', target]
+    original_unit_test_profile = lock['id'] in ('cad', 'photo')
+    serial_windows_unit = original_unit_test_profile and args.platform == 'windows-x64'
+    command = cargo + ['test'] + ([] if original_unit_test_profile else ['--release']) + ['--locked', '--target', target]
     for package in lock['testPackages']:
         command += ['-p', package]
-    test_env = dict(env, CARGO_BUILD_JOBS='1') if serial_cad_windows else env
+    test_env = dict(env, CARGO_BUILD_JOBS='1') if serial_windows_unit else env
     run(command, cwd=source, env=test_env)
-    core_test_execution = {'profile': 'test' if original_cad_test_profile else 'release',
+    core_test_execution = {'profile': 'test' if original_unit_test_profile else 'release',
                            'command': command, 'packages': lock['testPackages'],
                            'compilerJobsSetting': test_env.get('CARGO_BUILD_JOBS', 'cargo-default'),
-                           'compilerJobsOverride': '1' if serial_cad_windows else None,
-                           'profileBasis': 'original-cargo-xtask-ci' if original_cad_test_profile else 'release-core-tests'}
-    if original_cad_test_profile:
-        evidence = ROOT / 'manifests/build-prerequisites-cad-tests.json'
+                           'compilerJobsOverride': '1' if serial_windows_unit else None,
+                           'profileBasis': 'original-cargo-xtask-ci' if original_unit_test_profile else 'release-core-tests'}
+    if original_unit_test_profile:
+        evidence = ROOT / ('manifests/build-prerequisites-' + lock['id'] + '-tests.json')
         core_test_execution['originalProfileEvidence'] = {'path': evidence.relative_to(ROOT).as_posix(),
                                                         'sha256': digest(evidence), 'bytes': evidence.stat().st_size}
     if lock['id'] == 'vector':
@@ -712,6 +712,7 @@ def public_files(lock):
                   'tests/fixtures/cad-plotter-api/crates/doc/src/plotter.rs'})
     files.add('tests/test_design_recovery_fix.py')
     files.add('tests/test_cad_test_profile.py')
+    files.add('tests/test_photo_test_profile.py')
     files.update({'tests/test_pdf_msi_brand_contract.py',
                   'tests/fixtures/pdf-msi-brand-contract/provenance.json',
                   'tests/fixtures/pdf-msi-brand-contract/upstream-test-msi.ps1',

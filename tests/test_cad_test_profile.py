@@ -79,8 +79,8 @@ class CadOriginalTestProfile(unittest.TestCase):
                 self.assertEqual(execution['originalProfileEvidence']['sha256'], full.digest(evidence))
                 self.assertEqual(execution['originalProfileEvidence']['bytes'], evidence.stat().st_size)
 
-    def test_every_other_app_and_platform_retains_release_core_tests_and_the_identical_environment(self):
-        for app in sorted(set(full.IDS) - {'cad'}):
+    def test_the_other_eleven_apps_and_platforms_retain_release_core_tests_and_the_identical_environment(self):
+        for app in sorted(set(full.IDS) - {'cad', 'photo'}):
             for platform, target in full.common.TARGETS.items():
                 with self.subTest(app=app, platform=platform):
                     env = {'CARGO_BUILD_JOBS': '7', 'CRAFT_FONTS_REQUIRED': '1'}
