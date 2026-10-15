@@ -601,7 +601,7 @@
       "id": "pdf",
       "name": "KIO PDF",
       "assetPrefix": "KIO-PDF",
-      "version": "0.8.0-kio.1",
+      "version": "0.8.0-kio.2",
       "upstreamVersion": "0.8.0",
       "rust": "1.95.0",
       "sourceDateEpoch": 1791983188,

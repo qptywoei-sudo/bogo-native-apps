@@ -6,11 +6,16 @@ import hashlib
 import io
 import json
 from pathlib import Path
+import shutil
+import sys
 import tarfile
 import tempfile
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 import urllib.error
+import xml.etree.ElementTree as ET
+import zipfile
 
 spec = importlib.util.spec_from_file_location('notice_builder', Path(__file__).resolve().parents[1] / 'scripts/kio_native.py')
 builder = importlib.util.module_from_spec(spec)
@@ -705,6 +710,238 @@ class ReviewedDeclaredLicenseTests(unittest.TestCase):
         package = dict(self.package, version='0.2.55')
         with self.assertRaisesRegex(ValueError, 'no reviewed'):
             builder.reviewed_declared_license(package, self.folder, self.output)
+
+
+class StagedPublicNoticeTests(unittest.TestCase):
+    """The Windows ZIP/MSI boundary authenticates complete staged legal copies."""
+    setUp = DependencyNotices.setUp
+    tearDown = DependencyNotices.tearDown
+    collect = DependencyNotices.collect
+    fixture = ReviewedDeclaredLicenseTests.fixture
+    rehash = ReviewedDeclaredLicenseTests.rehash
+    reviewed_collect = ReviewedDeclaredLicenseTests.reviewed_collect
+    notice_response = ReviewedDeclaredLicenseTests.notice_response
+
+    def stage(self, label='cms-0.2.3', checksum=False):
+        self.fixture(label)
+        if not checksum:
+            (self.folder / '.cargo-checksum.json').unlink()
+        self.reviewed_collect(label)
+        app = self.root / 'portable'
+        destination = app / 'OpenSourceLicenses/Rust-dependencies' / label
+        shutil.copytree(self.output / label, destination)
+        if not hasattr(self, 'staged_pins'):
+            self.staged_pins = {}
+        self.staged_pins[label] = copy.deepcopy(self.pin)
+        return app, destination
+
+    def traverse(self, root, prefix):
+        with patch.dict(builder._REVIEWED_DECLARED_LICENSES, self.staged_pins):
+            validator = builder.reviewed_notice_public_validator(root, prefix)
+            return builder.regular_files(root, public=True, public_validator=validator)
+
+    def test_all_four_original_fixture_paths_survive_both_packaging_boundaries(self):
+        for label in ('cms-0.2.3', 'rustls-cng-0.7.1'):
+            app, _ = self.stage(label)
+            for root, prefix in ((app, 'OpenSourceLicenses/Rust-dependencies'),
+                                 (app / 'OpenSourceLicenses', 'Rust-dependencies')):
+                with self.subTest(crate=label, prefix=prefix):
+                    with self.assertRaisesRegex(ValueError, 'Private file refused'):
+                        builder.regular_files(root, public=True)
+                    files = dict(self.traverse(root, prefix))
+                    for relative, contents in self.contents.items():
+                        self.assertEqual(files[prefix + '/' + label + '/original-crate/' + relative].read_bytes(), contents)
+
+    def test_same_path_changed_certificate_is_rejected_even_when_proof_is_forged(self):
+        app, stage = self.stage()
+        relative = next(iter(self.pin['publicTestCertificates']))
+        path = stage / 'original-crate' / relative
+        path.write_bytes(b'private replacement certificate')
+        proof_path = stage / 'REVIEWED-LICENSE-PROVENANCE.json'
+        proof = json.loads(proof_path.read_text())
+        for row in proof['originalFiles']:
+            if row['path'] == relative:
+                row.update(bytes=path.stat().st_size, sha256=builder.digest(path))
+        builder.write_json(proof_path, proof)
+        with self.assertRaisesRegex(ValueError, 'manifest differs|SHA/bytes mismatch'):
+            self.traverse(app, 'OpenSourceLicenses/Rust-dependencies')
+
+    def test_removing_every_fixture_still_authenticates_the_complete_staged_crate(self):
+        for label in ('cms-0.2.3', 'rustls-cng-0.7.1'):
+            app, stage = self.stage(label)
+            originals = {stage / 'original-crate' / path: self.contents[path]
+                         for path in self.pin['publicTestCertificates']}
+            for path in originals:
+                path.unlink()
+            for root, prefix in ((app, 'OpenSourceLicenses/Rust-dependencies'),
+                                 (app / 'OpenSourceLicenses', 'Rust-dependencies')):
+                with self.subTest(crate=label, prefix=prefix), self.assertRaisesRegex(ValueError, 'missing or additional'):
+                    self.traverse(root, prefix)
+            for path, data in originals.items():
+                path.write_bytes(data)
+            self.traverse(app, 'OpenSourceLicenses/Rust-dependencies')
+
+    def test_identical_fixture_bytes_at_any_other_path_are_rejected(self):
+        app, stage = self.stage()
+        original = stage / 'original-crate' / next(iter(self.pin['publicTestCertificates']))
+        for relative in ('personal.pfx', 'OpenSourceLicenses/private.p12',
+                         'OpenSourceLicenses/Rust-dependencies/cms-0.2.3/copied.pfx',
+                         'OpenSourceLicenses/Rust-dependencies/cms-0.2.3/original-crate/tests/other.pfx',
+                         'OpenSourceLicenses/Rust-dependencies/unreviewed-1.0.0/original-crate/tests/examples/example.pfx'):
+            extra = app / relative
+            extra.parent.mkdir(parents=True, exist_ok=True)
+            extra.write_bytes(original.read_bytes())
+            with self.subTest(path=relative), self.assertRaises(ValueError):
+                self.traverse(app, 'OpenSourceLicenses/Rust-dependencies')
+            extra.unlink()
+
+    def test_complete_original_manifest_rejects_changed_missing_or_extra_source(self):
+        app, stage = self.stage()
+        source = stage / 'original-crate/src/lib.rs'
+        original = source.read_bytes()
+        for contents in (None, original + b'changed'):
+            if contents is None:
+                source.unlink()
+            else:
+                source.write_bytes(contents)
+            with self.subTest(contents=contents), self.assertRaises(ValueError):
+                self.traverse(app, 'OpenSourceLicenses/Rust-dependencies')
+        source.write_bytes(original)
+        extra = stage / 'original-crate/unreviewed.rs'
+        extra.write_bytes(b'extra public source is still not the pinned original')
+        with self.assertRaisesRegex(ValueError, 'additional files'):
+            self.traverse(app, 'OpenSourceLicenses/Rust-dependencies')
+
+    def test_staged_proof_cannot_replace_archive_author_identity_or_manifest(self):
+        app, stage = self.stage()
+        proof_path = stage / 'REVIEWED-LICENSE-PROVENANCE.json'
+        original = json.loads(proof_path.read_text())
+        changed_archive = dict(original['publishedArchive'], sha256='0' * 64)
+        for key, value in (('publishedArchive', changed_archive), ('authors', ['unreviewed']),
+                           ('reviewedPublicTestCertificates', {}), ('filesManifestSha256', '0' * 64),
+                           ('sourceBytes', original['sourceBytes'] + 1), ('originalFiles', []),
+                           ('cargoChecksumMetadata', {'present': False, 'generatedByCollector': True}),
+                           ('cargoChecksumFileSha256', '0' * 64)):
+            builder.write_json(proof_path, dict(original, **{key: value}))
+            with self.subTest(field=key), self.assertRaises(ValueError):
+                self.traverse(app, 'OpenSourceLicenses/Rust-dependencies')
+        for value in ([], None, 'not proof'):
+            builder.write_json(proof_path, value)
+            with self.subTest(proof=value), self.assertRaises(ValueError):
+                self.traverse(app, 'OpenSourceLicenses/Rust-dependencies')
+
+    def test_optional_original_checksum_is_authenticated_without_inventing_one(self):
+        app, stage = self.stage(checksum=True)
+        checksum = stage / 'original-crate/.cargo-checksum.json'
+        self.assertIn('OpenSourceLicenses/Rust-dependencies/cms-0.2.3/original-crate/.cargo-checksum.json',
+                      dict(self.traverse(app, 'OpenSourceLicenses/Rust-dependencies')))
+        value = json.loads(checksum.read_text())
+        builder.write_json(checksum, dict(value, package='0' * 64))
+        with self.assertRaisesRegex(ValueError, 'checksum metadata changed'):
+            self.traverse(app, 'OpenSourceLicenses/Rust-dependencies')
+        checksum.unlink()
+        with self.assertRaisesRegex(ValueError, 'missing or additional'):
+            self.traverse(app, 'OpenSourceLicenses/Rust-dependencies')
+
+    def test_legal_source_and_metadata_links_are_rejected(self):
+        app, stage = self.stage()
+        paths = [stage / 'original-crate/src/lib.rs', stage / 'REVIEWED-LICENSE-PROVENANCE.json',
+                 stage / 'original-crate/tests', app / 'OpenSourceLicenses']
+        for index, path in enumerate(paths):
+            saved = self.root / ('link-target-' + str(index))
+            path.rename(saved)
+            path.symlink_to(saved, target_is_directory=saved.is_dir())
+            with self.subTest(path=path), self.assertRaises(ValueError):
+                self.traverse(app, 'OpenSourceLicenses/Rust-dependencies')
+            path.unlink()
+            saved.rename(path)
+
+    def test_fixture_bytes_are_rechecked_after_cached_whole_crate_authentication(self):
+        app, stage = self.stage('rustls-cng-0.7.1')
+        with patch.dict(builder._REVIEWED_DECLARED_LICENSES, {'rustls-cng-0.7.1': self.pin}):
+            validate = builder.reviewed_notice_public_validator(app, 'OpenSourceLicenses/Rust-dependencies')
+            paths = list(self.pin['publicTestCertificates'])
+            validate('OpenSourceLicenses/Rust-dependencies/rustls-cng-0.7.1/original-crate/' + paths[0])
+            (stage / 'original-crate' / paths[1]).write_bytes(b'changed after authentication')
+            with self.assertRaisesRegex(ValueError, 'certificate SHA/bytes mismatch'):
+                validate('OpenSourceLicenses/Rust-dependencies/rustls-cng-0.7.1/original-crate/' + paths[1])
+
+    def test_unscoped_public_policy_and_invalid_prefixes_remain_closed(self):
+        app, stage = self.stage()
+        for name in ('.env', 'personal.pfx', 'personal.p12', 'secret.key', 'records.sqlite', 'credentials.json'):
+            with self.subTest(name=name), self.assertRaises(ValueError):
+                builder.check_public_path(name)
+        for prefix in ('', 'Other', '../Rust-dependencies', 'OpenSourceLicenses'):
+            with self.subTest(prefix=prefix), self.assertRaises(ValueError):
+                builder.reviewed_notice_public_validator(app, prefix)
+        private = stage / 'original-crate/private.key'
+        private.write_bytes(b'private input')
+        with self.assertRaises(ValueError):
+            self.traverse(app, 'OpenSourceLicenses/Rust-dependencies')
+
+    def test_real_windows_zip_and_msi_builders_retain_all_four_reviewed_fixture_files(self):
+        scripts = Path(__file__).resolve().parents[1] / 'scripts'
+        sys.path.insert(0, str(scripts))
+        spec = importlib.util.spec_from_file_location('fixture_full_native', scripts / 'full_native.py')
+        native = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(native)
+        pins, expected = {}, {}
+        for label in ('cms-0.2.3', 'rustls-cng-0.7.1'):
+            app, _ = self.stage(label)
+            pins[label] = copy.deepcopy(self.pin)
+            expected.update({'OpenSourceLicenses/Rust-dependencies/' + label + '/original-crate/' + path: contents
+                             for path, contents in self.contents.items()})
+        with patch.dict(native.common._REVIEWED_DECLARED_LICENSES, pins):
+            validate = native.common.reviewed_notice_public_validator(app, 'OpenSourceLicenses/Rust-dependencies')
+            files = native.common.regular_files(app, public=True, public_validator=validate)
+            output = self.root / 'portable.zip'
+            native.common.create_source_zip(output, [('KIO PDF/' + name, path) for name, path in files], 1700000000)
+            with zipfile.ZipFile(output) as archive:
+                self.assertEqual(len(archive.infolist()), len(files))
+                for path, contents in expected.items():
+                    self.assertEqual(archive.read('KIO PDF/' + path), contents)
+            original = '<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"><Package><Feature Id="Original"></Feature></Package></Wix>'
+            text, count = native.add_msi_notices(original, {'id': 'pdf'}, app / 'OpenSourceLicenses')
+            root = ET.fromstring(text)
+            installed = root.findall('.//{http://wixtoolset.org/schemas/v4/wxs}File')
+            self.assertEqual(count, len(files))
+            self.assertEqual({Path(node.attrib['Source']) for node in installed}, {path.resolve() for _, path in files})
+            self.assertEqual(sum(Path(node.attrib['Source']).suffix in ('.pfx', '.p12') for node in installed), 4)
+            # Exercise package() itself: native compilation and WiX execution are
+            # deliberately mocked, while both legal traversals and ZIP writes run.
+            lock = native.load_lock('pdf')
+            work = self.root / 'package-work'
+            work.mkdir()
+            binaries = {'app': self.root / 'synthetic-gui.exe', 'cli': self.root / 'synthetic-cli.exe'}
+            for name, path in binaries.items():
+                path.write_bytes(('Synthetic ' + name + ' fixture; not a real native executable').encode())
+            native.write_json(work / 'build-windows-x64.json', {'inputs': {}, 'binaries': {
+                name: {'sha256': native.digest(path), 'bytes': path.stat().st_size} for name, path in binaries.items()}})
+
+            def staged_notices(lock, source, fonts, destination, record, env, target):
+                shutil.copytree(app / 'OpenSourceLicenses', destination)
+
+            msi_calls = []
+            def msi(lock, source, legal, stage, env, destination):
+                xml, count = native.add_msi_notices(original, lock, legal)
+                msi_calls.append((xml, count))
+                destination.write_bytes(b'Synthetic MSI runner output; actual WiX is not executed by this test')
+                return {'legalFiles': count}
+
+            package_root = self.root / 'package-run'
+            with patch.object(native, 'ROOT', package_root), patch.object(native, 'assert_host'), \
+                    patch.object(native, 'prepared', return_value=(work, self.source, self.root / 'fonts', {})), \
+                    patch.object(native, 'build_env', return_value={}), patch.object(native, 'binary_paths', return_value=binaries), \
+                    patch.object(native, 'audit_native_dependencies', return_value={}), patch.object(native, 'stage_extras', return_value=[]), \
+                    patch.object(native, 'notices', side_effect=staged_notices), patch.object(native, 'original_windows_msi', side_effect=msi), \
+                    patch('sys.stdout', new=io.StringIO()):
+                native.package(SimpleNamespace(platform='windows-x64', existing_target=None), lock)
+            output = package_root / 'dist/pdf-windows-x64' / (native.artifact_base(lock, 'windows-x64') + '.zip')
+            with zipfile.ZipFile(output) as archive:
+                for path, contents in expected.items():
+                    self.assertEqual(archive.read('KIO PDF/' + path), contents)
+            self.assertEqual(len(msi_calls), 1)
+            self.assertEqual(msi_calls[0][1], len(files))
 
 
 if __name__ == '__main__':

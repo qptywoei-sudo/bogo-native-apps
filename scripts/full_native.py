@@ -499,7 +499,8 @@ def package(args, lock):
         if portable.is_file():
             shutil.copyfile(portable, folder / 'portable.txt')
         notices(lock, source, fonts, folder / 'OpenSourceLicenses', record, env, target)
-        common.create_source_zip(output / (base + '.zip'), [(lock['name'] + '/' + r, p) for r, p in common.regular_files(folder, public=True)], lock['sourceDateEpoch'])
+        legal_validator = common.reviewed_notice_public_validator(folder, 'OpenSourceLicenses/Rust-dependencies')
+        common.create_source_zip(output / (base + '.zip'), [(lock['name'] + '/' + r, p) for r, p in common.regular_files(folder, public=True, public_validator=legal_validator)], lock['sourceDateEpoch'])
         record['msiPackaging'] = original_windows_msi(lock, source, folder / 'OpenSourceLicenses', stage, env, output / (base + '.msi'))
         record['signing'] = {'kind': 'unsigned', 'publisherCertificate': False}
     write_json(output / (base + '-provenance.json'), record)
@@ -512,7 +513,8 @@ def add_msi_notices(original, lock, license_dir):
     require(original.count('</Feature>') >= 1 and original.count('</Wix>') == 1, 'Unexpected original WiX document')
     original = original.replace('</Feature>', '<ComponentGroupRef Id="KioNotices" /></Feature>', 1)
     components, references = [], []
-    for relative, p in common.regular_files(license_dir, public=True):
+    legal_validator = common.reviewed_notice_public_validator(license_dir, 'Rust-dependencies')
+    for relative, p in common.regular_files(license_dir, public=True, public_validator=legal_validator):
         token = hashlib.sha256((lock['id'] + '/' + relative).encode('utf-8')).hexdigest()[:28]
         component, file_id = 'KioC' + token, 'KioF' + token
         guid = str(uuid.uuid5(uuid.NAMESPACE_URL, 'https://kio-library.vercel.app/native/' + lock['id'] + '/legal/' + relative)).upper()

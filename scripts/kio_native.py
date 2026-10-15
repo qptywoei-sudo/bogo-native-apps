@@ -681,6 +681,102 @@ def reviewed_declared_license(package, folder, destination):
                                               "reason": "Exact reviewed immutable VCS-root original notice"} for notice in upstream_notices]
 
 
+def reviewed_notice_public_validator(root, dependency_prefix):
+    """Allow only pinned public certificate fixtures in authenticated legal copies.
+
+    The general public-file policy remains unchanged. A staged fixture needs the
+    exact reviewed crate archive identity and its entire pinned source manifest;
+    a matching certificate basename or a self-reported provenance is insufficient.
+    """
+    root = Path(root)
+    require(root.is_dir() and not root.is_symlink(), "Invalid legal staging root")
+    require(dependency_prefix in ("Rust-dependencies", "OpenSourceLicenses/Rust-dependencies"), "Invalid legal dependency prefix")
+    authenticated = set()
+
+    def authenticate(label, pin):
+        folder = root / dependency_prefix / label
+        for part in [root.joinpath(*PurePosixPath(dependency_prefix).parts[:i])
+                     for i in range(1, len(PurePosixPath(dependency_prefix).parts) + 1)] + [folder]:
+            require(part.is_dir() and not part.is_symlink(), "Legal dependency directory symlink refused")
+        proof = _reviewed_json(folder / "REVIEWED-LICENSE-PROVENANCE.json")
+        archive_url = "https://static.crates.io/crates/" + pin["name"] + "/" + label + ".crate"
+        require(isinstance(proof, dict) and proof.get("schema") == "kio.reviewed-declared-license.v1" and
+                all(proof.get(key) == pin[key] for key in ("name", "version", "repository", "authors", "commit", "pathInVcs")) and
+                proof.get("declaredLicense") == pin["license"] and proof.get("selectedLicense") == "MIT" and
+                proof.get("publishedArchive") == {"url": archive_url, "bytes": pin["archiveBytes"], "sha256": pin["archiveSha256"]} and
+                proof.get("filesManifestSha256") == pin["filesManifestSha256"] and proof.get("sourceBytes") == pin["sourceBytes"] and
+                proof.get("reviewedPublicTestCertificates") == pin["publicTestCertificates"], "Staged legal crate provenance differs from its immutable source pin")
+        rows = proof.get("originalFiles")
+        require(isinstance(rows, list) and len(rows) == pin["fileCount"], "Staged legal original file inventory missing")
+        hashes, sizes = {}, {}
+        for row in rows:
+            require(isinstance(row, dict) and set(row) == {"path", "bytes", "sha256"}, "Invalid staged original file record")
+            relative = safe_relative(row["path"]).as_posix()
+            require(relative not in hashes and type(row["bytes"]) is int and 0 <= row["bytes"] <= 2 * 1024 * 1024 and
+                    isinstance(row["sha256"], str) and HEX.fullmatch(row["sha256"]), "Duplicate or invalid staged original file")
+            hashes[relative], sizes[relative] = row["sha256"], row["bytes"]
+        canonical = json.dumps(hashes, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        require(hashlib.sha256(canonical).hexdigest() == pin["filesManifestSha256"] and sum(sizes.values()) == pin["sourceBytes"],
+                "Staged legal original manifest differs from authenticated published archive")
+        original = folder / "original-crate"
+        require(original.is_dir() and not original.is_symlink(), "Invalid staged original source directory")
+        actual = {}
+        for base, directories, filenames in os.walk(original, followlinks=False):
+            for name in directories:
+                path = Path(base) / name
+                require(not path.is_symlink(), "Staged original source directory symlink refused")
+                check_public_path(path.relative_to(original).as_posix())
+            for name in filenames:
+                path = Path(base) / name
+                require(path.is_file() and not path.is_symlink(), "Staged original source link or special file refused")
+                actual[safe_relative(path.relative_to(original).as_posix()).as_posix()] = path
+        checksum = proof.get("cargoChecksumMetadata")
+        require(isinstance(checksum, dict) and type(checksum.get("present")) is bool and checksum.get("generatedByCollector") is False,
+                "Invalid staged Cargo checksum evidence")
+        require(checksum.get("status") == ("validated-and-retained" if checksum["present"] else "absent-in-original-registry-unpack"),
+                "Invalid staged Cargo checksum status")
+        expected = set(hashes) | ({".cargo-checksum.json"} if checksum["present"] else set())
+        require(set(actual) == expected, "Staged original source has missing or additional files")
+        for relative, sha in hashes.items():
+            path = actual[relative]
+            require(path.stat().st_size == sizes[relative] and digest(path) == sha, "Staged original source SHA/bytes mismatch: " + relative)
+        if checksum["present"]:
+            path = actual[".cargo-checksum.json"]
+            require(digest(path) == proof.get("cargoChecksumFileSha256") and
+                    _reviewed_json(path) == {"files": hashes, "package": pin["archiveSha256"]}, "Staged Cargo checksum metadata changed")
+        else:
+            require(proof.get("cargoChecksumFileSha256") is None, "Invented staged Cargo checksum metadata")
+        authenticated.add(label)
+
+    def validate(relative):
+        path = safe_relative(relative)
+        try:
+            return check_public_path(relative)
+        except ValueError:
+            prefix = dependency_prefix + "/"
+            require(relative.startswith(prefix), "Private legal staging path refused: " + relative)
+            parts = path.parts[len(PurePosixPath(dependency_prefix).parts):]
+            require(len(parts) >= 3 and parts[1] == "original-crate", "Private legal staging path refused: " + relative)
+            label, original_path = parts[0], PurePosixPath(*parts[2:]).as_posix()
+            pin = _REVIEWED_DECLARED_LICENSES.get(label)
+            certificate = pin["publicTestCertificates"].get(original_path) if pin else None
+            require(certificate is not None, "Unreviewed private legal file refused: " + relative)
+            if label not in authenticated:
+                authenticate(label, pin)
+            fixture = root / path
+            require(fixture.is_file() and not fixture.is_symlink() and fixture.stat().st_size == certificate["bytes"] and
+                    digest(fixture) == certificate["sha256"], "Staged public test certificate SHA/bytes mismatch: " + relative)
+            return path
+
+    # A missing fixture must not avoid authentication merely because the private
+    # extension is no longer encountered by the later ZIP/MSI traversal.
+    for label, pin in _REVIEWED_DECLARED_LICENSES.items():
+        folder = root / dependency_prefix / label
+        if folder.exists() or folder.is_symlink():
+            authenticate(label, pin)
+    return validate
+
+
 def upstream_license_files(package, folder, cache):
     """Some published crates omit workspace-root licenses. Fetch only their immutable VCS root."""
     repository = re.fullmatch(r"https?://github\.com/([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+?)(?:\.git)?(?:/tree/[^?#]+)?/?", package.get("repository") or "")
