@@ -1,9 +1,12 @@
 """Regression coverage for legal material present in full native dependencies."""
 import importlib.util
 import copy
+import gzip
 import hashlib
+import io
 import json
 from pathlib import Path
+import tarfile
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -120,7 +123,7 @@ class ReviewedDeclaredLicenseTests(unittest.TestCase):
             data = ('Synthetic original upstream notice for ' + notice['path'] + '; tests never download a license.\n').encode()
             notice.update(bytes=len(data), sha256=hashlib.sha256(data).hexdigest())
             self.notice_contents[notice['path']] = data
-        self.folder = self.cargo / 'registry/src' / label
+        self.folder = self.cargo / 'registry/src/index.crates.io-fixture' / label
         self.folder.mkdir(parents=True)
         self.package = {key: copy.deepcopy(self.pin[key]) for key in ('name', 'version', 'repository', 'license', 'authors')}
         self.package.update(manifest_path=str(self.folder / 'Cargo.toml'), source='registry+https://github.com/rust-lang/crates.io-index')
@@ -149,13 +152,36 @@ class ReviewedDeclaredLicenseTests(unittest.TestCase):
         self.hashes = {path: hashlib.sha256(data).hexdigest() for path, data in self.contents.items()}
         self.pin.update(fileCount=len(self.hashes), sourceBytes=sum(map(len, self.contents.values())),
                         filesManifestSha256=hashlib.sha256(json.dumps(self.hashes, sort_keys=True, separators=(',', ':')).encode()).hexdigest())
+        archive = self.cargo / 'registry/cache/index.crates.io-fixture' / (self.pin['name'] + '-' + self.pin['version'] + '.crate')
+        archive.parent.mkdir(parents=True, exist_ok=True)
+        with tarfile.open(archive, 'w:gz') as stream:
+            for name, contents in sorted(self.contents.items()):
+                member = tarfile.TarInfo(self.pin['name'] + '-' + self.pin['version'] + '/' + name)
+                member.size = len(contents)
+                stream.addfile(member, io.BytesIO(contents))
+        self.pin.update(archiveBytes=archive.stat().st_size, archiveSha256=builder.digest(archive))
+        self.archive = archive
         builder.write_json(self.folder / '.cargo-checksum.json', {'files': self.hashes, 'package': self.pin['archiveSha256']})
 
-    def reviewed_collect(self, label):
+    def reviewed_collect(self, label, response=None):
         (self.root / 'LICENSE').write_bytes((builder.ROOT / 'LICENSE').read_bytes())
         with patch.dict(builder._REVIEWED_DECLARED_LICENSES, {label: self.pin}), patch.object(builder, 'upstream_license_files', side_effect=AssertionError('Known omission must not fetch mutable licenses')), \
-                patch.object(builder, 'ROOT', self.root), patch.object(builder.urllib.request, 'urlopen', side_effect=self.notice_response):
+                patch.object(builder, 'ROOT', self.root), patch.object(builder.urllib.request, 'urlopen', side_effect=response or self.notice_response):
             self.collect()
+
+    def archive_response(self, request, timeout):
+        label = self.pin['name'] + '-' + self.pin['version']
+        url = 'https://static.crates.io/crates/' + self.pin['name'] + '/' + label + '.crate'
+        self.assertEqual(request.full_url, url)
+
+        class Response:
+            def __enter__(response): return response
+            def __exit__(response, *args): pass
+            def read(response, limit): return self.archive_response_bytes[:limit]
+
+        response = Response()
+        response.url = url
+        return response
 
     def notice_response(self, request, timeout):
         root = 'https://raw.githubusercontent.com/' + self.pin['vcsRepository'] + '/' + self.pin['commit'] + '/'
@@ -251,6 +277,138 @@ class ReviewedDeclaredLicenseTests(unittest.TestCase):
                     self.assertIn('KIO elects the MIT option', text)
                 self.assertNotIn('Copyright (c) 2026 KIO', text)
                 self.assertEqual(text.split('Permission is hereby granted', 1)[1], (builder.ROOT / 'LICENSE').read_text().split('Permission is hereby granted', 1)[1])
+
+    def test_all_eight_actual_registry_layouts_need_no_vendor_checksum_file(self):
+        for label in builder._REVIEWED_DECLARED_LICENSES:
+            with self.subTest(label=label):
+                self.fixture(label)
+                (self.folder / '.cargo-checksum.json').unlink()
+                (self.folder / '.cargo-ok').write_text('{"v":1}')
+                self.reviewed_collect(label)
+                output = self.output / label
+                self.assertFalse((self.folder / '.cargo-checksum.json').exists())
+                self.assertFalse((output / 'original-crate/.cargo-checksum.json').exists())
+                self.assertFalse((output / 'original-crate/.cargo-ok').exists())
+                for relative, contents in self.contents.items():
+                    self.assertEqual((output / 'original-crate' / relative).read_bytes(), contents)
+                proof = json.loads((output / 'REVIEWED-LICENSE-PROVENANCE.json').read_text())
+                self.assertIsNone(proof['cargoChecksumFileSha256'])
+                self.assertEqual(proof['cargoChecksumMetadata'], {
+                    'present': False, 'generatedByCollector': False, 'status': 'absent-in-original-registry-unpack'})
+                self.assertEqual(proof['archiveVerification'], {
+                    'origin': 'cargo-registry-cache', 'sha256': self.pin['archiveSha256'], 'bytes': self.pin['archiveBytes'],
+                    'filesManifestSha256': self.pin['filesManifestSha256'], 'originalFileCount': len(self.contents),
+                    'sourceBytes': sum(map(len, self.contents.values()))})
+
+    def test_checksumless_registry_still_rejects_changed_source_and_extra_files(self):
+        for label in builder._REVIEWED_DECLARED_LICENSES:
+            with self.subTest(label=label):
+                self.fixture(label)
+                (self.folder / '.cargo-checksum.json').unlink()
+                original = (self.folder / 'src/lib.rs').read_bytes()
+                (self.folder / 'src/lib.rs').write_bytes(original + b'changed')
+                self.assert_refused(label)
+                (self.folder / 'src/lib.rs').write_bytes(original)
+                for name in ['unexpected.txt', '.hidden-source', '.env', 'credentials.json']:
+                    extra = self.folder / name
+                    extra.write_text('unreviewed extra input')
+                    self.assert_refused(label)
+                    extra.unlink()
+                self.assertFalse((self.folder / '.cargo-checksum.json').exists())
+
+    def test_missing_sibling_archive_uses_only_authenticated_fixed_official_url(self):
+        label = self.fixture()
+        (self.folder / '.cargo-checksum.json').unlink()
+        self.archive_response_bytes = self.archive.read_bytes()
+        self.archive.unlink()
+        self.reviewed_collect(label, response=self.archive_response)
+        cached = self.root / '.cache/reviewed-published-crates' / (label + '.crate')
+        self.assertEqual(cached.read_bytes(), self.archive_response_bytes)
+        proof = json.loads((self.output / label / 'REVIEWED-LICENSE-PROVENANCE.json').read_text())
+        self.assertEqual(proof['archiveVerification']['origin'], 'fixed-official-archive-cache')
+        self.assertFalse((self.folder / '.cargo-checksum.json').exists())
+
+    def test_fixed_archive_redirect_or_modified_response_is_rejected_before_caching(self):
+        label = self.fixture()
+        self.archive_response_bytes = self.archive.read_bytes()
+        self.archive.unlink()
+        original = self.archive_response_bytes
+
+        def redirected(request, timeout):
+            response = self.archive_response(request, timeout)
+            response.url = 'https://unrelated.example/modified.crate'
+            return response
+
+        with self.assertRaisesRegex(ValueError, 'redirect'):
+            self.reviewed_collect(label, response=redirected)
+        for data in [original[:-1], original + b'x', bytes([original[0] ^ 1]) + original[1:]]:
+            self.archive_response_bytes = data
+            with self.subTest(size=len(data)), self.assertRaisesRegex(ValueError, 'SHA/bytes mismatch'):
+                self.reviewed_collect(label, response=self.archive_response)
+        self.assertFalse((self.root / '.cache/reviewed-published-crates' / (label + '.crate')).exists())
+        self.assertFalse((self.output / label).exists())
+
+    def test_modified_sibling_archive_is_rejected_without_remote_fallback(self):
+        label = self.fixture()
+        raw = self.archive.read_bytes()
+        self.archive.write_bytes(raw[:-1] + bytes([raw[-1] ^ 1]))
+        with self.assertRaisesRegex(ValueError, 'published archive SHA/bytes mismatch'):
+            self.reviewed_collect(label)
+        self.assertFalse((self.output / label).exists())
+
+    def test_sibling_archive_and_cache_directory_links_are_refused(self):
+        label = self.fixture()
+        raw = self.archive.read_bytes()
+        other = self.root / 'unrelated.crate'
+        other.write_bytes(raw)
+        self.archive.unlink()
+        self.archive.symlink_to(other)
+        with self.assertRaisesRegex(ValueError, 'published archive SHA/bytes mismatch'):
+            self.reviewed_collect(label)
+        self.archive.unlink()
+        cache = self.archive.parent
+        moved = cache.with_name('moved-index')
+        cache.rename(moved)
+        (moved / self.archive.name).write_bytes(raw)
+        cache.symlink_to(moved, target_is_directory=True)
+        with self.assertRaisesRegex(ValueError, 'cache directory symlink'):
+            self.reviewed_collect(label)
+        self.assertFalse((self.output / label).exists())
+
+    def test_bounded_tar_rejects_bad_format_links_paths_duplicates_and_bombs(self):
+        label = self.fixture()
+
+        def archive(entries):
+            raw = io.BytesIO()
+            with tarfile.open(fileobj=raw, mode='w') as stream:
+                for member, contents in entries:
+                    stream.addfile(member, io.BytesIO(contents) if contents is not None else None)
+            return gzip.compress(raw.getvalue())
+
+        def file(name, contents=b'x'):
+            member = tarfile.TarInfo(name)
+            member.size = len(contents)
+            return member, contents
+
+        symbolic = tarfile.TarInfo(label + '/link')
+        symbolic.type, symbolic.linkname = tarfile.SYMTYPE, '../outside'
+        hard = tarfile.TarInfo(label + '/hard')
+        hard.type, hard.linkname = tarfile.LNKTYPE, label + '/Cargo.toml'
+        cases = [('not-tar', gzip.compress(b'not a tar archive')),
+                 ('symlink', archive([(symbolic, None)])), ('hardlink', archive([(hard, None)])),
+                 ('traversal', archive([file(label + '/../outside')])),
+                 ('absolute', archive([file('/' + label + '/outside')])),
+                 ('backslash', archive([file(label + '/bad\\file')])),
+                 ('duplicate', archive([file(label + '/same'), file(label + '/same')])),
+                 ('case-collision', archive([file(label + '/Same'), file(label + '/same')])),
+                 ('private-file', archive([file(label + '/credentials.json')])),
+                 ('too-many-files', archive([file(label + '/file' + str(i)) for i in range(self.pin['fileCount'] + 1)])),
+                 ('uncompressed-bomb', gzip.compress(b'x' * (self.pin['sourceBytes'] + self.pin['fileCount'] * 4096 + 65537)))]
+        for name, data in cases:
+            self.archive.write_bytes(data)
+            self.pin.update(archiveBytes=len(data), archiveSha256=hashlib.sha256(data).hexdigest())
+            with self.subTest(case=name):
+                self.assert_refused(label)
 
     def test_repository_license_authors_and_registry_identity_must_match_exactly(self):
         label = self.fixture()

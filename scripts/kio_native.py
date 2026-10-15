@@ -6,6 +6,7 @@ import argparse
 import concurrent.futures
 import gzip
 import hashlib
+import io
 import json
 import os
 import platform
@@ -429,7 +430,7 @@ _REVIEWED_DECLARED_LICENSES = {
 
 
 def _reviewed_json(path):
-    require(path.is_file() and not path.is_symlink() and 0 < path.stat().st_size <= 1024 * 1024, "Invalid reviewed crate metadata")
+    require(path.is_file() and not path.is_symlink() and 0 < path.stat().st_size <= 1024 * 1024, "Invalid reviewed crate metadata: " + path.name)
 
     def unique(pairs):
         result = {}
@@ -439,6 +440,83 @@ def _reviewed_json(path):
         return result
 
     return json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=unique)
+
+
+def reviewed_published_crate_files(pin, folder):
+    """Authenticate the published archive, not vendor-only generated checksum metadata."""
+    label = pin["name"] + "-" + pin["version"]
+    archive_url = "https://static.crates.io/crates/" + pin["name"] + "/" + label + ".crate"
+    archive = None
+    # A Cargo registry unpack has .cargo-ok, but normally no .cargo-checksum.json.
+    # The original .crate is its sibling under registry/cache/<index>/.
+    if folder.name == label and folder.parent.parent.name == "src" and folder.parent.parent.parent.name == "registry":
+        candidate = folder.parent.parent.parent / "cache" / folder.parent.name / (label + ".crate")
+        require(not any(p.is_symlink() for p in (candidate.parent, candidate.parent.parent)), "Reviewed registry cache directory symlink refused")
+        if candidate.exists() or candidate.is_symlink():
+            archive, origin = candidate, "cargo-registry-cache"
+    if archive is None:
+        cache = ROOT / ".cache/reviewed-published-crates"
+        require(not cache.is_symlink() and not cache.parent.is_symlink(), "Reviewed archive cache directory symlink refused")
+        archive, origin = cache / (label + ".crate"), "fixed-official-archive-cache"
+        if not archive.exists() and not archive.is_symlink():
+            request = urllib.request.Request(archive_url, headers={"User-Agent": "KIO-native-license-collector"})
+            with urllib.request.urlopen(request, timeout=30) as response:
+                require(response.url == archive_url, "Reviewed archive redirect refused")
+                data = response.read(pin["archiveBytes"] + 1)
+            require(len(data) == pin["archiveBytes"] and hashlib.sha256(data).hexdigest() == pin["archiveSha256"],
+                    "Reviewed downloaded archive SHA/bytes mismatch: " + label)
+            cache.mkdir(parents=True, exist_ok=True)
+            with archive.open("xb") as output:
+                output.write(data)
+    require(archive.is_file() and not archive.is_symlink() and archive.stat().st_size == pin["archiveBytes"] and
+            digest(archive) == pin["archiveSha256"], "Reviewed published archive SHA/bytes mismatch: " + label)
+    hashes, total, seen, kinds = {}, 0, set(), {}
+    try:
+        # Bound decompression before tarfile can read a malicious extended header.
+        tar_limit = pin["sourceBytes"] + pin["fileCount"] * 4096 + 65536
+        with gzip.open(archive, "rb") as compressed:
+            tar_bytes = compressed.read(tar_limit + 1)
+        require(len(tar_bytes) <= tar_limit, "Reviewed archive expansion limit exceeded")
+        with tarfile.open(fileobj=io.BytesIO(tar_bytes), mode="r:") as stream:
+            for member in stream:
+                name = member.name.rstrip("/")
+                path = safe_relative(name)
+                require(path.parts[0] == label, "Reviewed archive root mismatch")
+                require(member.isdir() or member.isfile(), "Reviewed archive link or special file refused")
+                key = name.casefold()
+                require(key not in seen, "Reviewed archive duplicate/case collision")
+                require(not any(kinds.get(PurePosixPath(*path.parts[:i]).as_posix().casefold()) == "file"
+                                for i in range(1, len(path.parts))), "Reviewed archive file/directory collision")
+                seen.add(key)
+                kinds[key] = "directory" if member.isdir() else "file"
+                require(len(seen) <= pin["fileCount"] * 4 + 32, "Reviewed archive member limit exceeded")
+                relative = PurePosixPath(*path.parts[1:]).as_posix() if len(path.parts) > 1 else ""
+                if not relative:
+                    require(member.isdir(), "Reviewed archive root must be a directory")
+                    continue
+                if member.isdir():
+                    check_public_path(relative)
+                    require(member.size == 0, "Reviewed archive directory has data")
+                    continue
+                require(0 <= member.size <= 2 * 1024 * 1024, "Reviewed archive member size exceeded")
+                total += member.size
+                require(total <= pin["sourceBytes"] and len(hashes) < pin["fileCount"], "Reviewed archive source bounds exceeded")
+                data = stream.extractfile(member).read(member.size + 1)
+                require(len(data) == member.size, "Reviewed archive member size mismatch")
+                sha = hashlib.sha256(data).hexdigest()
+                try:
+                    check_public_path(relative)
+                except ValueError:
+                    certificate = pin["publicTestCertificates"].get(relative)
+                    require(certificate == {"bytes": member.size, "sha256": sha}, "Unreviewed private filename in original archive: " + relative)
+                hashes[relative] = sha
+    except (tarfile.TarError, OSError, EOFError) as error:
+        raise ValueError("Invalid reviewed published TAR: " + label) from error
+    canonical = json.dumps(hashes, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    require(len(hashes) == pin["fileCount"] and total == pin["sourceBytes"] and
+            hashlib.sha256(canonical).hexdigest() == pin["filesManifestSha256"], "Reviewed published archive file manifest mismatch: " + label)
+    return hashes, {"origin": origin, "sha256": pin["archiveSha256"], "bytes": pin["archiveBytes"],
+                    "filesManifestSha256": pin["filesManifestSha256"], "originalFileCount": len(hashes), "sourceBytes": total}
 
 
 def reviewed_pinned_upstream_notices(pin):
@@ -478,16 +556,14 @@ def reviewed_declared_license(package, folder, destination):
             package.get("source") == "registry+https://github.com/rust-lang/crates.io-index" and not package.get("license_file"),
             "Reviewed crate metadata differs from its exact published declaration: " + label)
     require(folder.is_dir() and not folder.is_symlink(), "Invalid reviewed crate source directory")
+    hashes, archive_verification = reviewed_published_crate_files(pin, folder)
     checksum_path = folder / ".cargo-checksum.json"
-    checksum = _reviewed_json(checksum_path)
-    require(isinstance(checksum, dict) and set(checksum) == {"files", "package"} and checksum["package"] == pin["archiveSha256"],
-            "Reviewed crate package checksum mismatch: " + label)
-    hashes = checksum["files"]
-    require(isinstance(hashes, dict) and len(hashes) == pin["fileCount"] and
-            all(isinstance(name, str) and isinstance(value, str) and HEX.fullmatch(value) for name, value in hashes.items()),
-            "Invalid reviewed crate file checksum map: " + label)
-    canonical = json.dumps(hashes, sort_keys=True, separators=(",", ":")).encode("utf-8")
-    require(hashlib.sha256(canonical).hexdigest() == pin["filesManifestSha256"], "Reviewed crate published file manifest mismatch: " + label)
+    checksum_present = checksum_path.exists() or checksum_path.is_symlink()
+    if checksum_present:
+        checksum = _reviewed_json(checksum_path)
+        require(isinstance(checksum, dict) and set(checksum) == {"files", "package"} and checksum["package"] == pin["archiveSha256"],
+                "Reviewed crate package checksum mismatch: " + label)
+        require(checksum["files"] == hashes, "Reviewed crate file checksum map differs from authenticated archive: " + label)
     declaration_files = pin["declarationFiles"]
     require(declaration_files and "Cargo.toml" in declaration_files and len(declaration_files) == len(set(declaration_files)) and
             all(name in hashes for name in declaration_files),
@@ -516,8 +592,8 @@ def reviewed_declared_license(package, folder, destination):
             safe_relative(relative)
             actual[relative] = path
     # Cargo creates .cargo-ok after unpacking. It is not published source and
-    # is never copied. The generated checksum file is retained as evidence.
-    allowed = set(hashes) | {".cargo-checksum.json"}
+    # is never copied. Vendor-generated checksum metadata is retained only when present.
+    allowed = set(hashes) | ({".cargo-checksum.json"} if checksum_present else set())
     if ".cargo-ok" in actual:
         require(actual[".cargo-ok"].stat().st_size <= 1024, "Unexpected Cargo unpack marker size")
         allowed.add(".cargo-ok")
@@ -543,7 +619,8 @@ def reviewed_declared_license(package, folder, destination):
     # Authenticate the exact original notices before any destination is created.
     upstream_notices = reviewed_pinned_upstream_notices(pin)
     # Authenticate every input before writing anything, and verify copied bytes.
-    for item in original + [{"path": ".cargo-checksum.json", "bytes": checksum_path.stat().st_size, "sha256": digest(checksum_path)}]:
+    checksum_evidence = [{"path": ".cargo-checksum.json", "bytes": checksum_path.stat().st_size, "sha256": digest(checksum_path)}] if checksum_present else []
+    for item in original + checksum_evidence:
         output = destination / "original-crate" / item["path"]
         output.parent.mkdir(parents=True, exist_ok=True)
         with actual[item["path"]].open("rb") as source, output.open("xb") as target:
@@ -570,8 +647,11 @@ def reviewed_declared_license(package, folder, destination):
                   "declaredLicense": pin["license"], "selectedLicense": "MIT", "commit": pin["commit"], "pathInVcs": pin["pathInVcs"],
                   "publishedArchive": {"url": archive_url,
                                        "bytes": pin["archiveBytes"], "sha256": pin["archiveSha256"]},
-                  "sourceVerification": "Cargo package checksum plus pinned published path-to-SHA manifest and every original file SHA/byte count",
-                  "filesManifestSha256": pin["filesManifestSha256"], "cargoChecksumFileSha256": digest(checksum_path),
+                  "sourceVerification": "Exact published archive SHA/bytes, bounded TAR-derived pinned path-to-SHA manifest and every unpacked original file SHA/byte count",
+                  "archiveVerification": archive_verification,
+                  "filesManifestSha256": pin["filesManifestSha256"], "cargoChecksumFileSha256": digest(checksum_path) if checksum_present else None,
+                  "cargoChecksumMetadata": {"present": checksum_present, "generatedByCollector": False,
+                                            "status": "validated-and-retained" if checksum_present else "absent-in-original-registry-unpack"},
                   "originalFiles": original, "sourceBytes": total, "excludedGeneratedFiles": [".cargo-ok"] if ".cargo-ok" in actual else [],
                   "originalDeclarationFiles": [{"path": "original-crate/" + name, "sha256": hashes[name],
                                                 "publishedArchiveMember": label + "/" + name, "publishedArchiveUrl": archive_url}
