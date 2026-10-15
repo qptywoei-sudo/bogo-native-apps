@@ -3,6 +3,12 @@ name: Full native KIO Word (manual)
 on:
   workflow_dispatch:
     inputs:
+      platform:
+        description: Native platforms to build
+        type: choice
+        options: [all, windows-x64, macos-arm64]
+        default: all
+        required: true
       publish_draft:
         description: Create a draft release after both native builds and full source packaging pass
         type: boolean
@@ -13,7 +19,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: full-native-word-${{ github.ref }}
+  group: full-native-word-${{ github.sha }}-${{ inputs.platform }}
   cancel-in-progress: false
 
 jobs:
@@ -23,17 +29,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          # GitHub's documented macos-15 image is Apple Silicon; do not use macos-15-intel.
-          - runner: macos-15
-            platform: macos-arm64
-            target: aarch64-apple-darwin
-            python: python3
-          - runner: windows-2022
-            platform: windows-x64
-            target: x86_64-pc-windows-msvc
-            python: python
-    runs-on: ${{ matrix.runner }}
+        platform: ${{ fromJSON(inputs.platform == 'windows-x64' && '["windows-x64"]' || inputs.platform == 'macos-arm64' && '["macos-arm64"]' || '["macos-arm64","windows-x64"]') }}
+    runs-on: ${{ matrix.platform == 'macos-arm64' && 'macos-15' || 'windows-2022' }}
+    env:
+      KIO_PYTHON: ${{ matrix.platform == 'windows-x64' && 'python' || 'python3' }}
+      KIO_TARGET: ${{ matrix.platform == 'windows-x64' && 'x86_64-pc-windows-msvc' || 'aarch64-apple-darwin' }}
     timeout-minutes: 120
     defaults:
       run:
@@ -43,17 +43,17 @@ jobs:
         with:
           persist-credentials: false
       - name: Verify orchestrator guards
-        run: ${{ matrix.python }} -m unittest discover -s tests -v
+        run: "$KIO_PYTHON" -m unittest discover -s tests -v
       - name: Install the locked Rust toolchain
-        run: rustup toolchain install 1.95.0 --profile minimal --target ${{ matrix.target }}
+        run: rustup toolchain install 1.95.0 --profile minimal --target "$KIO_TARGET"
       - name: Fetch exact sources, fonts and apply the locked full-app patch
-        run: ${{ matrix.python }} scripts/kio_native.py prepare --app word
+        run: "$KIO_PYTHON" scripts/kio_native.py prepare --app word
       - name: Build the complete native app and CLI, test original core, check DOCX and PDF
-        run: ${{ matrix.python }} scripts/kio_native.py build --app word --platform ${{ matrix.platform }}
+        run: "$KIO_PYTHON" scripts/kio_native.py build --app word --platform ${{ matrix.platform }}
       - name: Package the full native application and license texts
-        run: ${{ matrix.python }} scripts/kio_native.py package --app word --platform ${{ matrix.platform }}
+        run: "$KIO_PYTHON" scripts/kio_native.py package --app word --platform ${{ matrix.platform }}
       - name: Verify exact release allowlist and SHA-256
-        run: ${{ matrix.python }} scripts/kio_native.py verify --directory dist/word-${{ matrix.platform }}
+        run: "$KIO_PYTHON" scripts/kio_native.py verify --directory dist/word-${{ matrix.platform }}
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: word-${{ matrix.platform }}
@@ -83,7 +83,7 @@ jobs:
           retention-days: 14
 
   publish-draft:
-    if: github.event_name == 'workflow_dispatch' && inputs.publish_draft && github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' && inputs.publish_draft && inputs.platform == 'all' && github.ref == 'refs/heads/main'
     needs: [native, full-source]
     permissions:
       contents: write

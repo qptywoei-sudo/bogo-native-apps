@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import gzip
 import hashlib
 import json
@@ -20,6 +21,7 @@ import tempfile
 import time
 import urllib.parse
 import urllib.request
+import urllib.error
 import zipfile
 from pathlib import Path, PurePosixPath
 
@@ -28,7 +30,7 @@ TARGETS = {"macos-arm64": "aarch64-apple-darwin", "windows-x64": "x86_64-pc-wind
 HEX = re.compile(r"[a-f0-9]{64}\Z")
 PRIVATE = re.compile(r"^(?:\.env(?:\..*)?|\.runtime\.json|id_rsa|id_ed25519|credentials\.json|token\.json)$", re.I)
 RESERVED = re.compile(r"(?:CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\..*)?\Z", re.I)
-PUBLIC_FILES = ("README.md", ".gitignore", "manifests/word.lock.json", "manifests/programs.json",
+PUBLIC_FILES = ("README.md", "LICENSE", ".gitignore", ".gitattributes", "manifests/word.lock.json", "manifests/programs.json",
                 "patches/word/wordcraft-v0.7.0-kio-word.patch", "scripts/kio_native.py", "tests/test_builder.py",
                 ".github/workflows/full-native-word.yml")
 
@@ -219,6 +221,7 @@ def prepare(args, lock):
         preserved[name] = digest(source / name)
     engines = {relative for relative, _ in regular_files(source) if relative.startswith("crates/") and "/src/" in relative}
     run(["git", "init", "--quiet"], cwd=source)
+    run(["git", "config", "core.autocrlf", "false"], cwd=source)
     patch = ROOT / lock["branding"]["patch"]
     run(["git", "apply", "--check", "--binary", patch], cwd=source)
     run(["git", "apply", "--binary", patch], cwd=source)
@@ -332,6 +335,49 @@ def copy_license_tree(source, destination):
     return selected
 
 
+_UPSTREAM_NOTICE_CACHE = {}
+
+
+def upstream_license_files(package, folder, cache):
+    """Some published crates omit workspace-root licenses. Fetch only their immutable VCS root."""
+    repository = re.fullmatch(r"https?://github\.com/([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+?)(?:\.git)?(?:/tree/[^?#]+)?/?", package.get("repository") or "")
+    require(repository, "Missing license requires an exact GitHub source repository: " + package["name"])
+    vcs = folder / ".cargo_vcs_info.json"
+    if vcs.is_file():
+        commit = json.loads(vcs.read_text(encoding="utf-8"))["git"]["sha1"]
+    else:
+        commit = (package.get("source") or "").rsplit("#", 1)[-1]
+    require(re.fullmatch(r"[a-f0-9]{40}", commit), "Missing license requires an immutable source commit")
+    root = "https://raw.githubusercontent.com/" + repository[1] + "/" + commit + "/"
+    if root in _UPSTREAM_NOTICE_CACHE:
+        return _UPSTREAM_NOTICE_CACHE[root]
+    cache.mkdir(parents=True, exist_ok=True)
+    candidates = ("LICENSE", "LICENSE.md", "LICENSE.txt", "LICENSE-MIT", "LICENSE-APACHE", "LICENCE", "LICENCE.md", "COPYING", "LICENSE-ZLIB", "LICENSE_MIT", "LICENSE_APACHE", "NOTICE", "NOTICE.md")
+
+    def fetch(name):
+        url = root + name
+        path = cache / (hashlib.sha256(url.encode("ascii")).hexdigest() + ".txt")
+        if not path.exists():
+            request = urllib.request.Request(url, headers={"User-Agent": "KIO-native-license-collector"})
+            try:
+                with urllib.request.urlopen(request, timeout=30) as result:
+                    require(result.url == url, "License redirect refused")
+                    content = result.read(4 * 1024 * 1024 + 1)
+            except urllib.error.HTTPError as error:
+                if error.code == 404:
+                    return None
+                raise
+            require(20 <= len(content) <= 4 * 1024 * 1024 and not content.lstrip().lower().startswith((b"<!doctype html", b"<html")), "Unexpected upstream license response")
+            path.write_bytes(content)
+        require(path.is_file() and not path.is_symlink(), "Invalid license cache file")
+        return name, path, url
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:
+        records = [record for record in pool.map(fetch, candidates) if record is not None]
+    _UPSTREAM_NOTICE_CACHE[root] = records
+    return records
+
+
 def dependency_licenses(lock, source, env, target, destination):
     metadata = json.loads(run(["rustup", "run", lock["rust"], "cargo", "metadata", "--locked", "--format-version", "1", "--filter-platform", target], cwd=source, env=env, capture=True, timeout=600))
     allowed_roots = [source.resolve(), Path(env["CARGO_HOME"]).resolve()]
@@ -351,15 +397,55 @@ def dependency_licenses(lock, source, env, target, destination):
             p = (folder / package["license_file"]).resolve()
             require(p.is_relative_to(folder), "Dependency license path escaped package")
             names.add(p)
+        if not names and (package.get("source") or "").startswith("git+"):
+            for ancestor in folder.parents:
+                if not ancestor.is_relative_to(Path(env["CARGO_HOME"]).resolve()):
+                    break
+                if (ancestor / "Cargo.toml").is_file():
+                    names.update(p for p in ancestor.iterdir() if p.is_file() and p.name.upper().startswith(("LICENSE", "COPYING", "NOTICE")))
+                    if names:
+                        break
+        retrieved = []
         if not names:
-            missing.append(label)
+            try:
+                for filename, p, url in upstream_license_files(package, folder, ROOT / ".cache/upstream-licenses"):
+                    out = destination / label / ("UPSTREAM-" + filename)
+                    out.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copyfile(p, out)
+                    retrieved.append({"file": out.name, "url": url, "sha256": digest(p)})
+            except ValueError:
+                missing.append(label)
+            if not retrieved and label not in missing:
+                # This exact published MIT crate has no standalone license even in its
+                # pinned VCS root. Retain every original byte, author declaration and
+                # license expression, plus an explicitly labelled standard MIT text.
+                if label == "dispatch-0.2.0" and package.get("license") == "MIT" and package.get("repository") == "http://github.com/SSheldon/rust-dispatch":
+                    files = regular_files(folder, public=True)
+                    require(sum(p.stat().st_size for _, p in files) < 1024 * 1024, "Reviewed dispatch source copy exceeded its bound")
+                    for relative, p in files:
+                        out = destination / label / "original-crate" / relative
+                        out.parent.mkdir(parents=True, exist_ok=True)
+                        shutil.copyfile(p, out)
+                    out = destination / label / "STANDARD-MIT-TEXT.txt"
+                    mit = (ROOT / "LICENSE").read_text(encoding="utf-8")
+                    mit = mit.replace("Copyright (c) 2026 KIO", "Original authors: " + ", ".join(package["authors"]) + " (see original-crate/Cargo.toml.orig).")
+                    out.write_text("Standard MIT text included by KIO because the original crate declares MIT but omits a standalone license file. Original source and metadata are retained unchanged.\n\n" + mit, encoding="utf-8")
+                    retrieved.append({"file": out.name, "url": None, "sha256": digest(out), "originalCrateFiles": len(files), "reason": "Original published crate declares MIT and has no standalone license file"})
+                else:
+                    missing.append(label)
+        nested = [(relative, p) for relative, p in regular_files(folder) if "/" in relative and p.name.upper().startswith(("LICENSE", "COPYING", "NOTICE", "OFL", "UNLICENSE"))]
+        for relative, p in nested:
+            require(p.stat().st_size <= 4 * 1024 * 1024, "Invalid nested license file")
+            out = destination / label / "bundled-notices" / relative
+            out.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(p, out)
         for p in sorted(names):
             require(p.is_file() and not p.is_symlink() and p.stat().st_size <= 4 * 1024 * 1024, "Invalid dependency license file")
             out = destination / label / p.name
             out.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(p, out)
         index.append({"name": package["name"], "version": package["version"], "license": package.get("license"),
-                      "repository": package.get("repository"), "files": sorted(p.name for p in names)})
+                      "repository": package.get("repository"), "files": sorted(p.name for p in names) + [r["file"] for r in retrieved], "immutableUpstreamNotices": retrieved, "bundledNotices": [r for r, _ in nested]})
     write_json(destination / "index.json", index)
     require(not missing, "Dependencies without a packaged license file need review: " + ", ".join(missing))
 
