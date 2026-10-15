@@ -1,0 +1,122 @@
+{
+  "schema": "kio.native-functional-patch.v1",
+  "programId": "photo",
+  "upstream": {
+    "repository": "https://github.com/storytold/photocraft",
+    "commit": "c699e3cda69f4852b43c0b191ab0091aaeff9d6a",
+    "tag": "v0.9.0",
+    "archiveSha256": "3f682751d94a36d9f85b80fb5e34bf9b893c97e64dd9d9d8f02c68daac4b4c35",
+    "archiveBytes": 18442275
+  },
+  "base": {
+    "brandingPatch": "photocraft-v0.9.0-kio-photo.patch",
+    "brandingPatchSha256": "290eecc962ab36b4b94d3a2396aa3b2384999b099b88a37604d5709506561b4a"
+  },
+  "patch": {
+    "file": "functional-original-svg-test-fixture.patch",
+    "sha256": "fcec862b14a3f107fb2d993fcbdc025bbab228a3d60cd874c50a9f4ef19238be",
+    "bytes": 770048
+  },
+  "files": [
+    {
+      "path": "crates/io/src/svg.rs",
+      "before": {
+        "bytes": 38059,
+        "sha256": "1c6bb8d35da7aaf6f36ee37cb2fb681d105a92a7dc988551726451b3c47ff03a"
+      },
+      "after": {
+        "bytes": 38073,
+        "sha256": "8e1935f10b8ade3cacde4f817832ed3ea1f369cc175f0aae7c937910d000c952"
+      }
+    },
+    {
+      "path": "crates/io/tests/fixtures/upstream-photocraft-single-clip.svg",
+      "before": null,
+      "after": {
+        "bytes": 768636,
+        "sha256": "a48333b7b794b70158da93a262d84fb82f5fbbf7442db60f235a0a69136a1ce2"
+      }
+    }
+  ],
+  "summary": "Keep the original rounded-square SVG clipping test independent of the branded product icon.",
+  "behavior": [
+    "Preserve every original assertion, test declaration, cfg and ignore condition.",
+    "Change exactly one include_bytes! literal inside cfg(test), from the product icon to a pinned original test fixture.",
+    "Copy the complete original upstream SVG as test-only data with exact SHA-256 and size.",
+    "Keep the KIO product icon, production IO prefix, engine, Cargo manifests/lock, dependencies, full release GUI/CLI features and original test profiles unchanged."
+  ],
+  "testFixture": {
+    "upstreamPath": "assets/app-icon/photocraft.svg",
+    "path": "crates/io/tests/fixtures/upstream-photocraft-single-clip.svg",
+    "bytes": 768636,
+    "sha256": "a48333b7b794b70158da93a262d84fb82f5fbbf7442db60f235a0a69136a1ce2",
+    "xmlElements": {
+      "clipPath": 1,
+      "rect": 2,
+      "path": 2,
+      "image": 0
+    },
+    "notPackagedAsProductBranding": true
+  },
+  "testOnlyBoundary": {
+    "cfgTestOffset": 31583,
+    "productionPrefix": {
+      "bytes": 31583,
+      "sha256": "572aed4db4a407fbaebc1eaa4055816ee5ada648b65b41c3abd6cda74c4966d7"
+    },
+    "productionPrefixExactlyUnchanged": true,
+    "allOtherRustBytesExactlyUnchanged": true,
+    "assertionAndTestDeclarationCountsBefore": {
+      "testAttributes": 5,
+      "assertMacroCalls": 28,
+      "ignoreAttributes": 0
+    },
+    "assertionAndTestDeclarationCountsAfter": {
+      "testAttributes": 5,
+      "assertMacroCalls": 28,
+      "ignoreAttributes": 0
+    },
+    "originalFixtureXmlCounts": {
+      "clipPath": 1,
+      "rect": 2,
+      "path": 2,
+      "image": 0
+    },
+    "productIconXmlCounts": {
+      "clipPath": 0,
+      "rect": 0,
+      "path": 0,
+      "image": 1
+    }
+  },
+  "actualFailure": {
+    "run": 38822210880,
+    "head": "fb93e2c8f99978a37937569d8391538f083c14f7",
+    "macJob": 116721355592,
+    "test": "svg::tests::a_single_path_clip_becomes_the_groups_vector_mask",
+    "sourcePath": "crates/io/src/svg.rs",
+    "line": 762,
+    "message": "its rounded square is a vector mask",
+    "logSha256": "ddda3725ff11c110fef784cfebb0de491e251cbb4298bb8fcf311da66e6d36d9",
+    "logBytes": 320723,
+    "actualCompletedTestSummaries": 55,
+    "actualPassed": 1983,
+    "actualFailed": 1,
+    "actualExistingIgnored": 20,
+    "laterSuitesNotClaimedExecuted": true
+  },
+  "validation": {
+    "nativeBuildExecuted": false,
+    "nativeTestsExecutedAfterFix": false,
+    "productionCodeByteIdentical": true,
+    "allOtherOriginalRustBytesIdentical": true,
+    "allAssertionsAndTestAttributesRetained": true,
+    "runtimeCargoDependenciesAndFeaturesChanged": false,
+    "exactChangedPaths": 2,
+    "historicalOriginalBuildRustFiles": 375,
+    "exactUnmodifiedOriginalFilesAfterFix": 374,
+    "testOnlyIncludeLiteralExceptions": 1,
+    "appAndFontFilesBefore": 1772,
+    "appAndFontFilesAfter": 1773
+  }
+}

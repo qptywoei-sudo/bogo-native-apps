@@ -1,0 +1,38 @@
+{
+  "schema": "kio.photo-original-svg-test-fixture.v1",
+  "upstream": {
+    "kind": "source",
+    "repository": "storytold/photocraft",
+    "commit": "c699e3cda69f4852b43c0b191ab0091aaeff9d6a",
+    "tag": "v0.9.0",
+    "url": "https://codeload.github.com/storytold/photocraft/tar.gz/c699e3cda69f4852b43c0b191ab0091aaeff9d6a",
+    "root": "photocraft-c699e3cda69f4852b43c0b191ab0091aaeff9d6a",
+    "sha256": "3f682751d94a36d9f85b80fb5e34bf9b893c97e64dd9d9d8f02c68daac4b4c35",
+    "bytes": 18442275,
+    "archiveMembers": 2028,
+    "localCacheFile": ".cache/archives/photocraft-c699e3cda69f4852b43c0b191ab0091aaeff9d6a.tar.gz",
+    "reuse": "downloaded pinned public codeload source",
+    "verifiedAgainstPriorLock": true,
+    "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+  },
+  "originalRust": {
+    "path": "crates/io/src/svg.rs",
+    "bytes": 38059,
+    "sha256": "1c6bb8d35da7aaf6f36ee37cb2fb681d105a92a7dc988551726451b3c47ff03a"
+  },
+  "originalIcon": {
+    "upstreamPath": "assets/app-icon/photocraft.svg",
+    "path": "crates/io/tests/fixtures/upstream-photocraft-single-clip.svg",
+    "bytes": 768636,
+    "sha256": "a48333b7b794b70158da93a262d84fb82f5fbbf7442db60f235a0a69136a1ce2",
+    "xmlElements": {
+      "clipPath": 1,
+      "rect": 2,
+      "path": 2,
+      "image": 0
+    },
+    "notPackagedAsProductBranding": true
+  },
+  "license": "Exact unmodified files from the pinned upstream source; original application license files remain in the complete source.",
+  "sourceDownloadedOrExecutedByTests": false
+}

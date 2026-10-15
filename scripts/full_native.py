@@ -98,10 +98,27 @@ def vector_functional_paths(meta):
     return allowed
 
 
+def photo_fixture_functional_paths(meta):
+    """Keep every original SVG assertion; separate its pinned icon input from branding."""
+    expected = {
+        'crates/io/src/svg.rs': ({'bytes': 38059, 'sha256': '1c6bb8d35da7aaf6f36ee37cb2fb681d105a92a7dc988551726451b3c47ff03a'},
+                                 {'bytes': 38073, 'sha256': '8e1935f10b8ade3cacde4f817832ed3ea1f369cc175f0aae7c937910d000c952'}),
+        'crates/io/tests/fixtures/upstream-photocraft-single-clip.svg':
+            (None, {'bytes': 768636, 'sha256': 'a48333b7b794b70158da93a262d84fb82f5fbbf7442db60f235a0a69136a1ce2'}),
+    }
+    require(meta['upstream']['commit'] == 'c699e3cda69f4852b43c0b191ab0091aaeff9d6a'
+            and len(meta['files']) == 2 and {row['path'] for row in meta['files']} == set(expected),
+            'Photo test fixture correction requires the exact two reviewed paths')
+    for row in meta['files']:
+        require((row['before'], row['after']) == expected[row['path']],
+                'Photo test fixture correction changed original input or production Rust bytes')
+    return set(expected)
+
+
 def functional_fixes(lock):
     result = []
     for fix in lock.get('functionalFixes', []):
-        require(lock['id'] in ('word', 'effect', 'sound', 'design', 'vector'), 'Functional fixes require an explicit application review')
+        require(lock['id'] in ('word', 'effect', 'sound', 'design', 'vector', 'photo'), 'Functional fixes require an explicit application review')
         for key, sha_key in (('patch', 'sha256'), ('manifest', 'manifestSha256')):
             relative = common.check_public_path(fix[key])
             require(str(relative).startswith('patches/' + lock['id'] + '/functional-'), 'Functional fix outside its reviewed path')
@@ -116,9 +133,11 @@ def functional_fixes(lock):
                    'sound': {'crates/engine/src/file_access.rs'},
                    'design': {'Cargo.lock', 'crates/engine/Cargo.toml', 'crates/engine/src/recovery.rs',
                               'crates/engine/src/cmd/book/safety_tests.rs'},
-                   'vector': set()}[lock['id']]
+                   'vector': set(), 'photo': set()}[lock['id']]
         if lock['id'] == 'vector':
             allowed = vector_functional_paths(meta)
+        if lock['id'] == 'photo':
+            allowed = photo_fixture_functional_paths(meta)
         require(meta['files'] and {x['path'] for x in meta['files']} <= allowed, 'Functional fix changed an unreviewed engine or legal file')
         result.append((fix, meta))
     return result
@@ -391,6 +410,12 @@ def build(args, lock):
         evidence = ROOT / ('manifests/build-prerequisites-' + lock['id'] + '-tests.json')
         core_test_execution['originalProfileEvidence'] = {'path': evidence.relative_to(ROOT).as_posix(),
                                                         'sha256': digest(evidence), 'bytes': evidence.stat().st_size}
+    if lock['id'] == 'photo':
+        # The original profile evidence predates the separate test-icon fixture.
+        # Bind its explicit 374-exact/one-test-only-exception assessment as well.
+        evidence = ROOT / 'manifests/build-prerequisites-photo-svg-fixture.json'
+        core_test_execution['originalTestFixtureEvidence'] = {'path': evidence.relative_to(ROOT).as_posix(),
+                                                            'sha256': digest(evidence), 'bytes': evidence.stat().st_size}
     if lock['id'] == 'vector':
         # Keep the original engine suite and additionally verify the complete
         # vendored PDF number parser through the real application dependency.
@@ -721,6 +746,9 @@ def public_files(lock):
     files.add('tests/test_design_recovery_fix.py')
     files.add('tests/test_cad_test_profile.py')
     files.add('tests/test_photo_test_profile.py')
+    files.update({'tests/test_photo_svg_fixture.py',
+                  'tests/fixtures/photo-svg/upstream-svg.rs',
+                  'tests/fixtures/photo-svg/provenance.json'})
     files.update({'tests/test_pdf_msi_brand_contract.py',
                   'tests/fixtures/pdf-msi-brand-contract/provenance.json',
                   'tests/fixtures/pdf-msi-brand-contract/upstream-test-msi.ps1',

@@ -126,7 +126,15 @@
         "app": "photocraft",
         "cli": "photocraft-cli"
       },
-      "windowsGuiVersionCheck": "stdout"
+      "windowsGuiVersionCheck": "stdout",
+      "functionalFixes": [
+        {
+          "patch": "patches/photo/functional-original-svg-test-fixture.patch",
+          "sha256": "fcec862b14a3f107fb2d993fcbdc025bbab228a3d60cd874c50a9f4ef19238be",
+          "manifest": "patches/photo/functional-original-svg-test-fixture.json",
+          "manifestSha256": "4602b843b360ab17f4bea640f2d998fc4373d6cff8ec7e2fed8eb45eaf193d16"
+        }
+      ]
     },
     {
       "id": "vector",
