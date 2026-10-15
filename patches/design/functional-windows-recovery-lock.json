@@ -1,0 +1,142 @@
+{
+  "schema": "kio.native-functional-patch.v1",
+  "programId": "design",
+  "upstream": {
+    "repository": "https://github.com/storytold/designcraft",
+    "commit": "11a51d5b665aec8d6e675bd107a8a01514f10d00",
+    "tag": "v0.8.0",
+    "sourceArchiveSha256": "5044162f9e7c2260156419b7e2c69c87801c5facc88e6b7aaa3552aca70c2acf"
+  },
+  "base": {
+    "brandingPatch": "designcraft-v0.8.0-kio-design.patch",
+    "brandingPatchSha256": "7194f461cba04891621767cf4f26576508432600fcadf2455d37ff3534d65b5c"
+  },
+  "patch": {
+    "file": "functional-windows-recovery-lock.patch",
+    "sha256": "6e2753c639ab35ca89fa799e26dba0bc6bad183cc8d6d2f334c8952de381b7fe",
+    "bytes": 8663
+  },
+  "files": [
+    {
+      "path": "Cargo.lock",
+      "before": {
+        "sha256": "00042a1bfbbc6462085469d8fe5953bdd9ab89a0828cbc39fc48abc7fa17cdd3",
+        "bytes": 145870
+      },
+      "after": {
+        "sha256": "375c8357571e7a3b1ab5a8fdee530c324005c8e015c3d2baf41b51a401b57193",
+        "bytes": 145884
+      }
+    },
+    {
+      "path": "crates/engine/Cargo.toml",
+      "before": {
+        "sha256": "a5730998b31218a3bc257c8f94e2ea2721b0401cdaa3acb4955c2654e340d6ad",
+        "bytes": 1544
+      },
+      "after": {
+        "sha256": "f28cae117ded7b17dac2542f9e047c2350b1fbc1d21354c0859649852ab00a58",
+        "bytes": 1698
+      }
+    },
+    {
+      "path": "crates/engine/src/recovery.rs",
+      "before": {
+        "sha256": "011ada9ac8ed3781c705f40720735b93dfb49a8591e48d5b284e726cb6a49923",
+        "bytes": 69181
+      },
+      "after": {
+        "sha256": "b18daa100d2170b560a1e8b2f0408c999e7ef05ac356268ee8bfc862e9f41b71",
+        "bytes": 74207
+      }
+    },
+    {
+      "path": "crates/engine/src/cmd/book/safety_tests.rs",
+      "before": {
+        "sha256": "e0bcdce6f852907a7383d147d9f26358316f0e2c42faac74d3315fad8db95f92",
+        "bytes": 2382
+      },
+      "after": {
+        "sha256": "ca5eae3d23caa5c9867589834a055f2213886d350a8962b14bd43290f83035bd",
+        "bytes": 2529
+      }
+    }
+  ],
+  "summary": "Validate Windows recovery-lock ownership by safe live native file identity without reading through a second exclusively locked handle; retain the bounded marker and existing liveness/deletion guards.",
+  "behavior": [
+    "On Windows only, compare simultaneously open file handles via exact already-locked same-file 1.0.6. Never unlock, use unsafe code, enable nightly APIs, disable features or weaken liveness/foreign-file checks.",
+    "Read the bounded marker through the owner handle on Windows. Unix marker/device/inode checks remain active and byte-equivalent.",
+    "Reopen and compare the named Windows file after its link/type metadata check to detect replacement.",
+    "Adapt the existing book partial-commit assertion to Rust Debug-escaped Windows paths; require the exact one-element completed prefix and retain all failure/unchanged-file/staging assertions.",
+    "Apply after immutable original archive, branding patch and original protected-file verification. The original branding patch, all legal files and all unrelated source remain byte-identical."
+  ],
+  "dependencyLock": {
+    "original": {
+      "sha256": "00042a1bfbbc6462085469d8fe5953bdd9ab89a0828cbc39fc48abc7fa17cdd3",
+      "bytes": 145870
+    },
+    "modified": {
+      "sha256": "375c8357571e7a3b1ab5a8fdee530c324005c8e015c3d2baf41b51a401b57193",
+      "bytes": 145884
+    },
+    "packageCountBefore": 568,
+    "packageCountAfter": 568,
+    "newPackages": [],
+    "removedPackages": [],
+    "changedPackageVersions": [],
+    "changedEdges": [
+      {
+        "from": "designcraft-engine 0.8.0",
+        "to": "same-file 1.0.6",
+        "target": "cfg(windows)"
+      }
+    ],
+    "existingLockedPackage": {
+      "name": "same-file",
+      "version": "1.0.6",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "93fc1dc3aaa9bfed95e02e6eadabb4baf7e3078b0bd1b4d7b6b0b68378900502",
+      "dependencies": [
+        "winapi-util"
+      ]
+    },
+    "allOtherPackageRecordsByteEquivalent": true
+  },
+  "tests": {
+    "nativeFullBuildRun": false,
+    "nativeFullCoreTestsRun": false,
+    "wholeOriginalBrandingRoundtrip": true,
+    "wholeFunctionalForwardReverseRoundtrip": true,
+    "wholeSourceFiles": 441,
+    "allOtherSourceAndLegalFilesByteIdentical": true,
+    "existingTestsAndSkipsPreserved": true,
+    "added": [
+      "lock_identity_accepts_the_owner_and_its_clone_without_unlocking",
+      "lock_identity_rejects_a_different_file_with_the_same_marker",
+      "lock_identity_rejects_path_replacement_and_preserves_the_replacement",
+      "lock_identity_preserves_the_bounded_marker_check",
+      "lock_identity_does_not_read_through_the_second_windows_handle",
+      "lock_identity_rejects_a_replaced_run_folder_without_touching_its_documents"
+    ],
+    "commands": [
+      "cargo test --release --locked --target x86_64-pc-windows-msvc -p designcraft-engine",
+      "cargo test --release --locked --target aarch64-apple-darwin -p designcraft-engine"
+    ],
+    "pending": [
+      "Run full original engine tests and all six added tests in actual Windows CI; Mac whole-engine CI also remains required."
+    ],
+    "targetedProductionCoreProbe": {
+      "platform": "macos-arm64",
+      "rust": "1.95.0",
+      "result": "7 passed; 0 failed; 0 ignored",
+      "functions": "Byte-identical production new_lock, validate_lock, same_lock_file, lock_marker and original is_link_like variants; no full engine build",
+      "windowsExecutionRun": false,
+      "wholeNativeBuildRun": false
+    },
+    "packagingAndPatchRegressions": {
+      "suite": "python3 -m unittest discover -s tests -v",
+      "result": "184 passed; 0 failed",
+      "newTests": 7
+    }
+  }
+}

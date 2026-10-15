@@ -1,0 +1,184 @@
+diff --git a/Cargo.lock b/Cargo.lock
+index e77a81be47831f15794dac7381953efd3f67295c..9c034617052d5cc9501a2e39e7722112ffffe745 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -987,6 +987,7 @@ dependencies = [
+  "log",
+  "quick-xml 0.38.4",
+  "regex",
++ "same-file",
+  "serde",
+  "serde_json",
+  "tempfile",
+diff --git a/crates/engine/Cargo.toml b/crates/engine/Cargo.toml
+index 1de90d145226c6a49387fa402e4dc4ea5acd7aa0..8b40a932d717f6495018d0f631264b6536767b0c 100644
+--- a/crates/engine/Cargo.toml
++++ b/crates/engine/Cargo.toml
+@@ -35,6 +35,10 @@ unicode-segmentation = { workspace = true }
+ [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+ tempfile = { workspace = true }
+ 
++[target.'cfg(windows)'.dependencies]
++# Already pinned in Cargo.lock; use safe native file identity without reading a locked region.
++same-file = "=1.0.6"
++
+ [dev-dependencies]
+ designcraft-fonts = { workspace = true, features = ["testing"] }
+ zip = { workspace = true }
+diff --git a/crates/engine/src/cmd/book/safety_tests.rs b/crates/engine/src/cmd/book/safety_tests.rs
+index e4ec20efd8fe1a65e03829c56e200389bee2f91a..4a8f9d07640d2ed12322d2abd1cfe408ba620599 100644
+--- a/crates/engine/src/cmd/book/safety_tests.rs
++++ b/crates/engine/src/cmd/book/safety_tests.rs
+@@ -34,8 +34,9 @@ fn a_commit_failure_reports_the_completed_prefix_and_cleans_staging() {
+     assert!(error.contains("synthetic disk full"), "{error}");
+     assert!(error.contains(second.to_str().unwrap()), "{error}");
+     let completed = error.split("completed chapter paths:").nth(1).unwrap();
+-    assert!(completed.contains(first.to_str().unwrap()), "{error}");
+-    assert!(!completed.contains(second.to_str().unwrap()) && !completed.contains(third.to_str().unwrap()), "{error}");
++    // The production diagnostic uses Debug strings, which escape Windows backslashes.
++    assert_eq!(completed.trim(), format!("{:?}", vec![first.to_str().unwrap()]), "{error}");
++    assert!(!completed.contains(&format!("{:?}", second.to_str().unwrap())) && !completed.contains(&format!("{:?}", third.to_str().unwrap())), "{error}");
+     assert_eq!(designcraft_format::load(&std::fs::read(first).unwrap()).unwrap().sections.first().unwrap().start_number, Some(9));
+     assert_eq!(std::fs::read(second).unwrap(), old_bytes);
+     assert_eq!(std::fs::read(third).unwrap(), old_bytes);
+diff --git a/crates/engine/src/recovery.rs b/crates/engine/src/recovery.rs
+index 33b9a2a338d06b1363fe90051764920cce03879a..4920020b97a69e9e806d2574e5b5bba99d72fb1f 100644
+--- a/crates/engine/src/recovery.rs
++++ b/crates/engine/src/recovery.rs
+@@ -161,6 +161,17 @@ fn validate_lock(dir: &Path, lock: &std::fs::File) -> Result<()> {
+     }
+     #[cfg(not(unix))]
+     let _ = (held, current);
++    #[cfg(windows)]
++    {
++        // LockFileEx denies reads through a separately opened handle, even in this process.
++        // Compare two live native file identities instead; never release the owner's lock.
++        if !same_lock_file(lock, &named).map_err(|_| fail())? {
++            return Err(fail());
++        }
++        // Keep the original bounded-marker validation, reading only the owner's handle.
++        lock_marker(lock).map_err(|_| fail())?;
++    }
++    #[cfg(not(windows))]
+     if lock_marker(lock).map_err(|_| fail())? != lock_marker(&named).map_err(|_| fail())? {
+         return Err(fail());
+     }
+@@ -175,13 +186,31 @@ fn validate_lock(dir: &Path, lock: &std::fs::File) -> Result<()> {
+             return Err(fail());
+         }
+     }
++    #[cfg(windows)]
++    {
++        // Recheck the pathname after the metadata check, retaining both open handles.
++        let after_named = std::fs::File::open(&path).map_err(|_| fail())?;
++        if !same_lock_file(lock, &after_named).map_err(|_| fail())? {
++            return Err(fail());
++        }
++    }
+     Ok(())
+ }
+ 
++#[cfg(windows)]
++fn same_lock_file(held: &std::fs::File, named: &std::fs::File) -> std::io::Result<bool> {
++    let held = same_file::Handle::from_file(held.try_clone()?)?;
++    let named = same_file::Handle::from_file(named.try_clone()?)?;
++    Ok(held == named)
++}
++
+ #[cfg(not(target_arch = "wasm32"))]
+ fn lock_marker(file: &std::fs::File) -> std::io::Result<Vec<u8>> {
+     use std::io::{Read, Seek};
++    #[cfg(not(windows))]
+     let mut file = file.try_clone()?;
++    #[cfg(windows)]
++    let mut file = file;
+     file.seek(std::io::SeekFrom::Start(0))?;
+     let mut bytes = Vec::new();
+     file.take(129).read_to_end(&mut bytes)?;
+@@ -934,6 +963,86 @@ mod tests {
+         }
+     }
+ 
++    /// A valid owner and its duplicate remain accepted while the exclusive lock stays held.
++    #[test]
++    fn lock_identity_accepts_the_owner_and_its_clone_without_unlocking() {
++        let root = tempfile::tempdir().unwrap();
++        let held = new_lock(root.path()).unwrap();
++        held.try_lock().unwrap();
++        validate_lock(root.path(), &held).unwrap();
++        let duplicate = held.try_clone().unwrap();
++        validate_lock(root.path(), &duplicate).unwrap();
++        let other = std::fs::File::open(root.path().join(LOCK)).unwrap();
++        assert!(matches!(other.try_lock(), Err(std::fs::TryLockError::WouldBlock)), "validation must retain the exclusive lock");
++    }
++
++    /// Equal marker contents are insufficient: the named file must be the owner's actual file.
++    #[test]
++    fn lock_identity_rejects_a_different_file_with_the_same_marker() {
++        let owner = tempfile::tempdir().unwrap();
++        let foreign = tempfile::tempdir().unwrap();
++        let held = new_lock(owner.path()).unwrap();
++        let marker = std::fs::read(owner.path().join(LOCK)).unwrap();
++        std::fs::write(foreign.path().join(LOCK), &marker).unwrap();
++        held.try_lock().unwrap();
++        assert!(validate_lock(foreign.path(), &held).is_err());
++        assert_eq!(std::fs::read(foreign.path().join(LOCK)).unwrap(), marker);
++    }
++
++    /// Renaming a held lock away and substituting identical bytes must never transfer ownership.
++    #[test]
++    fn lock_identity_rejects_path_replacement_and_preserves_the_replacement() {
++        let root = tempfile::tempdir().unwrap();
++        let path = root.path().join(LOCK);
++        let held = new_lock(root.path()).unwrap();
++        let marker = std::fs::read(&path).unwrap();
++        held.try_lock().unwrap();
++        std::fs::rename(&path, root.path().join("former-lock")).unwrap();
++        std::fs::write(&path, &marker).unwrap();
++        assert!(validate_lock(root.path(), &held).is_err());
++        assert_eq!(std::fs::read(&path).unwrap(), marker);
++        let replacement = std::fs::OpenOptions::new().read(true).write(true).open(&path).unwrap();
++        replacement.try_lock().unwrap();
++    }
++
++    #[test]
++    fn lock_identity_preserves_the_bounded_marker_check() {
++        let root = tempfile::tempdir().unwrap();
++        let held = new_lock(root.path()).unwrap();
++        std::fs::write(root.path().join(LOCK), [b'x'; 129]).unwrap();
++        held.try_lock().unwrap();
++        assert!(validate_lock(root.path(), &held).is_err());
++    }
++
++    #[cfg(windows)]
++    #[test]
++    fn lock_identity_does_not_read_through_the_second_windows_handle() {
++        let root = tempfile::tempdir().unwrap();
++        let held = new_lock(root.path()).unwrap();
++        held.try_lock().unwrap();
++        let error = std::fs::read(root.path().join(LOCK)).unwrap_err();
++        assert_eq!(error.raw_os_error(), Some(33), "ERROR_LOCK_VIOLATION proves that the other handle cannot read the marker");
++        validate_lock(root.path(), &held).unwrap();
++    }
++
++    /// A foreign replacement folder must not receive or lose recovery documents.
++    #[test]
++    fn lock_identity_rejects_a_replaced_run_folder_without_touching_its_documents() {
++        let root = tempfile::tempdir().unwrap();
++        let own = run_dir(root.path()).unwrap();
++        std::fs::rename(&own, root.path().join("former-run")).unwrap();
++        std::fs::create_dir(&own).unwrap();
++        std::fs::write(own.join(LOCK), b"").unwrap();
++        let session = dirty_session();
++        let (doc, meta) = files(&own, session.docs[0].uid);
++        std::fs::write(&doc, b"foreign document").unwrap();
++        std::fs::write(&meta, b"foreign metadata").unwrap();
++        assert!(save(&session, &own).is_err());
++        discard(&own, session.docs[0].uid);
++        assert_eq!(std::fs::read(&doc).unwrap(), b"foreign document");
++        assert_eq!(std::fs::read(&meta).unwrap(), b"foreign metadata");
++    }
++
+     fn failed_republication_session() -> (Session, tempfile::TempDir, u64) {
+         let root = tempfile::tempdir().unwrap();
+         let mut session = Session::new();

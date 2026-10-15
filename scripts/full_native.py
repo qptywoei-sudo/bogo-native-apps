@@ -73,7 +73,7 @@ def load_lock(app):
 def functional_fixes(lock):
     result = []
     for fix in lock.get('functionalFixes', []):
-        require(lock['id'] in ('word', 'effect', 'sound'), 'Functional fixes require an explicit application review')
+        require(lock['id'] in ('word', 'effect', 'sound', 'design'), 'Functional fixes require an explicit application review')
         for key, sha_key in (('patch', 'sha256'), ('manifest', 'manifestSha256')):
             relative = common.check_public_path(fix[key])
             require(str(relative).startswith('patches/' + lock['id'] + '/functional-'), 'Functional fix outside its reviewed path')
@@ -85,7 +85,9 @@ def functional_fixes(lock):
         require(meta['patch']['sha256'] == fix['sha256'] and meta['patch']['bytes'] == (ROOT / fix['patch']).stat().st_size, 'Functional fix patch mismatch')
         allowed = {'word': {'crates/engine/src/io.rs', 'crates/engine/src/cmd/file.rs', 'crates/engine/tests/wordml2003_save.rs'},
                    'effect': {'crates/engine/src/' + name for name in ('tests_frame_export.rs', 'tests_m137.rs', 'tests_essential.rs', 'tests_import_project.rs', 'commands/relink_moved.rs', 'footage_check.rs')},
-                   'sound': {'crates/engine/src/file_access.rs'}}[lock['id']]
+                   'sound': {'crates/engine/src/file_access.rs'},
+                   'design': {'Cargo.lock', 'crates/engine/Cargo.toml', 'crates/engine/src/recovery.rs',
+                              'crates/engine/src/cmd/book/safety_tests.rs'}}[lock['id']]
         require(meta['files'] and {x['path'] for x in meta['files']} <= allowed, 'Functional fix changed an unreviewed engine or legal file')
         result.append((fix, meta))
     return result
@@ -580,6 +582,7 @@ def public_files(lock):
                   'tests/fixtures/cad-plotter-api/crates/engine/src/lib.rs',
                   'tests/fixtures/cad-plotter-api/crates/doc/src/lib.rs',
                   'tests/fixtures/cad-plotter-api/crates/doc/src/plotter.rs'})
+    files.add('tests/test_design_recovery_fix.py')
     # Small original XML fixtures make the installer collision tests independent
     # of the source archive cache. Include the exact Launcher branding input too.
     files.update('tests/fixtures/windows-identity/' + app + '.wxs' for app in (*IDS, 'launcher'))
@@ -608,7 +611,7 @@ def make_source(args, lock):
     output.mkdir(parents=True)
     readme = work / 'SOURCE-README.txt'
     fonts_note = 'Set CRAFT_FONTS_DIR to the absolute craft-fonts folder and CRAFT_FONTS_REQUIRED=1.\n' if lock['fonts'] else 'This upstream release does not specify an additional craft-fonts checkout.\n'
-    readme.write_text('Complete modified ' + lock['name'] + ' original native workspace. No engine features were removed.\nOriginal Cargo.lock, licenses, notices, credits, formats and optional extension capability remain.\nThird-party Cargo archives are not duplicated; Cargo fetches their exact locked sources.\nInstall Rust 1.95.0 and the target OS SDK/tooling documented in orchestrator/manifests/build-prerequisites-*.json.\n' + fonts_note + 'From ' + lock['binaries']['app'] + '/ run: cargo +1.95.0 ' + ' '.join(lock['cargoArgs']) + '\nPDF full packages also run cargo xtask models to stage SHA-verified OCR models and original model licenses beside the app.\nReproducible KIO source locks, original feature selection, branding patch and native packaging scripts are in orchestrator/.\nRead original README/ROADMAP/gaps for known application limitations. No full commercial-product parity is claimed.\n', encoding='utf-8')
+    readme.write_text('Complete modified ' + lock['name'] + ' original native workspace. No engine features were removed.\nOriginal dependency version pins, licenses, notices, credits, formats and optional extension capability remain. Any reviewed Cargo.lock dependency-edge correction is recorded in its functional patch manifest.\nThird-party Cargo archives are not duplicated; Cargo fetches their exact locked sources.\nInstall Rust 1.95.0 and the target OS SDK/tooling documented in orchestrator/manifests/build-prerequisites-*.json.\n' + fonts_note + 'From ' + lock['binaries']['app'] + '/ run: cargo +1.95.0 ' + ' '.join(lock['cargoArgs']) + '\nPDF full packages also run cargo xtask models to stage SHA-verified OCR models and original model licenses beside the app.\nReproducible KIO source locks, original feature selection, branding patch and native packaging scripts are in orchestrator/.\nRead original README/ROADMAP/gaps for known application limitations. No full commercial-product parity is claimed.\n', encoding='utf-8')
     files = [(lock['binaries']['app'] + '/' + r, p) for r, p in source_files(lock, source)]
     if fonts.exists():
         files += [('craft-fonts/' + r, p) for r, p in common.regular_files(fonts, public=True)]

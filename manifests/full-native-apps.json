@@ -991,7 +991,15 @@
         "app": "designcraft",
         "cli": "designcraft-cli"
       },
-      "windowsGuiVersionCheck": "stdout"
+      "windowsGuiVersionCheck": "stdout",
+      "functionalFixes": [
+        {
+          "patch": "patches/design/functional-windows-recovery-lock.patch",
+          "sha256": "6e2753c639ab35ca89fa799e26dba0bc6bad183cc8d6d2f334c8952de381b7fe",
+          "manifest": "patches/design/functional-windows-recovery-lock.json",
+          "manifestSha256": "f1f5655e1d8dba4b3afaa7492abfb5a63d68d216815a7928d2e16dc14ee5e39d"
+        }
+      ]
     },
     {
       "id": "ui",
