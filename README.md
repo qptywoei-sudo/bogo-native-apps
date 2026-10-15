@@ -1,6 +1,6 @@
 # Full native KIO applications
 
-This separate build project packages complete upstream applications. It does not use the earlier KIO Apps 0.1 Electron editor prototype. Word is the first configured pipeline; the 13-entry catalog is an acquisition/build roadmap, not a completion list. No GitHub repository, workflow run or release is created by preparing these files.
+This separate build project packages complete upstream applications. It does not use the earlier KIO Apps 0.1 Electron editor prototype. The Word pipeline and the generic 13-application pipeline use independently pinned complete native workspaces. Source/patch readiness is not a record of successful binary builds or GUI validation. Preparing these files never creates or dispatches a remote release.
 
 KIO Word is based on the **entire WordCraft v0.7.0 workspace**, commit `fc41918814f62645b6746ed68e71e8c2c2e85d6f`, and craft-fonts commit `8dcdacd5153e64560d109541a47d806f26f048c0`. Source/font compressed bytes and SHA-256, Rust `1.95.0`, the exact binary branding patch and both native Cargo packages are locked in `manifests/word.lock.json`. Engine source, Cargo manifests/lock, MIT/Apache licenses and NOTICE are protected against branding changes. The patch removes upstream trademark artwork, changes the display identity/profile/icons, and retains original commands and crate names.
 
@@ -41,3 +41,26 @@ Inputs are reproducible and source-archive metadata is normalized. Native binari
 The workflow pins official actions by complete commit SHA: checkout v6.0.2, upload-artifact v6.0.0 and download-artifact v7.0.0, verified with official repository tags on 2026-10-15. Runner labels are `macos-15` (arm64) and `windows-2022` (x64), as documented by [GitHub's runner reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners). Do not replace the Mac label with the Intel variant or claim an unexecuted OS build succeeded. [Checkout source](https://github.com/actions/checkout/tree/de0fac2e4500dabe0009e67214ff5f5447ce83dd), [upload source](https://github.com/actions/upload-artifact/tree/b7c566a772e6b6bfb58ed0dc250532a479d7789f), [download source](https://github.com/actions/download-artifact/tree/37930b1c2abaa49bbe596cd826c3c89aef350131).
 
 The parent task reviews these files and controls remote creation, push, dispatch and public promotion. This project does not disable signing/OS security checks or reuse another project's publishing credentials.
+
+
+## Full native 13-application workflow
+
+`manifests/full-native-apps.json` locks all 13 original application archives, the exact font archive when specified upstream, branding patch and patch-audit bytes, full native Cargo arguments and original engine/format test packages. `manifests/build-prerequisites-photo.json` and `build-prerequisites-office.json` cite the pinned original Mac/Windows packaging and the shared workflow at commit `f0808a5ccbc32869248193ffab0de98d733de451`. The application callers use a mutable `@main`; this pipeline records the reviewed immutable workflow instead. No mandatory FFmpeg, ONNX Runtime DLL, vcpkg or nasm stage appears in those original default-native packaging commands. Extra tools are not inferred from feature names.
+
+```sh
+python3 scripts/full_native.py prepare --app grid
+python3 scripts/full_native.py build --app grid --platform macos-arm64
+python3 scripts/full_native.py package --app grid --platform macos-arm64
+python3 scripts/full_native.py source --app grid
+python3 scripts/full_native.py verify --app grid --platform source --directory dist/grid-source
+```
+
+`package --existing-target /absolute/path/to/target/release` also imports complete caller-selected native binaries on their actual OS. It verifies architecture and both original version contracts and records imported-build checks honestly. Workspaces live separately under `.work/full-native/<app>`; this does not modify the installed KIO web application or the earlier Electron prototype. Only `prepare --reset` removes the selected isolated source workspace. Existing release/staging folders are never overwritten automatically.
+
+`.github/workflows/full-native-apps.yml` is manual dispatch only. Choose one app or `all` to build real arm64 Mac and x64 Windows binaries. Both GUI and CLI are mandatory. Original default features remain enabled; Photo additionally enables original native HEIF and Light enables GUI+CLI HEIF while retaining default denoise. PDF runs the original `cargo xtask models` to ship both SHA-verified OCR models plus original CC-BY-SA license/attribution sidecars. Optional Film neural features, Effect model downloads and Sound ASIO retain their original extension capability without claiming they are bundled by default.
+
+Each app produces `KIO-<Name>-<upstream-version>-kio.1-macos-arm64.{dmg,zip}`, `-windows-x64.{msi,zip}` and `-source.zip`, with separate exact manifests/provenance/SHA files. The Mac app and portable Windows ZIP include both original executables and complete license material. Windows MSI is built with the original KIO-branded installer script and WiX 5.0.2 (UI/Util extensions); original dialogs, file associations and install/update behavior are retained. An added component group places the full original dependency/font notices in the MSI. Development artifacts are ad-hoc signed on Mac and have no Apple notarization or Windows publisher certificate.
+
+Full original source includes 14 public Film H.264 test-oracle files under an upstream-tracked `target` path and six synthetic PDF `.p12` signing test fixtures. Only their exact upstream paths, bytes and SHA-256 in the source lock are accepted. These are public test inputs from the pinned original archives, not KIO user data or publisher credentials. The default private/build-file guard remains unchanged for every other path.
+
+The generic source ZIP contains the entire modified selected application, pinned fonts, original licenses/Cargo.lock, exact branding patch and an explicit public orchestration allowlist. It omits compiler outputs, caches, private local configuration and redundant Cargo-vendor archives. Neither a prepared source nor a passing command-registry test is represented as full commercial editor compatibility. Successful native build, installation, actual file-format checks and interactive GUI validation remain separately recorded evidence.

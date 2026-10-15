@@ -71,7 +71,7 @@ def check_public_path(value):
     return p
 
 
-def regular_files(root, public=False):
+def regular_files(root, public=False, public_validator=None):
     root = Path(root)
     require(root.is_dir() and not root.is_symlink(), "Expected a real directory")
     result = []
@@ -85,19 +85,19 @@ def regular_files(root, public=False):
             p = Path(base) / name
             require(p.is_file() and not p.is_symlink(), "Non-regular file refused")
             relative = p.relative_to(root).as_posix()
-            (check_public_path if public else safe_relative)(relative)
+            ((public_validator or check_public_path) if public else safe_relative)(relative)
             result.append((relative, p))
     return sorted(result)
 
 
-def tree_fingerprint(root):
+def tree_fingerprint(root, public_validator=None):
     h = hashlib.sha256()
-    for relative, p in regular_files(root, public=True):
+    for relative, p in regular_files(root, public=True, public_validator=public_validator):
         h.update(relative.encode("utf-8") + b"\0" + digest(p).encode("ascii") + b"\n")
     return h.hexdigest()
 
 
-def safe_extract(archive, destination, expected_root, max_bytes=768 * 1024 * 1024):
+def safe_extract(archive, destination, expected_root, max_bytes=768 * 1024 * 1024, public_validator=None):
     """Validate the entire tar before writing; links/devices/traversal/case collisions fail closed."""
     destination = Path(destination)
     require(not destination.exists(), "Extraction destination already exists")
@@ -113,7 +113,7 @@ def safe_extract(archive, destination, expected_root, max_bytes=768 * 1024 * 102
             seen.add(key)
             relative = PurePosixPath(*p.parts[1:]).as_posix() if len(p.parts) > 1 else ""
             if relative:
-                check_public_path(relative)
+                (public_validator or check_public_path)(relative)
             total += member.size
             require(0 <= member.size <= 256 * 1024 * 1024 and total <= max_bytes and len(seen) <= 50000, "Archive expansion limit exceeded")
             records.append((member, relative))
@@ -322,9 +322,9 @@ def build(args, lock):
     print("Built full native app + CLI; architecture, core tests and synthetic DOCX/PDF checks passed.")
 
 
-def copy_license_tree(source, destination):
+def copy_license_tree(source, destination, public_validator=None):
     selected = []
-    for relative, p in regular_files(source, public=True):
+    for relative, p in regular_files(source, public=True, public_validator=public_validator):
         name = p.name.upper()
         if name.startswith(("LICENSE", "COPYING", "NOTICE", "OFL", "UNLICENSE")) or name == "ATTRIBUTION.MD":
             target = destination / relative

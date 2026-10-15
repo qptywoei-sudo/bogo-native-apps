@@ -1,0 +1,4950 @@
+{
+  "schema": "kio.native-branding-patch.v1",
+  "programId": "effect",
+  "applicationId": "com.kio.effect",
+  "displayName": "KIO Effect",
+  "status": "source-patch-ready; native build and GUI QA pending",
+  "upstream": {
+    "repository": "https://github.com/storytold/effectcraft",
+    "release": "v0.10.0",
+    "commit": "05955c08b4fd025f1a09882df72e6dbff1a8148a",
+    "sourceArchive": "effectcraft-05955c08b4fd025f1a09882df72e6dbff1a8148a.tar.gz",
+    "sourceArchiveSha256": "a160b94d9837906e3f129697f8c62ffb80d8342cb2787b2cfa439c0485098f43"
+  },
+  "patch": {
+    "file": "effectcraft-v0.10.0-kio-effect.patch",
+    "sha256": "b4f0adb7ff63ec467c98c29f2c624fd8e123349b4c41efcd0c9536fae18f80a2",
+    "bytes": 9309026
+  },
+  "counts": {
+    "upstreamFiles": 1098,
+    "forkFiles": 1095,
+    "changedPaths": 111,
+    "added": 27,
+    "removed": 30,
+    "modified": 54,
+    "protectedFilesByteIdentical": 769
+  },
+  "checks": {
+    "originalArchivePatchRoundtrip": true,
+    "protectedEngineDependenciesLicensesCreditsByteIdentical": true,
+    "everyCargoManifestAndLockByteIdentical": true,
+    "upstreamGapDocumentsByteIdentical": true,
+    "platformMetadataParses": true,
+    "packageShellSyntax": true,
+    "patchWhitespace": true,
+    "originalIconByteIdentical": true,
+    "allEmbeddedAssetPathsExist": true,
+    "upstreamTrademarkLogoFilesRemoved": true,
+    "nativeBuildRun": false,
+    "GUIValidationRun": false
+  },
+  "nonUiPlatformBrandingExceptions": [
+    "crates/host/src/app_dirs.rs"
+  ],
+  "features": {
+    "preserveDefaults": true,
+    "appDefaultFeatures": [],
+    "officialNativeAdditionalFeatures": [],
+    "optionalAppFeatures": []
+  },
+  "files": [
+    {
+      "path": "ATTRIBUTION.md",
+      "before": {
+        "sha256": "0186518bf46d473e5841d34234ee117f2059dfcaf8b4616ae6dfb6da5745dc38",
+        "bytes": 14751
+      },
+      "after": {
+        "sha256": "70ba29cbec5b5db1bf847ebaa33b003fb4521ceca520454be079050a0e73f7cb",
+        "bytes": 20477
+      }
+    },
+    {
+      "path": "KIO-FORK.json",
+      "before": null,
+      "after": {
+        "sha256": "adfe59686603a72b355f79509a192cc8a5d2fc18613e0abd6195b8746ad33287",
+        "bytes": 2513
+      }
+    },
+    {
+      "path": "KIO-FORK.md",
+      "before": null,
+      "after": {
+        "sha256": "8a830e3c4f3fa938fa980869c0a303396c454551d13e9d18fbb905e47eae8df3",
+        "bytes": 2670
+      }
+    },
+    {
+      "path": "README.md",
+      "before": {
+        "sha256": "8574349c2c0b30d4b9c574c6d53f7362a5c03ef1b11e6a9255bcdf230d5c056a",
+        "bytes": 23455
+      },
+      "after": {
+        "sha256": "2f3b1220e1d984992bc8102883bc71efb70bfa12984b4ae8941115e5921fcfcc",
+        "bytes": 23710
+      }
+    },
+    {
+      "path": "apps/effectcraft-web/web/favicon.svg",
+      "before": {
+        "sha256": "6c6cb887bc3b95e897e881ce62eab11cfad8d5f18c98782f3d90713a1c2fcaa5",
+        "bytes": 350998
+      },
+      "after": {
+        "sha256": "0fc101423aca189819ea05f55d68a33485bd1008f1c52b8e4385eeddd6f839f4",
+        "bytes": 510891
+      }
+    },
+    {
+      "path": "apps/effectcraft-web/web/favicon.svg.attribution",
+      "before": {
+        "sha256": "251067e86df910861eaeb6eb36fbc3a62b44e2e86bb991961c8842222ed2a7a2",
+        "bytes": 492
+      },
+      "after": {
+        "sha256": "03afc42adf3c6682a40f897f212376b775b2a1deca06cab94faa507b7c407be5",
+        "bytes": 227
+      }
+    },
+    {
+      "path": "apps/effectcraft-web/web/index.html",
+      "before": {
+        "sha256": "3ee2424e3018b78ead3d09fd660744dae2b6942fd0f7ef7fac7445d84b154ac1",
+        "bytes": 5411
+      },
+      "after": {
+        "sha256": "855da757d8206fec2604e0f0b5ad2189708a1d6cb027ff5a744fd1518ecc3649",
+        "bytes": 5407
+      }
+    },
+    {
+      "path": "apps/effectcraft/build.rs",
+      "before": {
+        "sha256": "14f629fbb418e99ab4d30c85eacccd9630fe3a7e1a03b28cfdcc58b655a14dfa",
+        "bytes": 1350
+      },
+      "after": {
+        "sha256": "938978969b0b4ad80478b43e6916e6d0701c3a5d4710f7794ea8768fe51ee149",
+        "bytes": 1348
+      }
+    },
+    {
+      "path": "apps/effectcraft/src/appimage.rs",
+      "before": {
+        "sha256": "4cbb17571ab6100b68e066dd5449e7b1e0012580d134a662e557c39355955b13",
+        "bytes": 6875
+      },
+      "after": {
+        "sha256": "aeac011843f9ee5e5dc7125eff7d5ba35c548d865604acbbe5e78b980ad6d543",
+        "bytes": 6789
+      }
+    },
+    {
+      "path": "apps/effectcraft/src/launch_guard.rs",
+      "before": {
+        "sha256": "e230e8b6ac0b698d20ad9b5d5d3d9d4f5651af8e288308ad41031c793e9c7add",
+        "bytes": 10833
+      },
+      "after": {
+        "sha256": "76d4c14dea9691cf6acb24cd2e480fd162f98a79736dbbf7c4db29ec0101e62d",
+        "bytes": 10832
+      }
+    },
+    {
+      "path": "apps/effectcraft/src/main.rs",
+      "before": {
+        "sha256": "ea5116a47ed1c66d2beb2dc0341bc5c1014d9b8a2b515ddd7835b56355fa4276",
+        "bytes": 30784
+      },
+      "after": {
+        "sha256": "2014838d3a76091c0d54b58c09f6bc7bb2c355debb6458224a5acabd273813e0",
+        "bytes": 30749
+      }
+    },
+    {
+      "path": "apps/effectcraft/src/sheet_dialogs.rs",
+      "before": {
+        "sha256": "9fb11cdfd420c9977fd480573cc967b05f2cd41f27a72625f93ea51037f48b05",
+        "bytes": 3204
+      },
+      "after": {
+        "sha256": "29768b62f604671d14732ac210c9b334b3a46449feefa32647907f3f895587b8",
+        "bytes": 3202
+      }
+    },
+    {
+      "path": "assets/app-icon/effectcraft-1024.png",
+      "before": {
+        "sha256": "2f1eec28b8b2ae8397a5c3517a74d1771fdd521fdc9d673918be35834fd935ae",
+        "bytes": 355764
+      },
+      "after": {
+        "sha256": "1ee2f5199288499cd37979985940615229298555a8c3f393be7e7bcf3c7f5266",
+        "bytes": 383044
+      }
+    },
+    {
+      "path": "assets/app-icon/effectcraft-1024.png.attribution",
+      "before": {
+        "sha256": "a8d53ce0b6b922c415fc190381e3d242cbe3fef3761667bd9ce9af9a53021a94",
+        "bytes": 419
+      },
+      "after": {
+        "sha256": "3c3d85338b2afaa35a6d8c94d8dcaf5cd454296117e1558698a147fbe9fdee29",
+        "bytes": 342
+      }
+    },
+    {
+      "path": "assets/app-icon/effectcraft-macos-512.png",
+      "before": {
+        "sha256": "e121c1c2d9a811a95f20d1f6a296c9df77c67fd8f3ff9263415bb890b0795fcd",
+        "bytes": 116708
+      },
+      "after": {
+        "sha256": "5bc561f9962f1e08526e9223eed40e3d1c10dada6a901715f3586802539a88a1",
+        "bytes": 207469
+      }
+    },
+    {
+      "path": "assets/app-icon/effectcraft-macos-512.png.attribution",
+      "before": {
+        "sha256": "5838dd1e2d59809c4ef4bc93785dae6014ec03af59f84733b37eca573279c993",
+        "bytes": 504
+      },
+      "after": {
+        "sha256": "3a12e715c62e226251be81a65365ab90c64d673882f6a8de02f0f0eb8a6bfb3a",
+        "bytes": 347
+      }
+    },
+    {
+      "path": "assets/app-icon/effectcraft-small.svg",
+      "before": {
+        "sha256": "6c6cb887bc3b95e897e881ce62eab11cfad8d5f18c98782f3d90713a1c2fcaa5",
+        "bytes": 350998
+      },
+      "after": {
+        "sha256": "0fc101423aca189819ea05f55d68a33485bd1008f1c52b8e4385eeddd6f839f4",
+        "bytes": 510891
+      }
+    },
+    {
+      "path": "assets/app-icon/effectcraft-small.svg.attribution",
+      "before": {
+        "sha256": "15db893cd2957f98a48a7d45ae34d5d3a679960bde2334d30b8e914355b862da",
+        "bytes": 480
+      },
+      "after": {
+        "sha256": "cf46686c05ea3b459c567adfd0c8afc53667dd97a68e539cfc8b3028f4ba5eb5",
+        "bytes": 343
+      }
+    },
+    {
+      "path": "assets/app-icon/effectcraft.icns",
+      "before": {
+        "sha256": "9ef9b5ae1cc9a5621423f925f2e776ea967c9fffb03c2f694edbfa8b0d169a22",
+        "bytes": 698295
+      },
+      "after": {
+        "sha256": "e2c2eb271cb5e2fc282d3ea4c229c4e8f3a51b146a0a35acb8248714011d24de",
+        "bytes": 1117942
+      }
+    },
+    {
+      "path": "assets/app-icon/effectcraft.icns.attribution",
+      "before": {
+        "sha256": "39708b29f022b161914353c1cf152b4c13eb9a2dd3530a90f8166ace4f2e606e",
+        "bytes": 455
+      },
+      "after": {
+        "sha256": "1bc8dfc5e895e4ed20fe417c4499913399ed3f402fca9609d99edbc42eb886bb",
+        "bytes": 338
+      }
+    },
+    {
+      "path": "assets/app-icon/effectcraft.ico",
+      "before": {
+        "sha256": "7fb1572a657fd60157eb0e3b734bf88ef467fe407ffa437b93ff24cb7e6f385c",
+        "bytes": 91248
+      },
+      "after": {
+        "sha256": "39ff51a521b42eca509ec256734b9ad9f992ab4249f90d5a1301f1a8d4fcf5c1",
+        "bytes": 120599
+      }
+    },
+    {
+      "path": "assets/app-icon/effectcraft.ico.attribution",
+      "before": {
+        "sha256": "66334e72007d10980a6b465c5377baf43759d3f28e96b6aad0f03c93a1b1df98",
+        "bytes": 454
+      },
+      "after": {
+        "sha256": "232e3825ca63077c92b8e862ec65c6f3e9af32ee8b1f437c0150a9da310dca28",
+        "bytes": 337
+      }
+    },
+    {
+      "path": "assets/app-icon/effectcraft.svg",
+      "before": {
+        "sha256": "cc723cd8894f2346ece281aab192de33cb92a442dd6466b957fc0dbc539df3f0",
+        "bytes": 698681
+      },
+      "after": {
+        "sha256": "0fc101423aca189819ea05f55d68a33485bd1008f1c52b8e4385eeddd6f839f4",
+        "bytes": 510891
+      }
+    },
+    {
+      "path": "assets/app-icon/effectcraft.svg.attribution",
+      "before": {
+        "sha256": "fb05c2b09b2887e21f820447b8e9b45052b7b7872156ff93f3cce017eaabf215",
+        "bytes": 579
+      },
+      "after": {
+        "sha256": "154cce5d192ff681dc1b2b91effa52f96ebbc728013cfbb537357670f3d1d7c8",
+        "bytes": 337
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/128x128/apps/ai.storyteller.effectcraft.png",
+      "before": {
+        "sha256": "4ad7caa4f43b4cbf3bcddda0ed23e471d392efbe8d0b4ce18107b5849f20dd2d",
+        "bytes": 17306
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/128x128/apps/com.kio.effect.png",
+      "before": null,
+      "after": {
+        "sha256": "58f1d3b797b1d0bc064be0480a22d6f9520ce0d3c30e8abc77d19558aa2f2c19",
+        "bytes": 23621
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/128x128/apps/com.kio.effect.png.attribution",
+      "before": null,
+      "after": {
+        "sha256": "5a4959bbe35d2cadbb1bf4c3dc39c7a14c0c7721477fa30ac3d7c35eb0a4fe12",
+        "bytes": 340
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/16x16/apps/ai.storyteller.effectcraft.png",
+      "before": {
+        "sha256": "1bb5737979feb30629b493a398103c953392a108a2e0ea835f722156a2c33f87",
+        "bytes": 733
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/16x16/apps/com.kio.effect.png",
+      "before": null,
+      "after": {
+        "sha256": "e188128ce30d590f82fe325534eaf0e42b72a56d42248f30a64a3d093d68399e",
+        "bytes": 820
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/16x16/apps/com.kio.effect.png.attribution",
+      "before": null,
+      "after": {
+        "sha256": "5a4959bbe35d2cadbb1bf4c3dc39c7a14c0c7721477fa30ac3d7c35eb0a4fe12",
+        "bytes": 340
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/24x24/apps/ai.storyteller.effectcraft.png",
+      "before": {
+        "sha256": "b7b4381785aec62207945723671649cea5f97288b6b77587391db463bc1812a4",
+        "bytes": 1256
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/24x24/apps/com.kio.effect.png",
+      "before": null,
+      "after": {
+        "sha256": "9e9edd184832ad7007fcd7ee79b66bc60114670592044ad6401644ecc6916d49",
+        "bytes": 1354
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/24x24/apps/com.kio.effect.png.attribution",
+      "before": null,
+      "after": {
+        "sha256": "5a4959bbe35d2cadbb1bf4c3dc39c7a14c0c7721477fa30ac3d7c35eb0a4fe12",
+        "bytes": 340
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/256x256/apps/ai.storyteller.effectcraft.png",
+      "before": {
+        "sha256": "186a1d869a4602ec86cd03f6e5e288ebbd328e0c3d8a17c205329829392f9add",
+        "bytes": 57151
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/256x256/apps/com.kio.effect.png",
+      "before": null,
+      "after": {
+        "sha256": "73f184efb227f376cad60e0273f9104bc08134e8dbed8a0b782d999ce74fac74",
+        "bytes": 81343
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/256x256/apps/com.kio.effect.png.attribution",
+      "before": null,
+      "after": {
+        "sha256": "5a4959bbe35d2cadbb1bf4c3dc39c7a14c0c7721477fa30ac3d7c35eb0a4fe12",
+        "bytes": 340
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/32x32/apps/ai.storyteller.effectcraft.png",
+      "before": {
+        "sha256": "8f6983752878f18989318500d2995a8484c7d54b0c0afa9c7c646b868911eaf8",
+        "bytes": 1890
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/32x32/apps/com.kio.effect.png",
+      "before": null,
+      "after": {
+        "sha256": "ce256d96e6501a7f9a1901bb73a0a2b1d8e6b6a1e5e2fed56c61f3340187fb17",
+        "bytes": 2188
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/32x32/apps/com.kio.effect.png.attribution",
+      "before": null,
+      "after": {
+        "sha256": "5a4959bbe35d2cadbb1bf4c3dc39c7a14c0c7721477fa30ac3d7c35eb0a4fe12",
+        "bytes": 340
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/48x48/apps/ai.storyteller.effectcraft.png",
+      "before": {
+        "sha256": "6338241a4c65f687c57042a9c44c402452b1345edfec6f4bc2d258ecc4c3acdc",
+        "bytes": 3549
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/48x48/apps/com.kio.effect.png",
+      "before": null,
+      "after": {
+        "sha256": "f97a148197c180d130979e3f564ed3d25007a925278eedfab2ec694d1af2bb65",
+        "bytes": 4305
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/48x48/apps/com.kio.effect.png.attribution",
+      "before": null,
+      "after": {
+        "sha256": "5a4959bbe35d2cadbb1bf4c3dc39c7a14c0c7721477fa30ac3d7c35eb0a4fe12",
+        "bytes": 340
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/512x512/apps/ai.storyteller.effectcraft.png",
+      "before": {
+        "sha256": "1d03baf4f9091d84cd8a48310d6b47fd92dfe31c0a648ea966dbbce28d8fd111",
+        "bytes": 150412
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/512x512/apps/com.kio.effect.png",
+      "before": null,
+      "after": {
+        "sha256": "5bc561f9962f1e08526e9223eed40e3d1c10dada6a901715f3586802539a88a1",
+        "bytes": 207469
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/512x512/apps/com.kio.effect.png.attribution",
+      "before": null,
+      "after": {
+        "sha256": "5a4959bbe35d2cadbb1bf4c3dc39c7a14c0c7721477fa30ac3d7c35eb0a4fe12",
+        "bytes": 340
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/64x64/apps/ai.storyteller.effectcraft.png",
+      "before": {
+        "sha256": "6b77b1f0da42f8441000d3eaa4115b0dda2170b5922cc7a208725e4af55a04fa",
+        "bytes": 5579
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/64x64/apps/com.kio.effect.png",
+      "before": null,
+      "after": {
+        "sha256": "c54530a9825753c2e3be43d28f4aeb6449ff308caae99d9290519114aa9dabf4",
+        "bytes": 6850
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/64x64/apps/com.kio.effect.png.attribution",
+      "before": null,
+      "after": {
+        "sha256": "5a4959bbe35d2cadbb1bf4c3dc39c7a14c0c7721477fa30ac3d7c35eb0a4fe12",
+        "bytes": 340
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/scalable/apps/ai.storyteller.effectcraft.svg",
+      "before": {
+        "sha256": "6c6cb887bc3b95e897e881ce62eab11cfad8d5f18c98782f3d90713a1c2fcaa5",
+        "bytes": 350998
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/scalable/apps/com.kio.effect.svg",
+      "before": null,
+      "after": {
+        "sha256": "0fc101423aca189819ea05f55d68a33485bd1008f1c52b8e4385eeddd6f839f4",
+        "bytes": 510891
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/scalable/apps/com.kio.effect.svg.attribution",
+      "before": null,
+      "after": {
+        "sha256": "d16e28c653c110f54a90eb72477df380ede04ee2333e1818aee46040709e2809",
+        "bytes": 340
+      }
+    },
+    {
+      "path": "assets/app-icon/kio-effect.png",
+      "before": null,
+      "after": {
+        "sha256": "1ee2f5199288499cd37979985940615229298555a8c3f393be7e7bcf3c7f5266",
+        "bytes": 383044
+      }
+    },
+    {
+      "path": "assets/app-icon/kio-effect.png.attribution",
+      "before": null,
+      "after": {
+        "sha256": "a71753e5741c4e764cce87711fa7c848d6b72219ac8c63fdf89c5ae1c5fb8569",
+        "bytes": 336
+      }
+    },
+    {
+      "path": "crates/host/src/app_dirs.rs",
+      "before": {
+        "sha256": "1eb38f5d9ce8ba6a36fcd49f10bc42e02550d264c2ad24b1d438b46c9dfaf824",
+        "bytes": 9541
+      },
+      "after": {
+        "sha256": "fba40fa97132c5c908099ce6fb94ff0d310e8bd053c15e580b0dc9f2ace6e4cd",
+        "bytes": 9563
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/header.rs",
+      "before": {
+        "sha256": "e6089dc29adae955f1f2553fff193d97327854c237490ce103e8451eaa0b8dd4",
+        "bytes": 36796
+      },
+      "after": {
+        "sha256": "4bf1e95e66b7682b6d22ccc61d2e33a62b6c9b1209a4828763f0f775777124ab",
+        "bytes": 36729
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n.rs",
+      "before": {
+        "sha256": "90691a1cea2b2ffd44655ca11e9ce59aab1feb7702617ac4865f17a65e722406",
+        "bytes": 470614
+      },
+      "after": {
+        "sha256": "55873535346ab508af38c7ff2816734c3056614913e73dce74b6d672f78fcf5b",
+        "bytes": 470454
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/ui.rs",
+      "before": {
+        "sha256": "0f705fd224b4c46ad5b02f0db1ebf6cdfb7e038c41b2ecf5634eba28fd78be2a",
+        "bytes": 251817
+      },
+      "after": {
+        "sha256": "49fcbd586aa6205c3814c1fae42f3d75c344532a63931f699f307fee3b52bf4d",
+        "bytes": 251726
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/menus.rs",
+      "before": {
+        "sha256": "8d2c02ef6c086ae27833626d8b2b72018d293f50524681c753ad61e7332d35d9",
+        "bytes": 125998
+      },
+      "after": {
+        "sha256": "decaedc2b7a269a122710b4873b72c35acbab61ad8a779d97beda43facf00bfd",
+        "bytes": 125996
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/native_menu.rs",
+      "before": {
+        "sha256": "df4a894cfb9e3526721bcf07c4d6647ac3955aeb088970a1cd485383aba97feb",
+        "bytes": 28831
+      },
+      "after": {
+        "sha256": "18aca21c78f9ec26747589beaa28664059838296dec3cc8e4c3fc57e57a41244",
+        "bytes": 28829
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/panels/dialogs.rs",
+      "before": {
+        "sha256": "3945f48086d95ec441a0b579022253a114a76a685f672d66a64795e43359d8d5",
+        "bytes": 43932
+      },
+      "after": {
+        "sha256": "e7fb6818c4bf397247de120d5e595407190d4a323f6b26b1ab9cd71ff21da289",
+        "bytes": 43855
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/panels/effect_controls.rs",
+      "before": {
+        "sha256": "4bac4aa61116bd512b9bad903398f48351bd6162f8ef379140996a2d1e047451",
+        "bytes": 89308
+      },
+      "after": {
+        "sha256": "49bf043a24e38e342c43dcb66d958bbe1a234c480dd64d3e0d2328d87f933729",
+        "bytes": 89307
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/panels/effects_presets.rs",
+      "before": {
+        "sha256": "7c0a16cd52cc8ebaffa19f54fb17031a01c5587dcef0875a24aa4269f4732ba7",
+        "bytes": 23366
+      },
+      "after": {
+        "sha256": "3716022c2eaeee4897e43a5eae22632bcff26983517e3821242d96b081639da7",
+        "bytes": 23365
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/panels/home.rs",
+      "before": {
+        "sha256": "24447b7a5748ea1182485143f68bee6de4675f31e2c641bed6a45a3954459bf9",
+        "bytes": 28201
+      },
+      "after": {
+        "sha256": "904bbe6498d38e8c038daad5e6483f8a856634f19e1f8f217c3e105bca980d13",
+        "bytes": 28195
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/panels/learn.rs",
+      "before": {
+        "sha256": "0fb266bb77fc16c08f34936fb27218e278d68854af4fc9b9ecf484a569e5b322",
+        "bytes": 10883
+      },
+      "after": {
+        "sha256": "eff2f535a6b374ee52c3f82407976cef771283ef1017e98a4ab7167205a579bf",
+        "bytes": 10882
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/panels/project.rs",
+      "before": {
+        "sha256": "778a5d7f1fb4b3485e9b89b155f7cd1199cfff095b5ac290db6bbdeaebf67cb5",
+        "bytes": 59277
+      },
+      "after": {
+        "sha256": "c860df2c73b746cf8eab88ba1c62b15b8275d82f9524f1d1839efc73aaaa81c9",
+        "bytes": 59275
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/panels/settings.rs",
+      "before": {
+        "sha256": "c3d1dd3d3949015257b3a51e66874bd5522081583fccbf9a06d03b587a0eb393",
+        "bytes": 42627
+      },
+      "after": {
+        "sha256": "303c7aa172387cc4e39ccd3d01d00edca1686806f69dd5be2334669b70a06191",
+        "bytes": 42625
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/panels/unsaved.rs",
+      "before": {
+        "sha256": "8a5f474d6577ce556e64a508bdcd98c0d301c251c932ae13248e27cdcd662d08",
+        "bytes": 16265
+      },
+      "after": {
+        "sha256": "fef4a6063413eca914413c06ca32c7d47d9edc2e094adb8b2eaa43f463842cb0",
+        "bytes": 16264
+      }
+    },
+    {
+      "path": "crates/ui-egui/tests/ui_keyframes.rs",
+      "before": {
+        "sha256": "c9342c58a8479b315a50b9d6a64f3436f6d1f009310826d0b5c7d6e543acaa9d",
+        "bytes": 25978
+      },
+      "after": {
+        "sha256": "bb9b9b393ee37c45deb94d43148dc6d0c0afd324d4a988188701deacc15f5ef7",
+        "bytes": 25976
+      }
+    },
+    {
+      "path": "crates/ui-egui/tests/ui_presets_folder.rs",
+      "before": {
+        "sha256": "729c98b13a3103ec347cfd77a92b342a9d3ddb734b756029b813c705f3c67375",
+        "bytes": 3856
+      },
+      "after": {
+        "sha256": "c8203d316be8a00b8caff91f5f8ff5230ae9f343fbc947276d3760d5c9dd2e11",
+        "bytes": 3855
+      }
+    },
+    {
+      "path": "crates/ui-egui/tests/ui_tabs.rs",
+      "before": {
+        "sha256": "200fd0622b00f0e3482c641ada20fdc7a3cca776cd57e2e8735a47d533fa1a0a",
+        "bytes": 20110
+      },
+      "after": {
+        "sha256": "f2c8d172f2fb0481bce474aa4ab53f54f913b740b8c293b502fa53bb9a31faf3",
+        "bytes": 20098
+      }
+    },
+    {
+      "path": "crates/ui-egui/tests/ui_timeline_shapes.rs",
+      "before": {
+        "sha256": "06e93727c7d6d8d3eac1572615e89db950e240c07ca975e9aead859e5668e41f",
+        "bytes": 13705
+      },
+      "after": {
+        "sha256": "e69114b8b5b41e46cd5bf036407730693f389cf29e80d352ad98218122dd2ab6",
+        "bytes": 13703
+      }
+    },
+    {
+      "path": "crates/ui-egui/tests/ui_visual_review.rs",
+      "before": {
+        "sha256": "3e2e9eee8b84885c48fe2cddd2c585d71856172d854bbbb89a2c08bff66972a9",
+        "bytes": 2595
+      },
+      "after": {
+        "sha256": "732edccf9160840abf95792a82a6a17b54baae443586c2442a7518d6f74988ba",
+        "bytes": 2594
+      }
+    },
+    {
+      "path": "docs/brand/artcraft-logo-white.png",
+      "before": {
+        "sha256": "8b86aeb06a12a90ba77a60e0d90329272310e244ee5c1f9b161b391280ca79d8",
+        "bytes": 32161
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-logo-white.png.attribution",
+      "before": {
+        "sha256": "565e5dd760e0ec12e076a734e69ea40f64cad8274fab860230f07d7be045e73d",
+        "bytes": 882
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-logo-white.svg",
+      "before": {
+        "sha256": "a3e03dc49f9ad4225b8517d5424309c8d1c864d3996d862190d9cc797d5af427",
+        "bytes": 5394
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-logo-white.svg.attribution",
+      "before": {
+        "sha256": "5f0cea4e227993f10439947958c3af2e498159b93e304c80ddc92b8bd5e60f16",
+        "bytes": 882
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-logo.png",
+      "before": {
+        "sha256": "08fc6d9d3717e8f13417bac6f9025b50e11d1e0b32e9e000883d2fe0c4a0c67b",
+        "bytes": 31302
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-logo.png.attribution",
+      "before": {
+        "sha256": "765433ab27edfb01b290fee8d01554b1bde9aee8291b01ec68188340b3c99c86",
+        "bytes": 898
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-logo.svg",
+      "before": {
+        "sha256": "3188971e1affdf4f6be4fa65f715376a7a305e6aa741ec78b0296c8f934eff08",
+        "bytes": 5394
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-logo.svg.attribution",
+      "before": {
+        "sha256": "243fbca3754883dcf5d5ad900bcce37264ec1057dbd3c9b44e7564a3f253017f",
+        "bytes": 898
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-mark-black.png",
+      "before": {
+        "sha256": "5954cc0306e1b9d7beb47097e2e842157113a39d9aba078b57304902687936a9",
+        "bytes": 26793
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-mark-black.png.attribution",
+      "before": {
+        "sha256": "756b30b82424ab3f24685ec4b2470e7a9af5b52351c60be4fbd63137abff6ad6",
+        "bytes": 866
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-mark-black.svg",
+      "before": {
+        "sha256": "570adcb4f7ba8ca0647f97074476bab81d3272988f1cdee52efa21bf026036a4",
+        "bytes": 341
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-mark-black.svg.attribution",
+      "before": {
+        "sha256": "301c3b1d288c04f3369127e2b9ee43207915603957b442e103681efe90b8c8a5",
+        "bytes": 866
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-mark.png",
+      "before": {
+        "sha256": "9d372157a949c147318561e629b11561c28b7cbc14c84b516a3fe6e84d8fbbad",
+        "bytes": 24715
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-mark.png.attribution",
+      "before": {
+        "sha256": "0bf8b2c81716a1da38e93bdcf4035de3cad3a120a8fd62eee842039badeebc29",
+        "bytes": 859
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-mark.svg",
+      "before": {
+        "sha256": "f87af81b6fa411da8820eed2bfdcc54c0ee9cd453b4e868c64f56c69db142d0e",
+        "bytes": 341
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-mark.svg.attribution",
+      "before": {
+        "sha256": "0f9c387b3d4ada1a6d8c5238694cd7854b5c522a6f1e12283f41d666f4773fc4",
+        "bytes": 859
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/env.sh",
+      "before": {
+        "sha256": "85a5b496e5309b0695abdc9715adf40520081a758df69c387f9b3f16d684ff37",
+        "bytes": 2184
+      },
+      "after": {
+        "sha256": "7a9dece035df995ad0214c7f1f709b27558539894b6ad1f681fcf8b18caa1075",
+        "bytes": 2242
+      }
+    },
+    {
+      "path": "packaging/freebsd/package.sh",
+      "before": {
+        "sha256": "df30068a1297f7debd8d4c689798e98a7114c74a3e4169eb377fe3ceef61b773",
+        "bytes": 4238
+      },
+      "after": {
+        "sha256": "b19ee91b7d4c142b4606bd74e50312899fd3ca7204e446c5dc4b627bf2042579",
+        "bytes": 4224
+      }
+    },
+    {
+      "path": "packaging/icons.sh",
+      "before": {
+        "sha256": "d2736a22b6c8a411b51bdc492c8ef65e037c2f0d8c7a5765bc04e7c23033350f",
+        "bytes": 2617
+      },
+      "after": {
+        "sha256": "216c6a505e7ff68ba0f4f9266e9b11248e6f9abd2157777fe77eda9b581a745c",
+        "bytes": 2605
+      }
+    },
+    {
+      "path": "packaging/linux/ai.storyteller.effectcraft.desktop",
+      "before": {
+        "sha256": "e907d2eec9775c6cf8405526832ff76cf62dcfbbfb1a443cfb5936a0461f5537",
+        "bytes": 404
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/linux/ai.storyteller.effectcraft.metainfo.xml.in",
+      "before": {
+        "sha256": "c639ba732ba0577c55e4377088025af0fbf979fbb693547719ac29f791ceecff",
+        "bytes": 2538
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/linux/ai.storyteller.effectcraft.mime.xml",
+      "before": {
+        "sha256": "0e5f0264eb16018949270b22da03aa49e8bcb3f1683da4e8e4dd7c17cc06417e",
+        "bytes": 126
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/linux/com.kio.effect.desktop",
+      "before": null,
+      "after": {
+        "sha256": "d06060bba835fa842f996dcc3d5937e785d4a7f70d912f79f3af61f2168b2bc4",
+        "bytes": 379
+      }
+    },
+    {
+      "path": "packaging/linux/com.kio.effect.metainfo.xml.in",
+      "before": null,
+      "after": {
+        "sha256": "52e1f343518caa727c2615725c219f4a52fd9e725453803812744b95a5967d92",
+        "bytes": 2475
+      }
+    },
+    {
+      "path": "packaging/linux/com.kio.effect.mime.xml",
+      "before": null,
+      "after": {
+        "sha256": "0e5f0264eb16018949270b22da03aa49e8bcb3f1683da4e8e4dd7c17cc06417e",
+        "bytes": 126
+      }
+    },
+    {
+      "path": "packaging/linux/flatpak-bundle.sh",
+      "before": {
+        "sha256": "e290f7587f1a32128e045651db9cea37fa77e078547f7790f32c1b3d3004bf86",
+        "bytes": 3109
+      },
+      "after": {
+        "sha256": "3e9bef39f843068b2085b69745fbf0de60346b8c946013e5c6e9596e66a993be",
+        "bytes": 3083
+      }
+    },
+    {
+      "path": "packaging/linux/flatpak/ai.storyteller.effectcraft.bundle.yml",
+      "before": {
+        "sha256": "2797ad1ea054c78798815d14249268d5d9ac292d02ff294e55072897928183d0",
+        "bytes": 3314
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/linux/flatpak/ai.storyteller.effectcraft.yml",
+      "before": {
+        "sha256": "6620b4173e64a04554a780998d531fbebbf8c35f7f46f3fd288a4770dc96274c",
+        "bytes": 3798
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/linux/flatpak/com.kio.effect.bundle.yml",
+      "before": null,
+      "after": {
+        "sha256": "34f7d09e9971007bb248a7e28394ffa7e5abb2b8653be4c9b936db4e9408e98c",
+        "bytes": 3218
+      }
+    },
+    {
+      "path": "packaging/linux/flatpak/com.kio.effect.yml",
+      "before": null,
+      "after": {
+        "sha256": "f20ef8c8ff788a18ec5ddef64187669298219344c17aa85246f21e4dc0989284",
+        "bytes": 3677
+      }
+    },
+    {
+      "path": "packaging/linux/nfpm.yaml",
+      "before": {
+        "sha256": "b68e51a46d2d87f86d0ec82745f449b455251060b9bcb14597fba5b08c7c7e4f",
+        "bytes": 2271
+      },
+      "after": {
+        "sha256": "e88dad1ffc0f99a6160095f44ddcc568f731744d7911d6c0ed704577eaf62623",
+        "bytes": 2253
+      }
+    },
+    {
+      "path": "packaging/linux/package.sh",
+      "before": {
+        "sha256": "3b24f0187fc7ac21249bf288e1b4265c9b2dda2778ae8d1dea0cfd5bb306301c",
+        "bytes": 7131
+      },
+      "after": {
+        "sha256": "bcb62d88c47ca70e61e9fb93f7a4fafadcb083705d483650acb14b63f7515d3e",
+        "bytes": 7115
+      }
+    },
+    {
+      "path": "packaging/macos/Info.plist.in",
+      "before": {
+        "sha256": "2909cd32374d12dfd5fed1747dc19f2ca73af25c245c52f33fde62888f268796",
+        "bytes": 4286
+      },
+      "after": {
+        "sha256": "7393a84b2222259b9b984a6874323596c35d676ff4d33c7741d925b24c1bab62",
+        "bytes": 4225
+      }
+    },
+    {
+      "path": "packaging/macos/package.sh",
+      "before": {
+        "sha256": "e884956a4871e9c63ca2b18605dbca436be9d8f31f7d49f8c2a991605540fed3",
+        "bytes": 7713
+      },
+      "after": {
+        "sha256": "890d55f4082ac68856ddbe5a4dec852bb1f417196738dc25483071db24a97e34",
+        "bytes": 7057
+      }
+    },
+    {
+      "path": "packaging/windows/effectcraft.wxs",
+      "before": {
+        "sha256": "0c4dc888cbad7e07c1d548c338151c76c0df141c8a453160340aed1f9555037f",
+        "bytes": 6000
+      },
+      "after": {
+        "sha256": "6877b419bd90e7d3e2c2d936cb5e179580e77e36d16045ccf3247de7a3178b17",
+        "bytes": 5969
+      }
+    },
+    {
+      "path": "packaging/windows/installer-ui.wxs",
+      "before": {
+        "sha256": "48401a0dc26b27c5369fc15158a45a0ebd54bba943916ac150a9b6746f751aab",
+        "bytes": 16244
+      },
+      "after": {
+        "sha256": "956ea0e1d68b698dac49d441fd5bda778dace6de4a65908bb6ae488dcad3452f",
+        "bytes": 16243
+      }
+    },
+    {
+      "path": "packaging/windows/package.ps1",
+      "before": {
+        "sha256": "ef9de6cbfab195106b9d72e9fcfff99a2315f190dd76370a3bfce0087d5a6781",
+        "bytes": 6975
+      },
+      "after": {
+        "sha256": "ae122cf33d065eb2548a650e3ce199d238921e8dab3ae60512e13c84f36060e8",
+        "bytes": 6972
+      }
+    },
+    {
+      "path": "packaging/windows/sign.ps1",
+      "before": {
+        "sha256": "26a1798c5655175f20cb1d0eee25434fc5a98adc496316f06c823f3c6a0c0e71",
+        "bytes": 4807
+      },
+      "after": {
+        "sha256": "4df78db7a23c97c65b9947413732f341ac26210457396505624cb9c2b471ea5a",
+        "bytes": 4806
+      }
+    },
+    {
+      "path": "packaging/windows/test-msi.ps1",
+      "before": {
+        "sha256": "20f1644093bf37afc9a9c4e32e0dea901204377cd36417339d7cc022f53882d3",
+        "bytes": 7860
+      },
+      "after": {
+        "sha256": "f1333784fd66e8776fa1fd0333474812aca8d453f7e4b49570465803b0edb350",
+        "bytes": 7853
+      }
+    }
+  ],
+  "protectedFiles": [
+    {
+      "path": "Cargo.toml",
+      "sha256": "e4e1ecf19212560e34aa7967227625df06436f887671bbcdfc78af5665e097f0",
+      "bytes": 8139
+    },
+    {
+      "path": "LICENSE-APACHE",
+      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+      "bytes": 10174
+    },
+    {
+      "path": "Cargo.lock",
+      "sha256": "975228a3c1d4834d2b2c127cb3f524526e54afcc1ac96e744353b994eae00c3f",
+      "bytes": 164488
+    },
+    {
+      "path": "NOTICE",
+      "sha256": "d0bf841555c56b6136745a61ec529c9a558c9dd7404d377d82f86d10e0e9b530",
+      "bytes": 907
+    },
+    {
+      "path": "LICENSE-MIT",
+      "sha256": "7b6db9a363688683feacdf9b528f059637f2e5d2edbacd8720fc9b26781c9abe",
+      "bytes": 1103
+    },
+    {
+      "path": "crates/svg/Cargo.toml",
+      "sha256": "0abb645db094211e6076d16daa8764daf12331015825fabdc276694ad0075d8a",
+      "bytes": 587
+    },
+    {
+      "path": "crates/svg/README.md",
+      "sha256": "351da82f949b9f00529288e82ca469d15859d2468c56e863cb69f0b92c4c7002",
+      "bytes": 1734
+    },
+    {
+      "path": "crates/svg/tests/fixtures/basic-shapes.svg.attribution",
+      "sha256": "05ecdce5b3988bd1cf80ce7f0d25ae1697b5c0e77fe6e9306a451db058fe3c4b",
+      "bytes": 379
+    },
+    {
+      "path": "crates/svg/tests/fixtures/paths-gradients.svg",
+      "sha256": "9ed2b97c69308dc21af6a419e412b1ab5fb305313465850b21a62ca24f28abe9",
+      "bytes": 1388
+    },
+    {
+      "path": "crates/svg/tests/fixtures/basic-shapes.svg",
+      "sha256": "f105da9b4a2daf4ebb343bcf4c029533d1c9f1693975eb1aa17e6c60f227a5a5",
+      "bytes": 957
+    },
+    {
+      "path": "crates/svg/tests/fixtures/paths-gradients.svg.attribution",
+      "sha256": "aced47628c8dc5802b1f1440a14e9b4bc6c03dd44833273bacda79ec25672c3d",
+      "bytes": 387
+    },
+    {
+      "path": "crates/svg/src/color.rs",
+      "sha256": "2667ad63abd9d798d21f79293e05d0fefcda52db9fa63ed5ca6e34dab2e740f3",
+      "bytes": 8568
+    },
+    {
+      "path": "crates/svg/src/lib.rs",
+      "sha256": "72d97bb31c6108aa776cbb80dd43d4508a3b7e53eae89b7b2d51ac07fc33fd09",
+      "bytes": 43295
+    },
+    {
+      "path": "crates/svg/src/pathdata.rs",
+      "sha256": "48382c59ad6d713a099155405a81fc363412de4baada7deb9d932ba1eda8c16c",
+      "bytes": 10300
+    },
+    {
+      "path": "crates/svg/src/raster.rs",
+      "sha256": "8813981352c34a794aa53c19f6af6e942e4e2af9c5af6c5efde900d5c4b1dbfe",
+      "bytes": 19604
+    },
+    {
+      "path": "crates/svg/src/tests.rs",
+      "sha256": "dc0186a5acdb500dae4aad4989041d84ad3c56a06d85e41da6e112972aea120b",
+      "bytes": 9788
+    },
+    {
+      "path": "crates/gpu/Cargo.toml",
+      "sha256": "ca0b8d00a8e24004496c399a3e3bb137c03ca59d178c445aaed32cb5722fa390",
+      "bytes": 1075
+    },
+    {
+      "path": "crates/gpu/src/tests_fx_stylize.rs",
+      "sha256": "1b5c7418c5da2b738872e3b59f2f372cb856ad72c1b670faa9150a7ef2acfa07",
+      "bytes": 12291
+    },
+    {
+      "path": "crates/gpu/src/tests_fx_gen2.rs",
+      "sha256": "deeab845f95b26d330045dffc8ec94ffffe9ea8373d7227636c86164fe5a7891",
+      "bytes": 9019
+    },
+    {
+      "path": "crates/gpu/src/fx_vr.rs",
+      "sha256": "359c32ed922250edd5ad89775493c0ed87074b6eee4c25d9f6ca4cc2a7dd0921",
+      "bytes": 18264
+    },
+    {
+      "path": "crates/gpu/src/fx_tone.rs",
+      "sha256": "2aa8994d1ca05d4f6a484ad0e62bc8c930360d8470e25c7baa66281e61ccabd7",
+      "bytes": 17351
+    },
+    {
+      "path": "crates/gpu/src/fx_particles.rs",
+      "sha256": "6de3ff62ecc96da94f383de6d35c5fc7e558b7c415ad33b1d8725182e43b6c33",
+      "bytes": 12589
+    },
+    {
+      "path": "crates/gpu/src/tests_fx_pixel2.rs",
+      "sha256": "53f90a704b2207dd8324833f0075bd9b27a1d815dcccbd046732e5d3d3b08d6a",
+      "bytes": 13137
+    },
+    {
+      "path": "crates/gpu/src/fx_lut.rs",
+      "sha256": "286212b03f9644109240e9a71f81144d44e05f3d68f88c5dc70a59cb13eaf898",
+      "bytes": 7337
+    },
+    {
+      "path": "crates/gpu/src/tests_adv3d.rs",
+      "sha256": "94a71b0583a0daf382282072652dc6ee50acc0e301d47b9e051b7f700f5d3a04",
+      "bytes": 29185
+    },
+    {
+      "path": "crates/gpu/src/tests_fx_extra.rs",
+      "sha256": "fb5947e32328663bf076d3c7e1a1b3f60e5cfd72241e8e1b65c5519538f595cf",
+      "bytes": 2365
+    },
+    {
+      "path": "crates/gpu/src/fx_pixel2.rs",
+      "sha256": "22b3105e3ebe414ac04388a422614aee12b91ddffbec291cbe8cd3357a3d1cc3",
+      "bytes": 21873
+    },
+    {
+      "path": "crates/gpu/src/fx_extra.rs",
+      "sha256": "85620fc9afd663a4d1e7f93fc69d5d32f0d0fb19b79d1de6463055bc5bc0c9b8",
+      "bytes": 7915
+    },
+    {
+      "path": "crates/gpu/src/tests_fx_particles.rs",
+      "sha256": "4734c0ea5fed7bae93c5753b6f35c0dbc6252a56a86aa78166e88cf6d1137d44",
+      "bytes": 6632
+    },
+    {
+      "path": "crates/gpu/src/tests_fx_generate.rs",
+      "sha256": "5c1b363efec1d5928a515c4c2f7dff8adbffd981343e50798b6c3660958ddbce",
+      "bytes": 8400
+    },
+    {
+      "path": "crates/gpu/src/lib.rs",
+      "sha256": "daa074747c3e115e6633c0f75ab4bc55559f6fb99481f064be2d26fe43aed5a8",
+      "bytes": 18397
+    },
+    {
+      "path": "crates/gpu/src/tests_adjust.rs",
+      "sha256": "485b22028a60aef0b1b0d0e1c3d36e70ce7700721429a224d55da38cb18dff1e",
+      "bytes": 5778
+    },
+    {
+      "path": "crates/gpu/src/classic3d.rs",
+      "sha256": "c6362da3bbaa644dd3729cc2ca587d0f56e264d06c283f8b8027757487547ccf",
+      "bytes": 9329
+    },
+    {
+      "path": "crates/gpu/src/fx_color.rs",
+      "sha256": "aa52bd8a084b465275ccd5a24e32434664f51300c7018f53c845180f82728bc1",
+      "bytes": 17378
+    },
+    {
+      "path": "crates/gpu/src/effects.rs",
+      "sha256": "0d5c24282163b58c1988f329541b392aa7e3a7ccb7b14c7a875046d4a4e0126e",
+      "bytes": 24057
+    },
+    {
+      "path": "crates/gpu/src/tests_fx_warp.rs",
+      "sha256": "af2d360cc04bcc1ffe26a8980b8afd9d8fcd9efcb69736276f1193466b2c9cd4",
+      "bytes": 9082
+    },
+    {
+      "path": "crates/gpu/src/fx_time.rs",
+      "sha256": "c753d67143bdda59aaf41d001a13870c3a8c2c135930bee2f498b041341e5afd",
+      "bytes": 11766
+    },
+    {
+      "path": "crates/gpu/src/tests_fx_lut.rs",
+      "sha256": "0ee594ab0bd5332acdcaf8a432be1db68f2e224108d3dfb70e2910f9f0578c5a",
+      "bytes": 14622
+    },
+    {
+      "path": "crates/gpu/src/tests_fx_color.rs",
+      "sha256": "0cdec0a4cc225d4690599c20653fe8dcdac565866a293771e57cd9dd122a3b1f",
+      "bytes": 7592
+    },
+    {
+      "path": "crates/gpu/src/tests_fx_light.rs",
+      "sha256": "32dfc0108af9560651d3fedad2563a26fa3acda379fa25c73a90f179a36fa21e",
+      "bytes": 2439
+    },
+    {
+      "path": "crates/gpu/src/tests_3d.rs",
+      "sha256": "d828d640c893868d78cb3cdae0c4a1cca9b04ecc396579b91c860200ae5ccf30",
+      "bytes": 14303
+    },
+    {
+      "path": "crates/gpu/src/fx_stylize.rs",
+      "sha256": "f8a682e68a47773fbe9028061fcb3fd4bf7c3942aac9c98ce022211de0e408f1",
+      "bytes": 39379
+    },
+    {
+      "path": "crates/gpu/src/tests_fx_text.rs",
+      "sha256": "a906f728240eba41a6c6008484ed1f1569e55f58de292955469e84cf90090c9a",
+      "bytes": 1571
+    },
+    {
+      "path": "crates/gpu/src/fx_light.rs",
+      "sha256": "9f51ba465c5806c9a974d7ecf10fa0482b59076a407d5f05e77ab02462e98738",
+      "bytes": 5681
+    },
+    {
+      "path": "crates/gpu/src/fx_generate.rs",
+      "sha256": "076b8219cf596d14e475d81460f699a8ed9832de2f766fc4a27b205bcaa67a59",
+      "bytes": 17038
+    },
+    {
+      "path": "crates/gpu/src/adv3d.rs",
+      "sha256": "532ce5c2f0f53c7394f21c2c6783e01c9659b5a3b18ffec146c888ebd5fb4094",
+      "bytes": 47910
+    },
+    {
+      "path": "crates/gpu/src/tests_fx_tone.rs",
+      "sha256": "b71e2dd63e3925b1650498900eb2d3f9a599500fee108320c5df4eb467af8ebf",
+      "bytes": 9474
+    },
+    {
+      "path": "crates/gpu/src/tests_particles.rs",
+      "sha256": "b4e0185c033e90e6f9edfd70a922cf1e83cae8829fabea698b75104b01904a1e",
+      "bytes": 6806
+    },
+    {
+      "path": "crates/gpu/src/fx_sim.rs",
+      "sha256": "c16196cac03e12c04739d6938d613d795064093596eb1cea0417a7d97ea2f24b",
+      "bytes": 21047
+    },
+    {
+      "path": "crates/gpu/src/tests_deferred_jobs.rs",
+      "sha256": "1464cd9b812b6928586cce6795b7cf5f1c6b231c6719542d78c3b260ab487075",
+      "bytes": 5339
+    },
+    {
+      "path": "crates/gpu/src/tests_fx_distort.rs",
+      "sha256": "15e0f7328f0b6ab2961460e958c6d54891807fb4429473ac76a5164c55955ab7",
+      "bytes": 7921
+    },
+    {
+      "path": "crates/gpu/src/tests_fx_key.rs",
+      "sha256": "8f7d64dfdcb881da5016f93179f6ab4a23f8cb19d80294e1ad6f7999221c2bbe",
+      "bytes": 13614
+    },
+    {
+      "path": "crates/gpu/src/readback.rs",
+      "sha256": "9b32da23d4be6136c29fb1d32b50605f4cc2911b53461984f94680d0e569d741",
+      "bytes": 19922
+    },
+    {
+      "path": "crates/gpu/src/fx_gen2.rs",
+      "sha256": "42cdee13615c475f311e68b954cc9bb8787ba3434f21df788f93d727e3a2d375",
+      "bytes": 23194
+    },
+    {
+      "path": "crates/gpu/src/bokeh.rs",
+      "sha256": "5c5c1a3bbcffdb9dc87aede9ed8da0a6b84a66a51b6f1c2716cbec39adcaa3e7",
+      "bytes": 2551
+    },
+    {
+      "path": "crates/gpu/src/tests.rs",
+      "sha256": "bf7a3b9a6f7a4dae9e94d23aff82d72c2cd2454d2d8001241937f965cc8d699f",
+      "bytes": 50942
+    },
+    {
+      "path": "crates/gpu/src/fx_text.rs",
+      "sha256": "019bbb915f8356358361ec61d8d06434aeb2ff269ca379022bf14d7ae9b02286",
+      "bytes": 1541
+    },
+    {
+      "path": "crates/gpu/src/tests_fx_sim.rs",
+      "sha256": "ef682ee3b953ea771bb1b2e8b48a4704c0746c096d1805ffdbad0708f293e61e",
+      "bytes": 8721
+    },
+    {
+      "path": "crates/gpu/src/tests_init.rs",
+      "sha256": "fecacd8a73ed2dc7f8cd2f4a2f7321491b6f9687f10096a55d88330eb13c39de",
+      "bytes": 8974
+    },
+    {
+      "path": "crates/gpu/src/fx_key.rs",
+      "sha256": "1ba67881b7d5f0e2a58de3e1417d2d6f4917d90d8e51e74b92dbe9e64798e708",
+      "bytes": 26905
+    },
+    {
+      "path": "crates/gpu/src/tests_fx_vr.rs",
+      "sha256": "77088c8d9fee257210a84013f3804faf938c6274c4eb9bf9c7a57e2d4c983972",
+      "bytes": 6624
+    },
+    {
+      "path": "crates/gpu/src/tests_fx_time.rs",
+      "sha256": "8d669f9bd43087f19a51c9f0e6b380da84afe85be318348fa7e7a12abc38dd52",
+      "bytes": 5723
+    },
+    {
+      "path": "crates/gpu/src/tests_fx_transition.rs",
+      "sha256": "2e5b1df7d6d6ea19af32aaf65638aa65a4d72ff7e8f31e2237f2bd1e06e842e4",
+      "bytes": 9090
+    },
+    {
+      "path": "crates/gpu/src/fx_warp.rs",
+      "sha256": "892a5dc7e3740fe50a3efd0e12e4056cdae8870848abda76b181271ad4658f61",
+      "bytes": 12121
+    },
+    {
+      "path": "crates/gpu/src/ops.rs",
+      "sha256": "3429f289711ea4d7480102335f032f5b185dc1aec04d7c0f3b2f5d08d85c4801",
+      "bytes": 7559
+    },
+    {
+      "path": "crates/gpu/src/tests_fx_depth.rs",
+      "sha256": "f38e5cab5e928658368707b37709e3f342514e1bc064f0e4309a58b51cd0710d",
+      "bytes": 11372
+    },
+    {
+      "path": "crates/gpu/src/tests_fx_noise.rs",
+      "sha256": "f72e0300d19479c74999f0aba5a1e0060d6e3c068db9fddb6b1e93205c65159a",
+      "bytes": 14409
+    },
+    {
+      "path": "crates/gpu/src/fx_noise.rs",
+      "sha256": "eb1578aa9d6b564c2c1215ccba1a990b8c57559633387b366d711a4d7cbcad5a",
+      "bytes": 24898
+    },
+    {
+      "path": "crates/gpu/src/fx_depth.rs",
+      "sha256": "75e5f3a59d1cabfd93fc003bccf80e7b31cd972bce111220739731198e15dfe6",
+      "bytes": 14535
+    },
+    {
+      "path": "crates/gpu/src/fx_distort.rs",
+      "sha256": "5390919023510365ebcdcaed74235ad556d34b65820de8eeeddbcdd1e1ff1dda",
+      "bytes": 18084
+    },
+    {
+      "path": "crates/gpu/src/particles.rs",
+      "sha256": "16d3ed3aa1d6430522fd34bc05cf75f782d9ac97d6b8d0ab75ab2acb276cf435",
+      "bytes": 9922
+    },
+    {
+      "path": "crates/gpu/src/fx_transition.rs",
+      "sha256": "ff5c2e1cac394cbbae05b1af63b76fe1c61ea8f36e3a46c1ea17f45a597e3c7e",
+      "bytes": 24814
+    },
+    {
+      "path": "crates/gpu/src/deferred.rs",
+      "sha256": "f85f91f63f64d0b2e41712e183c705fa73ddb86c8af2c5e06f4bf66511210896",
+      "bytes": 13039
+    },
+    {
+      "path": "crates/gpu/src/context.rs",
+      "sha256": "ef881a2039eb4c9c36946f8d17170bbdda51d07849881df7cf9cd60ee9fb210f",
+      "bytes": 60844
+    },
+    {
+      "path": "crates/gpu/src/tests_deferred.rs",
+      "sha256": "7d5be5ca1072ef148e02ffb0f762ab630f9d60a3978288a057b2ee4ec4b5bf75",
+      "bytes": 7621
+    },
+    {
+      "path": "crates/gpu/src/walk.rs",
+      "sha256": "87c4daf7408aa6c40065e09d63495777fad6a8b1831e7357caa0de9cc13f73e8",
+      "bytes": 20689
+    },
+    {
+      "path": "crates/gpu/src/shaders/common.wgsl",
+      "sha256": "4244140eba68055a0f1edcd6d0b1d7eee5a244e01c19f3ab0491f8e078702fff",
+      "bytes": 15692
+    },
+    {
+      "path": "crates/gpu/src/shaders/fx_generate.wgsl",
+      "sha256": "40a3b2601d048872d9f8a2346fe967a92605adbf8a3a6a2a17e96c856b18b7b4",
+      "bytes": 21740
+    },
+    {
+      "path": "crates/gpu/src/shaders/adv3d.wgsl",
+      "sha256": "767307b888968b681ea408af096e780430f1b92d03edfc2f185633f2f77fd794",
+      "bytes": 9031
+    },
+    {
+      "path": "crates/gpu/src/shaders/fx_particles.wgsl",
+      "sha256": "6ad218e9e80aee59dc76a1dc827152a8b0af569aac2ea9ee6a09e7cffd15fcad",
+      "bytes": 9345
+    },
+    {
+      "path": "crates/gpu/src/shaders/display.wgsl",
+      "sha256": "a14fa12a41ab75fa4f844589fa816229c4c0e1967bb25b6416532a849d8c09af",
+      "bytes": 1605
+    },
+    {
+      "path": "crates/gpu/src/shaders/fx_lut.wgsl",
+      "sha256": "5ea0b7ade1dfdf4c23efc13ea1cda6cd8fa2f9d220c7db486d0e8ef7224effaf",
+      "bytes": 18842
+    },
+    {
+      "path": "crates/gpu/src/shaders/classic3d.wgsl",
+      "sha256": "080f756994e3e98793322e9789216da8c69ac04be6d1f043ed11388df3b22cee",
+      "bytes": 14292
+    },
+    {
+      "path": "crates/gpu/src/shaders/advanced3d.wgsl",
+      "sha256": "8ca36c91119972884bc69753f6fcf65ac195673c15e558252c13fc4e1a6de29a",
+      "bytes": 13579
+    },
+    {
+      "path": "crates/gpu/src/shaders/fx_depth.wgsl",
+      "sha256": "527c69e4f82e086a00b895c571b4e0df914dd05337d5144b0200f36adca0da65",
+      "bytes": 10570
+    },
+    {
+      "path": "crates/gpu/src/shaders/kernels.wgsl",
+      "sha256": "5b9057f79fd28ce159672bcd625afd393efa5444f03cca95bc51c72664d2381f",
+      "bytes": 35150
+    },
+    {
+      "path": "crates/gpu/src/shaders/fx_vr.wgsl",
+      "sha256": "d90f7a1ca2b7a538e9260370399ca9fa6d426f87527dc379803f05288798f9aa",
+      "bytes": 21825
+    },
+    {
+      "path": "crates/gpu/src/shaders/fx_key.wgsl",
+      "sha256": "e3bc01443b082356f2255920b0b3d9e5d09ce04e1757ea84ae8a86b28f36d5f5",
+      "bytes": 30761
+    },
+    {
+      "path": "crates/gpu/src/shaders/fx_gen2.wgsl",
+      "sha256": "7574b2208ed0a49ddd984f172339f44150db0bb59bf0fbdb46fd88ddb69ba003",
+      "bytes": 26074
+    },
+    {
+      "path": "crates/gpu/src/shaders/fx_distort.wgsl",
+      "sha256": "288a08121a45591dc2fb1db2ed3b96a8ebbf4e3a8c520b133ba724ecc2dfa5d7",
+      "bytes": 18994
+    },
+    {
+      "path": "crates/gpu/src/shaders/fx_light.wgsl",
+      "sha256": "0b38003ade440b769855e7e604ce09a3393d720858d2dd9d346d0ebb9d095338",
+      "bytes": 7065
+    },
+    {
+      "path": "crates/gpu/src/shaders/fx_tone.wgsl",
+      "sha256": "0017e34a8f59893ce1512f51a7894f263ed2aae69354175fb75bf8a45b40f3a5",
+      "bytes": 25078
+    },
+    {
+      "path": "crates/gpu/src/shaders/fx_extra.wgsl",
+      "sha256": "6809c701b4b420e4d1fdf2fd792dff945f7924e8ff33ac2b11d8e8dbfaf1147f",
+      "bytes": 6849
+    },
+    {
+      "path": "crates/gpu/src/shaders/fx_time.wgsl",
+      "sha256": "0f269ec214161f3706460e6865cdb9e5ef7deb38c73eceb5c2f374c8619c90d3",
+      "bytes": 6586
+    },
+    {
+      "path": "crates/gpu/src/shaders/fx_warp.wgsl",
+      "sha256": "57e4f1ab1e658fb33fb89abde89bb8d1d92ecd04151574405a86ace20b6d955c",
+      "bytes": 17783
+    },
+    {
+      "path": "crates/gpu/src/shaders/fx_sim.wgsl",
+      "sha256": "cc9d4ba7ad881bd2a300802ddeda2af4569b92256fbe387ff5d027fe51b07d59",
+      "bytes": 22579
+    },
+    {
+      "path": "crates/gpu/src/shaders/sky.wgsl",
+      "sha256": "f34aedff7f01a2d5b3c1c5111f5f11f6115d31be61016cdb89483d599bb2cec1",
+      "bytes": 1401
+    },
+    {
+      "path": "crates/gpu/src/shaders/fx_stylize.wgsl",
+      "sha256": "8732c3e6e2e944e41c7a7d016b3c785fd1a7f61fe2466f01bbac4b62cd0b18c7",
+      "bytes": 34135
+    },
+    {
+      "path": "crates/gpu/src/shaders/particles.wgsl",
+      "sha256": "fedea245d0d05154c3845bfe4549d4e173049c894da7702ac3c549f768a8c0d2",
+      "bytes": 7766
+    },
+    {
+      "path": "crates/gpu/src/shaders/fx_pixel2.wgsl",
+      "sha256": "96c090c49459e530138675d83aa9b686f0a28d5f588d96967b789ad40b879853",
+      "bytes": 31017
+    },
+    {
+      "path": "crates/gpu/src/shaders/fx_noise.wgsl",
+      "sha256": "7dfae8f4898803becd4b1dce610d9033eb098373fca80ac5622a9a31e976aa55",
+      "bytes": 28729
+    },
+    {
+      "path": "crates/gpu/src/shaders/fx_text.wgsl",
+      "sha256": "4ad1d4e84ca3df820cfd39f12790b56cc2deb8ae7eda1c7cd0bd76c5b7c8e50f",
+      "bytes": 1938
+    },
+    {
+      "path": "crates/gpu/src/shaders/fx_transition.wgsl",
+      "sha256": "f10e88919882c60458c28cdc1f206d61743d779e9898e375e26ca7ba71a9dcfb",
+      "bytes": 30452
+    },
+    {
+      "path": "crates/gpu/src/shaders/fx_color.wgsl",
+      "sha256": "e7315b9af51d04f72ed751165adbf89d0e83930925b8cae145389e34d8b37132",
+      "bytes": 25897
+    },
+    {
+      "path": "crates/track/Cargo.toml",
+      "sha256": "b1f8a9198eae89b9ae784933e76484cc1cf720abb56a20a6b9de3c63a428214d",
+      "bytes": 678
+    },
+    {
+      "path": "crates/track/src/subspace.rs",
+      "sha256": "cbfbeab87d17f46b6cb1a28aa866166f81cc876d8cf1ed71bc00fb76e244db58",
+      "bytes": 19061
+    },
+    {
+      "path": "crates/track/src/fit.rs",
+      "sha256": "3471586a58908517af086a3a6eff8e7f1ff76cd6452c596b9336fae77b93423b",
+      "bytes": 11766
+    },
+    {
+      "path": "crates/track/src/lib.rs",
+      "sha256": "e07da32a88c64d873ac4d4d40c0b5812d08a69d4d8ac2718949a089cbb098c49",
+      "bytes": 25084
+    },
+    {
+      "path": "crates/track/src/klt.rs",
+      "sha256": "effd84138eea26b9d81c11e958b8e9b0ead51d1653b84e85b54585e9ae20ed37",
+      "bytes": 16593
+    },
+    {
+      "path": "crates/track/src/mask.rs",
+      "sha256": "b6b92ce4179d7695a1c6f7335ba24401374dcad5d1b1de173eb332eb490c3597",
+      "bytes": 9940
+    },
+    {
+      "path": "crates/track/src/plane.rs",
+      "sha256": "245b163db06e60d1ca6608be4059153f07ebbda74a625c491f7ac117eed7289f",
+      "bytes": 8889
+    },
+    {
+      "path": "crates/track/src/face.rs",
+      "sha256": "1fb908efa8afe7d4b1b38fe85c9aff2e52a37c7c642e986fb649dcfda26dbdc2",
+      "bytes": 59575
+    },
+    {
+      "path": "crates/track/src/stabilize.rs",
+      "sha256": "97f3a1cdc37918556795b008ba677ac782dbb0474861eeb6ef12b8844a598215",
+      "bytes": 36243
+    },
+    {
+      "path": "crates/track/src/solve.rs",
+      "sha256": "5caea54ea02833f351744c30eb42316842b1c19f1a5037f147fc4f789345d304",
+      "bytes": 10256
+    },
+    {
+      "path": "crates/track/src/tests.rs",
+      "sha256": "81e1815f000e6945384c44428e1b66717add7a1360b93aef6c33024e76a41c69",
+      "bytes": 11557
+    },
+    {
+      "path": "crates/track/src/camtrack/features.rs",
+      "sha256": "0c6d31caa9ef46d86f8c0faaa04bd85259212d87be3a6c0e7d6c945b136b6c91",
+      "bytes": 5574
+    },
+    {
+      "path": "crates/track/src/camtrack/solver.rs",
+      "sha256": "9145964b6bb4ca384b745f8f8816925a9f4d40b8f90ae052f3b521e747ed85aa",
+      "bytes": 44511
+    },
+    {
+      "path": "crates/track/src/camtrack/bundle.rs",
+      "sha256": "680d47d47e8a9472e556d8b6c6cfe7dbf0d71dcd3a15fbbbb628706299bdf23b",
+      "bytes": 19676
+    },
+    {
+      "path": "crates/track/src/camtrack/mod.rs",
+      "sha256": "06cb99b19d8da1d2f849d6f6331634810db03a3f81bafa8198f9deafc9524401",
+      "bytes": 19882
+    },
+    {
+      "path": "crates/track/src/camtrack/tests.rs",
+      "sha256": "f2210b7287971d2e6bfe32662d3ae2f56cf9926b5bcc2ff56e4bf7d3a40825e5",
+      "bytes": 22510
+    },
+    {
+      "path": "crates/track/src/camtrack/geometry.rs",
+      "sha256": "fe45706b71e12aa454d01f1ba7c0c95d8ce778163ffa673b3f926b2fdb07b2f7",
+      "bytes": 15628
+    },
+    {
+      "path": "crates/track/src/camtrack/linalg.rs",
+      "sha256": "c54536489bcbecaa55ea16600c981e40ebc17b8f336c856c59622cf200b58df6",
+      "bytes": 16792
+    },
+    {
+      "path": "crates/track/src/roto/refine.rs",
+      "sha256": "f5335bfe06b4fd677e73b0252b6ff983648b25ab947c7ad3bf186946c11fb992",
+      "bytes": 8301
+    },
+    {
+      "path": "crates/track/src/roto/maxflow.rs",
+      "sha256": "ab4c6d054cab6caced498928601e9b26671e5b85784e1546b9cc32d855748d10",
+      "bytes": 15291
+    },
+    {
+      "path": "crates/track/src/roto/gmm.rs",
+      "sha256": "d074d5bc1e16dffec8c09a4231ac35c42f03d00dcc6749f98105bf7ec9b07393",
+      "bytes": 7639
+    },
+    {
+      "path": "crates/track/src/roto/mod.rs",
+      "sha256": "5dfca65c821bb993ed91c13dcfba84ad49dd15b77cccde659f2cea0f5eacd6ea",
+      "bytes": 40710
+    },
+    {
+      "path": "crates/track/src/roto/tests.rs",
+      "sha256": "daff2995253de7497615c79a8ed3321a81db72bcbda3911886ddd27f335bf038",
+      "bytes": 19480
+    },
+    {
+      "path": "crates/track/src/roto/rle.rs",
+      "sha256": "6c322bcaaf0f9856c38c440803f4f959df33cfe7e18e2c83af483e58eebbc7a3",
+      "bytes": 3981
+    },
+    {
+      "path": "crates/track/src/roto/matting.rs",
+      "sha256": "3d747ec26ff2eb6894ade8b00d5de44f29e492502a284a4a12a05821c5600a85",
+      "bytes": 19249
+    },
+    {
+      "path": "crates/av1enc/Cargo.toml",
+      "sha256": "d91f48803aa70738c126878cb356b376bcb3e66d4a07df22d8848141af45bd62",
+      "bytes": 405
+    },
+    {
+      "path": "crates/av1enc/README.md",
+      "sha256": "4a4dd66bf126cc768cc56dbda13afc05c36ec6c73b6d7711f6bc1d2445b13e63",
+      "bytes": 5215
+    },
+    {
+      "path": "crates/av1enc/tests/ffmpeg_oracle.rs",
+      "sha256": "d4ecc58fda6d2ff09462cd85f63f373a39f46eaa8aadd0d36c36d2316da2dcff",
+      "bytes": 7010
+    },
+    {
+      "path": "crates/av1enc/tests/roundtrip.rs",
+      "sha256": "0a94720b7f90fe9d82c625298e5b3f72048f1972870c45f6e794bcdf229ece18",
+      "bytes": 3443
+    },
+    {
+      "path": "crates/av1enc/tests/bench.rs",
+      "sha256": "fcabbd036d22748143d7d202ddea0d9d33fb9fe020a47726df96f775196c92cf",
+      "bytes": 4326
+    },
+    {
+      "path": "crates/av1enc/tests/common/mod.rs",
+      "sha256": "489f488704c5c7cb088a5f42d7513ec4081d815a5bfc9807f8c72b913e2d71cd",
+      "bytes": 4709
+    },
+    {
+      "path": "crates/av1enc/src/symbol.rs",
+      "sha256": "4c133935a6857c77379fb14c27503265127922fe1ea9851fe3adc6fb2267325d",
+      "bytes": 9821
+    },
+    {
+      "path": "crates/av1enc/src/lib.rs",
+      "sha256": "691d8889df60ee071a1515ff32848b21f52f5efb8e3ee24da4f6f2852da12c66",
+      "bytes": 20953
+    },
+    {
+      "path": "crates/av1enc/src/cdf.rs",
+      "sha256": "4415699f5c094f40973831f50b8a828478fcdeb3297f987b7500619d68b075d8",
+      "bytes": 5534
+    },
+    {
+      "path": "crates/av1enc/src/bitw.rs",
+      "sha256": "4dcac0d361284073d5ecdcfb5fb6381e14d7b64548d71f2e21558e26c6d2a37b",
+      "bytes": 2099
+    },
+    {
+      "path": "crates/av1enc/src/pred.rs",
+      "sha256": "69a8f1ae2427a8decb8e7d730e7e12beaffc12593d9e44745d821e15b8ada0e8",
+      "bytes": 13182
+    },
+    {
+      "path": "crates/av1enc/src/transform.rs",
+      "sha256": "56fd47fdc5e16a56c555b5a7fcdb82a9cfa9d65f8228bc00d013a0236e19eae5",
+      "bytes": 14376
+    },
+    {
+      "path": "crates/av1enc/src/loopfilter.rs",
+      "sha256": "12eb05d867e93b939038fccf764ca477d6230cf8feed27c68d6688298e07ea33",
+      "bytes": 7703
+    },
+    {
+      "path": "crates/av1enc/src/tables.rs",
+      "sha256": "cd0b751fe913c62864b5099346b82866f22bb45b7ca8f725ecba2ba247b2aa55",
+      "bytes": 215045
+    },
+    {
+      "path": "crates/av1enc/src/writer.rs",
+      "sha256": "460c8c41094519163263ed9099c04bec5df1a90e551fa9e7cb64fd428e6981a2",
+      "bytes": 39881
+    },
+    {
+      "path": "crates/av1enc/src/decide.rs",
+      "sha256": "cf6d1a1ec2bd1724bff8fcc113c5368e24b75a784c1c9a4287faa2f6b744c9df",
+      "bytes": 35736
+    },
+    {
+      "path": "crates/host/Cargo.toml",
+      "sha256": "49102722275ab4e1b94b0d4012ea291981bcfef454c4b073dd4c9c40e0bcc98c",
+      "bytes": 1235
+    },
+    {
+      "path": "crates/host/tests/determinism.rs",
+      "sha256": "22660afc0dd1562dbe8ba180f15dce8eace44a822a057280822c37fdb08d7ea1",
+      "bytes": 3781
+    },
+    {
+      "path": "crates/host/tests/exr_layers.rs",
+      "sha256": "158369aab7dc827ebb72808b19a37cdd46080d1322f63782f946698d60050146",
+      "bytes": 3570
+    },
+    {
+      "path": "crates/host/tests/vector_import.rs",
+      "sha256": "f3fd80bd768795d6330b9538dfadab0873d489ee877b52e7106fe96459a104de",
+      "bytes": 28728
+    },
+    {
+      "path": "crates/host/tests/plugins.rs",
+      "sha256": "19a063fc64ce945ac1c66f59c4b92881cfb2caa2f32aa89ea431da3cf688b2b0",
+      "bytes": 7995
+    },
+    {
+      "path": "crates/host/tests/gif_animates.rs",
+      "sha256": "c73259bcd2d13bdfa5dc78ccaa656b113be85cd731237c84565fcdb2fd8961df",
+      "bytes": 2472
+    },
+    {
+      "path": "crates/host/tests/relink.rs",
+      "sha256": "7856776603655dfed97af8d1633b8aca311cc489b6343566ff222154a953a5cd",
+      "bytes": 2661
+    },
+    {
+      "path": "crates/host/tests/background_presets.rs",
+      "sha256": "2cf65d4e27cf83d7eb5a37c510717dfae0cb69077619198d9ef7adcfd3f9e68b",
+      "bytes": 3375
+    },
+    {
+      "path": "crates/host/tests/timeline_interop.rs",
+      "sha256": "b125444c53f54fb48401ef1de81ada5eb61eaf5367211487c9f00ca0f3b3de9d",
+      "bytes": 7746
+    },
+    {
+      "path": "crates/host/tests/footage_reload.rs",
+      "sha256": "2f5f49f661c6926450f3b7d5e2c6e6b99321c110200bd5139ffb18715cd4c23b",
+      "bytes": 10421
+    },
+    {
+      "path": "crates/host/src/lib.rs",
+      "sha256": "b84f1611b4d369cacd7d1474026eb7917794df8d1aa3bec4e5f63beab8cc7418",
+      "bytes": 38358
+    },
+    {
+      "path": "crates/psd/Cargo.toml",
+      "sha256": "64ae85cd172833024dc7159aede66a2327462d01f992f2c39a519a1934f3674b",
+      "bytes": 444
+    },
+    {
+      "path": "crates/psd/README.md",
+      "sha256": "ebeb4a065fe13cc0b010ca1c12c798a8b3a354d5926a60d744c983e15f24651c",
+      "bytes": 2080
+    },
+    {
+      "path": "crates/psd/src/tests_integration.rs",
+      "sha256": "eb1f7adf1bfd2e511ff0913b9259c9238c5f69d7155b93548b9d992c885b477b",
+      "bytes": 4861
+    },
+    {
+      "path": "crates/psd/src/placed.rs",
+      "sha256": "8ea87b2658254a359a0c3850ac33e9b02111cd263b4d1cffe5fdc0dd51d53804",
+      "bytes": 25737
+    },
+    {
+      "path": "crates/psd/src/lib.rs",
+      "sha256": "1b9054673904f9b4766150ab5fd7ee1e3212677c9bd5073d1693768c64162370",
+      "bytes": 61992
+    },
+    {
+      "path": "crates/psd/src/write.rs",
+      "sha256": "b43b46a6b281ee93bb0cb99c86996ab1bf66105bc328833881369ad0be99d5a1",
+      "bytes": 21066
+    },
+    {
+      "path": "crates/psd/src/descriptor.rs",
+      "sha256": "b765111b447507811a954b269982b9db47900139f6c3b17b9380ba1627d1e3f6",
+      "bytes": 16491
+    },
+    {
+      "path": "crates/psd/src/engine_data.rs",
+      "sha256": "6eb9d7e6cfe07ef6e93a254083337d923cfaa77df01bc5608092109411a1d624",
+      "bytes": 12134
+    },
+    {
+      "path": "crates/psd/src/read.rs",
+      "sha256": "9eb8135a0ccf2924215987d7f4e142199b9aecb77c49db25158784391e630143",
+      "bytes": 3262
+    },
+    {
+      "path": "crates/psd/src/tests_opt.rs",
+      "sha256": "01d560ddcb94b57e76409d487d715446311a7ebe42012a4e08332b03b6708e98",
+      "bytes": 27513
+    },
+    {
+      "path": "crates/psd/src/tests.rs",
+      "sha256": "3eb4f733205d1eb9bd8cec6bf319f442e7572cdce0239a198efe4f32104ff755",
+      "bytes": 20779
+    },
+    {
+      "path": "crates/psd/src/memory_tests.rs",
+      "sha256": "9e7ab85315685224786b52fa7eee0b7671c97c004912cacfded5738239e0a474",
+      "bytes": 19407
+    },
+    {
+      "path": "crates/opusenc/Cargo.toml",
+      "sha256": "c52ca7594cecf20d26f62e167f2f6e5190a6cb9b0f6530170f0c475cace7d676",
+      "bytes": 408
+    },
+    {
+      "path": "crates/opusenc/README.md",
+      "sha256": "c1a247c3a6c3335823db3478c99e5f924bed2f4e74be3d7dac834a528523073a",
+      "bytes": 8781
+    },
+    {
+      "path": "crates/opusenc/tests/ffmpeg.rs",
+      "sha256": "96a7242dcc3a20bba34a9265735435ea9e0ee27b43f0af99fc50987ed600975b",
+      "bytes": 4245
+    },
+    {
+      "path": "crates/opusenc/tests/modes.rs",
+      "sha256": "00687b47f00a63e7377fb051c9c89b922076a966bf415d1983155a5d677fc800",
+      "bytes": 12691
+    },
+    {
+      "path": "crates/opusenc/tests/common/mod.rs",
+      "sha256": "163b920eeb54fce90a9ce315ca69140a8d9c5b0f514e7bcf1786e726f8a86f5a",
+      "bytes": 10508
+    },
+    {
+      "path": "crates/opusenc/src/mdct.rs",
+      "sha256": "eb84c968e94020e2d16797958a9ffea61fa31ccf4463057bc3fa2b040b81450f",
+      "bytes": 10654
+    },
+    {
+      "path": "crates/opusenc/src/bands.rs",
+      "sha256": "85123537baf8c8b4bfd962546317cbe65ff4c226eca17be3e51611ca37d94b1e",
+      "bytes": 17261
+    },
+    {
+      "path": "crates/opusenc/src/rate.rs",
+      "sha256": "b5478eb9fab30ea672a9d6e8e7e5c4fa6e90fbe7fed72426ecf5c3708d35fee7",
+      "bytes": 18491
+    },
+    {
+      "path": "crates/opusenc/src/range.rs",
+      "sha256": "d8b9946972d5bb4276241ce601da478a43490397dc269f12b1af11f3def3d201",
+      "bytes": 15049
+    },
+    {
+      "path": "crates/opusenc/src/lib.rs",
+      "sha256": "53430120972f8fac0f631b9f0d4c91d22b422ac8b78f1fc5e2ee5781f5f19270",
+      "bytes": 22804
+    },
+    {
+      "path": "crates/opusenc/src/resample.rs",
+      "sha256": "21b6ebd71b63c911c4b256966e17bb17f6258d07835929e5ac05e70ba8ccd5fe",
+      "bytes": 4885
+    },
+    {
+      "path": "crates/opusenc/src/tables.rs",
+      "sha256": "af342ab2274099771299e4f18534c0afb58221ccec5e354ff10835f99cd96b11",
+      "bytes": 5752
+    },
+    {
+      "path": "crates/opusenc/src/energy.rs",
+      "sha256": "63c42fd7164829bf3bcecddc47ba00c2b4aa53c484035f09443f4109f1bba075",
+      "bytes": 8033
+    },
+    {
+      "path": "crates/opusenc/src/silk/analysis.rs",
+      "sha256": "b2978b82e34d81d65bdd84f1ac3e54ae66eeb2dd58ce1f879d1739675dc9c2b2",
+      "bytes": 10990
+    },
+    {
+      "path": "crates/opusenc/src/silk/lpc.rs",
+      "sha256": "a9a97a0e00c57278c8c6925539443ba7624bc36df011278456f231d48e24428d",
+      "bytes": 12387
+    },
+    {
+      "path": "crates/opusenc/src/silk/mod.rs",
+      "sha256": "79c1ef603cccf1c1c4994ba11087d30b036bb8195f5efa85bc8b8c8ab7e34e4a",
+      "bytes": 28051
+    },
+    {
+      "path": "crates/opusenc/src/silk/nlsf.rs",
+      "sha256": "451af498492aee504798fea7476aa3f32d1169285ded24c9eac709d02f01081d",
+      "bytes": 5429
+    },
+    {
+      "path": "crates/opusenc/src/silk/pulses.rs",
+      "sha256": "abc514818866b6340303cfd55f377792ef37f3cf42c1c6f276c5ab1e7acc13ad",
+      "bytes": 3640
+    },
+    {
+      "path": "crates/opusenc/src/silk/tables.rs",
+      "sha256": "0b28d38c9a36e513cd1daf75ec657ed4a3897c1eed6ea3ba255e527da74594ad",
+      "bytes": 24823
+    },
+    {
+      "path": "crates/vp9enc/Cargo.toml",
+      "sha256": "3b5d3f5ae4f40f5ff2e60c85d5dddada72d6e2c7f81b0416917ddf72be336ad8",
+      "bytes": 360
+    },
+    {
+      "path": "crates/vp9enc/README.md",
+      "sha256": "442be158506ee42902eda0c74bdde5efdde6a6eec61c9f0a3863d5917c73cf91",
+      "bytes": 3762
+    },
+    {
+      "path": "crates/vp9enc/src/bool.rs",
+      "sha256": "361ca1478791a9c1ea76f6570637ef047635ad73b69f7a49fc8ede0d3288550e",
+      "bytes": 4451
+    },
+    {
+      "path": "crates/vp9enc/src/lib.rs",
+      "sha256": "e51554e4b58a80d694c83a3eef6b7f146fb957f5dc3f3f099a8a40d971b714d8",
+      "bytes": 18820
+    },
+    {
+      "path": "crates/vp9enc/src/tile.rs",
+      "sha256": "6044b74778e31ccb1a1b193e19602b5041d270e8917fa4c8b7725179455bfb27",
+      "bytes": 36347
+    },
+    {
+      "path": "crates/vp9enc/src/mc.rs",
+      "sha256": "70acbacb33af8e5e609878d1992c01c7052dc352f8199c463da3f2ca87ad4190",
+      "bytes": 8359
+    },
+    {
+      "path": "crates/vp9enc/src/probs.rs",
+      "sha256": "5097603e4f647d52f80799e0f93a6c3e39e3e4cc142ac5e59d600f463fdc4622",
+      "bytes": 14165
+    },
+    {
+      "path": "crates/vp9enc/src/lf.rs",
+      "sha256": "8edce117fb5f1d8bd9c1ca124e25f076c5ab7bda3f3b648fe8c14e11cd5b05a1",
+      "bytes": 5448
+    },
+    {
+      "path": "crates/vp9enc/src/transform.rs",
+      "sha256": "99c67ddc2e9f5dea0e0b7cf1c426714cf5cb11661d0e1eb661cc0594f2b2a1d5",
+      "bytes": 7703
+    },
+    {
+      "path": "crates/vp9enc/src/tables.rs",
+      "sha256": "a068cb7fcfb83d1864b38f2062679b387eb633dee0bd71acb4d4a8580fb0296a",
+      "bytes": 18500
+    },
+    {
+      "path": "crates/color/Cargo.toml",
+      "sha256": "57b655e43dd9f6d2ab06a8e59d1348f101cd900a68e85ab8ab109f68e4dc3558",
+      "bytes": 265
+    },
+    {
+      "path": "crates/color/src/icc.rs",
+      "sha256": "79dc139c6eb6bb54124017635e9f851bab28ea583012e22ef2fcdcc0c10d1066",
+      "bytes": 43710
+    },
+    {
+      "path": "crates/color/src/lib.rs",
+      "sha256": "5f91bd820ab84fe236984d720c7063158e6f08365cc352624d2378a5dd33fceb",
+      "bytes": 8706
+    },
+    {
+      "path": "crates/color/src/blend.rs",
+      "sha256": "2b99e81999b6dd10f843d3dc3972cc43bcd17febc918ee3a4873f4a06ff5104a",
+      "bytes": 19263
+    },
+    {
+      "path": "crates/color/src/space.rs",
+      "sha256": "def1fb2518a7fcb5c0e79d11e275f542a68798d5643ffdde6e1e912ef7c8fe0c",
+      "bytes": 19690
+    },
+    {
+      "path": "crates/path/Cargo.toml",
+      "sha256": "f7fef87bc38203dbb16276548a3797b7f011f8afdf1094bf15ed007cfa6df103",
+      "bytes": 542
+    },
+    {
+      "path": "crates/path/src/boolean.rs",
+      "sha256": "6d43d0d8b44a6f8e583c9deef1c6f1f52e60d6303b5c7ce34579d73b3b87577d",
+      "bytes": 13065
+    },
+    {
+      "path": "crates/path/src/offset.rs",
+      "sha256": "9ba4de94ab99591c989f549884d385410d995f117633c43e3de766cee253f982",
+      "bytes": 5659
+    },
+    {
+      "path": "crates/path/src/fit.rs",
+      "sha256": "92bdff8b69f649b43717257611cc119d7045fcca890744b18e77c9cbe834c337",
+      "bytes": 5292
+    },
+    {
+      "path": "crates/path/src/lib.rs",
+      "sha256": "ea24618a706f12b9ce235d733590ecd31759ecb56860b12dada20239f9071b20",
+      "bytes": 14174
+    },
+    {
+      "path": "crates/path/src/trace.rs",
+      "sha256": "1a7247cb708e16d66ec338e35628fef2a551293e7e89a693fb7870c66811372c",
+      "bytes": 17132
+    },
+    {
+      "path": "crates/path/src/interp.rs",
+      "sha256": "07d929d3cbe2d62982de5b1043a386020e859e1be97dd457cd8c1fdda146f362",
+      "bytes": 22751
+    },
+    {
+      "path": "crates/path/src/varstroke.rs",
+      "sha256": "731cf43287808f7ee3647bb64629fd1f6aa705a3cb3b127c3c335b0d32d9d57e",
+      "bytes": 15382
+    },
+    {
+      "path": "crates/path/src/ops.rs",
+      "sha256": "dfc346258fa27c3e9533f7019e09e4e35ec0b8af52db640e443dbfafadc69764",
+      "bytes": 24465
+    },
+    {
+      "path": "crates/path/src/feather.rs",
+      "sha256": "ac5735d0a69cfe820075f3370f1e727dccfc3f8adf2ec1eb400b263a73b35c05",
+      "bytes": 11279
+    },
+    {
+      "path": "crates/path/src/ops/tests.rs",
+      "sha256": "e5ea404784d07e7512914828998ad4700568d41b9821d375beac09babaf3921c",
+      "bytes": 13813
+    },
+    {
+      "path": "crates/segment/Cargo.toml",
+      "sha256": "b75fe2f8b161199cc2687dbcdee7443da27bda508b95c64cb70cd88bf57b30d2",
+      "bytes": 563
+    },
+    {
+      "path": "crates/segment/README.md",
+      "sha256": "420cfd1d40c724d816988b5355bfc0798478212e5bffbe24152d8d399016373d",
+      "bytes": 4733
+    },
+    {
+      "path": "crates/segment/src/nn.rs",
+      "sha256": "2273310517423c7dc8b8e22fde1f8eaeab30cf321ae5fe9ae20b4ac8ad86b71e",
+      "bytes": 16825
+    },
+    {
+      "path": "crates/segment/src/tflite.rs",
+      "sha256": "d8d000414f27e9f729908920c34e95ed4b976654a01166bb92446d92731b1d72",
+      "bytes": 50571
+    },
+    {
+      "path": "crates/segment/src/pt.rs",
+      "sha256": "2934b2ced5fbdd656adce6813b06ac5bf41d7b62ff9138a2c8f5e311c9b9139c",
+      "bytes": 21135
+    },
+    {
+      "path": "crates/segment/src/lib.rs",
+      "sha256": "b30fcaf7734892337bac4f590998c4aed8023df3dbec8f3fb1fd7712232c9372",
+      "bytes": 12424
+    },
+    {
+      "path": "crates/segment/src/mediapipe.rs",
+      "sha256": "0a827539e1e65505aa997a1b78fc76609f6233432d962c805a357e480ac00d08",
+      "bytes": 14322
+    },
+    {
+      "path": "crates/segment/src/mobilesam.rs",
+      "sha256": "f2a3a1edadf588b9accf117dc8f3a9429f67fd862c89181fe57744748229252d",
+      "bytes": 28475
+    },
+    {
+      "path": "crates/segment/src/face.rs",
+      "sha256": "7680ed6d615751371b44b9ed33b9b4c21932c150cf4a340376750f24c54d0a73",
+      "bytes": 8316
+    },
+    {
+      "path": "crates/plugin/Cargo.toml",
+      "sha256": "9950a37bd5429117626d0c9f8b4b741fa956d07c9818e8a681305b321345b51a",
+      "bytes": 783
+    },
+    {
+      "path": "crates/plugin/src/lib.rs",
+      "sha256": "557b122232e30e744fc04c1731d77fcc2e81507f22f871fc0ca628a15337da1e",
+      "bytes": 3250
+    },
+    {
+      "path": "crates/plugin/src/tests.rs",
+      "sha256": "b0a092367d6f742d32aafc4042f8b54286b1adf102e09ce1c8b766fef0a93fa5",
+      "bytes": 15376
+    },
+    {
+      "path": "crates/plugin/src/wasm.rs",
+      "sha256": "e82d91462d2a72ddd9fa86246725d8a48a61fa52c4d520d03ac88af30b73e6fe",
+      "bytes": 6704
+    },
+    {
+      "path": "crates/interchange/Cargo.toml",
+      "sha256": "0a9a01da4bbb1342c47e8a818f1725ef7b981e149bd1853abe246afb9d7b44a1",
+      "bytes": 893
+    },
+    {
+      "path": "crates/interchange/src/export.rs",
+      "sha256": "20d93e31f82bba3ea3262f78beaa19e68a2aa8669a7785e291f74fec6151adad",
+      "bytes": 29466
+    },
+    {
+      "path": "crates/interchange/src/lib.rs",
+      "sha256": "bdd352d623690045cb513015af45afcff770e778ce00759dd4c737f44065c1c4",
+      "bytes": 8822
+    },
+    {
+      "path": "crates/interchange/src/import.rs",
+      "sha256": "bfef4bc4d3a74053748111c3ef560eb79f7784ce5ef90d73f0a7098f340ef5a2",
+      "bytes": 30615
+    },
+    {
+      "path": "crates/interchange/src/tests.rs",
+      "sha256": "c033628d5728fd7c4caea8d41341efcfefd63fc7d54fb23a8aa23d38e54f23db",
+      "bytes": 26294
+    },
+    {
+      "path": "crates/pdf/Cargo.toml",
+      "sha256": "505f42c1c38198de14ef6908ea09243e18448869e2c7314ae787582e5e1611d3",
+      "bytes": 916
+    },
+    {
+      "path": "crates/pdf/README.md",
+      "sha256": "bc5aea3995280676a36c3d5c12fd7e1398439b94a501148f0203c496793a92f2",
+      "bytes": 10754
+    },
+    {
+      "path": "crates/pdf/src/page.rs",
+      "sha256": "f5b43e7756cc2a7d05fd6cbc299e19160ec81710735530797eba851b8b81377f",
+      "bytes": 46369
+    },
+    {
+      "path": "crates/pdf/src/font.rs",
+      "sha256": "b95cf5cff46b2f4fcd86659adb9941fcfae768f3ac982e1a780685d0fc8eccfb",
+      "bytes": 30699
+    },
+    {
+      "path": "crates/pdf/src/ccitt.rs",
+      "sha256": "98dad3868a12c54c8c14b2f11cf257ea40bf4a896c97d86c892370196ad7c2dc",
+      "bytes": 26576
+    },
+    {
+      "path": "crates/pdf/src/tests_import.rs",
+      "sha256": "9a71e045fdcf58d159284fe3bcbb1093a7f500db2deb4dc782976ba6a6eff8eb",
+      "bytes": 17928
+    },
+    {
+      "path": "crates/pdf/src/cff.rs",
+      "sha256": "c04de87c413d0a2369474dfc7878afbbc77007efd4eba55fb9525c0ff3029551",
+      "bytes": 32683
+    },
+    {
+      "path": "crates/pdf/src/encoding.rs",
+      "sha256": "cf2d854eeb29ef0e9372de92f912c36ae859458cc238de479e061da91fe8e336",
+      "bytes": 11152
+    },
+    {
+      "path": "crates/pdf/src/tests_groups.rs",
+      "sha256": "3a22f423e591ea304f07ce924ea1ac868ba3c2b2ffd14c92976695b5134f70bb",
+      "bytes": 7383
+    },
+    {
+      "path": "crates/pdf/src/color.rs",
+      "sha256": "b4d07a2c753675ae3bb79f1c8968c0955d45de350d71a62f3e5e2ed6656bd383",
+      "bytes": 37568
+    },
+    {
+      "path": "crates/pdf/src/lib.rs",
+      "sha256": "2171ff5a8046f0fff1e249d81ca2ec46d9d76679cad503541ee702018c3208be",
+      "bytes": 6883
+    },
+    {
+      "path": "crates/pdf/src/object.rs",
+      "sha256": "27c00db493398b3ccf2e74e57f2e05b17e1072e15dc06f61c8e3549942fc3811",
+      "bytes": 29908
+    },
+    {
+      "path": "crates/pdf/src/write.rs",
+      "sha256": "938a3ee6912bcfc180ef5828ed0b0a20c87794c5dc34adc09c41795dcc200200",
+      "bytes": 2109
+    },
+    {
+      "path": "crates/pdf/src/tests_shading.rs",
+      "sha256": "e140d7fae5ddb187d70c6f449bda69ee2e4a324326bb0bb372dad1248ff4e875",
+      "bytes": 10986
+    },
+    {
+      "path": "crates/pdf/src/build.rs",
+      "sha256": "99eb341217720193448d686eddda6445d05e7e77000a28f99428a02cddabbe6d",
+      "bytes": 3743
+    },
+    {
+      "path": "crates/pdf/src/image.rs",
+      "sha256": "6aca36fc47ce59b39773bfac002183c664d3957183f4285f56ca6175bdf74f32",
+      "bytes": 12833
+    },
+    {
+      "path": "crates/pdf/src/type1.rs",
+      "sha256": "ef79951f0f907aadfd46b8ace6ae15399915601977015131163c5ea75e987342",
+      "bytes": 20101
+    },
+    {
+      "path": "crates/pdf/src/tests.rs",
+      "sha256": "02eb290af940e622b22827f8a2d40b4cc043827c7e0b2bdb738e0d90d47f11ad",
+      "bytes": 51417
+    },
+    {
+      "path": "crates/pdf/src/ps.rs",
+      "sha256": "fa925369cc55ae6c9113a3e7b3210582e0376c9e03e909a537808ed0d502ade4",
+      "bytes": 71944
+    },
+    {
+      "path": "crates/pdf/src/shading.rs",
+      "sha256": "290cc5a5a370428945e3d47c9245b25c64caa9e24084274e0176a6386ce1fbdb",
+      "bytes": 22504
+    },
+    {
+      "path": "crates/render/Cargo.toml",
+      "sha256": "1e19760edc2e573a24b71f4f58bf2cb33fe493806e69c153e28c9f5e0db4e969",
+      "bytes": 1058
+    },
+    {
+      "path": "crates/render/tests/motion_blur_probe.rs",
+      "sha256": "84cf2b1edb87a5843510feb204d9a61b6ac7a3008cd7ff28880602160f83275c",
+      "bytes": 4900
+    },
+    {
+      "path": "crates/render/src/tests_collapse.rs",
+      "sha256": "38677c831b636641285e5ef84e3ab8096f250b080abb47081701181d829564a6",
+      "bytes": 17474
+    },
+    {
+      "path": "crates/render/src/cache.rs",
+      "sha256": "0ee2f026c2ee03004de9ec382537fc70968112e755eaba9884058cf077e04bb3",
+      "bytes": 25433
+    },
+    {
+      "path": "crates/render/src/tests_time.rs",
+      "sha256": "42725b85245243725f4d6b358201ef0867e50362cb8e5e70acb36ccfe1f16c99",
+      "bytes": 7801
+    },
+    {
+      "path": "crates/render/src/tests_mask_blur.rs",
+      "sha256": "8859a3354080b2de813a31499cfefacb9651adae4bdac8a69a83bbd368cacd25",
+      "bytes": 2681
+    },
+    {
+      "path": "crates/render/src/shapes.rs",
+      "sha256": "b613aca578d412e37f2ee7c96a125ec6f17acc95045a68bce65cc09f3fabb820",
+      "bytes": 32496
+    },
+    {
+      "path": "crates/render/src/color.rs",
+      "sha256": "6bff3dba658e8808df08194971f9af827d90daa46a0718b4e7d5cd9526db6bbf",
+      "bytes": 13760
+    },
+    {
+      "path": "crates/render/src/lib.rs",
+      "sha256": "856c0dd11cc6053726af6c8967d49e75b78fa7884d02ea4bdcb11d3bb02eac49",
+      "bytes": 114421
+    },
+    {
+      "path": "crates/render/src/disk_cache.rs",
+      "sha256": "03d0a290e3f60bd9507fa6cca5468fa018aa66b50129606a17fd34f0cc087bef",
+      "bytes": 38474
+    },
+    {
+      "path": "crates/render/src/tests_audio_fx.rs",
+      "sha256": "70b6c00de96bde90aa5a9860f9d8ebbcd2acb023c8aab4b36d95b16db0e01016",
+      "bytes": 10566
+    },
+    {
+      "path": "crates/render/src/tests_styles.rs",
+      "sha256": "c32ca07bb809610bd4d3d37eaae0d44921687c0c6461d1b4d2d00ed88a8674c2",
+      "bytes": 20184
+    },
+    {
+      "path": "crates/render/src/passes.rs",
+      "sha256": "a1726aec5a405f2e48953cf6368fa893538c7174349cba7af3688b4142dd3d17",
+      "bytes": 4317
+    },
+    {
+      "path": "crates/render/src/auto.rs",
+      "sha256": "1d20e1b015a2916aad3ae3eaf33b96736dec2e5f7c141af75c3932643920b9d8",
+      "bytes": 5635
+    },
+    {
+      "path": "crates/render/src/tests_color.rs",
+      "sha256": "d2f34dd80ab47e4432cbbf75bf9c7d1c78519666553dec5d6a923c8c99762bb6",
+      "bytes": 16501
+    },
+    {
+      "path": "crates/render/src/tests_footage_size.rs",
+      "sha256": "4ab67ce6726750eb337de86ae486d6d0fe2b9c3df1998c6df7a92bb98c947b4f",
+      "bytes": 3620
+    },
+    {
+      "path": "crates/render/src/eval.rs",
+      "sha256": "a1915e7d3735eb25135cd788aa1fbdc19d81d8b1464060b30a46cafc219cd88d",
+      "bytes": 14817
+    },
+    {
+      "path": "crates/render/src/audio.rs",
+      "sha256": "687c4a01888257a6243c0d5ee6e84bb5cfc07253a052b77b9102a20d6443e4c6",
+      "bytes": 19614
+    },
+    {
+      "path": "crates/render/src/tests_remap.rs",
+      "sha256": "408b8936086473cea4c52eeb965194498844b3e1d68a81c9a280c2068b8c2da6",
+      "bytes": 3379
+    },
+    {
+      "path": "crates/render/src/tests.rs",
+      "sha256": "bda69f3d9cd25eb59aa87cc834b0adcdfee3b80ff173da8292a939f2435455ac",
+      "bytes": 48628
+    },
+    {
+      "path": "crates/render/src/tests_nested.rs",
+      "sha256": "c49697ee0499efe1a7a8d027c592d9834a8a5ae09747be1bbc77f4770c625c5d",
+      "bytes": 4861
+    },
+    {
+      "path": "crates/render/src/text.rs",
+      "sha256": "6f1da4a57337b09c22b62a237aee44531cf4e2e7ebb6a93c93db593234cd740e",
+      "bytes": 42093
+    },
+    {
+      "path": "crates/render/src/tests_frame_blend.rs",
+      "sha256": "f9af2ab68557a49a232b92cc4319bc812e6c73fbf4ca6a43661e81a5590863ca",
+      "bytes": 7440
+    },
+    {
+      "path": "crates/render/src/tests_paint.rs",
+      "sha256": "8889b53fc4dc89c1f82afe7eeaa5f608e2e54dfd48f81b16021f066d8eb8afb8",
+      "bytes": 5375
+    },
+    {
+      "path": "crates/render/src/masks.rs",
+      "sha256": "873d80a30d60e8393f1b35cd01259f507c3dadb9371671e728cc0bce8258bb50",
+      "bytes": 8521
+    },
+    {
+      "path": "crates/render/src/styles.rs",
+      "sha256": "543aab4f83bfb23d108d8bd8bf0b0211d6e143e7acda547c96e7fa348d259566",
+      "bytes": 29820
+    },
+    {
+      "path": "crates/render/src/tests_auto.rs",
+      "sha256": "e3c91d8ae393e4e43b955f4f63ca23c71d706453b65fe5cc803d1eb5494a73d7",
+      "bytes": 5843
+    },
+    {
+      "path": "crates/render/src/tests_roi.rs",
+      "sha256": "9636448dd1be45951dc7afbfaf1e06f51a6b4ea49368e50965602ef602ded2d2",
+      "bytes": 4844
+    },
+    {
+      "path": "crates/render/src/tests_aux.rs",
+      "sha256": "5d39920fc3cd6739f4a77f3a07510db982ad232f9cd406643f9da6daa2028806",
+      "bytes": 4994
+    },
+    {
+      "path": "crates/render/src/cache/dependencies.rs",
+      "sha256": "d4319c90726003e786642e55eae1097a75cdbf4923db7d72ffa01786d4c1e4ea",
+      "bytes": 4516
+    },
+    {
+      "path": "crates/render/src/three_d/light.rs",
+      "sha256": "2047a235911385019186ac7c867735e0257b2d0fc9975482bfc3edde6e482678",
+      "bytes": 9575
+    },
+    {
+      "path": "crates/render/src/three_d/compose.rs",
+      "sha256": "bb151d93cbefaf511a0463669035bf9126806699e0431076f5c5edcbd35d9613",
+      "bytes": 43724
+    },
+    {
+      "path": "crates/render/src/three_d/mod.rs",
+      "sha256": "2a898e8867d5e70ca8aaddefa60f55b67ff44483d06aa52c53a2a24d81618ff8",
+      "bytes": 1527
+    },
+    {
+      "path": "crates/render/src/three_d/bokeh.rs",
+      "sha256": "292e4011b348755abcd77de081ae49736b78d979eaed74f7e161d2889b2db636",
+      "bytes": 16039
+    },
+    {
+      "path": "crates/render/src/three_d/tests.rs",
+      "sha256": "1137c6ce96bfa46a66e40d0dfd6accd3f08a21eba4fdca2fd0974593ba51c170",
+      "bytes": 23300
+    },
+    {
+      "path": "crates/render/src/three_d/tests_orient.rs",
+      "sha256": "eaf79e4e1b52744ea02271d8b7f0285c5781be6f243033b5f913f97f1ed450b0",
+      "bytes": 7567
+    },
+    {
+      "path": "crates/render/src/three_d/camera.rs",
+      "sha256": "38b2bb694a923c375324085f682db4c13b26a3b94b0aaba1180cd1d665e7657e",
+      "bytes": 23848
+    },
+    {
+      "path": "crates/render/src/three_d/adv/scene.rs",
+      "sha256": "c78e59441cc8f0ce67284e7bdd38bbf534e195afe456ce3a566ff9bf8a941b64",
+      "bytes": 39972
+    },
+    {
+      "path": "crates/render/src/three_d/adv/mod.rs",
+      "sha256": "b1d23e75949a06b2752cfa27e8dd3028014363ba021a2e03ab7664df047e4a94",
+      "bytes": 16138
+    },
+    {
+      "path": "crates/render/src/three_d/adv/raster.rs",
+      "sha256": "78e4fe19c8f366776210b021a0cb0a740a8c75e576c9cf1de7f98eabff0ed9b4",
+      "bytes": 20350
+    },
+    {
+      "path": "crates/render/src/three_d/adv/tests.rs",
+      "sha256": "f1298f42329bba94f828cbac7bcfa2554c5adc7fd164bf249b6f0357a6c27a89",
+      "bytes": 31364
+    },
+    {
+      "path": "crates/render/src/three_d/adv/shade.rs",
+      "sha256": "15dde171b1e8c55213d68ab645097ec5585a998022cfcbeb074b60fd8e148aee",
+      "bytes": 15427
+    },
+    {
+      "path": "crates/render/src/three_d/adv/dof.rs",
+      "sha256": "981992fc993b2b1e9901f6d66f6a31223deedca70bba3d4af4bff149f263dc84",
+      "bytes": 5203
+    },
+    {
+      "path": "crates/render/src/shapes/tests.rs",
+      "sha256": "644b74d0794a34087ae518abf7c31849893c1d9826f03e821ed67ccde7a677b0",
+      "bytes": 17663
+    },
+    {
+      "path": "crates/render/src/text/tests.rs",
+      "sha256": "6b7085898e91b4012d5cb6167aa86ca515d60c7376fbc6d2c4441da998d425b9",
+      "bytes": 30006
+    },
+    {
+      "path": "crates/expr/Cargo.toml",
+      "sha256": "4ec1fb92a0388b0b666b4587f018ad619b5db6461c703aba7985aad01e115a02",
+      "bytes": 1017
+    },
+    {
+      "path": "crates/expr/src/runtime.rs",
+      "sha256": "f8231d1b35d23e5b4d70c8ac7e056f513e07cf992b1ebd068e2423c837f886b0",
+      "bytes": 27268
+    },
+    {
+      "path": "crates/expr/src/host.rs",
+      "sha256": "a0425fbd39887932462f024d66d4cabff5711df3d080fbf466963de0868aee14",
+      "bytes": 23851
+    },
+    {
+      "path": "crates/expr/src/lib.rs",
+      "sha256": "57581995744bf688793134b07e0091add4c6e9459d2fbfe0e2541354bb20df74",
+      "bytes": 11303
+    },
+    {
+      "path": "crates/expr/src/rewrite.rs",
+      "sha256": "9bfc4d73771bec6e61bb9635d5a0a48ca1fe4bbabd8208c1bfd9cfd542fcfe52",
+      "bytes": 32263
+    },
+    {
+      "path": "crates/expr/src/tests.rs",
+      "sha256": "123d1bb2dfbd0c99b372563bd45bb7ed1c99eef5beea207ad2ead12276dfd9ae",
+      "bytes": 55554
+    },
+    {
+      "path": "crates/expr/src/noise.rs",
+      "sha256": "74c2c5be45978bbba2c653a6f1f16b40ecd38543a71efd326818b19fb5fe5420",
+      "bytes": 4299
+    },
+    {
+      "path": "crates/expr/src/sample.rs",
+      "sha256": "020a562ef182191254a0b2457601fb5120f2b6824f242fdfb11238cec51df757",
+      "bytes": 4570
+    },
+    {
+      "path": "crates/expr/src/prelude.js",
+      "sha256": "14c9725bb582500f676f81d6805b729fd2014ebdc0d8f8fb02d0a91ab68d18a4",
+      "bytes": 43580
+    },
+    {
+      "path": "crates/expr/src/tests/fuzz.rs",
+      "sha256": "3f251c78ddf7b1da1462c4f880d381b238afb2859664f72dd9268021b8703a14",
+      "bytes": 16628
+    },
+    {
+      "path": "crates/script/Cargo.toml",
+      "sha256": "ebdb1ed50b5afd09eac1bd132a7f14c616eb66d7682fb0e9eb5679131b14120b",
+      "bytes": 1011
+    },
+    {
+      "path": "crates/script/src/tests_evalfile.rs",
+      "sha256": "02554e65af2224bdf6359d8e5cde318c5d521e001f04aa8a9489d678e51ec6a1",
+      "bytes": 4428
+    },
+    {
+      "path": "crates/script/src/runtime.rs",
+      "sha256": "bd06574988a95c1108b4309d55b87eb086609c81547372ea7ddd77a19349d1ed",
+      "bytes": 36683
+    },
+    {
+      "path": "crates/script/src/ui.rs",
+      "sha256": "05659e379f4ffcc0b386fad930ce5a0b577371068ec4019febf256c5baf93a23",
+      "bytes": 21230
+    },
+    {
+      "path": "crates/script/src/tests_ui_mouse.rs",
+      "sha256": "ce0e1e9ada9dac76e19f628ad34dc394a3d2fa6df375a49822b99719200f02e9",
+      "bytes": 9058
+    },
+    {
+      "path": "crates/script/src/tasks.rs",
+      "sha256": "94f510877222ddc872bc60aa2bd9b3af79b36e5d65c80be7525cd4b10f251f1f",
+      "bytes": 8380
+    },
+    {
+      "path": "crates/script/src/lib.rs",
+      "sha256": "ffbb3de21b01e5b1b39eb70a226a2547efce70a6c7fe1525a1614db5ae3afcc3",
+      "bytes": 5233
+    },
+    {
+      "path": "crates/script/src/tests_include.rs",
+      "sha256": "3c59286dcf1977d3920f260e1fa67e8a21e0e82ad17e2be8d0e5b1841b37e4b5",
+      "bytes": 4306
+    },
+    {
+      "path": "crates/script/src/tests_callable.rs",
+      "sha256": "f822ed7a42967812f40af77312187d6843f7c7574d87bb514d569ce6b8ce308d",
+      "bytes": 3657
+    },
+    {
+      "path": "crates/script/src/scriptfile.rs",
+      "sha256": "59a9f3f8de30d514f0c540c59e959f70956e1a3733993aa63ea781eb860a3851",
+      "bytes": 3198
+    },
+    {
+      "path": "crates/script/src/tests_tasks.rs",
+      "sha256": "a3fd8319eb15a4300b8041f6e59d1ae7cb7136bdf31b4757ca9b5e56f229a6ec",
+      "bytes": 7937
+    },
+    {
+      "path": "crates/script/src/socket.rs",
+      "sha256": "cef9d959d3fec9e23c64e04690a08d978bf0e52aa52ebf76e3f7104a6576cac3",
+      "bytes": 10842
+    },
+    {
+      "path": "crates/script/src/tests.rs",
+      "sha256": "f6d150e06d1e543f60dbcfe2ceb4acef2b31913ee4a1922a6785d1fdb5e773e4",
+      "bytes": 61813
+    },
+    {
+      "path": "crates/script/src/scriptui.js",
+      "sha256": "bd319de68be3ef0ef33c638227d443a85a50a76ef9165bb374af2c443093f72b",
+      "bytes": 38529
+    },
+    {
+      "path": "crates/script/src/tests_panels.rs",
+      "sha256": "ecc407c01f5bf472e32801fae634df9804444faf46dcbe54778ad3e1365b2914",
+      "bytes": 4711
+    },
+    {
+      "path": "crates/script/src/tests_ui_more.rs",
+      "sha256": "f4e04194ab072bf77347020cc73d216f3cc3329dcd98660e68b2aad766082c93",
+      "bytes": 23866
+    },
+    {
+      "path": "crates/script/src/matchnames.rs",
+      "sha256": "fc47fc888e13c36fe7716246b9342ad381472e1374b8900f476850aa39985b69",
+      "bytes": 23591
+    },
+    {
+      "path": "crates/script/src/include.rs",
+      "sha256": "d4df1489e00de8c8893a269e4cfd4a5029986cb7d551d040ef97a5bccc6e8549",
+      "bytes": 7343
+    },
+    {
+      "path": "crates/script/src/tests_ui.rs",
+      "sha256": "672a2893c48cfb5f5a2f6319a9cd837c07e48d436e4735b0331c82f17edb2d4f",
+      "bytes": 15226
+    },
+    {
+      "path": "crates/script/src/model.rs",
+      "sha256": "cb7aa1d82651eb678a5b27f0da05a648683d8738ae6be50fc1214f8414359837",
+      "bytes": 37283
+    },
+    {
+      "path": "crates/script/src/tests_ease_presets.rs",
+      "sha256": "4d960f57c94afb3c7ab1ed757bd27fdfa04588b0a100fbf2c59b9ec8247a99b6",
+      "bytes": 16635
+    },
+    {
+      "path": "crates/script/src/prelude.js",
+      "sha256": "50961651f952cc0290da807b4bbd14357f9558dfbcf6b7a32f2a8caedb4a637e",
+      "bytes": 103536
+    },
+    {
+      "path": "crates/time/Cargo.toml",
+      "sha256": "f60ed8272dea9cd134a8d919cf25f01ce73ae9513ad70d0d68b3e7a80e83e8d3",
+      "bytes": 264
+    },
+    {
+      "path": "crates/time/tests/relative_min_cancellation.rs",
+      "sha256": "37d6f52febfad973b024656c3662d07d951e6d22bd49eedd0a7bfd9071cc216d",
+      "bytes": 1547
+    },
+    {
+      "path": "crates/time/src/lib.rs",
+      "sha256": "49ffcb3d82fd520e62af639dec51182876e9085bef4ee60eeffe8e77e37af4db",
+      "bytes": 32245
+    },
+    {
+      "path": "crates/project/Cargo.toml",
+      "sha256": "dfa7e0f0636211809826f65798b8502a6723177e7bc9f7cc6ef4b617a97cb2ae",
+      "bytes": 567
+    },
+    {
+      "path": "crates/project/src/sequence.rs",
+      "sha256": "2371766307c9137ee9a47679b16e3af18971af1aa7f8fe09f6fada9bc10c7d54",
+      "bytes": 8915
+    },
+    {
+      "path": "crates/project/src/render_queue.rs",
+      "sha256": "1f0e24f91eda7117f625fefc07e3f672685b69753ef72bb888b9dd76c0a849f5",
+      "bytes": 69834
+    },
+    {
+      "path": "crates/project/src/lib.rs",
+      "sha256": "3bdd8fa1537bf1f557102d23958898425c7bbb9a655cacab9f6ac92b9b960d5b",
+      "bytes": 59063
+    },
+    {
+      "path": "crates/project/src/limits.rs",
+      "sha256": "0f87b9ef4cf8dfd23758fc9f58f9b7d21e109df3723ed84f4f6d2ad5eacf3cdb",
+      "bytes": 10317
+    },
+    {
+      "path": "crates/project/src/build.rs",
+      "sha256": "8cbab402dfb110a2e9633697ad1914f55c75b02bf183d71fcb4a3aa9b7b0b209",
+      "bytes": 50178
+    },
+    {
+      "path": "crates/project/src/props.rs",
+      "sha256": "5a9042b368ccfff93b2d95bdedb7ae620b76d5cf281a810d735aa4c3eca6eec7",
+      "bytes": 20202
+    },
+    {
+      "path": "crates/project/src/tracking.rs",
+      "sha256": "382eb0c40a7d2bb2f198b08bca81ece03b5ccff34aaaf4702b0de40eb54906a5",
+      "bytes": 11326
+    },
+    {
+      "path": "crates/project/src/tests.rs",
+      "sha256": "b0fa992ee888bfab656ac83920c3d38dea21c43cbcd9ed1a778c14f22e1d2592",
+      "bytes": 9933
+    },
+    {
+      "path": "crates/project/src/render_templates.rs",
+      "sha256": "a77b06ee67fb1890a254568098b6b54df5d7aba8f3d0ace96b05eea9e0c1a335",
+      "bytes": 14413
+    },
+    {
+      "path": "crates/project/src/essential.rs",
+      "sha256": "7a65900fc096fb2625f57a6851d45ee89adfbb336e54fe6d776f7462511dfd79",
+      "bytes": 35597
+    },
+    {
+      "path": "crates/project/src/styles.rs",
+      "sha256": "b74ee917a59967ecc50e799da3fe4d9ddd595161902441eba83f40f4a2d8f9d0",
+      "bytes": 22261
+    },
+    {
+      "path": "crates/ui-egui/src/credits.rs",
+      "sha256": "4ac16c0f1577ff19a2277e80ae238891e588b4a189778464af236df561a92292",
+      "bytes": 15705
+    },
+    {
+      "path": "crates/geom/Cargo.toml",
+      "sha256": "3883a7be7c7832d71cc4f90d8c7360e3f9f6716e77e8e68d7729f0ccccf8eef3",
+      "bytes": 264
+    },
+    {
+      "path": "crates/geom/src/lib.rs",
+      "sha256": "95bcabb495d52d410b4f2c2a86be30e21dbd2012482ad8d050b36cbf143318a4",
+      "bytes": 19332
+    },
+    {
+      "path": "crates/keyframe/Cargo.toml",
+      "sha256": "9c932ca3c785f76337a0aa5a228e00057f4c1d549df959569c7275e3e912feb5",
+      "bytes": 560
+    },
+    {
+      "path": "crates/keyframe/examples/ae_ease_samples.rs",
+      "sha256": "61ff018340295b3d5fdd4d9e2cf9f4cd0df121ef433242b9d2e8475ba2f8a720",
+      "bytes": 1838
+    },
+    {
+      "path": "crates/keyframe/src/lib.rs",
+      "sha256": "2bdf11a5958f55acb46188679cb187e0f2597d7356423caba6961d33b04e39a3",
+      "bytes": 45490
+    },
+    {
+      "path": "crates/keyframe/src/value.rs",
+      "sha256": "b8bec23896ae3aed389b78b279fc24a4dc0f15e100165c5e2ce5607d4ef1144b",
+      "bytes": 18548
+    },
+    {
+      "path": "crates/keyframe/src/text_doc.rs",
+      "sha256": "799787c07c36a9440bcdc9bb8d6cc0eaa00493728455469d731d0cc6cbe7beac",
+      "bytes": 59038
+    },
+    {
+      "path": "crates/model/Cargo.toml",
+      "sha256": "b573a3ac528d560efd5dcf5916f957d2943736291bdcbc0f195f762991730227",
+      "bytes": 615
+    },
+    {
+      "path": "crates/model/tests/fixtures/quad.glb",
+      "sha256": "194a4ba5a99960d418e32ddcc597c8fd1a68b88b6d66d4f383101791c46ac305",
+      "bytes": 2028
+    },
+    {
+      "path": "crates/model/tests/fixtures/quad.gltf",
+      "sha256": "e7179ef845d362e7eb4df979c2d43a4e5a48fe8f2d5eb691748c95d09190a2da",
+      "bytes": 2996
+    },
+    {
+      "path": "crates/model/tests/fixtures/quad.glb.attribution",
+      "sha256": "78b3b98af5007a7124f8a82103cb488db7018a1496f42df68a51edf99da8fa37",
+      "bytes": 541
+    },
+    {
+      "path": "crates/model/tests/fixtures/cube.mtl.attribution",
+      "sha256": "83d356cfeda0b562c1bad69fe128b72550558e753605356efae2453242fdbb07",
+      "bytes": 526
+    },
+    {
+      "path": "crates/model/tests/fixtures/quad.gltf.attribution",
+      "sha256": "3b1c9ce2c979ee88b8691fd3a2e92ab565c453ee6ef9759f61dab5563ffe96d7",
+      "bytes": 560
+    },
+    {
+      "path": "crates/model/tests/fixtures/cube.obj.attribution",
+      "sha256": "b37ce1fa1a8953a72ba861ddd725be802e95de420e97f7105ffcc2bd3834b517",
+      "bytes": 530
+    },
+    {
+      "path": "crates/model/tests/fixtures/cube.obj",
+      "sha256": "7f098e50cccb41a98a0270a4d8665f465e9386d27e0e34cf0486f4bc8b860074",
+      "bytes": 536
+    },
+    {
+      "path": "crates/model/tests/fixtures/cube.mtl",
+      "sha256": "be84d8cf9b88eb32fc4a03ff2d93204ed6e7de6a47632a1bfd359688d9493685",
+      "bytes": 167
+    },
+    {
+      "path": "crates/model/src/gltf.rs",
+      "sha256": "b601062a0d4c8c50a90cbf2c17e487230af76dfe1da91e9e232721c515dfe802",
+      "bytes": 24542
+    },
+    {
+      "path": "crates/model/src/fbx.rs",
+      "sha256": "9cbd986d362af80c5ba003b1d5e1cabd3df4d579bbbc3f13892bfe62f6b8f868",
+      "bytes": 34553
+    },
+    {
+      "path": "crates/model/src/prim.rs",
+      "sha256": "86cb6f4acd763065a9602d3313963ece9919418ba84e48e632ee39e4f2137f25",
+      "bytes": 8976
+    },
+    {
+      "path": "crates/model/src/fbx_tests.rs",
+      "sha256": "8238224014733d26be5c119121fbceb0c157decd12dcf1a15e0d01ddc0793a24",
+      "bytes": 11880
+    },
+    {
+      "path": "crates/model/src/extrude.rs",
+      "sha256": "87c7d5bb269b3fe31f0daeb43ba1f66ee56b4518fbe66a336edf5c8a2c1ae855",
+      "bytes": 14782
+    },
+    {
+      "path": "crates/model/src/lib.rs",
+      "sha256": "ae0c623a6571ce3518a39cb44f692d8978ddc3bcf6f78ea7520424b1552eb4a9",
+      "bytes": 27772
+    },
+    {
+      "path": "crates/model/src/stl.rs",
+      "sha256": "baeeb01974c546d3ae5ecacb824a342c84b956ec812ab35973a857ecd94d76ce",
+      "bytes": 8984
+    },
+    {
+      "path": "crates/model/src/tests.rs",
+      "sha256": "2a1b516b26761413daa7b8e09c74a24ddb03b48547824c4f6d1561d172dfc73f",
+      "bytes": 23694
+    },
+    {
+      "path": "crates/model/src/triangulate.rs",
+      "sha256": "1e7f7e396353e66444fe9e16ca9cbe25045d476a83aede04beb99c5b3a6db74c",
+      "bytes": 6559
+    },
+    {
+      "path": "crates/model/src/obj.rs",
+      "sha256": "fb32167a14a2af23dc3a54c08448d09c3832f53fc078d40814f6e8d68a87db46",
+      "bytes": 10979
+    },
+    {
+      "path": "crates/lottie/Cargo.toml",
+      "sha256": "dd6838fb78d3403b9c65798806e6f4fc512d370c971922e2d9adfdfc593e686f",
+      "bytes": 823
+    },
+    {
+      "path": "crates/lottie/tests/fixtures/legacy-masks.json",
+      "sha256": "5e43871e1ac2c82485e90e8d1cfcfc833b48da2315a589f291115e3a46698b3f",
+      "bytes": 1471
+    },
+    {
+      "path": "crates/lottie/tests/fixtures/bouncing-ball.json.attribution",
+      "sha256": "aaf816a90e22df3ee9711f07bfceeea26aaa89b441a31efbf43177a1644bd70f",
+      "bytes": 422
+    },
+    {
+      "path": "crates/lottie/tests/fixtures/precomp-matte-text.json",
+      "sha256": "221e988434fb6af43c641a342c1212d7206608c35ec2c39c479f4efd038cc008",
+      "bytes": 2740
+    },
+    {
+      "path": "crates/lottie/tests/fixtures/legacy-masks.json.attribution",
+      "sha256": "a7455e6dc72fe21526b238f86543b040e70c50e41c557b7c900823e4a64a1a08",
+      "bytes": 457
+    },
+    {
+      "path": "crates/lottie/tests/fixtures/shapes-gradient.json",
+      "sha256": "f1548df1eb0383c54e2759dfd48094e9838161a829a802ae6aead33f9cf8c8e5",
+      "bytes": 2355
+    },
+    {
+      "path": "crates/lottie/tests/fixtures/precomp-matte-text.json.attribution",
+      "sha256": "2a1727d304fc23eff2c93d82e597b6864c3b9c67b0c7fd5507f3f8e41cf5d315",
+      "bytes": 464
+    },
+    {
+      "path": "crates/lottie/tests/fixtures/bouncing-ball.json",
+      "sha256": "a04446480f58c99bc476d14d5059f1c6b1a8d0aec6c5c6c2bb12a22d23e940db",
+      "bytes": 1430
+    },
+    {
+      "path": "crates/lottie/tests/fixtures/shapes-gradient.json.attribution",
+      "sha256": "0769c39180c9bb81ee2f14f822f5c5b30921117006ef943038b1cada4623c232",
+      "bytes": 468
+    },
+    {
+      "path": "crates/lottie/src/export.rs",
+      "sha256": "968ac8539ba960ffb8565965b2061c81baa1350f9e70262963e6af866adcdb69",
+      "bytes": 21075
+    },
+    {
+      "path": "crates/lottie/src/anim.rs",
+      "sha256": "34eb7d104dfcdd2d033604538138134412e79eafede5e6104e2cfbda98de1e31",
+      "bytes": 13633
+    },
+    {
+      "path": "crates/lottie/src/base64.rs",
+      "sha256": "2363db9aaf87f7d462256a5649f91f89a8c32f0ebb83d0aee41c4437e34e92b0",
+      "bytes": 2324
+    },
+    {
+      "path": "crates/lottie/src/shapes.rs",
+      "sha256": "e1efa9d757a33d56b665062a0ba6f3a46e493e02307102223784a4aa62c8d293",
+      "bytes": 23571
+    },
+    {
+      "path": "crates/lottie/src/lib.rs",
+      "sha256": "d224c6e23896b1c16e766d3b42e1b11712a0007cbf9e0b0f2185bccb1f80d67f",
+      "bytes": 3594
+    },
+    {
+      "path": "crates/lottie/src/import.rs",
+      "sha256": "9b49b202c26278840ca83eecdcabd39aa6f14b8501dea80e8742d516dc729d40",
+      "bytes": 20667
+    },
+    {
+      "path": "crates/lottie/src/tests.rs",
+      "sha256": "885a032152ffa636bece2628b154032e248fd2fa8695b9fc7122edc16dbef5f2",
+      "bytes": 37484
+    },
+    {
+      "path": "crates/lottie/src/text.rs",
+      "sha256": "89e7f9c4f787c310d1e2ea00ef9dcd8e9f402336c074bfe78ef75850abf5a8cc",
+      "bytes": 18489
+    },
+    {
+      "path": "crates/lottie/src/zip.rs",
+      "sha256": "1cc62a58872717be3e92da22fc9e01fba6e0a9f81aee8fce9cf4fe90c309c8ac",
+      "bytes": 4018
+    },
+    {
+      "path": "crates/hevcenc/Cargo.toml",
+      "sha256": "ced9cb404a1dc00a303d20e62a72e98e91c9a191dd6014625016ab74b5441198",
+      "bytes": 375
+    },
+    {
+      "path": "crates/hevcenc/README.md",
+      "sha256": "1b44b873644feaff4696764df8b00d00f3173aaba07a4dfacb45973f1aa76399",
+      "bytes": 5920
+    },
+    {
+      "path": "crates/hevcenc/tests/roundtrip.rs",
+      "sha256": "535231fb160511513a43aba830c17fc5023de673596601c1fd97712868adbbc1",
+      "bytes": 15731
+    },
+    {
+      "path": "crates/hevcenc/src/cabac.rs",
+      "sha256": "ae6047cd903837e4c1392d3c94a4e14d037d4e21264533fb7cfffdce6554008e",
+      "bytes": 6556
+    },
+    {
+      "path": "crates/hevcenc/src/bitstream.rs",
+      "sha256": "9b62f6aba046092901ed8ed31943ce8bef3e0483182aa9e17c7ee176c45994d8",
+      "bytes": 3316
+    },
+    {
+      "path": "crates/hevcenc/src/me.rs",
+      "sha256": "859ab5d0b957dd4dc400f2a3c749380397a37f01d3cfd4cb06eb7383ee2b41a6",
+      "bytes": 6121
+    },
+    {
+      "path": "crates/hevcenc/src/lib.rs",
+      "sha256": "7cd3cb4512307acc1a2d705d79fe9ffb833151b33f44ea1f6e787e1bbc360203",
+      "bytes": 13708
+    },
+    {
+      "path": "crates/hevcenc/src/params.rs",
+      "sha256": "4533157ff80366fb22b040072e63f4f3e35661eeea1654974a76a2019e10ce33",
+      "bytes": 10545
+    },
+    {
+      "path": "crates/hevcenc/src/inter.rs",
+      "sha256": "98d0f5e0807651d279e0a11566d6142f2a3fe5b887575e05a3f061aad0a3bf9b",
+      "bytes": 5574
+    },
+    {
+      "path": "crates/hevcenc/src/transform.rs",
+      "sha256": "d731baedc05a050d0965605035caf20aec4d7fc6c6877b498b57f09aa7c2cb12",
+      "bytes": 10987
+    },
+    {
+      "path": "crates/hevcenc/src/frame.rs",
+      "sha256": "4cb6fb497824761fb3be29928e0abd193625028d7d59c20bd5098d92fda46bd5",
+      "bytes": 53782
+    },
+    {
+      "path": "crates/hevcenc/src/intra.rs",
+      "sha256": "368a243262f3f28b8e06835051556bed9dca6d409e6da43e3c80a7b8ebf3e982",
+      "bytes": 9084
+    },
+    {
+      "path": "crates/hevcenc/src/tables.rs",
+      "sha256": "017243727e3f916a9d1bede334277847e59f93ce6b5151e899bd873ec701d10c",
+      "bytes": 15631
+    },
+    {
+      "path": "crates/hevcenc/src/deblock.rs",
+      "sha256": "25629e18ec26e3f26ca615eb8d1eb9e7563aebfd158a0216ae0660b73d1fd1bf",
+      "bytes": 6584
+    },
+    {
+      "path": "crates/automation/Cargo.toml",
+      "sha256": "766f05da72f70a4622800269b24da8d5126aa5885ac5c55066d14361103ea11f",
+      "bytes": 566
+    },
+    {
+      "path": "crates/automation/tests/qa/compositing.rs",
+      "sha256": "040f3e72a68d4df4470dc5b693ba776b716d4ccc4cb22fee9e03e28834e9a47e",
+      "bytes": 12694
+    },
+    {
+      "path": "crates/automation/tests/qa/shapes.rs",
+      "sha256": "01f8868ac587e14f41fe0612ab9cf6069fd56c969b69b93b375fa64490d676c6",
+      "bytes": 7123
+    },
+    {
+      "path": "crates/automation/tests/qa/harness.rs",
+      "sha256": "9ebd3ac267de9480de27d6025ec7afe53e7d73ca3bcf7876f2a31cdd9166f72f",
+      "bytes": 5046
+    },
+    {
+      "path": "crates/automation/tests/qa/affordances.rs",
+      "sha256": "dab5dc94db6624807a3031d910b72f35b79d34b37f3c921f650584297825a8df",
+      "bytes": 2368
+    },
+    {
+      "path": "crates/automation/tests/qa/tracking.rs",
+      "sha256": "7f297c541cea4557d3f0d843837b42d1ef58e7c09ff1d26676b2eaab28c0934e",
+      "bytes": 7864
+    },
+    {
+      "path": "crates/automation/tests/qa/main.rs",
+      "sha256": "46f4ea9b1fc75e37947e353016e987b056a3b054b299c6352c75b285322ec49e",
+      "bytes": 358
+    },
+    {
+      "path": "crates/automation/tests/qa/lifecycle.rs",
+      "sha256": "517bc6ffaa2b1b980afb0065b476e65efb1f221b5bd717ea2ed7439e13932e57",
+      "bytes": 8491
+    },
+    {
+      "path": "crates/automation/tests/qa/kinetic.rs",
+      "sha256": "90d0685e347ba6766c1de91c7b9db5ffa895af1d68923d0b9a40a375242cb2a6",
+      "bytes": 8617
+    },
+    {
+      "path": "crates/automation/src/bridge.rs",
+      "sha256": "c7fe436876b7a3a9cc370adabbd8e05c1846ab3280a1531423a811439f00d941",
+      "bytes": 4598
+    },
+    {
+      "path": "crates/automation/src/autosave.rs",
+      "sha256": "2f57c9f44c9ee50a2cddc320bd1fb8182c2ca3794eda4a4bcffc5ddcd67f8bbc",
+      "bytes": 5901
+    },
+    {
+      "path": "crates/automation/src/tools.rs",
+      "sha256": "db73d53420b1f0ede72b210649a09e6c81a108532cf2ce761aff0a79d6f493e6",
+      "bytes": 50487
+    },
+    {
+      "path": "crates/automation/src/base64.rs",
+      "sha256": "a558a2b56e72fc8f03d666e84d52428a9eb4b1ef6fa9a2f046772e8a2c975e78",
+      "bytes": 2212
+    },
+    {
+      "path": "crates/automation/src/backend.rs",
+      "sha256": "c33b495e3d16f038fefed3098bdcd2727d18e3b10fb8a02c7f4f9d777f48378b",
+      "bytes": 5920
+    },
+    {
+      "path": "crates/automation/src/lib.rs",
+      "sha256": "4efb245068ad366667c37b26eec32ea4e1ce278152be77d355a825eebcbf8b6b",
+      "bytes": 3885
+    },
+    {
+      "path": "crates/automation/src/server.rs",
+      "sha256": "31a1d49c5c7e83f2827514756c21e122da384a0b6572a40b367d287d0ff4dcc9",
+      "bytes": 15930
+    },
+    {
+      "path": "crates/automation/src/long_job.rs",
+      "sha256": "212bdfe98b40be769def095914b87b58103236ee375fd9c09690e31a3aea91e7",
+      "bytes": 8410
+    },
+    {
+      "path": "crates/automation/src/tests.rs",
+      "sha256": "7af5b45a31b3a9639ab3d3b801c72830a50d4f2fe5bf5d536ae471f2aff5f82b",
+      "bytes": 69602
+    },
+    {
+      "path": "crates/automation/src/confine.rs",
+      "sha256": "ee090c32b00d7d33d7b75199cf8b9fcc31f99602025a2c385cff3a1ae3a1ee58",
+      "bytes": 12329
+    },
+    {
+      "path": "crates/text/Cargo.toml",
+      "sha256": "2fdb6f878dc1fa1db788922b254df4d763d516174c31119633550407493bbb1d",
+      "bytes": 733
+    },
+    {
+      "path": "crates/text/tests/script_fallback.rs",
+      "sha256": "e6133bd236ab8b0852bd8f2d0c9b49f81d734c5d55b42db8c25fd24d7f4fb876",
+      "bytes": 1901
+    },
+    {
+      "path": "crates/text/tests/vertical_punctuation.rs",
+      "sha256": "86e5bfe3aaf65c2226244930fe8d0526b54dd23ad016d9c9ec5acf6f9c5c059a",
+      "bytes": 2212
+    },
+    {
+      "path": "crates/text/tests/system_font_menu.rs",
+      "sha256": "34c114aadb32ad508826051dccf7209367f4b86043a11747f96f31de24f0d39a",
+      "bytes": 1059
+    },
+    {
+      "path": "crates/text/src/font_dirs.rs",
+      "sha256": "60dc3b3a34a54a86befc693ef4c83cc497a5214a8b14cac1d76ab32664b64bc2",
+      "bytes": 15271
+    },
+    {
+      "path": "crates/text/src/selectors.rs",
+      "sha256": "f703880b0dc1cd138a1e59858243d58063b735ae9a3b71a90c8d930552663546",
+      "bytes": 14728
+    },
+    {
+      "path": "crates/text/src/layout.rs",
+      "sha256": "ad2baea2bbcbb21eb5849027f42c8fcefa3e8b2feb3a74f74d3cb0364b09dfbf",
+      "bytes": 59749
+    },
+    {
+      "path": "crates/text/src/sfnt.rs",
+      "sha256": "4f00db9f9ce92e719916d039da239127d164c80f25d6c023a846df1964afae59",
+      "bytes": 9770
+    },
+    {
+      "path": "crates/text/src/lib.rs",
+      "sha256": "d289fdc35263a4ce0a935f570e955758668c7be5243d7b06204e7c11bafda9e7",
+      "bytes": 29410
+    },
+    {
+      "path": "crates/text/src/path_text.rs",
+      "sha256": "32dedf4b157bdf7b65a5dd9bd09a4f1cd7d0823082dd101826b42c0f2dc9ae5c",
+      "bytes": 6953
+    },
+    {
+      "path": "crates/text/src/fonts.rs",
+      "sha256": "a62b5c9bffd337105ccc55dc6072cce3fa617f1fb985c39c8d93fe1cf08ac208",
+      "bytes": 53201
+    },
+    {
+      "path": "crates/text/src/variable.rs",
+      "sha256": "6862e8e86f9291ba56c605899f21e6ba07c25bde39a179f05c14540bd9179044",
+      "bytes": 11196
+    },
+    {
+      "path": "crates/export/Cargo.toml",
+      "sha256": "867d9d955b52d8838bf4af8b8a42235768f8433bb00239889d8cde7246343bd4",
+      "bytes": 1416
+    },
+    {
+      "path": "crates/export/tests/mov_audio_sample_positions.rs",
+      "sha256": "a54d97064bbd7d1a5c3091ba700c55af8b8563e3353d619d4ad41a780b33769d",
+      "bytes": 10732
+    },
+    {
+      "path": "crates/export/tests/uncompressed_mov.rs",
+      "sha256": "1a842ea133eb3653b31840c8f3f5d049c0e586fdbf0e31b2e1a6e33735d693ec",
+      "bytes": 10236
+    },
+    {
+      "path": "crates/export/tests/hevc_av1_roundtrip.rs",
+      "sha256": "ffcb95812ba2e5c3bd3dd0e030dd4055ad1789e508d87ebaed714f682ded77a6",
+      "bytes": 12586
+    },
+    {
+      "path": "crates/export/tests/vp9_roundtrip.rs",
+      "sha256": "0ca3e872d39ecd69ddef4075bcc421f64883696a181e1d17b025284ff5ed330b",
+      "bytes": 16092
+    },
+    {
+      "path": "crates/export/tests/opus_roundtrip.rs",
+      "sha256": "4a2c34446a65059d90289c99c916e218c0c954cb19c6b48afa1e3e89e64fc4ef",
+      "bytes": 13993
+    },
+    {
+      "path": "crates/export/tests/render_settings.rs",
+      "sha256": "1ea56cd938ab8b4d0f7c68045d554b975b93e98ffdb7fe835e640a59056c42ec",
+      "bytes": 23378
+    },
+    {
+      "path": "crates/export/tests/roundtrip.rs",
+      "sha256": "e81efe89588704cf736b16342f3d367ee92be049e233e5c9c76bf60683cf71a2",
+      "bytes": 25614
+    },
+    {
+      "path": "crates/export/tests/audio_sample_positions.rs",
+      "sha256": "abd3dc94f546f403f60c10581b192e5ef352bad2af8435e4de6ceffdd10798f7",
+      "bytes": 5648
+    },
+    {
+      "path": "crates/export/tests/native_audio_sample_positions.rs",
+      "sha256": "db271dbe207284a70ae10721a862ae3e81b389bcc88ae22fbd5df8a768ddd891",
+      "bytes": 8068
+    },
+    {
+      "path": "crates/export/src/hevc_av1.rs",
+      "sha256": "233e093489b71c605abfb374a6d1ba6ca5a67a1b8b6cd9f55a9657f6607068f1",
+      "bytes": 8146
+    },
+    {
+      "path": "crates/export/src/out.rs",
+      "sha256": "9e01aab7b06e9172f0dc4e79a3547335545a4721e188fa8a9a7d493945f507bd",
+      "bytes": 2669
+    },
+    {
+      "path": "crates/export/src/encode.rs",
+      "sha256": "770de34acf576be21aea91e3c8ed87e5f03309010c3caa732b9fedb538c4b619",
+      "bytes": 17676
+    },
+    {
+      "path": "crates/export/src/webm.rs",
+      "sha256": "91e31785bcef9fe40e39eabddf457fce51f86d90706427913493b0d56ef3cad3",
+      "bytes": 18645
+    },
+    {
+      "path": "crates/export/src/lib.rs",
+      "sha256": "6c0b57f9eaf81067f050fbf953f0eada25d19fa1ed017000e74a80753f6534fc",
+      "bytes": 18584
+    },
+    {
+      "path": "crates/export/src/webm_av1.rs",
+      "sha256": "6e0403091a61a063e81f3f203eadb952700c3e8dbbe489a53183d06e27d92bce",
+      "bytes": 7299
+    },
+    {
+      "path": "crates/export/src/pipeline.rs",
+      "sha256": "44ea921fce899ebf0bcf4908f662d360ddd4e4bba6001a9f0962f5e1a5e3f32c",
+      "bytes": 29646
+    },
+    {
+      "path": "crates/export/src/uncompressed.rs",
+      "sha256": "3db9ebf3eb01e4549a1a748d0349ad6af7a7f43164980c6c7d40dbb9592fbdd8",
+      "bytes": 5255
+    },
+    {
+      "path": "crates/raster/Cargo.toml",
+      "sha256": "1113dc965863a1a1fd63c4bc03a0dbf9d8437e5bcb56cc9ed778e9247788946f",
+      "bytes": 419
+    },
+    {
+      "path": "crates/raster/src/flow.rs",
+      "sha256": "c9ae263b20ac16bc7cd4b4f3c004ff03cfd4c726ff1300aad22d8be4203d9cc3",
+      "bytes": 12199
+    },
+    {
+      "path": "crates/raster/src/channels3d.rs",
+      "sha256": "97b6e17cbf0afe31ad2cd452eff5b84e54090480202dfcde214891c23e53f968",
+      "bytes": 11287
+    },
+    {
+      "path": "crates/raster/src/lib.rs",
+      "sha256": "ae4cea2816ff1261cee42d546ba4f849440a87138aec61e1f7dc54ce740103e1",
+      "bytes": 12736
+    },
+    {
+      "path": "crates/raster/src/scopes.rs",
+      "sha256": "e7c6940a7ce04050b65aba7b03cae19a80121e9af90790d7fe16ec514e441ecf",
+      "bytes": 20775
+    },
+    {
+      "path": "crates/raster/src/inpaint.rs",
+      "sha256": "0a621645b85ed7cda4c851f60966c33105dc6149c820a071a3492e02149a4482",
+      "bytes": 38398
+    },
+    {
+      "path": "crates/raster/src/cuts.rs",
+      "sha256": "f3d296db5d9ee34d03b49f46cda261d16bfbe73f37e97ec6340848f9312996bd",
+      "bytes": 7479
+    },
+    {
+      "path": "crates/raster/src/warp.rs",
+      "sha256": "5852f62357c2bced38c4f7d5e0028fab272afbee4f38cdb46a23a4769dcafa9d",
+      "bytes": 16888
+    },
+    {
+      "path": "crates/raster/src/blur.rs",
+      "sha256": "60270cfafd558149320f1fb00efdaea3d850157363256a7a42b4bca16e0ae738",
+      "bytes": 10806
+    },
+    {
+      "path": "crates/effects/Cargo.toml",
+      "sha256": "7ac13c3a1c4012b87df5820ed586b66fe1984e29a7d3f76fd568ab9fec0c29cf",
+      "bytes": 711
+    },
+    {
+      "path": "crates/effects/tests/particle_golden.rs",
+      "sha256": "f2560f89762260511b1757379bfe6053198e9ef8463a0c5ef09c9d33c40992da",
+      "bytes": 34570
+    },
+    {
+      "path": "crates/effects/tests/timewarp_golden.rs",
+      "sha256": "3e61473bd9b2fb5a8b3a3c527c2a633b7773e1e7f7609c0049cb1d96f9fc9c0f",
+      "bytes": 9476
+    },
+    {
+      "path": "crates/effects/tests/gen_golden.rs",
+      "sha256": "cca713e83151f7d62cc92e1d28a03ec6c807b5469a58023c0a93d06e05872972",
+      "bytes": 36501
+    },
+    {
+      "path": "crates/effects/tests/sim_golden.rs",
+      "sha256": "1052bd12adc20d37edceb61df7d56a2cd292f11a220b7b375d55be98fcb7dc1d",
+      "bytes": 38934
+    },
+    {
+      "path": "crates/effects/src/blur3.rs",
+      "sha256": "b5f2dc481c4ac932c3e01b44a510e81725e1d8f3a167b76ad57237c00364a6b6",
+      "bytes": 17442
+    },
+    {
+      "path": "crates/effects/src/paint.rs",
+      "sha256": "1eee4096801dcd7a655f4297311ac6c48dc145e4e623ccc374c04cd1534d7ddb",
+      "bytes": 35255
+    },
+    {
+      "path": "crates/effects/src/keying.rs",
+      "sha256": "bcf9ce2042a95aee20feeb5c5dd9121cc14dcf10060f722de91aed5615583aed",
+      "bytes": 35111
+    },
+    {
+      "path": "crates/effects/src/ocio_config.rs",
+      "sha256": "09e2a1692c32e59a8f59e350f98493f5f80159ca0d08fda3f7298cecb0368c0f",
+      "bytes": 73429
+    },
+    {
+      "path": "crates/effects/src/sim2.rs",
+      "sha256": "8bd5251788009015fff8a4169a1db9769d3960404e91cbb118f0c8bfd5b966d1",
+      "bytes": 133265
+    },
+    {
+      "path": "crates/effects/src/psim.rs",
+      "sha256": "3ad0aa6f669553ffa2acc1b141611e69e750a01781d571b8d7e9a40ca0739087",
+      "bytes": 3715
+    },
+    {
+      "path": "crates/effects/src/warp_stab.rs",
+      "sha256": "c8418129a6f9b6d97b6466eb853fe695acd86d8fdb0fbe2e3ebaa753335ffcc4",
+      "bytes": 25979
+    },
+    {
+      "path": "crates/effects/src/matte.rs",
+      "sha256": "9b4a5e207b64f84ff2f5e43a49c4e96a453d85013137cf53488ff23911ec713e",
+      "bytes": 20972
+    },
+    {
+      "path": "crates/effects/src/sim3.rs",
+      "sha256": "3b94eeda5909e84de9f51dd1b497ee8b32320c1de9dcb632073ecfefcefbdd1a",
+      "bytes": 68678
+    },
+    {
+      "path": "crates/effects/src/util.rs",
+      "sha256": "fc9150b1149335c26853682c541a0774d6ca6c1ee86a49a07a590e54f7fb7deb",
+      "bytes": 29296
+    },
+    {
+      "path": "crates/effects/src/blur2.rs",
+      "sha256": "25a328fe79a0bd99ea422c9453964cba02f958fff001036eed135185a86151de",
+      "bytes": 39999
+    },
+    {
+      "path": "crates/effects/src/transition.rs",
+      "sha256": "af4848d329752fd71390470711ce56ed82d9f6b52456b7a450d8d6fa28254161",
+      "bytes": 40369
+    },
+    {
+      "path": "crates/effects/src/channel.rs",
+      "sha256": "38959196c2acefd6ac3153bd3f706ba68973c85b39bdf395a6975490cf57617a",
+      "bytes": 29967
+    },
+    {
+      "path": "crates/effects/src/channel3d.rs",
+      "sha256": "221867fabe30b5498703cd7ec8a79806cbe89d1cd1e12fc923c4d94535f6974a",
+      "bytes": 43147
+    },
+    {
+      "path": "crates/effects/src/utility.rs",
+      "sha256": "54e0647d70aac7064113bdbcbabbb0f91d0aadff362c9c03e554d271be3db683",
+      "bytes": 18504
+    },
+    {
+      "path": "crates/effects/src/distort2.rs",
+      "sha256": "701ce40c7246f87e094202b5b4ac36b26765b5afad2bcff7e198a5593288d17f",
+      "bytes": 50856
+    },
+    {
+      "path": "crates/effects/src/perspective.rs",
+      "sha256": "fd0d7752b7abd2f2e3447496ca69fad4ef0218b97a88ce2d43e72d5478ebd71b",
+      "bytes": 25379
+    },
+    {
+      "path": "crates/effects/src/obsolete.rs",
+      "sha256": "306f4f542b78abcb1265a23ca5408cd20a017651b09475431e611802d42187d3",
+      "bytes": 7471
+    },
+    {
+      "path": "crates/effects/src/generate2.rs",
+      "sha256": "0593555eaa361272d5aac67e4cb7b028d84e0d8bec538c251b99c32d109ce763",
+      "bytes": 72299
+    },
+    {
+      "path": "crates/effects/src/distort.rs",
+      "sha256": "f2a84831073cdfb384b8d423fad048c1a18a8a6b65040d469b6784c095aaf430",
+      "bytes": 26266
+    },
+    {
+      "path": "crates/effects/src/generate.rs",
+      "sha256": "72f97b50659acf2d8a404f67c22a487367ab8c922de1c880f1df1c89b58905fa",
+      "bytes": 22353
+    },
+    {
+      "path": "crates/effects/src/mocha_shape.rs",
+      "sha256": "50523e325baac5ccc84358953b38f8952953ce6da4520941e6713cc059fd652b",
+      "bytes": 9684
+    },
+    {
+      "path": "crates/effects/src/lib.rs",
+      "sha256": "9b2c3f264b56459fd862da8388c1c46442a0e1a3e5d574fc4bcb83a97d9044f2",
+      "bytes": 57301
+    },
+    {
+      "path": "crates/effects/src/color_fx.rs",
+      "sha256": "54bdf56d8af81129d4dc539d926454d15ee31a3a0a338654ab128da2c0932850",
+      "bytes": 66987
+    },
+    {
+      "path": "crates/effects/src/ocio.rs",
+      "sha256": "34b31eb7848fc0ad679fce26f77081d6d4d213c5a2c3b2d4a27b7a10f9b30391",
+      "bytes": 79750
+    },
+    {
+      "path": "crates/effects/src/utility2.rs",
+      "sha256": "3c0e4fbd558ec47f7e526932b9d7c1fee24b2225011aa09cd29a21cb489f85b7",
+      "bytes": 2930
+    },
+    {
+      "path": "crates/effects/src/audio_fx.rs",
+      "sha256": "7ab8937f00dda79ee81a724aebc4c3d6e1d6377b71e1109d902849f4952b97e7",
+      "bytes": 44426
+    },
+    {
+      "path": "crates/effects/src/catalog.rs",
+      "sha256": "96082a84ed9a96bd2773f03546f20994b5f60bfb3f2ea63853adb6ce9966c660",
+      "bytes": 12491
+    },
+    {
+      "path": "crates/effects/src/distort3.rs",
+      "sha256": "1485fd84f2ef752b9248a4b32ee0e65d8b072b3be8b5dff787cd24bb04693edf",
+      "bytes": 58306
+    },
+    {
+      "path": "crates/effects/src/sim.rs",
+      "sha256": "4b8b8c22a307783282e52315f000f72f73a6011064d9b51cedeb78f617525471",
+      "bytes": 90373
+    },
+    {
+      "path": "crates/effects/src/generate3.rs",
+      "sha256": "ce6cb28cb99fb7677881ac1e2ca245a259ca577027b4acd89f30f95f9eafc961",
+      "bytes": 109597
+    },
+    {
+      "path": "crates/effects/src/controls.rs",
+      "sha256": "23af82e0dcba5fb41639b763d03f8cf96d760f190086e83713180342df82a81e",
+      "bytes": 2813
+    },
+    {
+      "path": "crates/effects/src/misc.rs",
+      "sha256": "d3e54a153b24b3f4f56a3031b7406214d06c8ae072f1044539eb0c854001a0f9",
+      "bytes": 31043
+    },
+    {
+      "path": "crates/effects/src/keying2.rs",
+      "sha256": "2de4247fc712dfb7ccbed296743259a7fc566a76e948a6047e5934e630afb56e",
+      "bytes": 31247
+    },
+    {
+      "path": "crates/effects/src/distort4.rs",
+      "sha256": "02af607155f9b14eaac37da3e590df026e78c65159d460e8fb898c49c1f67ff6",
+      "bytes": 34506
+    },
+    {
+      "path": "crates/effects/src/stylize2.rs",
+      "sha256": "470215b65d85f74cbc83513dc7e7be96b91cbb61495131e4e7da52b5202a897a",
+      "bytes": 46078
+    },
+    {
+      "path": "crates/effects/src/migrate.rs",
+      "sha256": "03b921977fd1ee391388d7a0dadc3e5b83920758501c43f27037821908131e16",
+      "bytes": 38161
+    },
+    {
+      "path": "crates/effects/src/camera_tracker.rs",
+      "sha256": "2af425c3188a9c5356dc2da92b426d66390045b4f6ed76a5640453d99763958f",
+      "bytes": 16279
+    },
+    {
+      "path": "crates/effects/src/transition2.rs",
+      "sha256": "651f7ccca4f4f483749b1f05eaffe0801d4cd46b0505423f9dbb4164a053ab07",
+      "bytes": 20686
+    },
+    {
+      "path": "crates/effects/src/textfx.rs",
+      "sha256": "b2f3258591136b9d2b3d4c33f89e1738733a4f25cfdf1df52f9b959333b9edea",
+      "bytes": 58552
+    },
+    {
+      "path": "crates/effects/src/keylight.rs",
+      "sha256": "baba8352af7d9fbc9c53da90a3b9b48b61d8040af3d4cfa0facefd15f0878524",
+      "bytes": 33460
+    },
+    {
+      "path": "crates/effects/src/face_track.rs",
+      "sha256": "eae578806ecf16870a4380c4d30418e9c2041507d8ee317f7fb7a8d17a3dc1af",
+      "bytes": 2232
+    },
+    {
+      "path": "crates/effects/src/stylize3.rs",
+      "sha256": "7c053b20ad45be3dab0bc0ef3d00a6a1a342ceea6495ecc0092c26fe4d5b91d2",
+      "bytes": 27088
+    },
+    {
+      "path": "crates/effects/src/roto.rs",
+      "sha256": "f8e19574ce89b78566d44d7ba1f5b68250cb4aa353d400f4c686aee4175f4b71",
+      "bytes": 33753
+    },
+    {
+      "path": "crates/effects/src/color2.rs",
+      "sha256": "ac5044b6d6d899ec364f861e20e8698f8841550fe5805adeabe36ced0d3b0846",
+      "bytes": 54897
+    },
+    {
+      "path": "crates/effects/src/noise.rs",
+      "sha256": "7aecd13fa8ea131f081fe1496631ebf78df7379e8c0f6b7cd2709469b10f2a39",
+      "bytes": 47509
+    },
+    {
+      "path": "crates/effects/src/noise2.rs",
+      "sha256": "50e0e2c8234a12ec451453fbe4b4c5c3866e288d912caa524f6b154736a2c127",
+      "bytes": 15856
+    },
+    {
+      "path": "crates/effects/src/vr.rs",
+      "sha256": "50e087e4fcecc0f7ef6df145d048937cec98132c5b0a0adeab357bb6317aea2a",
+      "bytes": 60573
+    },
+    {
+      "path": "crates/effects/src/object_matte.rs",
+      "sha256": "4b62663e45d6fa0b31bebc4aa563192a88d4652cedb65e7c363d0e8fc07bdc22",
+      "bytes": 32904
+    },
+    {
+      "path": "crates/effects/src/plugin.rs",
+      "sha256": "5532b727bbd6ea340234cc376a7b9909eab9769d2ab422115db44dd0ac873fe2",
+      "bytes": 13693
+    },
+    {
+      "path": "crates/effects/src/card3d.rs",
+      "sha256": "7c013a90ed4c0c72dc40d64e32636b16309489fa774980b312ea7aa461275b36",
+      "bytes": 21039
+    },
+    {
+      "path": "crates/effects/src/fidelity.rs",
+      "sha256": "606ecf0a7a85a518e86ae25b5c03dfb84dc7a74ae119ed67bcce932f4025ff18",
+      "bytes": 2417
+    },
+    {
+      "path": "crates/effects/src/perspective2.rs",
+      "sha256": "01d4c5873e6e9c1c0860f52c8af723f0f02633b0e576e285e5c179278eb99908",
+      "bytes": 12629
+    },
+    {
+      "path": "crates/effects/src/time_fx.rs",
+      "sha256": "88a7beec97c596e585ffefa6b7775f6de8ad3052b26b85855f5470b6043efeec",
+      "bytes": 54626
+    },
+    {
+      "path": "crates/effects/src/color3.rs",
+      "sha256": "dcbce3fdf37b6a041bfe3134e58cd3d3502e22d227552b471b64ca37d88ed7e1",
+      "bytes": 51520
+    },
+    {
+      "path": "crates/effects/src/noise3.rs",
+      "sha256": "14145ae4f210c7b7e0fdef3f15a5e549e0947416143426bd842371a1dbd8e87c",
+      "bytes": 31056
+    },
+    {
+      "path": "crates/effects/src/channel2.rs",
+      "sha256": "865dba18f643a5988387a2a238d9f7849251dcd9de1058c3c1fe9c1b46b6c999",
+      "bytes": 19354
+    },
+    {
+      "path": "crates/effects/src/paint/tests.rs",
+      "sha256": "a5248aa79a93c3a2257f09fa1d8c72e54f5b7c1fb8a2c501c0a7a366ca343d88",
+      "bytes": 9698
+    },
+    {
+      "path": "crates/effects/src/puppet/arap.rs",
+      "sha256": "a22043550530a172939a26363116d50118df8df4469e53f404769a5eda4169fd",
+      "bytes": 11969
+    },
+    {
+      "path": "crates/effects/src/puppet/mesh.rs",
+      "sha256": "6b50886629a78ebde4873bb6815e02305f5e4bf1290f817fc54835036a0205f7",
+      "bytes": 22424
+    },
+    {
+      "path": "crates/effects/src/puppet/mod.rs",
+      "sha256": "8c5ad68ca026285efe89db101df29de70ca336cd184a472d7e3132f81bee8cad",
+      "bytes": 20983
+    },
+    {
+      "path": "crates/effects/src/puppet/tests.rs",
+      "sha256": "fbec9e8ff7727253dd154cb889b46d0de0c5156bc1ed58a4ff5f4e2293ce37ec",
+      "bytes": 12810
+    },
+    {
+      "path": "crates/engine/Cargo.toml",
+      "sha256": "f386d25ef4548e7b85215167c089955fb2bc4f74cb91ea5d44346e7aed4d760c",
+      "bytes": 1367
+    },
+    {
+      "path": "crates/engine/tests/key_time_reply_contract.rs",
+      "sha256": "78f3690f3b50cb04353f18257530f64cf294aef81be12bfde0c3048960f19a5a",
+      "bytes": 11150
+    },
+    {
+      "path": "crates/engine/tests/key_time_post_snap_bounds.rs",
+      "sha256": "67d4321393a759a3d3d5146ba374ab0f2a1c83ecfffe95086635c59b1194b3c8",
+      "bytes": 4203
+    },
+    {
+      "path": "crates/engine/tests/parenting_3d_position.rs",
+      "sha256": "8f9efa09c32fa90b53a9997ba4d23484a2027ecb6074212bad4abe4ae955c2c3",
+      "bytes": 28334
+    },
+    {
+      "path": "crates/engine/scripts/Rename Layers.jsx.attribution",
+      "sha256": "bc515b75c5b5bad5cd1a1f6ede3f4d7619145aeb03c9eece8ebaa6b2c97924ac",
+      "bytes": 378
+    },
+    {
+      "path": "crates/engine/scripts/Render Queue Batch.jsx",
+      "sha256": "379b19343332c1c307259cc4964ab93e4b63747e24ef183658d849e9a41f34d7",
+      "bytes": 2210
+    },
+    {
+      "path": "crates/engine/scripts/Create Null at Selected Layers.jsx",
+      "sha256": "701db076894d6e79e7def71d4d1d4ec9b8961139a5e5946e0db4009e3dfa1441",
+      "bytes": 1353
+    },
+    {
+      "path": "crates/engine/scripts/Sort Layers by In Point.jsx.attribution",
+      "sha256": "c560f707015fe3d4618d09a18dedc04b4d978f5778c7e0d04403e937510cf65e",
+      "bytes": 398
+    },
+    {
+      "path": "crates/engine/scripts/Rename Layers.jsx",
+      "sha256": "984391c4e93aa8c99ed52438c6866b0277acab404838a49037beb8f2362d47d1",
+      "bytes": 2545
+    },
+    {
+      "path": "crates/engine/scripts/Create Null at Selected Layers.jsx.attribution",
+      "sha256": "892b1556f4a87fc5df6270d34f9ab183781ae1433a7bb3fbf2b1157ba66cd8c1",
+      "bytes": 412
+    },
+    {
+      "path": "crates/engine/scripts/Sort Layers by In Point.jsx",
+      "sha256": "c40369a6747d167936013d5a8fe7e67da8e7a14626472c8be55c5ccbe74b9880",
+      "bytes": 1454
+    },
+    {
+      "path": "crates/engine/scripts/Render Queue Batch.jsx.attribution",
+      "sha256": "2555454fac8730271285cb1cdd624a8c35f437c55b9858066136a7e632c28dae",
+      "bytes": 388
+    },
+    {
+      "path": "crates/engine/scripts/ScriptUI Panels/Layer Tools.jsx",
+      "sha256": "1ed61a724f3939bf479ef7187194a04ab1ed35df8fe7d886f5b13a26306e4323",
+      "bytes": 3339
+    },
+    {
+      "path": "crates/engine/scripts/ScriptUI Panels/Layer Tools.jsx.attribution",
+      "sha256": "a365ed48991a050089531ed4dad572020bf91bb24f62c198c22b5f1f64decd31",
+      "bytes": 374
+    },
+    {
+      "path": "crates/engine/presets/transitions.json.attribution",
+      "sha256": "942c5d71b4fae316b0fac288c461f978976c6eb47997881e7931bae16d5eb709",
+      "bytes": 700
+    },
+    {
+      "path": "crates/engine/presets/text_animators.json",
+      "sha256": "7a1659a23a2bd881c03a83225e329694c0f524f2af999d616f5b8f98038d7d83",
+      "bytes": 4911
+    },
+    {
+      "path": "crates/engine/presets/backgrounds.json",
+      "sha256": "2d5be8b757a49c7c65658cac42975fb4aa4415789eb1e5ec1a164adf744c0080",
+      "bytes": 16216
+    },
+    {
+      "path": "crates/engine/presets/backgrounds.json.attribution",
+      "sha256": "33a237062ffad87657aeb351418962863b4a6cd344ae5c748c93b4d1be76455d",
+      "bytes": 791
+    },
+    {
+      "path": "crates/engine/presets/text_animators.json.attribution",
+      "sha256": "1ffeed04df6b827c1ccaf62f7b12bc2c0155ee7b86c7a6f0e948161eac5de80c",
+      "bytes": 460
+    },
+    {
+      "path": "crates/engine/presets/transitions.json",
+      "sha256": "7497f2fefb2d22693161d67f91f849e3327c32e6d4cd14bcd868ee76cbcc91fd",
+      "bytes": 9551
+    },
+    {
+      "path": "crates/engine/src/links.rs",
+      "sha256": "4a066fcf853d61fcae3564468022c20138d6c713bbf1f321deb4df0051c23323",
+      "bytes": 1054
+    },
+    {
+      "path": "crates/engine/src/tests_limits.rs",
+      "sha256": "f21ffe2a3d697d8d9c1e64ed448e95eb0bfb81454e5d9684dd36599147914cf2",
+      "bytes": 5889
+    },
+    {
+      "path": "crates/engine/src/tests_mask_warp.rs",
+      "sha256": "869e0e68e7630650adb7b8a5b29b327fa399f9d9e32e3da04f22a612736d2c1c",
+      "bytes": 22498
+    },
+    {
+      "path": "crates/engine/src/tests_tail.rs",
+      "sha256": "b444394beb4dbb5be5d1ae998cd750d65fcce1627e74223069db7ceb5a6ce977",
+      "bytes": 26755
+    },
+    {
+      "path": "crates/engine/src/tests_models.rs",
+      "sha256": "47fb790a05fde95e03761fca16648ca2203b74cef188511011f6a8d75fa5ea3f",
+      "bytes": 4964
+    },
+    {
+      "path": "crates/engine/src/tests_m137.rs",
+      "sha256": "d5f4bc82fd9c4149fe45aba4dab1c3b1de4e5a237b33759968bd332030597b39",
+      "bytes": 9195
+    },
+    {
+      "path": "crates/engine/src/tests_menu_cmds.rs",
+      "sha256": "5fb5c696dac18437136135309a03cd4ee943d64ac04ea2347d0a5efa036a58bd",
+      "bytes": 87332
+    },
+    {
+      "path": "crates/engine/src/tests_viewer.rs",
+      "sha256": "b968ea28ebc688af0ef5d82d6b1c6568022739911d2efe60d20629bfe38aa257",
+      "bytes": 38121
+    },
+    {
+      "path": "crates/engine/src/sequence.rs",
+      "sha256": "a99d2087b72d3212bf8f1b88a9615abfb3f61384bc921d590282deead32b6d4a",
+      "bytes": 16298
+    },
+    {
+      "path": "crates/engine/src/tests_history.rs",
+      "sha256": "a3f5686914d72e9ff2b5e1a6d9998ba65f1177b2d985815bc206cb5cf6b0838b",
+      "bytes": 10209
+    },
+    {
+      "path": "crates/engine/src/tests_disk_cache.rs",
+      "sha256": "df52c3d30374d2641468a9d15ed66d02a88935381789b55a3a1c289bb8b7c124",
+      "bytes": 6338
+    },
+    {
+      "path": "crates/engine/src/tests_stubs.rs",
+      "sha256": "fcb7ad11d6981eccf7d2d2b369bee24b018a9513b85d5d39c316d790bfe4b091",
+      "bytes": 26620
+    },
+    {
+      "path": "crates/engine/src/tests_key_metadata_order.rs",
+      "sha256": "d919162816c284ac652a04c2931614343d96b944fa2f5ce4a3d122aa113e5286",
+      "bytes": 5625
+    },
+    {
+      "path": "crates/engine/src/autosave.rs",
+      "sha256": "c029fa088af81d18cd97fa7ebed9f195f389cded5877f7393557fd2862659ccf",
+      "bytes": 10882
+    },
+    {
+      "path": "crates/engine/src/remote.rs",
+      "sha256": "c4544ba4d6b6a6771b4367e9d36c2f26380ab662c5aa46159f842fa394638815",
+      "bytes": 34722
+    },
+    {
+      "path": "crates/engine/src/tests_sequence.rs",
+      "sha256": "149ea6ab597f23c94246d5e2bb3b1f708bb2180019c97ee85bfb633dd3f7f48d",
+      "bytes": 11626
+    },
+    {
+      "path": "crates/engine/src/media_browser.rs",
+      "sha256": "6a3a05b78cf112690964af41a5bdc7fad2718aae19170007146ce74348efdf86",
+      "bytes": 17406
+    },
+    {
+      "path": "crates/engine/src/tests_timeline.rs",
+      "sha256": "300c94843abc55ed5fa6b17f72775896887ead4ea6a72f9908957ccdecefcc10",
+      "bytes": 68740
+    },
+    {
+      "path": "crates/engine/src/render_queue.rs",
+      "sha256": "6327845b212096594eaeae4751275979e6907c6bfcb2cc8d8a4981ebb30a8f16",
+      "bytes": 32382
+    },
+    {
+      "path": "crates/engine/src/config.rs",
+      "sha256": "26cc7dfd3986ce45c30163d5da58961360b3222684b4ec9aa42dc1cf948ccfe2",
+      "bytes": 7803
+    },
+    {
+      "path": "crates/engine/src/tests_lottie.rs",
+      "sha256": "3a650773a0d2bc99115f33259aa856455353270934dc8d58e45c3314e2a30142",
+      "bytes": 2894
+    },
+    {
+      "path": "crates/engine/src/viewer.rs",
+      "sha256": "ccf6985dbba2ddbf68982b364e971ee38dff236cafe6bedf8814db8268524dcc",
+      "bytes": 45852
+    },
+    {
+      "path": "crates/engine/src/vector.rs",
+      "sha256": "e21c0031aa68f5f0dc926b99d9e1a863f960023616f06eb9a78d0fd6e27335a3",
+      "bytes": 25523
+    },
+    {
+      "path": "crates/engine/src/mask_track.rs",
+      "sha256": "98ccbd06355cf014860006b89a89244f325b614ea9fe00711ce8116f2ce6ebb4",
+      "bytes": 20961
+    },
+    {
+      "path": "crates/engine/src/xml_project.rs",
+      "sha256": "7812d57da4cbd6082225fe4dc7b6328e8a56e8a47f38797fe79927d38423f249",
+      "bytes": 10511
+    },
+    {
+      "path": "crates/engine/src/shortcuts.rs",
+      "sha256": "abbb3c556e05d08ebb0392778705b6f741a610b03df6a2846afb7e0099884fe9",
+      "bytes": 17717
+    },
+    {
+      "path": "crates/engine/src/lib.rs",
+      "sha256": "4555e3c703c4f9cddfcc676bf4d79b8ab8a38072edd1ae66bcd18b546e9634de",
+      "bytes": 60296
+    },
+    {
+      "path": "crates/engine/src/tests_text_edit.rs",
+      "sha256": "a0f3f3cf745af48c7bb8befd25c5d0f3fac09443e8a3a0fcde235d6832de6e9b",
+      "bytes": 18052
+    },
+    {
+      "path": "crates/engine/src/models.rs",
+      "sha256": "b9645c5ae3d9d4f014a5ee24dd474b51707b39bc3f11dcf4ac7fb5afde38e8e6",
+      "bytes": 17766
+    },
+    {
+      "path": "crates/engine/src/session_settings.rs",
+      "sha256": "fa7379c58e4c3e5367efe4ef336898df48c2fdb95d1bffcf517f3772e6fd6e2a",
+      "bytes": 13968
+    },
+    {
+      "path": "crates/engine/src/logging.rs",
+      "sha256": "55b3487036acb98c3688a93ebfa6bb057ff1a06a05b6bf7fd4d5801ad4d94856",
+      "bytes": 17945
+    },
+    {
+      "path": "crates/engine/src/preview.rs",
+      "sha256": "13ec9011f10ae91c65076c730423edf1530eaf790a3ae9dd08f69b24c78f8587",
+      "bytes": 22413
+    },
+    {
+      "path": "crates/engine/src/perf.rs",
+      "sha256": "c4c5a5366234b25730003fdac21b6616b928425ed939b971413c375e81650da2",
+      "bytes": 17791
+    },
+    {
+      "path": "crates/engine/src/tests_project_items.rs",
+      "sha256": "ba5d9b12c07ca194a8e811abfcb0498a656114bea2867b50b3f5e62720cf134c",
+      "bytes": 12774
+    },
+    {
+      "path": "crates/engine/src/tests_key_time.rs",
+      "sha256": "101786956d0ef68845f6f79fff38de261139b18f50cf6fb3aea3ddedfccf2abe",
+      "bytes": 8676
+    },
+    {
+      "path": "crates/engine/src/tests_shortcut_cmds.rs",
+      "sha256": "83fd5c1d01ad4627974c2d3d8410f1f2ce685c1ad02b05c7c1394e79f29c1e6a",
+      "bytes": 10485
+    },
+    {
+      "path": "crates/engine/src/tests_markers.rs",
+      "sha256": "5c16c9dc30e4a188aaa4fa100b9128f3c0207c474220eacdcff88db96f235b95",
+      "bytes": 11200
+    },
+    {
+      "path": "crates/engine/src/tests_3d.rs",
+      "sha256": "cd08f9504c185b67e5235a02d66f345c369308671d9c7d8e403dc36eec017c92",
+      "bytes": 14019
+    },
+    {
+      "path": "crates/engine/src/rq_tests.rs",
+      "sha256": "ce4572c1a8e0aab47c208eafc22fe8ef705b544f21edbf1f2ec5c3bdcc26a138",
+      "bytes": 11329
+    },
+    {
+      "path": "crates/engine/src/tests_vector_import.rs",
+      "sha256": "f6dfaca8c37b09e1d2868a3cfe597c3b3c52a1d9ec677ea1a666f28847a25d69",
+      "bytes": 17159
+    },
+    {
+      "path": "crates/engine/src/tests_anim_presets.rs",
+      "sha256": "436812522afabd4ef77bde7305b497de218b6637e850f5004947aa4af6a93b6f",
+      "bytes": 6991
+    },
+    {
+      "path": "crates/engine/src/offload.rs",
+      "sha256": "49f92fde53ea2d4e531904cd62bc810e1d081c579035a338a5dd9dc30ea50ace",
+      "bytes": 47788
+    },
+    {
+      "path": "crates/engine/src/tests_styles.rs",
+      "sha256": "3215765b86462cd03bba02f60096409a780e8d8854e8a787366e87894ebd75ca",
+      "bytes": 6763
+    },
+    {
+      "path": "crates/engine/src/history.rs",
+      "sha256": "fa2c67e5604207ae4ba177d67de719eaa25be509526bb051986ba6b5cb57aa44",
+      "bytes": 14398
+    },
+    {
+      "path": "crates/engine/src/tests_color_view.rs",
+      "sha256": "ccc4468b8cd8f9a096d509b0b5ac8c554ccd0b907aeb31248f3abba4354860e9",
+      "bytes": 20661
+    },
+    {
+      "path": "crates/engine/src/tests_codec_options.rs",
+      "sha256": "fc934dfcd6696cc2288dc5f7b57b4926f729e53346a976fe423b3eddbda0b9a9",
+      "bytes": 10370
+    },
+    {
+      "path": "crates/engine/src/tests_essential.rs",
+      "sha256": "8e1d537112521dff005072aebe9efbc37d8f3bb43487ceb011886e26f7bcfa36",
+      "bytes": 24247
+    },
+    {
+      "path": "crates/engine/src/tests_anim_tools.rs",
+      "sha256": "6ccdff470ccadea2e800fa36732706fe57c4514ccf545bc678a4c01a18a03b46",
+      "bytes": 5811
+    },
+    {
+      "path": "crates/engine/src/menus.rs",
+      "sha256": "668abf4c3986d1841a34d5471c11c178ae2c8665e8363312de92dfa26a28cfad",
+      "bytes": 53697
+    },
+    {
+      "path": "crates/engine/src/tests_frame_export.rs",
+      "sha256": "1f647efb9eafbacd12792ce0c14df8f7aeeb1f2b84eab0942cca05520344ebd7",
+      "bytes": 7911
+    },
+    {
+      "path": "crates/engine/src/tracking.rs",
+      "sha256": "a324844a38d364c123f5102caaae4decd4f3f6a2603125e236f21bc1d327d134",
+      "bytes": 26558
+    },
+    {
+      "path": "crates/engine/src/tests_rig3d.rs",
+      "sha256": "fad5d61b71308f2b5cd692d51992f0edb042abb2d58839f98fd8f82d43a32869",
+      "bytes": 17844
+    },
+    {
+      "path": "crates/engine/src/tests_motion_blur_depth.rs",
+      "sha256": "ec2b11b1cbb7abb1dfed507c5e13edde16d541a47bd018f1c161bc712e0a8822",
+      "bytes": 6106
+    },
+    {
+      "path": "crates/engine/src/demo.rs",
+      "sha256": "cc63ccafc559e4acee29d9be99bf54279f02d1a99301d4fb58e9836dfd84c2a1",
+      "bytes": 20779
+    },
+    {
+      "path": "crates/engine/src/tests_camera_track.rs",
+      "sha256": "012655bc0e0bdbd410e8f74e905c369a4f5d72b4550c3cbdb4ba88a246e75d69",
+      "bytes": 15235
+    },
+    {
+      "path": "crates/engine/src/tests.rs",
+      "sha256": "407dce18ac68a400438d1cd442a1bb3ffcf117c872c8de6e77e2f36acf3f1d7e",
+      "bytes": 38720
+    },
+    {
+      "path": "crates/engine/src/tests_text.rs",
+      "sha256": "b777794f62f605b27e5131336ca3f60da5e7c08465f75d40bff8cb234a695dc3",
+      "bytes": 10540
+    },
+    {
+      "path": "crates/engine/src/roto.rs",
+      "sha256": "59ae502011197008166dae110b37050815ddbd5d94cf87df9b5b918bffafc0b6",
+      "bytes": 31821
+    },
+    {
+      "path": "crates/engine/src/tests_keylight.rs",
+      "sha256": "5e363a96f1ef7c5779a04a95d485e2064119a76d4ac0ecb6053742687683239f",
+      "bytes": 6516
+    },
+    {
+      "path": "crates/engine/src/tests_essential_more.rs",
+      "sha256": "36a1d81ad74af68fcbdbc133aa7d1e2301b60d36ec7b941e6ed850f25c4cc387",
+      "bytes": 6362
+    },
+    {
+      "path": "crates/engine/src/tests_timeline_interchange.rs",
+      "sha256": "b9a6ca73b6138846415a3228725c0c5d971c4dda426d4a307e1fbb19c0e1cbb5",
+      "bytes": 3928
+    },
+    {
+      "path": "crates/engine/src/storage.rs",
+      "sha256": "eea71f167e5df1e00f20a174fa28d13dd7d76d16cbd030cdbab23f91f8f06e34",
+      "bytes": 6299
+    },
+    {
+      "path": "crates/engine/src/tests_panels.rs",
+      "sha256": "0d14d0ef0199e9e95f3017a8c7ad91cba90386b4d9203468e35b78b649eb8cea",
+      "bytes": 32427
+    },
+    {
+      "path": "crates/engine/src/tests_roto.rs",
+      "sha256": "3993a80f8524a323e222fcb6bcb729911be9273241dc5f6b7b57ce238c111520",
+      "bytes": 31768
+    },
+    {
+      "path": "crates/engine/src/footage_check.rs",
+      "sha256": "3b14bd8be23b82d47cdbd1b7eeb842ace6156a2a53189495b46bd819c3c35030",
+      "bytes": 13295
+    },
+    {
+      "path": "crates/engine/src/camera_track.rs",
+      "sha256": "5bf1883bf05cc631b75330e2cc8509a3796e2425ce90d37496fe169a0721317b",
+      "bytes": 27666
+    },
+    {
+      "path": "crates/engine/src/tests_effects.rs",
+      "sha256": "0dc041af970ce6ae8f6fa1164820f452cba063647c8760dbeab006c2db5d8b83",
+      "bytes": 40697
+    },
+    {
+      "path": "crates/engine/src/guard.rs",
+      "sha256": "b46fba71edb8774eacde72420481b6a3048916b99f56cff01e827cb2d9663c5b",
+      "bytes": 2584
+    },
+    {
+      "path": "crates/engine/src/warp.rs",
+      "sha256": "705a0019d542e9cfa53a47a17f86b385ca50fc514fea4aed02284f65a5f14e9b",
+      "bytes": 17703
+    },
+    {
+      "path": "crates/engine/src/tests_fidelity.rs",
+      "sha256": "d7f5add7b28563af8ecc6e95d1852b962db9d38c6dee0e1f6446baa0471ebe56",
+      "bytes": 4814
+    },
+    {
+      "path": "crates/engine/src/sysinfo.rs",
+      "sha256": "80e947e03f87b7381673f86f6e48e7dfa7823e0461c3bd485cc2b53c5002c744",
+      "bytes": 9885
+    },
+    {
+      "path": "crates/engine/src/tests_settings.rs",
+      "sha256": "b0f1dbff4a8421935abf4865bfe90e5d48ba02ca779b46fb4476473434034bce",
+      "bytes": 44384
+    },
+    {
+      "path": "crates/engine/src/tests_paint.rs",
+      "sha256": "90c90c2c23bc7cb5ac917e84858ab99d72967f3671be55f2aa83174fda4a124e",
+      "bytes": 27328
+    },
+    {
+      "path": "crates/engine/src/media_cache.rs",
+      "sha256": "5b696398907bd577c58a3d7e83a1b5113f99d40a388b6bb171e8e5296dc16cb1",
+      "bytes": 2635
+    },
+    {
+      "path": "crates/engine/src/learn.rs",
+      "sha256": "b5c573ed92599008aab120622576325865ba0ba76967c0e4536737a36bb267c7",
+      "bytes": 24468
+    },
+    {
+      "path": "crates/engine/src/prefs.rs",
+      "sha256": "1bbbf23947097be14076d9bb717bda18a5f545f065d2fca4b2249f5935e8b1dd",
+      "bytes": 64446
+    },
+    {
+      "path": "crates/engine/src/templates.rs",
+      "sha256": "d469ac3392720a3eb95cdd9c7bdcbb8b50007393d750ac5d5db7eddbcf81b698",
+      "bytes": 56840
+    },
+    {
+      "path": "crates/engine/src/jobs.rs",
+      "sha256": "e03bbdc90554584cd5f249c0cb55b01c8daf508156ae0cb3e2f775a79dbb6fd8",
+      "bytes": 12441
+    },
+    {
+      "path": "crates/engine/src/tests_face.rs",
+      "sha256": "ce949a9b09ace5a29d7f80dce26b40e8c297fa075ffb9733feb8c0c6c9a1d2e2",
+      "bytes": 8158
+    },
+    {
+      "path": "crates/engine/src/tests_m145.rs",
+      "sha256": "3129948c5848b74a0780b17492688ea6caf6716e15e6381458831449ee035b37",
+      "bytes": 39787
+    },
+    {
+      "path": "crates/engine/src/scriptui.rs",
+      "sha256": "0cf3ee6827bab0fbe23a0a6113f79453f696686b07512852ba3e52e2bebb67c4",
+      "bytes": 39219
+    },
+    {
+      "path": "crates/engine/src/tests_fuzz_open.rs",
+      "sha256": "3e75938c487fef805f4e01b67a47ed2907dffbb7a37a48b7fbd75a4d10ddfaaf",
+      "bytes": 14407
+    },
+    {
+      "path": "crates/engine/src/tests_import_project.rs",
+      "sha256": "1478db346ec294a95cf1ac58c5a50ad2334d4e580e5a0371f7e512a3605c4750",
+      "bytes": 7851
+    },
+    {
+      "path": "crates/engine/src/tests_proxy.rs",
+      "sha256": "44cd0437be0c8c4e85ac8e33f271f4617cc9dee9dd44b67bd3fe15bca3756de3",
+      "bytes": 13916
+    },
+    {
+      "path": "crates/engine/src/psd_import.rs",
+      "sha256": "f7dce31eaae4e9584f674f3b84e62f818d13e80aa5576167ac392c980512cb73",
+      "bytes": 33299
+    },
+    {
+      "path": "crates/engine/src/tests_quick_offset.rs",
+      "sha256": "70d6e9cec6d90cb1ba658f61dc55d2a347cac9cb51fdb2c86ebddbda66fbda3d",
+      "bytes": 14772
+    },
+    {
+      "path": "crates/engine/src/tests_track.rs",
+      "sha256": "31b0a2bc74fde7794d99b11bba885b07375f5b5c15da7a73a9bd52ae2528a73d",
+      "bytes": 19843
+    },
+    {
+      "path": "crates/engine/src/footage_reload.rs",
+      "sha256": "871309e8c781e35efbdc0881d314c8d5574c00326abf8a6e2dd136f8856bb23b",
+      "bytes": 11904
+    },
+    {
+      "path": "crates/engine/src/tests_model3d.rs",
+      "sha256": "2de8f3dc685b9c7c12e4e3a0841b2d8e7fa4b9257e6f5921a5435b54bfb47622",
+      "bytes": 14612
+    },
+    {
+      "path": "crates/engine/src/menus/tests.rs",
+      "sha256": "57dc79033bd1a635be8c4ac390fc1b933df2d880240618688b1fa84115bff0f8",
+      "bytes": 8258
+    },
+    {
+      "path": "crates/engine/src/commands/edit.rs",
+      "sha256": "94a2a8af76c1f390948983c6bd6527d6f4746c8a981e4eec79d920f9c812fbc0",
+      "bytes": 40779
+    },
+    {
+      "path": "crates/engine/src/commands/frontend.rs",
+      "sha256": "629c44f29ad09b1a35962f39c0c0422aef91c70924e19afa844ead026022dd38",
+      "bytes": 8130
+    },
+    {
+      "path": "crates/engine/src/commands/paint.rs",
+      "sha256": "8c003824fac3e9120de32a23de07a4843c195c87593d94087715fb691af9fe87",
+      "bytes": 19932
+    },
+    {
+      "path": "crates/engine/src/commands/key_transform.rs",
+      "sha256": "9cccf0a3cfaf87dfaee7c60c762bef7cc649d32cd86e7fa883773b174484bc33",
+      "bytes": 8596
+    },
+    {
+      "path": "crates/engine/src/commands/anim_presets.rs",
+      "sha256": "0a3ba671b4fb5bfeca5e70483d86269071f5651c05121a8d6f0562cf98a62a1f",
+      "bytes": 9243
+    },
+    {
+      "path": "crates/engine/src/commands/content_fill.rs",
+      "sha256": "e3ddff1e1a647a372a2f9c1fea156fa28df0bdb811cc8590e60b47dc914d7b3d",
+      "bytes": 18194
+    },
+    {
+      "path": "crates/engine/src/commands/prop_groups.rs",
+      "sha256": "e9503177c5a48841608b7ac73b0ff92d1ef99f00e865840f87934ab6aceea0fd",
+      "bytes": 11441
+    },
+    {
+      "path": "crates/engine/src/commands/expr_tools.rs",
+      "sha256": "994f05118c595c017d8796300f32022442b682c53bc7a8bf144fecaac073d2f5",
+      "bytes": 17180
+    },
+    {
+      "path": "crates/engine/src/commands/lottie.rs",
+      "sha256": "b6379296ca8e4eee8fb0cc6069ab01ce0bcaa0618b0fd4045067de91e8cf252c",
+      "bytes": 3619
+    },
+    {
+      "path": "crates/engine/src/commands/text_edit.rs",
+      "sha256": "6ef39fd3ce16f6d2399a10ada3d8b67a5c1bdb205882a205bb744710c313a25e",
+      "bytes": 25575
+    },
+    {
+      "path": "crates/engine/src/commands/proxy.rs",
+      "sha256": "ff11de9bb42539dd32fe0a42aaede27a89382fd26791530e27385e83fe2b7ab3",
+      "bytes": 10364
+    },
+    {
+      "path": "crates/engine/src/commands/watch_folder.rs",
+      "sha256": "6f514349d98338472827d7889fa760178827c922fc3c7b03fa0fd61068624fbd",
+      "bytes": 6376
+    },
+    {
+      "path": "crates/engine/src/commands/warp_cmds.rs",
+      "sha256": "714e775ac52b0aaf3f4c18d3976f3bf1cebdc21e4477f0ae49c1180c19b58e20",
+      "bytes": 7533
+    },
+    {
+      "path": "crates/engine/src/commands/track.rs",
+      "sha256": "33f610c6029f615c37a67f359219c3cddda346c1f821a6a315269127786d85e1",
+      "bytes": 26115
+    },
+    {
+      "path": "crates/engine/src/commands/prop.rs",
+      "sha256": "202d229d4f49f006dab957aad9cc73b722cc3550cfed391dffd37f51497b9fa3",
+      "bytes": 59314
+    },
+    {
+      "path": "crates/engine/src/commands/footage_panel.rs",
+      "sha256": "9f570d9f7aa2f6609f6ea79e16e85a1b99a30f171f409b901fe242ac3815b18b",
+      "bytes": 10866
+    },
+    {
+      "path": "crates/engine/src/commands/viewer_cmds.rs",
+      "sha256": "85d910091d29bf1b34352960f888ed772d55bd19d5679dcbe4c9a5244d37b40c",
+      "bytes": 26229
+    },
+    {
+      "path": "crates/engine/src/commands/batch.rs",
+      "sha256": "4c371d44daf82446c471be2e38a4c3c5819d9fe4ea449bc73eae14ed04d62dc1",
+      "bytes": 7685
+    },
+    {
+      "path": "crates/engine/src/commands/align.rs",
+      "sha256": "cd735931b2732f5d7c64edde962362c8181dce7cf429d12063bb4ca7ac979195",
+      "bytes": 17588
+    },
+    {
+      "path": "crates/engine/src/commands/render_queue.rs",
+      "sha256": "d95be97eb22f50aaaf010ed36c34081b17378e2f9f3c6cb3bad15a886ffa9eae",
+      "bytes": 50427
+    },
+    {
+      "path": "crates/engine/src/commands/anim.rs",
+      "sha256": "e060f7c62f51f66473a703050469065ea8896c00d2c26e058a753c031be704dc",
+      "bytes": 21889
+    },
+    {
+      "path": "crates/engine/src/commands/layer_menu.rs",
+      "sha256": "8d5323866dd455906ba3f5d6d548eb2c341771bace5a6c6f53ce3e4d0eb02d56",
+      "bytes": 38621
+    },
+    {
+      "path": "crates/engine/src/commands/timeline.rs",
+      "sha256": "981646546742a76b542465caf4b429e330425306d19cdb76f121ee698dbc1f99",
+      "bytes": 10735
+    },
+    {
+      "path": "crates/engine/src/commands/project_items.rs",
+      "sha256": "26f06abe06d620e990b735e676870314fdf1ae8f4f0aeb399010af958ccb41c9",
+      "bytes": 11914
+    },
+    {
+      "path": "crates/engine/src/commands/model3d.rs",
+      "sha256": "bc040eb912c82fc8f1ee431f157e1adf07d0e3e059837fd7bcd05e8f33a6e2e8",
+      "bytes": 18993
+    },
+    {
+      "path": "crates/engine/src/commands/paths.rs",
+      "sha256": "d544d88c69eee1dc7a0a266b510f7d63a45b77ab60e804c1d58703311889a406",
+      "bytes": 20390
+    },
+    {
+      "path": "crates/engine/src/commands/query.rs",
+      "sha256": "506247d2f3ae3b97e316df073a1c2adc9038bfae5250f8ff610f9c34b700e84c",
+      "bytes": 10191
+    },
+    {
+      "path": "crates/engine/src/commands/create.rs",
+      "sha256": "ee7adeef26182c03429f2b430a54b3bf3dd575a9030d4fde54bde5cf898024c5",
+      "bytes": 10844
+    },
+    {
+      "path": "crates/engine/src/commands/liquify.rs",
+      "sha256": "98b3a82677f0733d2c1a394335a61abc29cf37dec976305fd175558b9818ddc6",
+      "bytes": 7409
+    },
+    {
+      "path": "crates/engine/src/commands/time.rs",
+      "sha256": "c9eecbaa06000d8eca9d5b2d3dbb39f95c5f1c0ea38c473fb98aca03f216dfcb",
+      "bytes": 11274
+    },
+    {
+      "path": "crates/engine/src/commands/vr_editor.rs",
+      "sha256": "694eabe34b1bfeafc6983b1123580cc14c1c212a226a3cf05b8959ddbe3f8cca",
+      "bytes": 7169
+    },
+    {
+      "path": "crates/engine/src/commands/rig3d.rs",
+      "sha256": "39f03b55da53a21b8fb05bc19ab1859adac236fb0c12bff88abb578732a6279f",
+      "bytes": 30441
+    },
+    {
+      "path": "crates/engine/src/commands/import_project.rs",
+      "sha256": "7f6daee4819eb3109230ae6a1fe4e8830024330a780b0c4d65293244b4485cca",
+      "bytes": 6366
+    },
+    {
+      "path": "crates/engine/src/commands/mask.rs",
+      "sha256": "178d2905e34596ea0d3bf957936e09f3dbde851923de226181794a6f5ef5a943",
+      "bytes": 28902
+    },
+    {
+      "path": "crates/engine/src/commands/text_anim.rs",
+      "sha256": "3086df12303cb11f651bcedc692be2973b4a5b0838a2cdac190efef69bcb84a5",
+      "bytes": 21804
+    },
+    {
+      "path": "crates/engine/src/commands/nav_more.rs",
+      "sha256": "ff01896616b7b0b88626d4bc5d126be8df254bda2ce6346a87b1ccc6b585eb96",
+      "bytes": 6834
+    },
+    {
+      "path": "crates/engine/src/commands/autotrace.rs",
+      "sha256": "cc5099a3d539365c347601f105f748482dffe4e647b42fb91fb4799271c629d5",
+      "bytes": 9101
+    },
+    {
+      "path": "crates/engine/src/commands/link.rs",
+      "sha256": "2595d11711e115fd76a38dabf0ba322d62644f4f3a1cf6771f7ed564e1610d4f",
+      "bytes": 10221
+    },
+    {
+      "path": "crates/engine/src/commands/comp.rs",
+      "sha256": "ca9033150c8bbba0fb7890c72e673ec5fe2a261ef80f28db64ffd31539acffec",
+      "bytes": 13132
+    },
+    {
+      "path": "crates/engine/src/commands/relink.rs",
+      "sha256": "59da7f5db160c9a0e6cf792bfeddbcdb3890325707d8e4a3342eaa13ca086d2e",
+      "bytes": 20080
+    },
+    {
+      "path": "crates/engine/src/commands/camera_cmds.rs",
+      "sha256": "30824dbfcb10eecad31ba040a7064560e955b9521c8b6a4e3b83e134d50f57d6",
+      "bytes": 29077
+    },
+    {
+      "path": "crates/engine/src/commands/relink_moved.rs",
+      "sha256": "18deb8d45f861b4f9e28bb6fac14a38a0137cf437c33210a6c707c561b232772",
+      "bytes": 14246
+    },
+    {
+      "path": "crates/engine/src/commands/effect.rs",
+      "sha256": "4b1d894acf800d08a7aed57c49f36ef5a02bd54197eb77295ef52b456250421c",
+      "bytes": 33329
+    },
+    {
+      "path": "crates/engine/src/commands/scene_detect.rs",
+      "sha256": "690430451795a0e1b4dde870ad10caa982da85be243f0f8905d3d1ac9fe8f863",
+      "bytes": 7831
+    },
+    {
+      "path": "crates/engine/src/commands/quick_offset.rs",
+      "sha256": "2fcc225e3f86add1ad6e96d7eabf7b4e781611f9373f53ba02cb3ef2970dd12a",
+      "bytes": 6688
+    },
+    {
+      "path": "crates/engine/src/commands/panels_cmds.rs",
+      "sha256": "235811a9e6a8d9067e92ce6f52c22fa0cf1b77b29f98abc7e178f7b9f0a07e52",
+      "bytes": 11441
+    },
+    {
+      "path": "crates/engine/src/commands/mod.rs",
+      "sha256": "c3e1ff9d9bddc6673f1258896f498ebe472c4a37520044f2c9b11b86a5c2631e",
+      "bytes": 22093
+    },
+    {
+      "path": "crates/engine/src/commands/focus.rs",
+      "sha256": "dd58a7292aa9ed3ce22efbe1b123133b79ad4196588a305604b4a876f7a58d27",
+      "bytes": 5378
+    },
+    {
+      "path": "crates/engine/src/commands/app_more.rs",
+      "sha256": "594b7821a52e46e113f5e2f3c1d9c9032abbb432a371a6ae3a923768a0fdc082",
+      "bytes": 36069
+    },
+    {
+      "path": "crates/engine/src/commands/vpe.rs",
+      "sha256": "28e370888347dd21c9ef289910ef6cea9aa83a2810efaf62913c8e4adf6d5cee",
+      "bytes": 1081
+    },
+    {
+      "path": "crates/engine/src/commands/three_d.rs",
+      "sha256": "525e42041bc6e23243a11ec60890c0b586780c1b290ca59e83e929eced51af21",
+      "bytes": 35242
+    },
+    {
+      "path": "crates/engine/src/commands/scripts.rs",
+      "sha256": "f85bd822c42b323e2f828f991dbd1e2284b1ce496d6ec0c2ca234037b8348fee",
+      "bytes": 29908
+    },
+    {
+      "path": "crates/engine/src/commands/key_labels.rs",
+      "sha256": "f84d2565691c3aeb9a0aa64f5abaa1d21ab4544b85bf3c1e54c9fbee6d044c83",
+      "bytes": 3606
+    },
+    {
+      "path": "crates/engine/src/commands/help.rs",
+      "sha256": "c5ff3919266f4ba7a6bdce09e7e23a5b2001808cfdf80a101a444ff9316b9c66",
+      "bytes": 2517
+    },
+    {
+      "path": "crates/engine/src/commands/markers.rs",
+      "sha256": "7cf42d4265bdee3d335aa964c7615c3712d1e60850c7bcce6fc151f0d8fb7056",
+      "bytes": 16268
+    },
+    {
+      "path": "crates/engine/src/commands/layer_time.rs",
+      "sha256": "45b9c82c23cdc43601308317741a8556df98757e8d8475fd733279926ba950b2",
+      "bytes": 12317
+    },
+    {
+      "path": "crates/engine/src/commands/frame_export.rs",
+      "sha256": "b8e67930afa6c2cf08077a6e931ef3ec8fe76813c737ea9eda2f620f17ec336d",
+      "bytes": 10382
+    },
+    {
+      "path": "crates/engine/src/commands/shape_stroke.rs",
+      "sha256": "801e52690cd602cb081828e77fe959e6d941845081d279830be123c3de941e4c",
+      "bytes": 22025
+    },
+    {
+      "path": "crates/engine/src/commands/file_more.rs",
+      "sha256": "6936296f25260e673e518aff5ed9ece436e0566355045e8e779b78959de846dd",
+      "bytes": 48487
+    },
+    {
+      "path": "crates/engine/src/commands/puppet.rs",
+      "sha256": "b8adcad54f2fa3a949f694311692f9796ac2db9558fd85050a4d65527dd1e532",
+      "bytes": 34508
+    },
+    {
+      "path": "crates/engine/src/commands/comp_more.rs",
+      "sha256": "46457a13f0503a297427b8ef815fc4e57113f952f28d93ee7d2a0ba2b61b9f0b",
+      "bytes": 12377
+    },
+    {
+      "path": "crates/engine/src/commands/anim_tools.rs",
+      "sha256": "e3823f3d54b459d823f2aef0aaba58ff25defdd92768dc3cf8fc384b5a325707",
+      "bytes": 17265
+    },
+    {
+      "path": "crates/engine/src/commands/path_nulls.rs",
+      "sha256": "d5251d79b009b8e2338230d97ff308037c29ea40a3c3cb236668d9300329794b",
+      "bytes": 15490
+    },
+    {
+      "path": "crates/engine/src/commands/essential.rs",
+      "sha256": "dbc785eb9013fe19dce9f7e7909b933b3416645ea43ffae83cff365f11ade54a",
+      "bytes": 50536
+    },
+    {
+      "path": "crates/engine/src/commands/settings.rs",
+      "sha256": "f0409942e37fc510c3d99fa61943f3c40828600da8918fcbc214b87a2418eb04",
+      "bytes": 13195
+    },
+    {
+      "path": "crates/engine/src/commands/layer.rs",
+      "sha256": "524f960e6a69afd1a5d5a51e1dcb0c7727625749e9665fb1d30e1e7d607ad80b",
+      "bytes": 90217
+    },
+    {
+      "path": "crates/engine/src/commands/styles.rs",
+      "sha256": "e16cb9247c149970f390c376d92337e772422f098f002a60381aee666fe04a86",
+      "bytes": 11940
+    },
+    {
+      "path": "crates/engine/src/commands/mask_interp.rs",
+      "sha256": "6c48500466d48c648c776f21a5922ae4663d7b235df55417c7287fbdf29708cd",
+      "bytes": 22952
+    },
+    {
+      "path": "crates/engine/src/commands/roto_cmds.rs",
+      "sha256": "35de19d0b49266a50280da7a3efecc4d6e6b0da5b197909ff3c8c20b2d4bdfef",
+      "bytes": 31113
+    },
+    {
+      "path": "crates/engine/src/commands/animation.rs",
+      "sha256": "74b1464bb16758dfd57ca1a9fbff42f0b13a04e0df00fa2bdd6119a7be9292a6",
+      "bytes": 22474
+    },
+    {
+      "path": "crates/engine/src/commands/shape_tool.rs",
+      "sha256": "7692586b805b85b51c3a6318e487103421020182394b0fd78c52c723fa5e8585",
+      "bytes": 17181
+    },
+    {
+      "path": "crates/engine/src/commands/keys_more.rs",
+      "sha256": "ccf30ad112910b09d4cc2f7d7d27811cf6ac170b7618c50e453acb223b06d9c5",
+      "bytes": 12560
+    },
+    {
+      "path": "crates/engine/src/commands/view.rs",
+      "sha256": "37b673da3fde5756e0dd1b105fcd222279f12bff76b7dc0c022d88af2b92a819",
+      "bytes": 9716
+    },
+    {
+      "path": "crates/engine/src/commands/align_data.rs",
+      "sha256": "65a1cd51a1c5d30ed19dd821a93403fa1591536871395551b285ee7fd0727c18",
+      "bytes": 12424
+    },
+    {
+      "path": "crates/engine/src/commands/stubs.rs",
+      "sha256": "803fc0de053ec85ffd457a6a6499e2bf82ee2dc61f9f2e2f68b85110eb8d9d88",
+      "bytes": 1209
+    },
+    {
+      "path": "crates/engine/src/commands/file.rs",
+      "sha256": "fdfd234809d445697f206b462492875634201df8194f7f6295357880167c0d4e",
+      "bytes": 38538
+    },
+    {
+      "path": "crates/media/Cargo.toml",
+      "sha256": "335236b99677b09efcd4de5691c01fea72a811666c3deed59458f45c4fa758b2",
+      "bytes": 1159
+    },
+    {
+      "path": "crates/media/tests/footage.rs",
+      "sha256": "68934cfcf993b37542513ab915d24cf49d58b44c90ace5a6dfded0ecbddc1241",
+      "bytes": 47970
+    },
+    {
+      "path": "crates/media/tests/open_in_place.rs",
+      "sha256": "63ceba6835fcfff95481ae2912125df54dd83015bc3e17f90c1ab57effdf6836",
+      "bytes": 4332
+    },
+    {
+      "path": "crates/media/tests/downmix.rs",
+      "sha256": "8a3b1ca1ad3e765872009c70fb31f7cad0f3f4fe901dfa439b68dc77f80e6e2c",
+      "bytes": 10254
+    },
+    {
+      "path": "crates/media/tests/exif_orientation.rs",
+      "sha256": "8063e2b6cd593bba3fe86db4e444a3675cd21f1f914084b2c6268040736f1919",
+      "bytes": 3700
+    },
+    {
+      "path": "crates/media/src/stream.rs",
+      "sha256": "0044872a0df7af143ff82426851157de93dcf8a1ff3023addccd77136d4f770e",
+      "bytes": 6464
+    },
+    {
+      "path": "crates/media/src/gif_anim.rs",
+      "sha256": "4e0e8ae8913b4d405aba18f6e4f4e2f600e97fafa1b4ae090327d558b895bec0",
+      "bytes": 8558
+    },
+    {
+      "path": "crates/media/src/convert.rs",
+      "sha256": "72567e602d6f8bcabe6dce335ae030f14690837038055cb6974baab4ced7c20b",
+      "bytes": 23799
+    },
+    {
+      "path": "crates/media/src/layered.rs",
+      "sha256": "c8e0f4e46c382a7739a58fce0b3b6fc97d081eb2582e1c72774dd29aa5fdde8b",
+      "bytes": 6729
+    },
+    {
+      "path": "crates/media/src/exr_channels.rs",
+      "sha256": "80159ee4bed0c46614ef663b6d21d29cd01d5c5f500d511557fb886e37ccb7e2",
+      "bytes": 22670
+    },
+    {
+      "path": "crates/media/src/lib.rs",
+      "sha256": "ebb3107cfb43e2736db0519f117a96fbf7ab74a1053193be07ef68c7e38627a8",
+      "bytes": 4417
+    },
+    {
+      "path": "crates/media/src/downmix.rs",
+      "sha256": "5db517058b18ba4ec31cb5b795052644802054038755de61a3809f9f90f12a43",
+      "bytes": 5779
+    },
+    {
+      "path": "crates/media/src/webp_anim.rs",
+      "sha256": "9944f8fce838fafec42100ed1bc184341183d183e691b484458b21074c7aae6c",
+      "bytes": 14538
+    },
+    {
+      "path": "crates/media/src/pool.rs",
+      "sha256": "45cfe1815e3a309b7a2b070e87e612ce13bc75b7f0553012a5d257902cf69fa2",
+      "bytes": 54532
+    },
+    {
+      "path": "crates/media/src/probe.rs",
+      "sha256": "b98e0a09b837e94a0ae0ef58c26704e1810d38e97fa4d46e023b513c2d01a07c",
+      "bytes": 11009
+    },
+    {
+      "path": "crates/media/src/dpx.rs",
+      "sha256": "050390e5aeba7bef5026921668d71837504fc9da89b81843a52f3f0050ec8f37",
+      "bytes": 19148
+    },
+    {
+      "path": "docs/architecture.md",
+      "sha256": "1812db3c9819f50e1ca3f04442adc89142e6ea7c7b9f06efb6564af50f17915d",
+      "bytes": 60719
+    },
+    {
+      "path": "docs/releasing.md",
+      "sha256": "4dfb2f6c9361ab28495bbd033d5f70833b7be4df73d2e81dd641825206bb1b20",
+      "bytes": 8899
+    },
+    {
+      "path": "docs/mcp.md",
+      "sha256": "c6bf4f858041ec2641376e44414a5310e1e6e1da155427fa3fb7406bbbbbae2f",
+      "bytes": 5461
+    },
+    {
+      "path": "docs/target-app-parity.md",
+      "sha256": "fead9b8a8bb3fc50bc3b97f5e53974dc4d9170b6bb0780c0f6dded74f3106404",
+      "bytes": 111067
+    },
+    {
+      "path": "docs/ui-parity.md",
+      "sha256": "ed501f68562ef955732511d7cb4016086234208944bc7c1e5f06355421f900f6",
+      "bytes": 6631
+    },
+    {
+      "path": "docs/hardware-parity.md",
+      "sha256": "4ea09a68e35cecfb622d9ac85e4d1ab785e01201c1b1d9695a479a93b28963ce",
+      "bytes": 4511
+    },
+    {
+      "path": "docs/localization-parity.md",
+      "sha256": "8135f1bea3fbc9c1fe1cd71da2de67e271e97877f3fbcc1df266b24bbc0f2f74",
+      "bytes": 9549
+    },
+    {
+      "path": "docs/gaps.md",
+      "sha256": "06a4323839e338412d8bef57d69e8f117b38231b189442df71b008c64cda14ef",
+      "bytes": 40907
+    },
+    {
+      "path": "docs/effects-parity.md",
+      "sha256": "139909b3b7f888b29c858905fe1ac71e1a047206e18bc0c4ec01e5ad595b30ca",
+      "bytes": 5444
+    },
+    {
+      "path": "docs/testing.md",
+      "sha256": "60f75a7b497afca0df996acf5e3620f2c81d32db03829181dd59cb1e56807268",
+      "bytes": 4112
+    },
+    {
+      "path": "docs/footage.md",
+      "sha256": "e0530d7d0378bcd58f2560327b1a664193072c5d5b636c8e9b226eeede265cd4",
+      "bytes": 10167
+    },
+    {
+      "path": "docs/roadmap.md",
+      "sha256": "3560e461bba141941a22b9d12218a947e4438e21c2ef8670373500124245506a",
+      "bytes": 6793
+    },
+    {
+      "path": "docs/contributors.md",
+      "sha256": "fce7271d78c01ad5dc046f69d427fd875bc84550899a48d3f9152c28bcd0a3b6",
+      "bytes": 2788
+    },
+    {
+      "path": "docs/effects.md",
+      "sha256": "f6484dd48046d7b28d190b39d9f1266655b3baa0cd692b1ecd40338a8897219f",
+      "bytes": 24623
+    },
+    {
+      "path": "docs/plugins.md",
+      "sha256": "33c57995bc75ac428e5213bf7d5fd16ed1f1df954a316287500c8632a7886655",
+      "bytes": 15232
+    },
+    {
+      "path": "docs/scripting-parity.md",
+      "sha256": "501c425c5d9566bf4b6adb31d3e777a1d9b3c923cdd6437a8d13d770b4cd629c",
+      "bytes": 5329
+    },
+    {
+      "path": "docs/web.md",
+      "sha256": "7520e2ee071ff6408f48d3021a1bc13bf97306ab7ebc829d86ec86f7a311f440",
+      "bytes": 36179
+    },
+    {
+      "path": "docs/file-format-parity.md",
+      "sha256": "9f1da3ed88d1928e7c93286c0c416a2fc3aa2c733e6e48a1e1f311f57af44d34",
+      "bytes": 9192
+    },
+    {
+      "path": "docs/control-protocol.md",
+      "sha256": "d033268a5994fb45579bd9ffbaea7d440f9eca2876453b15ac2402e19b946016",
+      "bytes": 16243
+    },
+    {
+      "path": "docs/preferences.md",
+      "sha256": "aeeef656f0f75e7d3c0ea4a578a954723422b22737359c62e132dc4f9a7274dd",
+      "bytes": 21096
+    },
+    {
+      "path": "docs/agents.md",
+      "sha256": "795da92a6f20ea939f741761377ed109bb390acb2b1813f9bc82ec7c5ee5a3c4",
+      "bytes": 53898
+    },
+    {
+      "path": "docs/images/effectcraft-3d.png",
+      "sha256": "f6299e5f29011b393b306519d43b4822dfc70840c2adf0b0fe7abaa53160dd1f",
+      "bytes": 673719
+    },
+    {
+      "path": "docs/images/effectcraft-hero.png",
+      "sha256": "e76ef6195d1d1a90014c9e1b92108681cd9fc2f0aecb131975db07121ec204f2",
+      "bytes": 764159
+    },
+    {
+      "path": "docs/images/effectcraft-3d.png.attribution",
+      "sha256": "0b21db17692ca5e6aad28bc54f641473d27f20062dba310d9f85d879d115d2db",
+      "bytes": 638
+    },
+    {
+      "path": "docs/images/effectcraft-render-queue.png.attribution",
+      "sha256": "b03fad053b9e9d918831e2c8e43af4dab64eaea9a4fc05677f5a0b29c3330773",
+      "bytes": 642
+    },
+    {
+      "path": "docs/images/effectcraft-graph-editor.png",
+      "sha256": "dfd2853d8d89b8aacd4e3998acff2f27577de646faea6e319ce24071a801502c",
+      "bytes": 757446
+    },
+    {
+      "path": "docs/images/effectcraft-effects.png",
+      "sha256": "c7f0f5723409343e2ab66d73abf98662bbeac30e103315f9662abdd5225d4926",
+      "bytes": 456209
+    },
+    {
+      "path": "docs/images/effectcraft-effects.png.attribution",
+      "sha256": "519e1fc421cd8b997df55e15f5f0747a7bbc345f764a3074ffb6580bef1efcc3",
+      "bytes": 609
+    },
+    {
+      "path": "docs/images/effectcraft-hero.png.attribution",
+      "sha256": "33981b8f1ad5bc744d377c1af61909ec215f5ee7d9e77f943251e1169e5bd024",
+      "bytes": 690
+    },
+    {
+      "path": "docs/images/effectcraft-graph-editor.png.attribution",
+      "sha256": "9892ad3d9de2190c31112ff203144ff3901e650ffa753e277d94de7f06a9c617",
+      "bytes": 623
+    },
+    {
+      "path": "docs/images/effectcraft-render-queue.png",
+      "sha256": "67f39084bc047ea9c14858d9065a6006bc9e8915ed295df5ea56b2ca6d223b5b",
+      "bytes": 626062
+    },
+    {
+      "path": "docs/brand/LICENSE-brand.txt",
+      "sha256": "7ee27fdb49f96a969ab80d5f800d8422aa17cb39d1cca286d18aa6227d8c7628",
+      "bytes": 2277
+    },
+    {
+      "path": "docs/fidelity/keyframe-ease.json",
+      "sha256": "bb93a4db51de52fda2db24fe5c1445cca7e594199eedda8a005d0db27ed7f5a6",
+      "bytes": 1221
+    },
+    {
+      "path": "docs/fidelity/workflow-checks.md",
+      "sha256": "fc2e740606c38705687d217e973089ccf8d49cadfad69b9d2a0eac40c99c5464",
+      "bytes": 6889
+    },
+    {
+      "path": "docs/fidelity/README.md",
+      "sha256": "68337284e4f1e594b7da3583f051950d019a980873788fc9cf622ee48fb4e2bd",
+      "bytes": 5019
+    },
+    {
+      "path": "docs/fidelity/object-matte.md",
+      "sha256": "b5166caabcae091ed24d5592e93b34f666fa35ace55ed981523d95961b35b7a9",
+      "bytes": 4564
+    },
+    {
+      "path": "docs/fidelity/ae-2026-acceptance.md",
+      "sha256": "116a77388bb2fa4350058c319e390864afb438f8ef8783de59f19d916937ea12",
+      "bytes": 4139
+    },
+    {
+      "path": "contributors/people.toml",
+      "sha256": "a99ef2f587647af858743e17c02e83c343a46e0a4c67fe79acd8a90c426c3c14",
+      "bytes": 2204
+    },
+    {
+      "path": "contributors/contributors.json",
+      "sha256": "46e7b8948b6c299971387701cefe18a358c70fb866ca440e3327ab918f97f84b",
+      "bytes": 10152
+    },
+    {
+      "path": "assets/app-icon/LICENSE.txt",
+      "sha256": "6f7a100b47da67df0c9e8e06397a7222766932c36cdebeff2e89cb2cd2917b85",
+      "bytes": 643
+    }
+  ]
+}

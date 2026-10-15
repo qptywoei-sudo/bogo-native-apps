@@ -1,0 +1,3 @@
+# KIO Deck reproducible source branding patch
+
+Verify the fixed original source archive SHA against manifest.json, extract it safely, then run `git apply --check /absolute/path/deckcraft-v0.7.0-kio-deck.patch` and `git apply --binary /absolute/path/deckcraft-v0.7.0-kio-deck.patch` from the extracted source root. No separate icon inputs are needed: the binary patch contains all KIO icon conversions and provenance files. A fresh extraction → apply → full-file SHA comparison passed. All engine/modules, dependency pins, licenses, original credit records and known-gap documents are preserved. No native build or GUI validation was run for this patch. See KIO-FORK.md in the patched tree for inherited limits and font pin.

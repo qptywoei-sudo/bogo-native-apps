@@ -1,0 +1,1574 @@
+{
+  "schema": "kio.native-branding-patch.v1",
+  "programId": "pdf",
+  "stage": "branding-draft-not-built",
+  "displayName": "KIO PDF",
+  "applicationId": "com.kio.pdf",
+  "upstream": {
+    "repository": "https://github.com/storytold/pdfcraft",
+    "release": "v0.8.0",
+    "commit": "9931329b9fae0b05373b4dc3ac7c58541f0891a4",
+    "sourceArchiveUrl": "https://codeload.github.com/storytold/pdfcraft/tar.gz/9931329b9fae0b05373b4dc3ac7c58541f0891a4",
+    "sourceArchiveSha256": "953f32944503e09323c4d66aac2528974cb04f94acfc1a4dfe50c1a86f0091ed",
+    "sourceArchiveBytes": 14600876
+  },
+  "patch": {
+    "file": "pdfcraft-v0.8.0-kio-pdf.patch",
+    "sha256": "51acf636a116dfe3f452b5f5845532ea1e961b587afa1bb4d3fb27c721767ba5",
+    "bytes": 8740582
+  },
+  "counts": {
+    "upstreamFiles": 1345,
+    "forkFiles": 1341,
+    "changedPaths": 120,
+    "added": 18,
+    "removed": 22,
+    "modified": 80,
+    "protectedFilesByteIdentical": 304
+  },
+  "checks": {
+    "originalArchivePatchRoundtrip": true,
+    "protectedEngineDependenciesLicensesCreditsByteIdentical": true,
+    "platformMetadataParses": true,
+    "literalIncludesResolve": true,
+    "originalKioIconSourceSha256": "c593afa189c06ace343228a5f5d5d4ab8af1d1bc8064e261d32cdd9ab769bed9",
+    "upstreamTrademarkLogoFilesRemoved": true,
+    "nativeBuildRunByBrandingAgent": false,
+    "allEngineFilesByteIdentical": true
+  },
+  "profileConfigurationExceptions": [],
+  "coverage": {
+    "applicationDisplayStrings": true,
+    "nativePackagingMetadata": true,
+    "existingIconAssetsReplaced": true,
+    "explicitAppProfileDirectoryLiteralsRebranded": true,
+    "allProfilesAndLegacyMigrationIndependentlyAudited": false,
+    "allLocalizedAboutEndorsementClaimsAudited": false,
+    "engineOwnedProfilePathCandidatesUnmodified": [],
+    "remainingEnglishMembershipClaimFiles": [],
+    "requiredFollowup": [
+      "Compile and run complete original native workspace with pinned features/fonts/resources.",
+      "Review inherited legacy profile migration and engine-owned profile paths; launcher must supply isolated per-app profile where supported.",
+      "Review localized About/community strings and platform package identity after build.",
+      "Run original meaningful tests and real project/format round trips."
+    ]
+  },
+  "files": [
+    {
+      "path": "KIO-FORK.json",
+      "before": null,
+      "after": {
+        "sha256": "2146cb10c22d840e0120c28b8fc670d45cae35aad076edefe3c4df3aca2c064f",
+        "bytes": 748
+      }
+    },
+    {
+      "path": "KIO-FORK.md",
+      "before": null,
+      "after": {
+        "sha256": "d865119a460484ad6eca7b0357da31542b6934aa1b24b8d08edec65cf28a8ef7",
+        "bytes": 841
+      }
+    },
+    {
+      "path": "README.md",
+      "before": {
+        "sha256": "9aba7a6dbe76c7083ba3a5093adf1b726fdf9eab6b178dd79dc2622c7febc300",
+        "bytes": 36144
+      },
+      "after": {
+        "sha256": "616d14ce72e848f714f36da30db120556f0ef17984327d0efe3c7699b49f08d8",
+        "bytes": 36091
+      }
+    },
+    {
+      "path": "apps/pdfcraft-cli/build.rs",
+      "before": {
+        "sha256": "8b4d65367ee85283e2f2bd134442ed30eb71eb725b389f8ae7e942d15661b3dd",
+        "bytes": 1382
+      },
+      "after": {
+        "sha256": "2d52f9bed05d53508659f4dd2b60fc926388181bc5754a3a9ec67ad7f1bed857",
+        "bytes": 1380
+      }
+    },
+    {
+      "path": "apps/pdfcraft-cli/tests/render.rs",
+      "before": {
+        "sha256": "eda694ccf215a93fd3b7f802f2a430b77a73e3aa35011f0c97c97462202140dd",
+        "bytes": 3049
+      },
+      "after": {
+        "sha256": "598ee93a39a59ce7fcd26fe4792ef23e80c005bbc213bd4b01e7c1cf18a9ddae",
+        "bytes": 3048
+      }
+    },
+    {
+      "path": "apps/pdfcraft-cli/tests/stdout.rs",
+      "before": {
+        "sha256": "42300071c9e31b0696cbaed0370e23b7eea160e028a57d463744644012ece27d",
+        "bytes": 3700
+      },
+      "after": {
+        "sha256": "29fe637eaa97835b1ffcfe5b19e46f0b724d2c149b3bbead91651405f8b81c6b",
+        "bytes": 3699
+      }
+    },
+    {
+      "path": "apps/pdfcraft-cli/tests/version_resource.rs",
+      "before": {
+        "sha256": "796f55561593f05d6a73624facac7cea492a937ab74ac1b9ef30b38cae916ad4",
+        "bytes": 2670
+      },
+      "after": {
+        "sha256": "ed4e2360e2d72ff16378b86bb0842c40a276f48d22dbda9ecab751d309f51ef3",
+        "bytes": 2668
+      }
+    },
+    {
+      "path": "apps/pdfcraft-web/index.html",
+      "before": {
+        "sha256": "139837866320cf67a49e49f5ccc6c6b58e0bfeec8128833fc13dce259a5eac31",
+        "bytes": 567
+      },
+      "after": {
+        "sha256": "78d149c3c1b6644e9ea41d9856babc9a710f6cbe4ef7f9beb769515d26b05432",
+        "bytes": 566
+      }
+    },
+    {
+      "path": "apps/pdfcraft-web/src/main.rs",
+      "before": {
+        "sha256": "48501a5c6a35e56b78502342a0ae5478b7e34e2e6379f33671487f08613ef72b",
+        "bytes": 11899
+      },
+      "after": {
+        "sha256": "4cd915b50bba6a5d71ce03228f69fa4ade1c88b3cb71f39c23c3817737eab2d8",
+        "bytes": 11898
+      }
+    },
+    {
+      "path": "apps/pdfcraft/build.rs",
+      "before": {
+        "sha256": "550aa4f651c42e91d58e7ee0f50d20afd8e030036e8be79cb8b6a0b327aa1d68",
+        "bytes": 1839
+      },
+      "after": {
+        "sha256": "210514939add19e3cb95b4ba21f5a0945f4681a4c9e636da7c8bf5307b91e590",
+        "bytes": 1837
+      }
+    },
+    {
+      "path": "apps/pdfcraft/src/apple_events.rs",
+      "before": {
+        "sha256": "4f520921b26b03e9569055f13b3828e83051eee59b7018b7aaf08c6bf326b367",
+        "bytes": 2128
+      },
+      "after": {
+        "sha256": "6118c4c534f2da6d44ebb40a4d0d4652310a6ee30e1d255e7936a0afe735ef00",
+        "bytes": 2127
+      }
+    },
+    {
+      "path": "apps/pdfcraft/src/decorations.rs",
+      "before": {
+        "sha256": "c0f4df3a7dbefab83143b3f6f3f6d2d899480de50506cd657e41a66890bcdf63",
+        "bytes": 3005
+      },
+      "after": {
+        "sha256": "19e5b02e33b9f242fb3afcec52228ad5e1381ff40ad995eccc034896b3e262af",
+        "bytes": 3004
+      }
+    },
+    {
+      "path": "apps/pdfcraft/src/main.rs",
+      "before": {
+        "sha256": "7b6b8438f50aa8504cdd9db7fa45a7c081d8288b5498db8b95cc8faf675920aa",
+        "bytes": 71290
+      },
+      "after": {
+        "sha256": "9249dfa2c0499ac3da1d681a9e4b5bad79b097642a33d762fe925881435b8cfc",
+        "bytes": 71226
+      }
+    },
+    {
+      "path": "apps/pdfcraft/src/reopen.rs",
+      "before": {
+        "sha256": "a4ad21ea533ef15d85ab4fa1365c6345986582fefae1263bb27e218a3668b742",
+        "bytes": 3102
+      },
+      "after": {
+        "sha256": "f2215f2dc72c815c4084073c1f7d1b94e0cf6cbc03f5a9e1dab277180d2c64fa",
+        "bytes": 3101
+      }
+    },
+    {
+      "path": "apps/pdfcraft/src/single_instance.rs",
+      "before": {
+        "sha256": "a945b5836af732d9ac0752f0863a69f4f7c0f54ba413c08d7fc72669385f4a50",
+        "bytes": 18591
+      },
+      "after": {
+        "sha256": "94279f42ad93aa757ce94e1d06f953d69943c8b5e73d73e0da6051f960edc2be",
+        "bytes": 18592
+      }
+    },
+    {
+      "path": "apps/pdfcraft/src/updates.rs",
+      "before": {
+        "sha256": "76e7e984dba427b970c6b08e5f66a1a374a9fb9354cb291c888042e4469bdaf5",
+        "bytes": 6242
+      },
+      "after": {
+        "sha256": "ea2d72ebef8878262f1d955bc9215587ba57bc9951a61dd4a454891a2e8a7526",
+        "bytes": 6250
+      }
+    },
+    {
+      "path": "apps/pdfcraft/tests/winit_x11_dpi.rs",
+      "before": {
+        "sha256": "67c1256c208a2b767c6f7653180072155933bec3ca96b12ef8558944b48b793e",
+        "bytes": 977
+      },
+      "after": {
+        "sha256": "2af8ef711cd8436fff0ba046aad00441f8df90b8e46508817d644c814bd5d266",
+        "bytes": 965
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/128x128/apps/ai.storyteller.pdfcraft.png",
+      "before": {
+        "sha256": "6ef927ca252b40bc9b5d8843d84137334362f8aa1acbb1bf8c15a02affd25b2b",
+        "bytes": 17218
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/128x128/apps/com.kio.pdf.png",
+      "before": null,
+      "after": {
+        "sha256": "7bfc8b0de75e4825f647c39e55b11c06a72547d17d8926c67e14aefe2f87b8a5",
+        "bytes": 22717
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/16x16/apps/ai.storyteller.pdfcraft.png",
+      "before": {
+        "sha256": "9b77095cbe75dcba6b74a1fdcd4064812850efaf7a12edebefc9ded5eabb49da",
+        "bytes": 695
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/16x16/apps/com.kio.pdf.png",
+      "before": null,
+      "after": {
+        "sha256": "d30e3828cd2ea3ed3117822eb6c8d53bb1bc96a46c08fc006779b97e4f1ea155",
+        "bytes": 776
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/24x24/apps/ai.storyteller.pdfcraft.png",
+      "before": {
+        "sha256": "a4cd466687f6c5cb59eef3fc564bdba1c8f0d9e324754eeebab82f18823efae7",
+        "bytes": 1254
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/24x24/apps/com.kio.pdf.png",
+      "before": null,
+      "after": {
+        "sha256": "874db66a48dc74506f6d8c69aaf1782da218ee90d90e210e0cdbaa1aa15e5731",
+        "bytes": 1313
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/256x256/apps/ai.storyteller.pdfcraft.png",
+      "before": {
+        "sha256": "cde7ee8c5ee38f9fc40a429fd9e6d99a035bcd321701fce331bb13bac126614d",
+        "bytes": 52732
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/256x256/apps/com.kio.pdf.png",
+      "before": null,
+      "after": {
+        "sha256": "1eb9c9ea5e9b1fada9a1718cf293314ca3b1fc9b5910b7c4fbff6e37155998ae",
+        "bytes": 77424
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/32x32/apps/ai.storyteller.pdfcraft.png",
+      "before": {
+        "sha256": "e22279013a5ed5c02571e1e4e9bc4cef9aa0847fcb733a285b2916fabd16bf78",
+        "bytes": 1919
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/32x32/apps/com.kio.pdf.png",
+      "before": null,
+      "after": {
+        "sha256": "94a03d4769c7f3cd4c091856e59c72b69b1c38331020abc93a231c3357bc0de0",
+        "bytes": 2094
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/48x48/apps/ai.storyteller.pdfcraft.png",
+      "before": {
+        "sha256": "55daf2d5575f6c4e4c4975c9f1c74231178f1801963a8b19f68dfa9bc50cb22f",
+        "bytes": 3617
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/48x48/apps/com.kio.pdf.png",
+      "before": null,
+      "after": {
+        "sha256": "bf052a410a698eb0c47a6fed414f32eb287d31e4acf6fd54c16cc492a045c56d",
+        "bytes": 4094
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/512x512/apps/ai.storyteller.pdfcraft.png",
+      "before": {
+        "sha256": "5ede733e93b96f4eb8d94299232cf2f9605fa19b0d913f95fe9828c316a2d066",
+        "bytes": 144396
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/512x512/apps/com.kio.pdf.png",
+      "before": null,
+      "after": {
+        "sha256": "75adadf5113e7b58f8834157563ec9d6c52fec15ac62bf41cf99198e33448225",
+        "bytes": 197317
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/64x64/apps/ai.storyteller.pdfcraft.png",
+      "before": {
+        "sha256": "2975c200f341e247b5fa18f568fb27d390e3fa01e9b2ad37acb48d0e1cc8a124",
+        "bytes": 5478
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/64x64/apps/com.kio.pdf.png",
+      "before": null,
+      "after": {
+        "sha256": "42738c434f84a15f060f0b603e973f37a442814f45ed1cb43f99f52bb485f839",
+        "bytes": 6664
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/scalable/apps/ai.storyteller.pdfcraft.svg",
+      "before": {
+        "sha256": "52b384a10a2a7fdd3145d9822972cfd568ef0cb7312549bd4399addd89d45a6d",
+        "bytes": 461713
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/scalable/apps/com.kio.pdf.svg",
+      "before": null,
+      "after": {
+        "sha256": "8fe000c164825227d3e7065689d8dfaa9ada5a8c3dd5acdd5968b758e5c4632e",
+        "bytes": 466071
+      }
+    },
+    {
+      "path": "assets/app-icon/kio.png",
+      "before": null,
+      "after": {
+        "sha256": "c593afa189c06ace343228a5f5d5d4ab8af1d1bc8064e261d32cdd9ab769bed9",
+        "bytes": 349430
+      }
+    },
+    {
+      "path": "assets/app-icon/kio.svg",
+      "before": null,
+      "after": {
+        "sha256": "8fe000c164825227d3e7065689d8dfaa9ada5a8c3dd5acdd5968b758e5c4632e",
+        "bytes": 466071
+      }
+    },
+    {
+      "path": "assets/app-icon/pdfcraft-1024.png",
+      "before": {
+        "sha256": "da577d3f21fbcf5c739067787a9e683be2b064d76813b5d5fec9074a7a106538",
+        "bytes": 271438
+      },
+      "after": {
+        "sha256": "c593afa189c06ace343228a5f5d5d4ab8af1d1bc8064e261d32cdd9ab769bed9",
+        "bytes": 349430
+      }
+    },
+    {
+      "path": "assets/app-icon/pdfcraft-document.ico",
+      "before": {
+        "sha256": "ba3f9128b368fc6d17d376cf62dbdbc22455451c5c8c4779210d7a2a7409b9e6",
+        "bytes": 35829
+      },
+      "after": {
+        "sha256": "f55257e7822a43250948e71ae38eda2a6718740a216687d90588fd7c785940df",
+        "bytes": 115200
+      }
+    },
+    {
+      "path": "assets/app-icon/pdfcraft-document.svg",
+      "before": {
+        "sha256": "8da8278c2b89362be0a960879d453ff879d7544d6d58e47d5389574e8dfff77b",
+        "bytes": 1023
+      },
+      "after": {
+        "sha256": "8fe000c164825227d3e7065689d8dfaa9ada5a8c3dd5acdd5968b758e5c4632e",
+        "bytes": 466071
+      }
+    },
+    {
+      "path": "assets/app-icon/pdfcraft-small.svg",
+      "before": {
+        "sha256": "b036304c11ef5dcad36636d06ca0bf331b51e47650d25d3c916a0e1eabf544c7",
+        "bytes": 243333
+      },
+      "after": {
+        "sha256": "8fe000c164825227d3e7065689d8dfaa9ada5a8c3dd5acdd5968b758e5c4632e",
+        "bytes": 466071
+      }
+    },
+    {
+      "path": "assets/app-icon/pdfcraft.icns",
+      "before": {
+        "sha256": "2425148222873de241d267aba667a8b234ecdd0149f2ca8bb6e79443b743b1e8",
+        "bytes": 681360
+      },
+      "after": {
+        "sha256": "fd3580b162bf633fe762b258920b034682282f668b71f9859017cb0275fb62bb",
+        "bytes": 1053840
+      }
+    },
+    {
+      "path": "assets/app-icon/pdfcraft.ico",
+      "before": {
+        "sha256": "56daaaae9ae5389794909570885809adf5e1d9183bef2d9669ed2f9bba3ed6f5",
+        "bytes": 86694
+      },
+      "after": {
+        "sha256": "f55257e7822a43250948e71ae38eda2a6718740a216687d90588fd7c785940df",
+        "bytes": 115200
+      }
+    },
+    {
+      "path": "assets/app-icon/pdfcraft.svg",
+      "before": {
+        "sha256": "52b384a10a2a7fdd3145d9822972cfd568ef0cb7312549bd4399addd89d45a6d",
+        "bytes": 461713
+      },
+      "after": {
+        "sha256": "8fe000c164825227d3e7065689d8dfaa9ada5a8c3dd5acdd5968b758e5c4632e",
+        "bytes": 466071
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/canvas.rs",
+      "before": {
+        "sha256": "d1fd064f157f690b7a7b7d3d5ee59bfecf8a388d3530704c8259a16d3219bc0c",
+        "bytes": 269469
+      },
+      "after": {
+        "sha256": "3d6e059cf9e7447f27af9051e1ea667669cdc686ffe7164fa40546d4ba758df5",
+        "bytes": 269467
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/content_ui.rs",
+      "before": {
+        "sha256": "e154b891af8ca21a115a41565a015ef6af17dee2e9b770251ae55fb3634707f2",
+        "bytes": 35959
+      },
+      "after": {
+        "sha256": "342b750e32acc9c758735ffcbd91e84c958be6c0b4a8c78045865fef9ef3c113",
+        "bytes": 35957
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/dialogs.rs",
+      "before": {
+        "sha256": "d8cba2c456732833fa5eaadb708db09c0c59f6595475eaafb261df070c3b4c02",
+        "bytes": 82176
+      },
+      "after": {
+        "sha256": "8423b75420ff196267bd8920f88e06df04d393e19c92e1c7bc1f67f9cf5932a6",
+        "bytes": 82174
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/fill_sign.rs",
+      "before": {
+        "sha256": "d7fcdd9d6022f62b18297fc7255aaf3dabf4f1611930d112d3c4235061db2514",
+        "bytes": 54538
+      },
+      "after": {
+        "sha256": "6717990bb9060dfda587002405b1ea1f639eab5d3ddde8d00aea1683c950563b",
+        "bytes": 54537
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/home.rs",
+      "before": {
+        "sha256": "bdd7729118e3b9eb902c6326a01cb6d3806815661b220d7e789001d41e524086",
+        "bytes": 14071
+      },
+      "after": {
+        "sha256": "2fb175301633325293f8ff28673982172ecf79fe02707af1ec21936034756faf",
+        "bytes": 14078
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/ar.tsv",
+      "before": {
+        "sha256": "113fdf57e28fcff90d212fb468011bedebfb98ac100218d29b584f4de4c87912",
+        "bytes": 155740
+      },
+      "after": {
+        "sha256": "78414e31ab4b57bf801cda9015f2db5ff27fa7ae43ad37e72def17a4fe137b0d",
+        "bytes": 155691
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/bg.tsv",
+      "before": {
+        "sha256": "f8ae97901c61dfdc0a844a23356173211bb052b3ff54128d7edc8097c535eee9",
+        "bytes": 181707
+      },
+      "after": {
+        "sha256": "c8054c1ebb317a0d11f1d1ca0b295247ef534dd3f2121530aa9829bbdba8c0de",
+        "bytes": 181662
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/cs.tsv",
+      "before": {
+        "sha256": "322b8cda21a2b8d157716182846619bd92bfb31263d1f8d13da7eaad365fbfd7",
+        "bytes": 135344
+      },
+      "after": {
+        "sha256": "2c1e228ae89fb8bc860f32b4d542c72905d22728ca13fa769a142245ebd69337",
+        "bytes": 135298
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/de.tsv",
+      "before": {
+        "sha256": "686ab9658b7ef9dd7f3af05ce73f99f1ab2a75f8357bad6f7e987d40a8730df9",
+        "bytes": 132862
+      },
+      "after": {
+        "sha256": "f3ad57a95413b715234510f4c0065279b05d45f171a81dad857e84877da83716",
+        "bytes": 132812
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/el.tsv",
+      "before": {
+        "sha256": "389982dcbb7f1ac29fb150c9af43f9529db6e59a091b9971f0401684847d8b53",
+        "bytes": 197467
+      },
+      "after": {
+        "sha256": "3fa9b56ca2e24322957f06c2cbac878e3ef7e31cfc58466375e1e246d1733798",
+        "bytes": 197420
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/es.tsv",
+      "before": {
+        "sha256": "fef35ae1771edf2e044e72aebb958bb4827ded57234207f96b6cb7a250fedb22",
+        "bytes": 148181
+      },
+      "after": {
+        "sha256": "d677df6ab3fce180dd7407ca17481c4a045c4eef53d3ff830cf5cee2f453efb1",
+        "bytes": 148128
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/fr.tsv",
+      "before": {
+        "sha256": "d723622298b10400e9a1ba697cbebd831f5e0f7e5bbe4545b97f61e64db7535f",
+        "bytes": 136390
+      },
+      "after": {
+        "sha256": "6962b3831777823e14b28a4ef42e52ae41a5305504b7bf4975848388bffe5304",
+        "bytes": 136341
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/hu.tsv",
+      "before": {
+        "sha256": "01b32370cedce935b74925858a79ee691dc2a5560ba5eb758de2de1c243c528e",
+        "bytes": 135599
+      },
+      "after": {
+        "sha256": "231842cf1540bffe2a970b1b6b48e4b933233870b1de470d77aebc0f7594c627",
+        "bytes": 135557
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/it.tsv",
+      "before": {
+        "sha256": "5aa6475df91a3e82010aee198c2e29bb80328505bbd0240f3828e36a5d6dfdf3",
+        "bytes": 131164
+      },
+      "after": {
+        "sha256": "f87efb623244bf5d90915aafa0ba92e07ecbf877c1b6500fe168140861e82d9f",
+        "bytes": 131115
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/ja.tsv",
+      "before": {
+        "sha256": "114b3d50531eb1682535c7a646e62914b0c9afaa5d5d1b9f66b94fd472e4e7b3",
+        "bytes": 147700
+      },
+      "after": {
+        "sha256": "725df07ccf1028918587d1cd3d9cbd2c500c59325ebd359c4f04da01cb8e2c20",
+        "bytes": 147651
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/kk.tsv",
+      "before": {
+        "sha256": "7107ba77577794395451dd85355a86ef3e033a7f240b72414b877b9b43adb19e",
+        "bytes": 178488
+      },
+      "after": {
+        "sha256": "414ab836ebf09b1fe125985b300c28fab6587ff6ad64503d4962891e898876b8",
+        "bytes": 178440
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/lt.tsv",
+      "before": {
+        "sha256": "fe58835b0538f470b463f078e1b4cdf78a8e2632056bc61c6946071478f39a64",
+        "bytes": 156154
+      },
+      "after": {
+        "sha256": "b4228a32a5948e76b8f2966995c6ccc23b4113d1a9e75dc9a6a350ab507d02c4",
+        "bytes": 156101
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/mod.rs",
+      "before": {
+        "sha256": "b8ba5cebf409c1dad2294c93057fd0418af3be8874b3ac4f42474457306c5dec",
+        "bytes": 152579
+      },
+      "after": {
+        "sha256": "7103c3bd64ef4b2d30a3d2545597583d83fafffaff373aea7e54731748d2edf3",
+        "bytes": 152578
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/pl.tsv",
+      "before": {
+        "sha256": "e6d306d9bf289fac2fe8fcfa6f9d0a51b650728e45669289d391be2031076692",
+        "bytes": 128837
+      },
+      "after": {
+        "sha256": "d67d44a46ca594a258d6171f941e2dad9cbb54fcfb587c80018e004931a146ee",
+        "bytes": 128788
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/pt-br.tsv",
+      "before": {
+        "sha256": "21bf9c73b482eb987ddaf839b4a4aa8f9938d5aa10428e6d39beea254a95a0c0",
+        "bytes": 132726
+      },
+      "after": {
+        "sha256": "68c79fdbe48f2940d16e813db3ba6f1bf7f78e60fdce88d65b3a479a8ecbc90b",
+        "bytes": 132677
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/ru.tsv",
+      "before": {
+        "sha256": "277f4995a87297a2fcc473df1feebdbdf3378fa460a7f85eb1a0a151cee40a2b",
+        "bytes": 172792
+      },
+      "after": {
+        "sha256": "2adbf087e48296f4cf1af8823d44bd5b2c12530350306cf6539f6186176e6243",
+        "bytes": 172749
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/sl.tsv",
+      "before": {
+        "sha256": "9bbbd0d516f284b571ad6e2ed811f6bbdee283cea8483686f4aa939db38ea288",
+        "bytes": 127032
+      },
+      "after": {
+        "sha256": "d054915461034f375df5c6b74345bbbca4b6eec748c96912e20f74dc2acda947",
+        "bytes": 126986
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/te.tsv",
+      "before": {
+        "sha256": "90b94038699aa74aa48ffbda3e90a2255b65d0dbf081e8ecf20c5804940fc129",
+        "bytes": 224312
+      },
+      "after": {
+        "sha256": "184e2e482a48826b08eb87369e49990e70e47532a4c8302d766896d2b4f93d82",
+        "bytes": 224273
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/tr.tsv",
+      "before": {
+        "sha256": "2b5edfe026578ed475f07f94f1d1ed4a3dac93a745c19209589936e2d67f6ec5",
+        "bytes": 129356
+      },
+      "after": {
+        "sha256": "43a43ffae7759352287ba1bdb37d8ac1796c2ff6390ee099ca4ae18bd3c70773",
+        "bytes": 129307
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/uk.tsv",
+      "before": {
+        "sha256": "f56ec5f4cb7d1992041df0783f1cfd76c27d5d180c3f73c60b104e3fd02f600d",
+        "bytes": 182082
+      },
+      "after": {
+        "sha256": "10cd9747cbc00242be06edf555c4345e21b2d7554751ea5b32a9a41833e28a53",
+        "bytes": 182033
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/zh-hans.tsv",
+      "before": {
+        "sha256": "d8ea23644d81476e3fd35c09780ab9b3ac8c9e28bed4e14e1cbc6493bb896d91",
+        "bytes": 113204
+      },
+      "after": {
+        "sha256": "0abcbd8ba141816b5ea582e5142b983d3f88d9ebe46ea0418ad0e1b24c0b5660",
+        "bytes": 113159
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/zh-hant.tsv",
+      "before": {
+        "sha256": "26dd0b0d697fd40db996fc102f3c7f2320bdeb6d6af38dbdde353bd5d940baad",
+        "bytes": 108567
+      },
+      "after": {
+        "sha256": "664b2c91248084f067267c7cd112058f428d251fec36a0075edc00d56bec6c33",
+        "bytes": 108522
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/image_pick.rs",
+      "before": {
+        "sha256": "c708be25ee76b86c2e8cd990cccf86603dc865e330077b48104ab537c40c989b",
+        "bytes": 12992
+      },
+      "after": {
+        "sha256": "ee37ccc03783b47bec4b9620349c6fc8d3cc90f80a440494b80957ec96a0269b",
+        "bytes": 13001
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/js_ui.rs",
+      "before": {
+        "sha256": "dd2b81a9077703f55777b9f381de75afd38d425cfc4263ed2019b179f4d5bf1e",
+        "bytes": 28037
+      },
+      "after": {
+        "sha256": "683d8df85aba91553ceb4177999b531763e752b8b9e8993512608e2c2b067b01",
+        "bytes": 28035
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/lib.rs",
+      "before": {
+        "sha256": "8726e563a693a05c2555e5726483b74eb434836dec963365e54ada66f923c903",
+        "bytes": 136367
+      },
+      "after": {
+        "sha256": "a1f937d727c5a47821492918582b6e9cd9d0e588ce6a272f331947f9008b624c",
+        "bytes": 136363
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/ocr_ui.rs",
+      "before": {
+        "sha256": "ff219e64363b0986faf38fb2c9ee3030e9e1b55aad1b33c4e0359753171a1a53",
+        "bytes": 15571
+      },
+      "after": {
+        "sha256": "2424838f37c7647c1193ebbd15dba3ea6fc630f6cbfbec0269c22f88020cb773",
+        "bytes": 15570
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/portable.rs",
+      "before": {
+        "sha256": "0ac61f2f4d825d53700654f4280980eead463ab5de7953baa8926a4a73109b65",
+        "bytes": 6890
+      },
+      "after": {
+        "sha256": "e04a60cfa41c4aa7d2d021d2820936dc31b95b7ff16eb6488acd360bc54590f0",
+        "bytes": 6888
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/recovery.rs",
+      "before": {
+        "sha256": "eb2cd5f003f907eadd4c79257def2cf690031e57a351b6930f64aec3444e816e",
+        "bytes": 12444
+      },
+      "after": {
+        "sha256": "3b748a93a61ced64f131e0b15bda232c2d9ff87a1238660287181b920a73e08d",
+        "bytes": 12453
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/sign_ui.rs",
+      "before": {
+        "sha256": "e85fbe8251701e67b4a7ccd713aa1f9dc735eb6f31dad7cfc2f4d01feda0df01",
+        "bytes": 67528
+      },
+      "after": {
+        "sha256": "eeb21f61737e6aea2019057b4986bc0ed790d588efca625cacb6e37a5f5aa3d1",
+        "bytes": 67526
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/updates.rs",
+      "before": {
+        "sha256": "c3b0065c5ae10c246a29cb698d06367ae6d3ce9b0da7fc5265a5a83625e788fe",
+        "bytes": 7169
+      },
+      "after": {
+        "sha256": "dc820a344f9007890e12b95f0a4221eeee7c7208ec6ac5699465e6a74669e688",
+        "bytes": 7170
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/web_print.rs",
+      "before": {
+        "sha256": "82cc646485a812718398596e73ad5f262dc1399d529fc5319de37d48191f2226",
+        "bytes": 21431
+      },
+      "after": {
+        "sha256": "ecdc74baa195f9b44d5c0a34a91d08a419280e46f035eb8fea5fb05265835e7f",
+        "bytes": 21430
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/widgets.rs",
+      "before": {
+        "sha256": "2534db8282df70093174c21a1b71d1600e57a38ba957c4df4fd0563c254268c6",
+        "bytes": 43297
+      },
+      "after": {
+        "sha256": "3a4668e9fbb040491fe6fca3a707498165de3ec37b731adfa21d4ae3d1a3983f",
+        "bytes": 43276
+      }
+    },
+    {
+      "path": "crates/ui-egui/tests/accessibility.rs",
+      "before": {
+        "sha256": "3941cc9815be89d5a7b6903c92c457289300cbaf2b5f200a6d892b46d58d8331",
+        "bytes": 15656
+      },
+      "after": {
+        "sha256": "d1efba1943699436e59d8fc008390b2e8f41dd93ff6c387a0f6c71087ac1af0f",
+        "bytes": 15655
+      }
+    },
+    {
+      "path": "crates/ui-egui/tests/editing.rs",
+      "before": {
+        "sha256": "374ad960d15552773485afe2b321f431b62c9d57447d3578276ff19e433d8d15",
+        "bytes": 189276
+      },
+      "after": {
+        "sha256": "c5b5e3a5b6208ee542ba84896b4b15de6a2526213211670d33bf1bf622b244de",
+        "bytes": 189278
+      }
+    },
+    {
+      "path": "crates/ui-egui/tests/fonts.rs",
+      "before": {
+        "sha256": "f7086df8d6a0f597a2fc5f56e3492d7f1c973f95613d4c9bbb6dae47e38853ac",
+        "bytes": 16307
+      },
+      "after": {
+        "sha256": "78385a9ad49e0af0bf9e7b3de2dc4e28bb63cfad278498e569f63d8a38418bba",
+        "bytes": 16304
+      }
+    },
+    {
+      "path": "crates/ui-egui/tests/pickers.rs",
+      "before": {
+        "sha256": "bd03d7de83c9adacae134706956cc849a730aa481f3afe4e00a471eb19787475",
+        "bytes": 37032
+      },
+      "after": {
+        "sha256": "e6f82c2baf7ab905e3fdbe75539fcbcbbd4ddb6efa31134b836f623ceda82dbd",
+        "bytes": 37031
+      }
+    },
+    {
+      "path": "crates/ui-egui/tests/signing.rs",
+      "before": {
+        "sha256": "94130ca8af61855be5d1fd566135ec7974a25bb0598277bfa4120dbf2401c15a",
+        "bytes": 21215
+      },
+      "after": {
+        "sha256": "867ccaf33f7e7806cf31844801990b8ec968a4df8f1c488851ad47c18446b4be",
+        "bytes": 21214
+      }
+    },
+    {
+      "path": "crates/ui-egui/tests/ui.rs",
+      "before": {
+        "sha256": "31285e1f19ff9900ce073e19abc00c644e95818f26b89d76544899126ad15b5d",
+        "bytes": 57212
+      },
+      "after": {
+        "sha256": "8dec966467d5b8cb2e9f641564168648bc3c4c664990415e6f71bd28b17bab42",
+        "bytes": 57209
+      }
+    },
+    {
+      "path": "crates/ui-egui/tests/ui_group/links.rs",
+      "before": {
+        "sha256": "36265df7be552fedb6e2fa01cfbc1676274a4e616670e52c74970f13356f8f5e",
+        "bytes": 4174
+      },
+      "after": {
+        "sha256": "1e32532e7493e53d05039b57963611d04f341a737e6af2486d4562016e470870",
+        "bytes": 4182
+      }
+    },
+    {
+      "path": "crates/ui-egui/tests/ui_group/updates.rs",
+      "before": {
+        "sha256": "3fc9ececf12f3bb61073a9767f365de12f0bcc7ebd4ec3acb6b991be48d5060e",
+        "bytes": 3939
+      },
+      "after": {
+        "sha256": "8af0c4f2de9c0c4a6a705cdbabf306378a253791620ec5eeb11ec7bd156c4a90",
+        "bytes": 3943
+      }
+    },
+    {
+      "path": "crates/ui-egui/tests/viewer.rs",
+      "before": {
+        "sha256": "6ceded1f9025050def34e4386ff3363f230537dd6139d9ce5f28995b3b5b4918",
+        "bytes": 56411
+      },
+      "after": {
+        "sha256": "8c0c783196da4ebcb7205bff9e9e57b494d607f5596a23d0632e731b4f683a59",
+        "bytes": 56408
+      }
+    },
+    {
+      "path": "docs/brand/artcraft-logo-white.png",
+      "before": {
+        "sha256": "8b86aeb06a12a90ba77a60e0d90329272310e244ee5c1f9b161b391280ca79d8",
+        "bytes": 32161
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-logo-white.svg",
+      "before": {
+        "sha256": "a3e03dc49f9ad4225b8517d5424309c8d1c864d3996d862190d9cc797d5af427",
+        "bytes": 5394
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-logo.png",
+      "before": {
+        "sha256": "08fc6d9d3717e8f13417bac6f9025b50e11d1e0b32e9e000883d2fe0c4a0c67b",
+        "bytes": 31302
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-logo.svg",
+      "before": {
+        "sha256": "3188971e1affdf4f6be4fa65f715376a7a305e6aa741ec78b0296c8f934eff08",
+        "bytes": 5394
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-mark-black.png",
+      "before": {
+        "sha256": "5954cc0306e1b9d7beb47097e2e842157113a39d9aba078b57304902687936a9",
+        "bytes": 26793
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-mark-black.svg",
+      "before": {
+        "sha256": "570adcb4f7ba8ca0647f97074476bab81d3272988f1cdee52efa21bf026036a4",
+        "bytes": 341
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-mark.png",
+      "before": {
+        "sha256": "9d372157a949c147318561e629b11561c28b7cbc14c84b516a3fe6e84d8fbbad",
+        "bytes": 24715
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-mark.svg",
+      "before": {
+        "sha256": "f87af81b6fa411da8820eed2bfdcc54c0ee9cd453b4e868c64f56c69db142d0e",
+        "bytes": 341
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/env.sh",
+      "before": {
+        "sha256": "81cd66bfa05d1e9eb0b09481a3843f66a259a7122597a3a7d5dfdef2426f33f2",
+        "bytes": 4114
+      },
+      "after": {
+        "sha256": "e1da73a39874672b9425557099edc73a8c78ad035279906646cf49045baf4914",
+        "bytes": 4140
+      }
+    },
+    {
+      "path": "packaging/freebsd/package.sh",
+      "before": {
+        "sha256": "197495a72933a278b1c8562d8cf10caa91f6e1a53aae7db320ba861cecbe197d",
+        "bytes": 2386
+      },
+      "after": {
+        "sha256": "3461c69b6933e6cb37525da81eb03923e7cf545c8b03557da0f78ea9bfe96f27",
+        "bytes": 2372
+      }
+    },
+    {
+      "path": "packaging/icons.sh",
+      "before": {
+        "sha256": "8052b94008e64dce4d05466a2e2ed2303d0948c9719b1c99644251fc73923d4c",
+        "bytes": 3056
+      },
+      "after": {
+        "sha256": "00ee95c4a2efb2d6d88cb056e5d3449bb8223d79ec97a7c51f3fc5e376a69917",
+        "bytes": 3044
+      }
+    },
+    {
+      "path": "packaging/linux/ai.storyteller.pdfcraft.desktop",
+      "before": {
+        "sha256": "467d7ada3228b439c16d012d82c2ecd1b52c133cf7cbde9a14a9ac91e01f4677",
+        "bytes": 373
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/linux/ai.storyteller.pdfcraft.metainfo.xml.in",
+      "before": {
+        "sha256": "05ac27ef4da1e685f6c29d8a3c185f234970da23af8c4db1c32f9a9dd715118c",
+        "bytes": 2374
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/linux/ai.storyteller.pdfcraft.mime.xml",
+      "before": {
+        "sha256": "0e5f0264eb16018949270b22da03aa49e8bcb3f1683da4e8e4dd7c17cc06417e",
+        "bytes": 126
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/linux/com.kio.pdf.desktop",
+      "before": null,
+      "after": {
+        "sha256": "e6c591214082b142b2004db52e4d5786cb26b503c2ac6306da30720f8c3e8931",
+        "bytes": 348
+      }
+    },
+    {
+      "path": "packaging/linux/com.kio.pdf.metainfo.xml.in",
+      "before": null,
+      "after": {
+        "sha256": "e1632338d31e92550aeb185b146c2a1b0f59022f5bb9c43f11d6cd10466d204a",
+        "bytes": 2336
+      }
+    },
+    {
+      "path": "packaging/linux/com.kio.pdf.mime.xml",
+      "before": null,
+      "after": {
+        "sha256": "0e5f0264eb16018949270b22da03aa49e8bcb3f1683da4e8e4dd7c17cc06417e",
+        "bytes": 126
+      }
+    },
+    {
+      "path": "packaging/linux/flatpak-bundle.sh",
+      "before": {
+        "sha256": "d8a64106b1571fc28013dae347e2d9aabeb73590c07eeacabeecd90b550501a1",
+        "bytes": 3422
+      },
+      "after": {
+        "sha256": "5ae903a5eb3edd99fcd85a43719436f60bcc935693bc5413e61773b4c67ac505",
+        "bytes": 3396
+      }
+    },
+    {
+      "path": "packaging/linux/flatpak/ai.storyteller.pdfcraft.bundle.yml",
+      "before": {
+        "sha256": "522a42a93cdc41832e8bbeb38b91cad18b3a76589ca387dad1384f38173b9bb1",
+        "bytes": 3399
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/linux/flatpak/ai.storyteller.pdfcraft.yml",
+      "before": {
+        "sha256": "62ce1e069b34f9e7a558c6023e51257174bd9e77ddc17e7129d858a15d34bb56",
+        "bytes": 3524
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/linux/flatpak/com.kio.pdf.bundle.yml",
+      "before": null,
+      "after": {
+        "sha256": "1825284380fb97e7e213e4ff9ae2c85605ca7f7daa8559232e5f7dfcfc9d7238",
+        "bytes": 3303
+      }
+    },
+    {
+      "path": "packaging/linux/flatpak/com.kio.pdf.yml",
+      "before": null,
+      "after": {
+        "sha256": "eba0e9985c2eadb3c650b9a8ced6266b65999d99cb71602dc0815d1ba7cf788e",
+        "bytes": 3403
+      }
+    },
+    {
+      "path": "packaging/linux/package.sh",
+      "before": {
+        "sha256": "920c6baa31f4de0c8a604bdd0c08c5be636ad08c051322289f59c6a456a15102",
+        "bytes": 8400
+      },
+      "after": {
+        "sha256": "a1539c938eb6bafa48604fad2cdc878c6c393b49f6fc93ed848be7c5fd463782",
+        "bytes": 8384
+      }
+    },
+    {
+      "path": "packaging/macos/Info.plist.in",
+      "before": {
+        "sha256": "327da2db511a1691289a0e68c3c3eabda7ea77ff22371275275ac840ebdcd282",
+        "bytes": 2809
+      },
+      "after": {
+        "sha256": "3089bda460bd1e75dd3fc707a4ec0067d1f25cefe5932d8957a175a3b945edca",
+        "bytes": 2791
+      }
+    },
+    {
+      "path": "packaging/macos/package.sh",
+      "before": {
+        "sha256": "43120e135343ebab2aba67fd1df68b1e2f8987f7ff4db502aea0cd896a23a4c9",
+        "bytes": 8438
+      },
+      "after": {
+        "sha256": "60c79fad66c630a7973a5e636215eb0e13ec3ea5931a4264d3049872f3bdc4af",
+        "bytes": 8250
+      }
+    },
+    {
+      "path": "packaging/windows/package.ps1",
+      "before": {
+        "sha256": "039afd5ae61c29adae9a3130aa9ef15bd40678048c038f575ac04e5b3e36de6d",
+        "bytes": 8993
+      },
+      "after": {
+        "sha256": "10f2b2c4ca3fcd8a8fce2d65a8d87f6429ee0c1c83c687ed2671c9e44e9d3481",
+        "bytes": 8991
+      }
+    },
+    {
+      "path": "packaging/windows/pdfcraft.wxs",
+      "before": {
+        "sha256": "68e1269ba3340bc105a01863687bea6fc67a15303a9cb6ca5ceddd0f727bedea",
+        "bytes": 16954
+      },
+      "after": {
+        "sha256": "3485585faf3ccc04fc565f2dcb9dd8703d6c69e9e09fde07a11b91f388efb58c",
+        "bytes": 16908
+      }
+    },
+    {
+      "path": "packaging/windows/security-audit.ps1",
+      "before": {
+        "sha256": "30cf20b8ed8a89b9cb3a8f994542608e93da0d62bddd4496f7daa2cde04ea07a",
+        "bytes": 4009
+      },
+      "after": {
+        "sha256": "51fa0003c59b0b061d6ea1d7e5ebdf68a1a84cc9a2f5029acced1e118d52ad89",
+        "bytes": 4008
+      }
+    },
+    {
+      "path": "packaging/windows/sign.ps1",
+      "before": {
+        "sha256": "aaf6b2a0a0b5e990fb636d81171ebf557e3cf032c2da4e65aac4673bd8d5206b",
+        "bytes": 4792
+      },
+      "after": {
+        "sha256": "98a472c3a515f77f500ba4c7dbea229071f16444a057bcc61b91299b1c0fbc46",
+        "bytes": 4790
+      }
+    },
+    {
+      "path": "packaging/windows/test-msi.ps1",
+      "before": {
+        "sha256": "0234bf90f87de956ed5e683e0958c1d6a474273da0f63d4816976acc94650c4b",
+        "bytes": 14506
+      },
+      "after": {
+        "sha256": "f631acf80a2ee1d14b0fb493fd2c18fdd0fbcc983e0f2ab30867780758578103",
+        "bytes": 14496
+      }
+    }
+  ],
+  "protectedFileHashes": {
+    "ATTRIBUTION.md": "1b324a5b8fabaccb9ee6bbb3cb889b6be82cacffe76de8e28b8f23d7d09c2f05",
+    "ATTRIBUTION.toml": "79d7984b29199676206be7f5c076a858090d9bff2f0f539d94e6cce5e831b618",
+    "Cargo.lock": "4b378b35f2f982f4befdbe90e8dfa1ad03ccdb13da9e87857087d19daff4fc64",
+    "Cargo.toml": "5704435bf957fb52e324730d6226d85fae91dcc1a9f37d25aa1e746b5c5e2336",
+    "LICENSE-APACHE": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+    "LICENSE-MIT": "cd7032ea33b71427f188e34ffb4aee9d6868a57fd196037c5c8b2be03a2a0352",
+    "NOTICE": "496946cff190a3fec32fe0241ea60d40539c73a9da1865073eb0c73ee822c8d5",
+    "contributors/contributors.json": "46520510a313cd4b32cee01ba0b0a46ae5098cd490c597683df497d324216146",
+    "crates/a11y/Cargo.toml": "03d0c3157eb78f0100d1e58502807a7e73166dc2b0aca78cb25429b2aded79a1",
+    "crates/a11y/README.md": "6bd6d4a52121a079d291ba1a96d5bef237e4e2e85ceaf0512cf3b52ec3494b5d",
+    "crates/a11y/src/alt.rs": "75661d16e5deb845d02e68e92f809a46015bef16e18db12c43c4d8bd5d037d38",
+    "crates/a11y/src/autotag.rs": "f08f7c6798fde3875cc05ce3ff698fe5768a7f3de42b8412e755a8fdddbed87d",
+    "crates/a11y/src/content.rs": "3eef01906f3e0e2888d9d9732c78308aa5eeb38d82628cfa7ea74194868dd890",
+    "crates/a11y/src/headings.rs": "e45e450495c9a3130ee80868e4833d9e79d1e5834793b0d7e52835e443453ed1",
+    "crates/a11y/src/lib.rs": "2632b709e3c5264ee2e805c95e5413dfb1e56a067f792c2b4673b74ebf69009a",
+    "crates/a11y/src/report.rs": "c36828c686830cf7a361067254e0c871369ec34f2004e403af22827e03bd444a",
+    "crates/a11y/src/structure.rs": "7d7be31c7fdde1590eefbf9366674f0b41bf15cda7a7ab642d3f02293aa72b4f",
+    "crates/a11y/src/tags.rs": "358b0bdd1f6218f3afa32ca22fcb9099eb74050fbe24f7c71d3319944a4c74a5",
+    "crates/a11y/src/tests.rs": "78604ae9435c46aeda8d2c9f722410c81e2c90fb8d49883363996522daa08745",
+    "crates/annot/Cargo.toml": "ec2891c2fffbd1694a806848a7d8053d66d4db57da9d2d40e057da0fc41abae8",
+    "crates/annot/README.md": "18acbe9e4374a65d38f014c22fdef98952aff4620d9db35193b6bbca55bdbb7d",
+    "crates/annot/src/appearance.rs": "2dd056be7e145c83fe8a60f3f97fd54fd18064bb1addbf3259c91244fdbe47a9",
+    "crates/annot/src/lib.rs": "09e90cff94682ea9dfedbdce07c2e7ee6db20e892e903f8b88dbc7ef6b65fa46",
+    "crates/annot/src/links.rs": "8424cba7ddbcae7c0286a2608a13dfaf781498792520c4fb2458abc040406fd0",
+    "crates/annot/src/tests.rs": "cee9129e5d8ba6c08b8da145223a5d8dae09a1d77067c8eaf70b26119177d624",
+    "crates/audit/Cargo.toml": "b1b506cf45bb5babcf4d33032a3756fce92a0ebb0c1b133b8d32562045e534bb",
+    "crates/audit/README.md": "5231ecfd5c9da3e0fa5f804ea8a6f6e24ae6aa3641f9e1514982056250d7f7a4",
+    "crates/audit/src/cover.rs": "96b972baed28989dfbe2373d7a4e409a0493d187b2755d9f51ef21b0bbbab055",
+    "crates/audit/src/lib.rs": "9d8761ca32e4a27b2aee186ebfdb049da80d31193a962b003995162488eced82",
+    "crates/audit/src/tests.rs": "44473ed67bb1d5c2c45f0299043eaad1a94db5bcb51c693538a7f8686779ae82",
+    "crates/automation/Cargo.toml": "0cea5f863d2415122451f22c90ae3556b8ab5be473c95d198151a531080393b9",
+    "crates/automation/README.md": "117d30b14920a1b429c0ef32d1e68c2b8c9bde625d5b010b00097112f633267f",
+    "crates/automation/src/a11y.rs": "6024ce74969417f980e50d35b08880b12e26585c8a53b82eae38b290e7fc7b08",
+    "crates/automation/src/batch.rs": "6af9c959f2c29851d0aca5a10d62ca62f8105a44a547743a0f7e5cc291a74ba9",
+    "crates/automation/src/comments.rs": "539dd8c1d13332145895a78430ee4df7e4ac153360b707e5d655f85aee5e35a9",
+    "crates/automation/src/content.rs": "341f71afef34c9e8f0d3ed7be2d22adb26590f777e3af05e5b9c6f7eb9eb9d2e",
+    "crates/automation/src/conventions.rs": "8a205a91dc4bf24b35bcfddbcd4418dafa3a0badf456087b480d82e39aeff2d8",
+    "crates/automation/src/forms.rs": "9ef3522eb90ab267ba8f2837bd67b368f7916dce889d036156a867c2954c3a44",
+    "crates/automation/src/lib.rs": "7f5522eabe4fcd62d947fac99cf32601cd70a022d0622540f0185fe064b6b390",
+    "crates/automation/src/links.rs": "863e03c68f6873549659cdd9a79e6aecfaa54872ea88dbdd69050bec1fae5297",
+    "crates/automation/src/mcp.rs": "30dc25a6eada3bfdf75d97391ba0572ef51dc4951668d2d338d383e6c72abcdf",
+    "crates/automation/src/measure.rs": "4b8eff8e97151cc7e07ad259f2d5ad3d309e9ac95f5216a3abf5bb6af8fc903d",
+    "crates/automation/src/printing.rs": "43ee37de0a9482b43c5f1549c4c33cb4f6aa0827822690c6af23c360436e685c",
+    "crates/automation/src/reading.rs": "eb5327897e1e9fd30e276b77f0c811bf2ad019d2bfe73abe0ec525599a20be2a",
+    "crates/automation/src/redact.rs": "cc33d1b98e4986f3ac9e9ba5b4255ee522f63ecc3f33c2fd0c64d49f2a16d92f",
+    "crates/automation/src/signing.rs": "33f1a0045d936afcfc053d6365211d2c83e55b8b25f5aba53b3e27c8ca7ad18a",
+    "crates/automation/src/text_cache.rs": "c2f509f390c1ba6ffa059bb850a388a55deeee7844d53620dfb54d528834b0db",
+    "crates/automation/src/tools.rs": "bfc4851a10bc351dc92cfba4d68faf8b3a64864dd5e6e3314c72d545ae91ecfe",
+    "crates/automation/tests/automation.rs": "3d26e39427f14bfd73ffb63e808a8b39920be89bf94a0ede4ecf6af8ab51a0b4",
+    "crates/automation/tests/batch.rs": "500b27cd2215517784c070f79122f440bf0a6f30c6ba6469981e7292dd490063",
+    "crates/automation/tests/form_bulk.rs": "3fdc76891e72d255dc994b12c94acac29daa8f2a05f055dc3bfecb7152253cee",
+    "crates/automation/tests/hostile_args.rs": "aa84ca02c4d768a7702e843df3ad9d567dfcaae17c4b17e82c983be576c71c9e",
+    "crates/compare/Cargo.toml": "52948abadb7b73b58b387349e51c88e2379fae418f4e5ed7894d257a5fc9b1be",
+    "crates/compare/src/lib.rs": "7a797cc8eda74e143d5c966917d0274e5b941448bf92ed884beba9b657c7cc96",
+    "crates/content/Cargo.toml": "caf220c2230d07cd0ebcfe54cc294a80c68be3aaf50893e266b7ea4f7c1c5e37",
+    "crates/content/README.md": "726785efa65ae5da39d23279e8c40031138e7e74d62032fd244610e804261897",
+    "crates/content/src/lib.rs": "a9ab3dbea5755460dcb2f54e207bb05d8f893feb00ae30699ec1fd37f8295d93",
+    "crates/content/src/tests.rs": "6c3e65245cd1e79a8b9e59e343175a5225a004c5c5ff281afaa7d8284fefb9af",
+    "crates/cos/Cargo.toml": "e4a59442b1f329944a7fa764c311fefe9799f28fa01e931d4de1caa9f64a15e8",
+    "crates/cos/README.md": "536f7f5c762b979771eb328c74edb3dd5886f334a41614c48116775a7f18a9f5",
+    "crates/cos/examples/cosinfo.rs": "6a85f31baae4f8634f63bd0224e8e8bad3d738658419a7bf205a0e64a498fa1d",
+    "crates/cos/examples/protect.rs": "42131a778e5a512eb7dc045786c57009da1993f8944488c9308bbf8f8e8ee238",
+    "crates/cos/src/bytes.rs": "01555b52dbfbafd4e367ae3d256c82617b758a55fa3f5fc6fb5063dcc9e4262d",
+    "crates/cos/src/document.rs": "866638e1ed17222c21b5cbc1eef20f3a03db98a2e08744830847e96702bdb569",
+    "crates/cos/src/lib.rs": "679de59b7a175a614470fa5cbace43c3400781cf4a39201f2217edf7a2611ad2",
+    "crates/cos/src/object.rs": "ebcf96f6c68d0889dbc897a363b3539fc996b60198f3e67ef280a7d6695fe409",
+    "crates/cos/src/page_labels.rs": "9bfc72cd2da16f47beae09cae6c011a6b828d623feed5125f607f15a759e58b2",
+    "crates/cos/src/parser.rs": "4887fbf8eecd8f40174cc0aa653db62730bdc4b670bf5a50e9f6f97932e15208",
+    "crates/cos/src/security.rs": "413f75d9b324fa710481f59db0718742d083bb878618f1bb144df65c4fbd4fb5",
+    "crates/cos/src/writer.rs": "d0c22ecd212a97a161d2dc912c33119951a4a6e8ebe1f456053e61e53aa905e6",
+    "crates/cos/tests/bounded_writer.rs": "57c37589094785850069983630c2502979641c232a6b5eff04e8b8082dd35506",
+    "crates/cos/tests/corpus.rs": "835db1a0f709fb5d6f01c5cd7be4a565e72c8bb3bc0384577b1dc45ea8f85e92",
+    "crates/cos/tests/encryption.rs": "47e20d68971876e4125db8fbd76f0440a9db6ec9d0c4020c3c01895a3c664ca8",
+    "crates/cos/tests/shared_streams.rs": "c0d9acf69f873387315390a537855b2c2321b69085c4b2a9e5f55932144e9412",
+    "crates/cos/tests/writer.rs": "0a1c1e35985caed8740461b371dbee06a5b7b2ff49d5f7783ad51dc5536fecfa",
+    "crates/create/Cargo.toml": "b2f78184d7a05dc4648658de809b262791e1296c8274f1ba9cc903a7efbc4e6d",
+    "crates/create/README.md": "6bd033876683ff1ce15554c90da2011771177eed48a6c49dca1bfd37c1718015",
+    "crates/create/src/extract.rs": "979f3a6a86727cd437d9d90fe3d02b049eedce5bab9bfc722b7217b24ffa2f86",
+    "crates/create/src/lib.rs": "c828e570d51c43f641b7aaa508a883d86f96524fd381a830e774eded8223eb27",
+    "crates/create/src/tests.rs": "c3426c84dda76a9bd06d7b3015aa3e0ee04a88dec8e9544d2e69fadfd1f58935",
+    "crates/crypt/Cargo.toml": "df7f69cdd35e6b4a6f956cf4a6a3bbfaa157558cb588955502764c03abc2c87c",
+    "crates/crypt/src/aes_cbc.rs": "459d1558b9c7964debec5a19d282cb6bb3e18fdf2cb904154c12f0eb90fc4dd1",
+    "crates/crypt/src/lib.rs": "47e946a5ad984b8de8d8d0f81c297fe28c389cd472e366dcd07a049c29265492",
+    "crates/crypt/src/rc4.rs": "fe2a980f40ea0c46bf2e915e8a2ca843a8277a52e8192800b8f1b427cbc62eb8",
+    "crates/crypt/src/tests.rs": "dccaab5a5e91de3b05c61d9716140efc8ec358b291d701833ef13a1339d9771a",
+    "crates/edit/Cargo.toml": "9e1b7948c711e736ef617bcb3fdf7c86a607b8ed39153514b47849a88189d2ba",
+    "crates/edit/src/added/arabic_tests.rs": "f4ca919a464c0afba52c025a1590eb36b77aa47d6d43e938a64e200f6e3bae43",
+    "crates/edit/src/added.rs": "edff76cfb35fbee52a00cb5658016a1e5a72da9b8d7d6a75ea88646060135578",
+    "crates/edit/src/bidi.rs": "914cebd6d04dc175cb22e411585674e59e0ccaba77e34641b06ce773e237f1fa",
+    "crates/edit/src/flatten.rs": "9d92cf8ccb02cb84be9ad36800dda616f4e326cbf280b491265a4c59b076488d",
+    "crates/edit/src/images.rs": "ead4e3b138781da633c659ddc46b27a431696ec2abef78c671cb55428c5adfe1",
+    "crates/edit/src/indic.rs": "e50eff1c0cc268406ffaa16751ab5e84bcbcc1f79c45eb3407df202065a17f86",
+    "crates/edit/src/lib.rs": "e3a00a6e41b2f3bb0d71400437cf0b8498e35491815a2e7432cccbcec78970d0",
+    "crates/edit/src/objects.rs": "efa4c790952ed7059710c5f25626cf59243ba8799237f00e54287f732306b912",
+    "crates/edit/src/tests.rs": "faf0b0b0cfa95d3746d7a9b8d0cbbcbed30c9c6be3bf94add0cf6ac23826104c",
+    "crates/edit/src/text.rs": "0a2d1fa51b79fdfbde9f2bb9fed0e81506170815d96d559d27f0e39382c30804",
+    "crates/edit/src/text_regions.rs": "32da4153d5a4acacf998abf6c528e779e84880f8641849497af8237effa36b76",
+    "crates/engine/Cargo.toml": "6011017a333f0720dc29622136f0d4605608abdb9cbd3f63dc4d9d4bd4ec3e32",
+    "crates/engine/README.md": "40388f567f4a6f221c7fcf11fd671e3a3901bfb98f3fda093d780260880f81fb",
+    "crates/engine/src/actions.rs": "44a14601acd58dbf2122e51d2bfe8e721812386519f5635577bdf1a45d4f5100",
+    "crates/engine/src/autotag.rs": "96c402acbf2518ca47ae089c7d4776b64fe0907947afa3baa401a63a9b7eaf74",
+    "crates/engine/src/build_info.rs": "4ef631f0f69ad12dc29e3323721b1959af87c3d01497b66f2999a57ba1d0c93d",
+    "crates/engine/src/camera.rs": "493c479564749080bf56a34da1b1bbde72f7518e4571f01cfb08377438cea6c8",
+    "crates/engine/src/camera_clean.rs": "320ba1b664e25232078b396b9b6340d5be7b4ea5f53b07acf7b5479d20a93ccd",
+    "crates/engine/src/camera_edges.rs": "c232bc53561b1de5450efeb2eb0ca4403275a3ebd4a418f790b821a6cb357c1b",
+    "crates/engine/src/catalog.rs": "55008f54da4afff1600dbfb0c630afdba691133857883d478fd67685f5de4aa7",
+    "crates/engine/src/commands.rs": "e99e9c0d201f66b3b1d2390c165b87eb4a9079f930d12a1ab680aba364b8d690",
+    "crates/engine/src/compare.rs": "a76ed32e18934b4eec08cc6c88a918f7f21d7ecc7bce1e1b3e1dd1a16b44dac4",
+    "crates/engine/src/copy_image.rs": "ee4bfc1ae7c32ad59762eb88ae4251a6d48dcf27dee5003c38178b4efb22edfa",
+    "crates/engine/src/dates.rs": "d4d678f50480bbca4f85731b748a627057aefa474f88aa3fb1780b86fab0d9b4",
+    "crates/engine/src/export.rs": "fb9a63f07c30bd7e4e413718a1bde184bc6a45d9f2af90063e088d69c4b8d70a",
+    "crates/engine/src/js.rs": "c3245c7d84afb4d0137ff7434fe95465c5694c1bc989a0272c3b2f9c2eac46bb",
+    "crates/engine/src/lib.rs": "7a9de52d739d7492f35494cb3e03951489c95feb86b13c8a9429e60be318c15a",
+    "crates/engine/src/links.rs": "3e872d1cab6c6255dbbd496512009162f7faeecb41fcabe89b2fcbe18049b398",
+    "crates/engine/src/ocr.rs": "45bc34bea7827deb910b4723de46e6373ea89d8a6c45cd77733e390c57bf4663",
+    "crates/engine/src/optimizer.rs": "d11d98fe5084968d7ed854cb56d0550c14e5d0e0e7482f1686c111e363dcab54",
+    "crates/engine/src/printcheck.rs": "bc6729e7aba25c5ab72aee0459a394e1439cb095fad514cc2f44318beb680c9c",
+    "crates/engine/src/scan_colours.rs": "858ce96d5fa92af8a4cd1b0afbd3d45838e562b2cebfc8f16d791dc4c1b20bbb",
+    "crates/engine/src/signature_image.rs": "d2e276877687f503376c75d99af24abeff20de4725569e5a6cf05dc6f283ca43",
+    "crates/engine/src/signature_scan.rs": "71b186b09350be50f3ac5ffc3e5e54174e60c6f6bb8bb5148ca31b8162fce7e4",
+    "crates/engine/src/tests.rs": "94fff44928fb2c01ee417593e5e6be494cbb5fe688d1c5cd4d57a424d16f79ef",
+    "crates/engine/src/text_fonts.rs": "38306c168e46ed5b9baae019b1ff2ca889633d21c6ae835b188654876797a7e9",
+    "crates/engine/src/text_preview.rs": "915281fcd326653792d7d618c29e272c3b69800811a85cc3e7f0cc5906dfb200",
+    "crates/engine/src/upright_image.rs": "d6a4b6640dc79ea6e48f485c6e28d1add207c989f16ccbb0f57eac3b30ece5dd",
+    "crates/engine/src/xfa.rs": "144266b5efcecdf3845afbed3f69bc9e48c7cf511a73896f40bdce40709abc97",
+    "crates/engine/tests/document_fonts.rs": "2ad373c0edd211cfba82583b0f931e6278cc92666f0b2b28872427ef7e69d8e0",
+    "crates/engine/tests/form_rotation.rs": "cccb82b1ed96f5c8e38c8e76f7fd804a6f3801b96a88878fb33d973f8d0274b2",
+    "crates/engine/tests/ocr_edit.rs": "3ae24f5a6d4640975b1b696821b191dc2a18a345e2ba9e8a27ab922a7d93bed5",
+    "crates/engine/tests/private_image_resize.rs": "86a2a15bac528842ed87904e58dea95278dbb3523da6c9aa7a6ecd10c18c10f2",
+    "crates/engine/tests/private_text_glyphs.rs": "8d52b3602095ae39f7c7f59f8c72dba296910fd4516e7afec67e2bdae3c81f15",
+    "crates/engine/tests/support/font_fixture.rs": "7849e067f15cf5f668aa93f9189b37d59b0498d74a5b8ee2339a8117ae34ef9c",
+    "crates/export/Cargo.toml": "1cf7382538b623e4f33445657329d1121c8b4070274d05b81f8f23a93443e9c9",
+    "crates/export/src/lib.rs": "45f7ef788ecb3818f689d26a39be016b303719360dda32fd957259a34c3d5572",
+    "crates/export/src/pptx.rs": "d5933e809301d824b6d85130c38a87dbf27ad7fe27c7f7eba4a2a7c78219ef98",
+    "crates/export/src/zip.rs": "8b9a6eeec65b5576cc4e5dd65094d93d270d9945dcd545950468cb58573734b3",
+    "crates/filters/Cargo.toml": "949c655338256330fd9ed81e56c20938050f8bbff56bd5be9d92955ea27e70bf",
+    "crates/filters/README.md": "220616295ddeafa6d4f01a91e22e16a728094fbcce66acc6ebfd403a348b1b28",
+    "crates/filters/fuzz/.gitignore": "f70e1c78716e7ef6c4211d6ca9a4c4e6847314662fc8786b16156e3e94f9f99d",
+    "crates/filters/fuzz/Cargo.toml": "35934e19270c221abcda33373eeec86ec9cd51e2815f4ca3803ff63faf75e01e",
+    "crates/filters/fuzz/fuzz_targets/decode.rs": "661c478d83575c758b7d6da46dd40d35ad3deabeffba26f15f8ae2a3149bce2c",
+    "crates/filters/src/ascii85.rs": "0ed5ca4c28d42b34c13c005d2ee8b29d9d69c6e598943044ae34c2b129005429",
+    "crates/filters/src/asciihex.rs": "64645ec8619a32b631f7ad0f84565b63fe09bddae9ba468ea25d5f5929264c92",
+    "crates/filters/src/flate.rs": "6b23a0bb3131c84bbca12fe5ea3054203c3aec99619ce425d50cd2b9188e0077",
+    "crates/filters/src/lib.rs": "3457a1d2f8ada68c13ec671dd6a3ef258150e4fa819474a8e61bd0204ecd9462",
+    "crates/filters/src/lzw.rs": "ec7fdc87aa8712fce2525d0b7d069909072c8d0285cba4f689e10e42ad8f1f1f",
+    "crates/filters/src/predictor.rs": "7f52da2fc29adacc98cb3c08d48e3855a27c0ebefb7eb26b248a5d4d9a67633b",
+    "crates/filters/src/runlength.rs": "052b4aa6003ade7905b80edbdaef868cf510c816297e72be0ac985f8046516d6",
+    "crates/filters/tests/proptests.proptest-regressions": "959cc6b57deafd7a05014c2c93094cf7898ca3a779ae80c0832f0eaed0b0aa42",
+    "crates/filters/tests/proptests.rs": "ed4cfafdcd6b5d0de53fa2773b6a8a8edd29eb52dd98e8f481010f6c13a3e5c7",
+    "crates/fonts/Cargo.toml": "15b9e81dbd05494b67156fb5815f0bbf8e53509cb62a3054fe56e48e9af077d1",
+    "crates/fonts/README.md": "2cbb68284586ad57c20a35b064f83c5161a0c68a1de6cd3568d75a793591bad4",
+    "crates/fonts/build.rs": "2d18b487f3d3a38da582dece6029039b54e0c64de7d619395151451470ff5ca5",
+    "crates/fonts/src/craft.rs": "aa40ce727a600ea8b9f4ca1ceccea110ac198d1cb6d6b92d043f6ba69ca22836",
+    "crates/fonts/src/embedding.rs": "91c64e5802b9e0778c97f47485a70d89a35b5599fe006a53df33cd06668f8493",
+    "crates/fonts/src/encodings.rs": "97e331eafc42d0f55023d1eff98926bb75371ba34ada64794c2f3040b382f776",
+    "crates/fonts/src/fallback.rs": "bca929d85bc884d457309fed690cec043caa76b79c7ac95ce84f1a86c0201ddf",
+    "crates/fonts/src/lib.rs": "bf1c3a70c447651e0438ca0823f8a4d639f93ccce251f78a40e6cb8009012d43",
+    "crates/fonts/src/pdf.rs": "6f1e5d93ec8f5df119b1e1317754c7b6c240e2c3653c2b73fd6d241bfcb914a6",
+    "crates/fonts/src/script.rs": "86e550daa0b7c5c52b4761acb25ad5fa18c3179efce852bd6911d76be0afabbc",
+    "crates/fonts/src/shaping.rs": "16158f128660f9ddfac2d98af6d85f64c69e1d013932ca9e7260d9f5e529080f",
+    "crates/fonts/src/source_shaping.rs": "9a719273c2e2b3cea8e3510f767b7db7ecab9b403bb6888f088465f87dc0c2f8",
+    "crates/fonts/src/std14.rs": "8bdb11699abe7b95b6cb244080ba8eed0a0b00ce714d11c8cbdbbdb4d0ab26aa",
+    "crates/fonts/src/std14_metrics.rs": "f225e0b044875b8fa6375b6b5ad935f0d99fcc1ad03ecf9f0baae2cedbfca4d2",
+    "crates/forms/Cargo.toml": "fd7a103270e4cc81811182daac54cc0b578aafc137481b2a3fdc6e646c75ddd0",
+    "crates/forms/README.md": "b4f585bd879fb3e5440812b300e383246eec20b36375fe5f3efd3f38dc700b0c",
+    "crates/forms/src/actions.rs": "41371b4eb2f2ab3e7659f2b9766931a87eb9a13d047f7c31d3968e90adffc6ea",
+    "crates/forms/src/af.rs": "af4e8a41a03bf561f956be6d1e8678b397173e9becf7ea6d030bb577631b256d",
+    "crates/forms/src/appearance.rs": "a085cb867bb1c0566db7bf6dcd1bf1cc54e36147f989e456b41e9e3756263518",
+    "crates/forms/src/author.rs": "56d00cf5cc6fbbd856e2f356cf827ed648a94fcb8d9e86d6194ca83fcf9a160d",
+    "crates/forms/src/detect.rs": "8436084d25e43994922c70513932997843562cfdabf2baf7bc817482cdc83f5c",
+    "crates/forms/src/lib.rs": "8015c07366cf941cb38d2c1ebe483ac1d9420c983c76bb95a25471d1dedf6a5b",
+    "crates/forms/src/scripting.rs": "7f5e8ab0441c0e171ddc3afe778699b428fc30970b5d813c22adac3a94c04fe5",
+    "crates/forms/src/tests.rs": "b7f2389adbd897033ec7f89544dc752e176b9bfb0344476bf407d31fe520730f",
+    "crates/geom/Cargo.toml": "de5ff455324a829671fc4ccfc1e18b80c92e7352f45f3baf05fa5019971666dd",
+    "crates/geom/src/lib.rs": "c18a2b430bb12beb426dbc4e4c8e049cbb63e2835198711a4f9300cacd387f23",
+    "crates/geom/src/perspective.rs": "9762fc023cc123f6dd5cee83231611ff39d866c9502cbd657690559442b38818",
+    "crates/js/Cargo.toml": "00b31a9abb64600e9427b3be7ae54b03753ad64a23f709aefa9c8e00503d5c8f",
+    "crates/js/src/formcalc.rs": "e6d7ab6781aa111167c8f6d8b95b0b7411776e8857cb830445b17b4a3ef00655",
+    "crates/js/src/lib.rs": "94da149b8d63153a902671f2a877954c40cd8e82dce572fd711897aa859e30a8",
+    "crates/js/src/tests.rs": "7d6c8cb92c1b3086325d570f8c92f7b22227ae464d530e035fd56cfe1ba182f9",
+    "crates/js/src/xfa.rs": "7bd528ba769d09c7362303834778054012433d44c38453f24b1a98b9aea53934",
+    "crates/js/src/xfa_session.rs": "6617ced4f6f6605de3d7c25c99b09c8e949142a36799512f6f76fec4a6b13038",
+    "crates/measure/Cargo.toml": "6912bce534ec1e95c72b83a9b5f51aef30a14cf1f5d2973bf44698d9d87d5f4c",
+    "crates/measure/README.md": "226a01e1bd6f30e0ea6a9d31bb8dc922854ac842862819bd35e8eeaee6d39491",
+    "crates/measure/src/lib.rs": "021cea24e78bda90a02dd492621fd846a2538ebb9213b167adaf222922840a61",
+    "crates/measure/src/snap.rs": "0cfbbeb5ab5d25aade3389219735546e68cf5360e6948e76c38d20fa73b53125",
+    "crates/measure/src/tests.rs": "9988a36d269028c4c3d830defcb5e2969e8c052e9b6802259531e75f19d85825",
+    "crates/measure/tests/snap_property.rs": "8dbbfb7b9ad0b8c6b5d9d7a7817e81667d05dd8b0aabe3484bcf57c74f31ef2f",
+    "crates/model/Cargo.toml": "c6371c4f93444615f4b3437c01ee4664333f56cbc83c475aade3fac9788c46a1",
+    "crates/model/README.md": "46b238d4b6cbf06fa3418226b66f0b4c0d0d6d3ae1a27a9f3ad1640ff997ec46",
+    "crates/model/src/lib.rs": "1f515eaf90dd4ce45d82b9da17f9db5050c70c035836cfb8adcfe972fb93acd0",
+    "crates/ocr/Cargo.toml": "1dbad72047c515b3b430b6ffb9995121da4a1015c39a51f2db43d515b483f60b",
+    "crates/ocr/src/lib.rs": "d25a235883fe9dbe1b3ffd46feeb98b0b5dbcb2183f8d9a8d9d677b2e3ad1f1d",
+    "crates/optimize/Cargo.toml": "f74e741b306ea52ba62b513ee4dbfbec4a0b04cf4820b1287d945b80e4d6203d",
+    "crates/optimize/README.md": "08ffc51359e2ae28331eea52673a6705bf0e99f683da89ae1c01cf33be6b67fd",
+    "crates/optimize/src/audit.rs": "4d84fe7bca406f469f848bfac4ea18e102ed2e03b681335afc0cddc35f54baf8",
+    "crates/optimize/src/images.rs": "deba94e616bcd64bfa5fa261bc76831e15bb3904742e8a29f05ed91005e2811e",
+    "crates/optimize/src/lib.rs": "82e129a62bc0edd7b33cdbc897e535ec8e847866b4953e40fc43552f38a06fba",
+    "crates/optimize/src/links.rs": "2ebfb74dd6a218ccc9ccc846fa9fe39766dca11b55dc890945ec8628579686f9",
+    "crates/optimize/src/unused.rs": "37003d80145d63faf6bc064d2e16b7bf7b095d41c5079f670c105b7f04ce7fe1",
+    "crates/optimize/tests/optimize.rs": "11384ab066127a9f1ceeda6f208f1af3c33292d126ac2aed076f66aa8de67e83",
+    "crates/organize/Cargo.toml": "78d072fe81c0bea6ef56f88ad32fa7653961756f66aa76f167ee4b42233d88d3",
+    "crates/organize/src/boxes.rs": "bd8ce685d67c1261ee7ebe66f4344b66723fa7e69335296eca0c8c316d2a18ac",
+    "crates/organize/src/dedupe.rs": "9f4d3e3e7595523bb85ea9d1cb5b35b70f916de63bd4f405296a34f2702e6e2f",
+    "crates/organize/src/import.rs": "2edefbe0c1fde90d018ee5e8d941f0f802f1553f656675bb05771362aed32ec0",
+    "crates/organize/src/labels.rs": "53faca87adbdfa16595c7a70207fcea94322be84abe8c00d92a0d41017216e1f",
+    "crates/organize/src/lib.rs": "8c7bf9f169ba20a03417e5d7745afb104d67f1b9d479ca6195eb1ebfa5c9e82c",
+    "crates/organize/src/outline.rs": "a09d8b6df8b60cd979598dcd457a19b8e799b84b0453b8810936700665288edc",
+    "crates/organize/src/pdfx.rs": "86f9d92a5e2c98486b1bd9e89d7452bbe8efe1bd87ba3592ab9546108542dd7f",
+    "crates/organize/src/prune.rs": "08b13e10b75c12a5a9288962534795e4c65852caedc5c5dc41df5d9e057b7681",
+    "crates/organize/src/tests.rs": "2b9d16a4a30c50199fb13c08e980e42932be24a32bb176ff20b5a0565920435e",
+    "crates/organize/src/view.rs": "d2984a91673ff560b9dd470bb2793a72a170f7589fde5010af1ffa19358c9a4a",
+    "crates/organize/src/xmp.rs": "b4a2f7665d26410767c2444c0eb61960374d0a7293c40be890b6f0e552d43d2d",
+    "crates/platform/Cargo.toml": "041a643986458951789e57289e6d6ab98378dccd95789f52eeddcec6e6de972b",
+    "crates/platform/README.md": "9087fe55fe040d9d76a8a8b3fda4d4f5c69cc060b8912d494955f98ab590a078",
+    "crates/platform/src/desktop_theme.rs": "b0ba9586d0e32cc6be03c57512f89c15c9de486f0c7ff0b4130b1f21642d3aed",
+    "crates/platform/src/lib.rs": "1eabafa675e0d1f50bdf197f175d4f8098f8929c8b4cc891a63a50c4dcc5c7de",
+    "crates/platform/src/staging.rs": "847f0780168cc0395c9ea4471e4fefa0ee0bd9e9b2bf3b901f7805cbc4acdbab",
+    "crates/preflight/Cargo.toml": "cb9f69708597aece78069eba26d428ee113a5b61b18b858098800591bd225089",
+    "crates/preflight/src/icc.rs": "965d4714d20b113a759035d2e496939fe7b9bac2e37ba08c0cea231501a689f7",
+    "crates/preflight/src/lib.rs": "b15b1fca59398551007bbeb432307510f8cbf1415695ddc00ca065ec7350dbe4",
+    "crates/preflight/src/tests.rs": "2840a45aebcedd10fcee889630f8a566a8fafab3f3ef8f840398e622a04c5634",
+    "crates/preflight/src/xmp.rs": "df6087a91c6bb193fd572c7c0d841540b21dd498ed98baeff5bd8eacf97786c8",
+    "crates/print/Cargo.toml": "b7525a42e48cbc4fa0ffd8a598be3d04c929755ed5579eab6d4d43e8da84d05f",
+    "crates/print/README.md": "b7026b5d2c8d450af97681a8126f1b43e5c2c271ceb177794f7c23eb25464914",
+    "crates/print/src/lib.rs": "114ca2a5a1465a96fb507f1e2592d64813f3b5a1241c3e6ac887ec1960f0072e",
+    "crates/print/src/range.rs": "44b0e5476908ff269adc0132629fb6e3264b34de38d13a4766924b09d6e41f72",
+    "crates/print/src/spool.rs": "4c7f2f85c6f10159033b6b59b8466c0926db2609abdcb347c5524ada1719514a",
+    "crates/print/src/tests.rs": "4abdb18be1061794421ead9306237a046310332df628cd33507dd49e4ac3e22e",
+    "crates/redact/Cargo.toml": "6661d057970bb1d8d7b4f61506541a87b3052b11c0350d6d0ea70752e3be2478",
+    "crates/redact/README.md": "0cde87343317093d0bbd2bcd785daa791451b05cf4a6287812860cac9e1b4537",
+    "crates/redact/src/codes.rs": "1085c8f5e6a31aea00bb58cf32c00ce32a37d0db92021ca0ce085450a8c7a89b",
+    "crates/redact/src/image.rs": "dcf7f8d5fab7c7472cdb0f537eb8ac6824c39c169f21edad5e1371016a940b87",
+    "crates/redact/src/interp.rs": "310de2b58e3c6d26aba07feb363a436646d24fcff923334f0b69e84d22ada69f",
+    "crates/redact/src/lib.rs": "41753b2c016415cb2148f0adaffb50b685235105f28d1d7c49dfa7ed97357e4b",
+    "crates/redact/src/patterns.rs": "b0f84f2217935b3065f1487dbd02fdcf3a20690d0b380ee8e8dcebe9c32c7000",
+    "crates/redact/src/sanitize.rs": "5eda825785261388c396bf66ebeede0efc20bd1754832c08b9a8764ac69a31e9",
+    "crates/redact/src/tags.rs": "ebbceaf4c2a8a5b9cc0654d98e0019f9e8e9658e83ef001facedbddf104dc90f",
+    "crates/redact/src/tests.rs": "c4e077869ef93da696a78a2a0f8c635f9c130d3b91d0b65993c9d4cf074c96db",
+    "crates/render/Cargo.toml": "78c39bc98d825a5e201a7ef79aa86e7eae813ae6a2b17aee078593f66e7665fa",
+    "crates/render/src/inspect.rs": "1c3af377f4e869b2b9c9420639e2bc6bd5fb98d67912f1cc7509221b7d318941",
+    "crates/render/src/lab_bradford_tests.rs": "f321ee8b6d4e8668c096761495bbfc0b89e663d9d28284ccbfa961c0d87e8a0c",
+    "crates/render/src/lib.rs": "2644d8dc1835944ed8bf2076d0517542432645332cd6f608eba5b5af2f43c122",
+    "crates/render/src/pixels.rs": "eca4d09ac2f0355e8f40589f9f8b53e572285abec0a53133cfea1df9ce254b18",
+    "crates/render/src/raster/work_queue.rs": "e2115dec76ef1eddec92203da4819e5bda0ad3867624824c6f203bd246d3c2d3",
+    "crates/render/src/raster.rs": "fafded000827903be9ea8f3dd9b96fb87289afbaf435a5239e85fbfcbb422aba",
+    "crates/render/src/reading.rs": "983581b564140fc3809476d360543c266a332fefaa76c1fecda25be44c32ba30",
+    "crates/render/src/structure.rs": "655f3354b6a5f8c28374ac7fffb7b638d025e09425935dd93c657f0784520625",
+    "crates/render/src/text.rs": "e7578271e9a16530fd4ff3c1debc7814265126539d1c1ec8d9c24f1dbfd81bea",
+    "crates/sign/Cargo.toml": "299f3ec259ad32c4fe9ceea47ac413beacdaa9971dd6db39a90a64b1a3adc50e",
+    "crates/sign/README.md": "b2e3f29c93ec12347ed90b275d26dbf9380cd91c3cd050d529ad8dd92d237a95",
+    "crates/sign/src/cms.rs": "237da34622546580f6e9e96b06c740dd4251ca60487c858a9382b7bc7788fe71",
+    "crates/sign/src/der.rs": "2bdfa7f7518787717aba3a8e4635ff6910e71deb286212079098ebb5750c28a4",
+    "crates/sign/src/dss.rs": "8e22597bb117efd471a346d1fbfbc6bc2abd3ba1561e7d8389072cc4ccc2edb8",
+    "crates/sign/src/ec512.rs": "b4af14fdf9297b40515574a48ea601b25af097966871d09d4b52f04857675940",
+    "crates/sign/src/graphic.rs": "d614e65f4432500ceba70d485fb343d78f6726f2cfebcbdd51d06db44ecace8c",
+    "crates/sign/src/keychain.rs": "4bb8d73d9903affb57303601d8735132a031c398fece65f380cf5098f00ebd7e",
+    "crates/sign/src/keys.rs": "a44f672a909fbb98cfdef78c0bf719cfdf1aaa5f6ee2fcb0bc363e3ad1ac8bc5",
+    "crates/sign/src/lib.rs": "5a7cd2f53c1668b31ba5b9fb7ee66c0889f89960092bd284e48fe987fa60add5",
+    "crates/sign/src/pdf.rs": "02638a120663a9f91f069870cbfd608e722ca088afa2cbcc5e9cb43bd926bc5b",
+    "crates/sign/src/pdf_discovery_tests.rs": "ebeb3c4f7b406340afda67841d630d476f22e1908ef36ffcb92ef752b5a30351",
+    "crates/sign/src/pkcs12.rs": "414ed869a64f82e90343c7a8f8f1e5224d3f9407072ed9498aa4c4629c987382",
+    "crates/sign/src/revocation.rs": "c4ecd47d5fdb75fd654db03ff32b1e16cf970492986d1b13cf63feda1ec3d5b3",
+    "crates/sign/src/rsa_pad.rs": "e803ff49bcf6f6c4543e73ee11fc80594c039ea79a65fd85a8742c1c6542b4c7",
+    "crates/sign/src/timestamp.rs": "440f9c432cfce8b2d4784bfadc04f0b97f7ce9c85a0f2f2f66c21ea995fe80c8",
+    "crates/sign/src/windows.rs": "888601e2a205bc35adbfd4dad730ada8ea34e4646eb31e8c91ef3b1e210366bc",
+    "crates/sign/src/x509.rs": "a1f015bf734e98f6cd986597a7e8f8c0be826efd195fb96eb92c2480e085e72c",
+    "crates/sign/tests/algorithms.rs": "9d7b9e5a94d50e0ed9e32c97aa1319c5efbc524b2ca81a8c0eeb166ef4936800",
+    "crates/sign/tests/ber.rs": "bc027b7e9eea44d925d990acc1dccdd6a1abfa4d2ce61385d9a9cc3487821396",
+    "crates/sign/tests/chain.rs": "974f1f5d62d42e6cbac2a3c9aae6d97908984ce00e7585ad194759efb27a5fcd",
+    "crates/sign/tests/crypto.rs": "66ef071b73b97ecfd11d1d32b23218b2a2374a264b5689db15b959cfdad656d6",
+    "crates/sign/tests/data/README.md": "1b572830fa5243c8dafbfdcb515fc15dcda0d81bac5d14bb732f7832a21d592a",
+    "crates/sign/tests/data/ca.crt.pem": "66e6e48bb904c73d6a98a0bd5a1c94a04caad2869f72e0f9ad2e63bea79171b8",
+    "crates/sign/tests/data/chain.p12": "ee84857631866918d90e9352c071c91e17181e9a3235d147d0a4e54f26820a10",
+    "crates/sign/tests/data/ec-legacy.p12": "47de17ef0f8fac5b02080d3e5a917cbdd6f6f8b1af43b3fb498f312800a1fd7a",
+    "crates/sign/tests/data/ec-p256.p12": "fbaad3e004e19d86f44d4446e99d885402ea865beb6d0c55bbf8dcb2719da1c0",
+    "crates/sign/tests/data/ec-p384.p12": "e50b2c9f59bca47525ae0c4d87000066e041341160e1189bb76c1cfb0816f0a5",
+    "crates/sign/tests/data/openssl-signed.pdf": "8b91c3b4e39c4a31717a0dd0685bd7d0468671df32aee5b9818d44dc72c2bc3c",
+    "crates/sign/tests/data/rsa-aes.p12": "67b64bd68ae331b176747747edf550d8c48514d4190202711edd53bbacd56d29",
+    "crates/sign/tests/data/rsa-legacy.p12": "b5350ec838e04b923de21f0c4e76b6072b9df15671c63e33a33973dcfabb1eb5",
+    "crates/sign/tests/data/rsa.crt.pem": "1612ef6d2e02861fda69c041cdf489376329870ae102cae8ff277e4be35af275",
+    "crates/sign/tests/data/x509-rsa-sha1.pdf": "b77bfb21166f4bd043597e45a1ea28b9d9f4ba6df0142b3a0fc8b7f8e0fc111b",
+    "crates/sign/tests/pdf.rs": "67d6000e151261545478e7723c39453dbb89b4f12cbe2400ed7810829b2e86fa",
+    "crates/sign/tests/store_keys.rs": "3d5fedc5b479f45f8caed0f31cafad6433213f4b5f40ed6db793fcaea5f5862f",
+    "crates/ui-egui/src/credits.rs": "6e8c0f9552c96ebf1176155910368d41e8870cff2dce709c45842947f960f003",
+    "crates/xfa/Cargo.toml": "393d2191f9ba241b6b0c1c3d71898bc4259354bc9486963305c414e84339f035",
+    "crates/xfa/README.md": "0a710cce06dc5b26f104659f3395f506af6d1f9a7dc63bfdc82da47cb7118e4e",
+    "crates/xfa/src/data.rs": "d6cb80f7c3a9f23bac50a2a79733d3de14db85ab1105bb4dc4e2bc008e8cf364",
+    "crates/xfa/src/fixtures.rs": "85e3eaeed45a86a0883a7c6152c8a216492064b35d477314ef52d5a098a62f80",
+    "crates/xfa/src/image.rs": "16e31aa35af1f29a7fa490c05f44ee28418538c51b847906f33e1c98c3f141e8",
+    "crates/xfa/src/layout.rs": "001d2c6a4955c829355de7ee3f1ae4ec0871e88e204f0c852383588270881027",
+    "crates/xfa/src/lib.rs": "ec7d8853c97136591ff1c6c903231855980c961e7cf66fc095e5cd6078d196c6",
+    "crates/xfa/src/model.rs": "b043451ab94fef5ba7f01be0ecf55d6a6290a3d31d6e2144f6f92c1b368dc675",
+    "crates/xfa/src/packets.rs": "fcc05da212f2d291d3fc751623b7f0399a9d1033a9a5048548a849747bff04b8",
+    "crates/xfa/src/parse.rs": "38448c594b39c86edc41184a5fd8cb709e09557d8d5df0f7a748fa002d746017",
+    "crates/xfa/src/pdf.rs": "9bd825800eaadc790a6415c42397c9c8b169f1a48419cfb4d8bb255051c30b3c",
+    "crates/xfa/src/script.rs": "d93e968a1112fdb1f83a2cd87b377632d34cd8a4fe668d5def20416163ea34cf",
+    "crates/xfa/src/tests.rs": "7afc12df85e8470aff8690b8b1e76369e76d36835ba33f439279e703d8b28e83",
+    "crates/xfa/src/text.rs": "8ed1f7d03737acca5800798dfdb53857a0defeb5b2e2c7b887d09eb46943bcf5",
+    "crates/xfdf/Cargo.toml": "a5b0c3117dbf931d78f268d4a483654ca33d1a94ed36ef6175db787f2c9a0342",
+    "crates/xfdf/README.md": "a29097a49777e0f29d6f0c2b56bfc0d51aba4450b081223103eebfe72b90644a",
+    "crates/xfdf/src/lib.rs": "ea3db87bc54bbfca42fd74c8cd4ea80401cd0879b3a2020127e87da02715298c",
+    "crates/xfdf/src/tests.rs": "cac0e523c64714f571dd1acc871a9afb7aa96333b1be673026910c9962b9d033",
+    "docs/contributors.md": "eea8a600aaac114282078ec9afddb9b1b9e60f6de1640dc1d9f885c68729c11f"
+  },
+  "removedTrademarkAssets": [
+    "docs/brand/artcraft-logo-white.png",
+    "docs/brand/artcraft-mark-black.png",
+    "docs/brand/artcraft-mark-black.svg",
+    "docs/brand/artcraft-logo-white.svg",
+    "docs/brand/artcraft-mark.svg",
+    "docs/brand/artcraft-logo.png",
+    "docs/brand/artcraft-logo.svg",
+    "docs/brand/artcraft-mark.png"
+  ]
+}

@@ -1,0 +1,960 @@
+{
+  "schema": 1,
+  "generatedAt": "2026-10-15T17:06:05.007254+00:00",
+  "validationScope": "Full immutable public source/font archive bytes checked and tar roots inspected without extraction. Not an application build or executable validation.",
+  "uniqueArchives": 17,
+  "sourceArchives": 13,
+  "fontArchives": 4,
+  "totalUniqueArchiveBytes": 250222163,
+  "archives": [
+    {
+      "kind": "source",
+      "repository": "storytold/photocraft",
+      "commit": "c699e3cda69f4852b43c0b191ab0091aaeff9d6a",
+      "tag": "v0.9.0",
+      "url": "https://codeload.github.com/storytold/photocraft/tar.gz/c699e3cda69f4852b43c0b191ab0091aaeff9d6a",
+      "root": "photocraft-c699e3cda69f4852b43c0b191ab0091aaeff9d6a",
+      "sha256": "3f682751d94a36d9f85b80fb5e34bf9b893c97e64dd9d9d8f02c68daac4b4c35",
+      "bytes": 18442275,
+      "archiveMembers": 2028,
+      "localCacheFile": ".cache/archives/photocraft-c699e3cda69f4852b43c0b191ab0091aaeff9d6a.tar.gz",
+      "reuse": "downloaded pinned public codeload source",
+      "verifiedAgainstPriorLock": true,
+      "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+    },
+    {
+      "kind": "fonts",
+      "repository": "storytold/craft-fonts",
+      "commit": "abb83316d96aa59c1cf64784289e378fe9fa5695",
+      "url": "https://codeload.github.com/storytold/craft-fonts/tar.gz/abb83316d96aa59c1cf64784289e378fe9fa5695",
+      "root": "craft-fonts-abb83316d96aa59c1cf64784289e378fe9fa5695",
+      "sha256": "53e41ed01ee81a0ef664601a73fb87281f1fd748e724f560c8128d7d33eb3328",
+      "bytes": 14570459,
+      "archiveMembers": 39,
+      "localCacheFile": ".cache/archives/craft-fonts-abb83316d96aa59c1cf64784289e378fe9fa5695.tar.gz",
+      "reuse": "downloaded pinned public codeload source",
+      "verifiedAgainstPriorLock": false,
+      "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+    },
+    {
+      "kind": "source",
+      "repository": "storytold/vectorcraft",
+      "commit": "0a33cff3f6e2a1e9e672f4c3816f58cd8d3d032e",
+      "tag": "v0.11.0",
+      "url": "https://codeload.github.com/storytold/vectorcraft/tar.gz/0a33cff3f6e2a1e9e672f4c3816f58cd8d3d032e",
+      "root": "vectorcraft-0a33cff3f6e2a1e9e672f4c3816f58cd8d3d032e",
+      "sha256": "91582b06374205c80a07c58da465c4fd681452777ded9678c240cfca7e39489f",
+      "bytes": 16453954,
+      "archiveMembers": 1802,
+      "localCacheFile": ".cache/archives/vectorcraft-0a33cff3f6e2a1e9e672f4c3816f58cd8d3d032e.tar.gz",
+      "reuse": "hardlink reused existing source archive",
+      "verifiedAgainstPriorLock": true,
+      "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+    },
+    {
+      "kind": "fonts",
+      "repository": "storytold/craft-fonts",
+      "commit": "3d9ab3a132ed0eff457e424226a435a901da30d3",
+      "url": "https://codeload.github.com/storytold/craft-fonts/tar.gz/3d9ab3a132ed0eff457e424226a435a901da30d3",
+      "root": "craft-fonts-3d9ab3a132ed0eff457e424226a435a901da30d3",
+      "sha256": "bb8c4d2c32148760d2d47d77e8b222bc2b22fda1e85fcd72290fe7bfbb4689ee",
+      "bytes": 28766039,
+      "archiveMembers": 48,
+      "localCacheFile": ".cache/archives/craft-fonts-3d9ab3a132ed0eff457e424226a435a901da30d3.tar.gz",
+      "reuse": "downloaded pinned public codeload source",
+      "verifiedAgainstPriorLock": false,
+      "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+    },
+    {
+      "kind": "source",
+      "repository": "storytold/filmcraft",
+      "commit": "f03e21556d8e3a7155b91892d958debd5255d7af",
+      "tag": "v0.8.0",
+      "url": "https://codeload.github.com/storytold/filmcraft/tar.gz/f03e21556d8e3a7155b91892d958debd5255d7af",
+      "root": "filmcraft-f03e21556d8e3a7155b91892d958debd5255d7af",
+      "sha256": "ee62f9048c0088ae47283b4b7ae37a31a2319a27ebdd6af36b43f4999ea55d45",
+      "bytes": 20295015,
+      "archiveMembers": 1622,
+      "localCacheFile": ".cache/archives/filmcraft-f03e21556d8e3a7155b91892d958debd5255d7af.tar.gz",
+      "reuse": "downloaded pinned public codeload source",
+      "verifiedAgainstPriorLock": true,
+      "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+    },
+    {
+      "kind": "source",
+      "repository": "storytold/lightcraft",
+      "commit": "16dbb90499d3c63a6582fcbba1b2550a6e2da032",
+      "tag": "v0.8.0",
+      "url": "https://codeload.github.com/storytold/lightcraft/tar.gz/16dbb90499d3c63a6582fcbba1b2550a6e2da032",
+      "root": "lightcraft-16dbb90499d3c63a6582fcbba1b2550a6e2da032",
+      "sha256": "6d0d035eacb385f2b810db1d6166c13190c71c8ae8904a3d410cc1530a88a588",
+      "bytes": 16214739,
+      "archiveMembers": 973,
+      "localCacheFile": ".cache/archives/lightcraft-16dbb90499d3c63a6582fcbba1b2550a6e2da032.tar.gz",
+      "reuse": "downloaded pinned public codeload source",
+      "verifiedAgainstPriorLock": true,
+      "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+    },
+    {
+      "kind": "fonts",
+      "repository": "storytold/craft-fonts",
+      "commit": "8dcdacd5153e64560d109541a47d806f26f048c0",
+      "url": "https://codeload.github.com/storytold/craft-fonts/tar.gz/8dcdacd5153e64560d109541a47d806f26f048c0",
+      "root": "craft-fonts-8dcdacd5153e64560d109541a47d806f26f048c0",
+      "sha256": "c0bfca8f4dd8c98825e598c0324c66d90609fe531b212a6c9a04f6852dc5387b",
+      "bytes": 28629163,
+      "archiveMembers": 45,
+      "localCacheFile": ".cache/archives/craft-fonts-8dcdacd5153e64560d109541a47d806f26f048c0.tar.gz",
+      "reuse": "hardlink reused existing source archive",
+      "verifiedAgainstPriorLock": true,
+      "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+    },
+    {
+      "kind": "source",
+      "repository": "storytold/pdfcraft",
+      "commit": "9931329b9fae0b05373b4dc3ac7c58541f0891a4",
+      "tag": "v0.8.0",
+      "url": "https://codeload.github.com/storytold/pdfcraft/tar.gz/9931329b9fae0b05373b4dc3ac7c58541f0891a4",
+      "root": "pdfcraft-9931329b9fae0b05373b4dc3ac7c58541f0891a4",
+      "sha256": "953f32944503e09323c4d66aac2528974cb04f94acfc1a4dfe50c1a86f0091ed",
+      "bytes": 14600876,
+      "archiveMembers": 1550,
+      "localCacheFile": ".cache/archives/pdfcraft-9931329b9fae0b05373b4dc3ac7c58541f0891a4.tar.gz",
+      "reuse": "downloaded pinned public codeload source",
+      "verifiedAgainstPriorLock": true,
+      "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+    },
+    {
+      "kind": "source",
+      "repository": "storytold/effectcraft",
+      "commit": "05955c08b4fd025f1a09882df72e6dbff1a8148a",
+      "tag": "v0.10.0",
+      "url": "https://codeload.github.com/storytold/effectcraft/tar.gz/05955c08b4fd025f1a09882df72e6dbff1a8148a",
+      "root": "effectcraft-05955c08b4fd025f1a09882df72e6dbff1a8148a",
+      "sha256": "a160b94d9837906e3f129697f8c62ffb80d8342cb2787b2cfa439c0485098f43",
+      "bytes": 11625180,
+      "archiveMembers": 1266,
+      "localCacheFile": ".cache/archives/effectcraft-05955c08b4fd025f1a09882df72e6dbff1a8148a.tar.gz",
+      "reuse": "hardlink reused existing source archive",
+      "verifiedAgainstPriorLock": false,
+      "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+    },
+    {
+      "kind": "source",
+      "repository": "storytold/designcraft",
+      "commit": "11a51d5b665aec8d6e675bd107a8a01514f10d00",
+      "tag": "v0.8.0",
+      "url": "https://codeload.github.com/storytold/designcraft/tar.gz/11a51d5b665aec8d6e675bd107a8a01514f10d00",
+      "root": "designcraft-11a51d5b665aec8d6e675bd107a8a01514f10d00",
+      "sha256": "5044162f9e7c2260156419b7e2c69c87801c5facc88e6b7aaa3552aca70c2acf",
+      "bytes": 7805542,
+      "archiveMembers": 548,
+      "localCacheFile": ".cache/archives/designcraft-11a51d5b665aec8d6e675bd107a8a01514f10d00.tar.gz",
+      "reuse": "hardlink reused existing source archive",
+      "verifiedAgainstPriorLock": false,
+      "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+    },
+    {
+      "kind": "source",
+      "repository": "storytold/figcraft",
+      "commit": "833f0d2c27f0acbae5394848930ae531fc89c724",
+      "tag": "v0.6.0",
+      "url": "https://codeload.github.com/storytold/figcraft/tar.gz/833f0d2c27f0acbae5394848930ae531fc89c724",
+      "root": "figcraft-833f0d2c27f0acbae5394848930ae531fc89c724",
+      "sha256": "f327701beaf7a025a0f124c8551472ab998d2b07baf3949c8a2d86ebcf457e59",
+      "bytes": 8079741,
+      "archiveMembers": 944,
+      "localCacheFile": ".cache/archives/figcraft-833f0d2c27f0acbae5394848930ae531fc89c724.tar.gz",
+      "reuse": "hardlink reused existing source archive",
+      "verifiedAgainstPriorLock": false,
+      "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+    },
+    {
+      "kind": "fonts",
+      "repository": "storytold/craft-fonts",
+      "commit": "43913056ce82a3fdad0ef69f6b88d1dc922a8104",
+      "url": "https://codeload.github.com/storytold/craft-fonts/tar.gz/43913056ce82a3fdad0ef69f6b88d1dc922a8104",
+      "root": "craft-fonts-43913056ce82a3fdad0ef69f6b88d1dc922a8104",
+      "sha256": "e2dd2bb3ae39e442ee67416b9bc29b7ca8ef906e8ff2caaf5a451aaa6c662057",
+      "bytes": 38766980,
+      "archiveMembers": 129,
+      "localCacheFile": ".cache/archives/craft-fonts-43913056ce82a3fdad0ef69f6b88d1dc922a8104.tar.gz",
+      "reuse": "downloaded pinned public codeload source",
+      "verifiedAgainstPriorLock": false,
+      "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+    },
+    {
+      "kind": "source",
+      "repository": "storytold/wordcraft",
+      "commit": "fc41918814f62645b6746ed68e71e8c2c2e85d6f",
+      "tag": "v0.7.0",
+      "url": "https://codeload.github.com/storytold/wordcraft/tar.gz/fc41918814f62645b6746ed68e71e8c2c2e85d6f",
+      "root": "wordcraft-fc41918814f62645b6746ed68e71e8c2c2e85d6f",
+      "sha256": "ea7a64508f9df85878481f41ad961f8396be0e6a4cf0f9842844a86dc7a48fb6",
+      "bytes": 9370348,
+      "archiveMembers": 615,
+      "localCacheFile": ".cache/archives/wordcraft-fc41918814f62645b6746ed68e71e8c2c2e85d6f.tar.gz",
+      "reuse": "hardlink reused existing source archive",
+      "verifiedAgainstPriorLock": true,
+      "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+    },
+    {
+      "kind": "source",
+      "repository": "storytold/soundcraft",
+      "commit": "3a28a657692c1b98b28c276d8f61df9471074f0f",
+      "tag": "v0.7.0",
+      "url": "https://codeload.github.com/storytold/soundcraft/tar.gz/3a28a657692c1b98b28c276d8f61df9471074f0f",
+      "root": "soundcraft-3a28a657692c1b98b28c276d8f61df9471074f0f",
+      "sha256": "72a936c404b66a1210a74d3f81142910e868ea51150edd6bee10e6faba5d0325",
+      "bytes": 5186470,
+      "archiveMembers": 525,
+      "localCacheFile": ".cache/archives/soundcraft-3a28a657692c1b98b28c276d8f61df9471074f0f.tar.gz",
+      "reuse": "hardlink reused existing source archive",
+      "verifiedAgainstPriorLock": false,
+      "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+    },
+    {
+      "kind": "source",
+      "repository": "storytold/deckcraft",
+      "commit": "d78e657e4cb1e490ceb5445785c052d9cf5ad963",
+      "tag": "v0.7.0",
+      "url": "https://codeload.github.com/storytold/deckcraft/tar.gz/d78e657e4cb1e490ceb5445785c052d9cf5ad963",
+      "root": "deckcraft-d78e657e4cb1e490ceb5445785c052d9cf5ad963",
+      "sha256": "e5dfbccdcbfe7d36566299e3d396bae606d49013fbfe8b2bb8afbfeda62a3f55",
+      "bytes": 3244089,
+      "archiveMembers": 557,
+      "localCacheFile": ".cache/archives/deckcraft-d78e657e4cb1e490ceb5445785c052d9cf5ad963.tar.gz",
+      "reuse": "hardlink reused existing source archive",
+      "verifiedAgainstPriorLock": true,
+      "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+    },
+    {
+      "kind": "source",
+      "repository": "storytold/cadcraft",
+      "commit": "fc4e98315a8d771b5ab832f0ade0b5e7b106df7f",
+      "tag": "v0.7.0",
+      "url": "https://codeload.github.com/storytold/cadcraft/tar.gz/fc4e98315a8d771b5ab832f0ade0b5e7b106df7f",
+      "root": "cadcraft-fc4e98315a8d771b5ab832f0ade0b5e7b106df7f",
+      "sha256": "039ee54bfbf6c25f49a24770a5ba0ef4c2d3125c26fa88bafa06da4048b34d17",
+      "bytes": 3979882,
+      "archiveMembers": 816,
+      "localCacheFile": ".cache/archives/cadcraft-fc4e98315a8d771b5ab832f0ade0b5e7b106df7f.tar.gz",
+      "reuse": "hardlink reused existing source archive",
+      "verifiedAgainstPriorLock": false,
+      "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+    },
+    {
+      "kind": "source",
+      "repository": "storytold/gridcraft",
+      "commit": "d9d09f0baa912e88c5111107903fc8c640214b57",
+      "tag": "v0.7.0",
+      "url": "https://codeload.github.com/storytold/gridcraft/tar.gz/d9d09f0baa912e88c5111107903fc8c640214b57",
+      "root": "gridcraft-d9d09f0baa912e88c5111107903fc8c640214b57",
+      "sha256": "3f4fc387e910a3a4c6e435f33b9b123abb6d3347399d589f9b791a9f53c50b25",
+      "bytes": 4191411,
+      "archiveMembers": 498,
+      "localCacheFile": ".cache/archives/gridcraft-d9d09f0baa912e88c5111107903fc8c640214b57.tar.gz",
+      "reuse": "hardlink reused existing source archive",
+      "verifiedAgainstPriorLock": true,
+      "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+    }
+  ],
+  "applications": [
+    {
+      "id": "photo",
+      "name": "KIO Photo",
+      "upstreamName": "PhotoCraft",
+      "source": {
+        "kind": "source",
+        "repository": "storytold/photocraft",
+        "commit": "c699e3cda69f4852b43c0b191ab0091aaeff9d6a",
+        "tag": "v0.9.0",
+        "url": "https://codeload.github.com/storytold/photocraft/tar.gz/c699e3cda69f4852b43c0b191ab0091aaeff9d6a",
+        "root": "photocraft-c699e3cda69f4852b43c0b191ab0091aaeff9d6a",
+        "sha256": "3f682751d94a36d9f85b80fb5e34bf9b893c97e64dd9d9d8f02c68daac4b4c35",
+        "bytes": 18442275,
+        "archiveMembers": 2028,
+        "localCacheFile": ".cache/archives/photocraft-c699e3cda69f4852b43c0b191ab0091aaeff9d6a.tar.gz",
+        "reuse": "downloaded pinned public codeload source",
+        "verifiedAgainstPriorLock": true,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "fonts": {
+        "kind": "fonts",
+        "repository": "storytold/craft-fonts",
+        "commit": "abb83316d96aa59c1cf64784289e378fe9fa5695",
+        "url": "https://codeload.github.com/storytold/craft-fonts/tar.gz/abb83316d96aa59c1cf64784289e378fe9fa5695",
+        "root": "craft-fonts-abb83316d96aa59c1cf64784289e378fe9fa5695",
+        "sha256": "53e41ed01ee81a0ef664601a73fb87281f1fd748e724f560c8128d7d33eb3328",
+        "bytes": 14570459,
+        "archiveMembers": 39,
+        "localCacheFile": ".cache/archives/craft-fonts-abb83316d96aa59c1cf64784289e378fe9fa5695.tar.gz",
+        "reuse": "downloaded pinned public codeload source",
+        "verifiedAgainstPriorLock": false,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "features": {
+        "preserveDefaults": true,
+        "appDefaultFeatures": [],
+        "officialNativeAdditionalFeatures": [
+          "heif"
+        ],
+        "optionalAppFeatures": [
+          "heif"
+        ]
+      },
+      "offlineExtraStaging": [
+        {
+          "kind": "fonts",
+          "requiredForOfficialNativeParity": true,
+          "repo": "storytold/craft-fonts",
+          "commit": "abb83316d96aa59c1cf64784289e378fe9fa5695",
+          "buildEnvironment": {
+            "CRAFT_FONTS_DIR": "<absolute-path-to-pinned-craft-fonts>",
+            "CRAFT_FONTS_REQUIRED": "1"
+          },
+          "staging": "Embedded at compile time; also copy font OFL license files into the package using upstream packaging helpers."
+        }
+      ]
+    },
+    {
+      "id": "vector",
+      "name": "KIO Vector",
+      "upstreamName": "VectorCraft",
+      "source": {
+        "kind": "source",
+        "repository": "storytold/vectorcraft",
+        "commit": "0a33cff3f6e2a1e9e672f4c3816f58cd8d3d032e",
+        "tag": "v0.11.0",
+        "url": "https://codeload.github.com/storytold/vectorcraft/tar.gz/0a33cff3f6e2a1e9e672f4c3816f58cd8d3d032e",
+        "root": "vectorcraft-0a33cff3f6e2a1e9e672f4c3816f58cd8d3d032e",
+        "sha256": "91582b06374205c80a07c58da465c4fd681452777ded9678c240cfca7e39489f",
+        "bytes": 16453954,
+        "archiveMembers": 1802,
+        "localCacheFile": ".cache/archives/vectorcraft-0a33cff3f6e2a1e9e672f4c3816f58cd8d3d032e.tar.gz",
+        "reuse": "hardlink reused existing source archive",
+        "verifiedAgainstPriorLock": true,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "fonts": {
+        "kind": "fonts",
+        "repository": "storytold/craft-fonts",
+        "commit": "3d9ab3a132ed0eff457e424226a435a901da30d3",
+        "url": "https://codeload.github.com/storytold/craft-fonts/tar.gz/3d9ab3a132ed0eff457e424226a435a901da30d3",
+        "root": "craft-fonts-3d9ab3a132ed0eff457e424226a435a901da30d3",
+        "sha256": "bb8c4d2c32148760d2d47d77e8b222bc2b22fda1e85fcd72290fe7bfbb4689ee",
+        "bytes": 28766039,
+        "archiveMembers": 48,
+        "localCacheFile": ".cache/archives/craft-fonts-3d9ab3a132ed0eff457e424226a435a901da30d3.tar.gz",
+        "reuse": "downloaded pinned public codeload source",
+        "verifiedAgainstPriorLock": false,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "features": {
+        "preserveDefaults": true,
+        "appDefaultFeatures": [
+          "wgpu",
+          "accessibility"
+        ],
+        "officialNativeAdditionalFeatures": [],
+        "optionalAppFeatures": []
+      },
+      "offlineExtraStaging": [
+        {
+          "kind": "fonts",
+          "requiredForOfficialNativeParity": true,
+          "repo": "storytold/craft-fonts",
+          "commit": "3d9ab3a132ed0eff457e424226a435a901da30d3",
+          "buildEnvironment": {
+            "CRAFT_FONTS_DIR": "<absolute-path-to-pinned-craft-fonts>",
+            "CRAFT_FONTS_REQUIRED": "1"
+          },
+          "staging": "Embedded at compile time; also copy font OFL license files into the package using upstream packaging helpers."
+        }
+      ]
+    },
+    {
+      "id": "film",
+      "name": "KIO Film",
+      "upstreamName": "FilmCraft",
+      "source": {
+        "kind": "source",
+        "repository": "storytold/filmcraft",
+        "commit": "f03e21556d8e3a7155b91892d958debd5255d7af",
+        "tag": "v0.8.0",
+        "url": "https://codeload.github.com/storytold/filmcraft/tar.gz/f03e21556d8e3a7155b91892d958debd5255d7af",
+        "root": "filmcraft-f03e21556d8e3a7155b91892d958debd5255d7af",
+        "sha256": "ee62f9048c0088ae47283b4b7ae37a31a2319a27ebdd6af36b43f4999ea55d45",
+        "bytes": 20295015,
+        "archiveMembers": 1622,
+        "localCacheFile": ".cache/archives/filmcraft-f03e21556d8e3a7155b91892d958debd5255d7af.tar.gz",
+        "reuse": "downloaded pinned public codeload source",
+        "verifiedAgainstPriorLock": true,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "fonts": {
+        "kind": "fonts",
+        "repository": "storytold/craft-fonts",
+        "commit": "abb83316d96aa59c1cf64784289e378fe9fa5695",
+        "url": "https://codeload.github.com/storytold/craft-fonts/tar.gz/abb83316d96aa59c1cf64784289e378fe9fa5695",
+        "root": "craft-fonts-abb83316d96aa59c1cf64784289e378fe9fa5695",
+        "sha256": "53e41ed01ee81a0ef664601a73fb87281f1fd748e724f560c8128d7d33eb3328",
+        "bytes": 14570459,
+        "archiveMembers": 39,
+        "localCacheFile": ".cache/archives/craft-fonts-abb83316d96aa59c1cf64784289e378fe9fa5695.tar.gz",
+        "reuse": "downloaded pinned public codeload source",
+        "verifiedAgainstPriorLock": false,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "features": {
+        "preserveDefaults": true,
+        "appDefaultFeatures": [],
+        "officialNativeAdditionalFeatures": [],
+        "optionalAppFeatures": [
+          "whisper",
+          "neural-voices"
+        ]
+      },
+      "offlineExtraStaging": [
+        {
+          "kind": "fonts",
+          "requiredForOfficialNativeParity": true,
+          "repo": "storytold/craft-fonts",
+          "commit": "abb83316d96aa59c1cf64784289e378fe9fa5695",
+          "buildEnvironment": {
+            "CRAFT_FONTS_DIR": "<absolute-path-to-pinned-craft-fonts>",
+            "CRAFT_FONTS_REQUIRED": "1"
+          },
+          "staging": "Embedded at compile time; also copy font OFL license files into the package using upstream packaging helpers."
+        },
+        {
+          "kind": "optional-models",
+          "requiredForOfficialNativeParity": false,
+          "notes": "Whisper speech transcription and Kokoro neural voices require optional compile features; upstream official native package scripts do not enable them by default. Preserve optional extension capability without claiming it is bundled."
+        }
+      ]
+    },
+    {
+      "id": "light",
+      "name": "KIO Light",
+      "upstreamName": "LightCraft",
+      "source": {
+        "kind": "source",
+        "repository": "storytold/lightcraft",
+        "commit": "16dbb90499d3c63a6582fcbba1b2550a6e2da032",
+        "tag": "v0.8.0",
+        "url": "https://codeload.github.com/storytold/lightcraft/tar.gz/16dbb90499d3c63a6582fcbba1b2550a6e2da032",
+        "root": "lightcraft-16dbb90499d3c63a6582fcbba1b2550a6e2da032",
+        "sha256": "6d0d035eacb385f2b810db1d6166c13190c71c8ae8904a3d410cc1530a88a588",
+        "bytes": 16214739,
+        "archiveMembers": 973,
+        "localCacheFile": ".cache/archives/lightcraft-16dbb90499d3c63a6582fcbba1b2550a6e2da032.tar.gz",
+        "reuse": "downloaded pinned public codeload source",
+        "verifiedAgainstPriorLock": true,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "fonts": {
+        "kind": "fonts",
+        "repository": "storytold/craft-fonts",
+        "commit": "8dcdacd5153e64560d109541a47d806f26f048c0",
+        "url": "https://codeload.github.com/storytold/craft-fonts/tar.gz/8dcdacd5153e64560d109541a47d806f26f048c0",
+        "root": "craft-fonts-8dcdacd5153e64560d109541a47d806f26f048c0",
+        "sha256": "c0bfca8f4dd8c98825e598c0324c66d90609fe531b212a6c9a04f6852dc5387b",
+        "bytes": 28629163,
+        "archiveMembers": 45,
+        "localCacheFile": ".cache/archives/craft-fonts-8dcdacd5153e64560d109541a47d806f26f048c0.tar.gz",
+        "reuse": "hardlink reused existing source archive",
+        "verifiedAgainstPriorLock": true,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "features": {
+        "preserveDefaults": true,
+        "appDefaultFeatures": [
+          "denoise"
+        ],
+        "officialNativeAdditionalFeatures": [
+          "lightcraft/heif",
+          "lightcraft-cli/heif"
+        ],
+        "optionalAppFeatures": [
+          "heif",
+          "rawnind-model"
+        ]
+      },
+      "offlineExtraStaging": [
+        {
+          "kind": "fonts",
+          "requiredForOfficialNativeParity": true,
+          "repo": "storytold/craft-fonts",
+          "commit": "8dcdacd5153e64560d109541a47d806f26f048c0",
+          "buildEnvironment": {
+            "CRAFT_FONTS_DIR": "<absolute-path-to-pinned-craft-fonts>",
+            "CRAFT_FONTS_REQUIRED": "1"
+          },
+          "staging": "Embedded at compile time; also copy font OFL license files into the package using upstream packaging helpers."
+        }
+      ]
+    },
+    {
+      "id": "pdf",
+      "name": "KIO PDF",
+      "upstreamName": "PdfCraft",
+      "source": {
+        "kind": "source",
+        "repository": "storytold/pdfcraft",
+        "commit": "9931329b9fae0b05373b4dc3ac7c58541f0891a4",
+        "tag": "v0.8.0",
+        "url": "https://codeload.github.com/storytold/pdfcraft/tar.gz/9931329b9fae0b05373b4dc3ac7c58541f0891a4",
+        "root": "pdfcraft-9931329b9fae0b05373b4dc3ac7c58541f0891a4",
+        "sha256": "953f32944503e09323c4d66aac2528974cb04f94acfc1a4dfe50c1a86f0091ed",
+        "bytes": 14600876,
+        "archiveMembers": 1550,
+        "localCacheFile": ".cache/archives/pdfcraft-9931329b9fae0b05373b4dc3ac7c58541f0891a4.tar.gz",
+        "reuse": "downloaded pinned public codeload source",
+        "verifiedAgainstPriorLock": true,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "fonts": {
+        "kind": "fonts",
+        "repository": "storytold/craft-fonts",
+        "commit": "3d9ab3a132ed0eff457e424226a435a901da30d3",
+        "url": "https://codeload.github.com/storytold/craft-fonts/tar.gz/3d9ab3a132ed0eff457e424226a435a901da30d3",
+        "root": "craft-fonts-3d9ab3a132ed0eff457e424226a435a901da30d3",
+        "sha256": "bb8c4d2c32148760d2d47d77e8b222bc2b22fda1e85fcd72290fe7bfbb4689ee",
+        "bytes": 28766039,
+        "archiveMembers": 48,
+        "localCacheFile": ".cache/archives/craft-fonts-3d9ab3a132ed0eff457e424226a435a901da30d3.tar.gz",
+        "reuse": "downloaded pinned public codeload source",
+        "verifiedAgainstPriorLock": false,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "features": {
+        "preserveDefaults": true,
+        "appDefaultFeatures": [],
+        "officialNativeAdditionalFeatures": [],
+        "optionalAppFeatures": []
+      },
+      "offlineExtraStaging": [
+        {
+          "kind": "fonts",
+          "requiredForOfficialNativeParity": true,
+          "repo": "storytold/craft-fonts",
+          "commit": "3d9ab3a132ed0eff457e424226a435a901da30d3",
+          "buildEnvironment": {
+            "CRAFT_FONTS_DIR": "<absolute-path-to-pinned-craft-fonts>",
+            "CRAFT_FONTS_REQUIRED": "1"
+          },
+          "staging": "Embedded at compile time; also copy font OFL license files into the package using upstream packaging helpers."
+        },
+        {
+          "kind": "ocr-models",
+          "requiredForOfficialNativeParity": true,
+          "prepareCommand": [
+            "cargo",
+            "xtask",
+            "models",
+            "<staging-models-directory>"
+          ],
+          "macosDestination": "<App>.app/Contents/Resources/models",
+          "windowsDestination": "<directory-containing-exe>/models",
+          "requiredCompanions": [
+            "ATTRIBUTION.txt",
+            "*.LICENCE.txt"
+          ],
+          "notes": "Upstream package scripts fetch and stage all OCR models before code signing. Do not ship only the executable."
+        }
+      ]
+    },
+    {
+      "id": "effect",
+      "name": "KIO Effect",
+      "upstreamName": "EffectCraft",
+      "source": {
+        "kind": "source",
+        "repository": "storytold/effectcraft",
+        "commit": "05955c08b4fd025f1a09882df72e6dbff1a8148a",
+        "tag": "v0.10.0",
+        "url": "https://codeload.github.com/storytold/effectcraft/tar.gz/05955c08b4fd025f1a09882df72e6dbff1a8148a",
+        "root": "effectcraft-05955c08b4fd025f1a09882df72e6dbff1a8148a",
+        "sha256": "a160b94d9837906e3f129697f8c62ffb80d8342cb2787b2cfa439c0485098f43",
+        "bytes": 11625180,
+        "archiveMembers": 1266,
+        "localCacheFile": ".cache/archives/effectcraft-05955c08b4fd025f1a09882df72e6dbff1a8148a.tar.gz",
+        "reuse": "hardlink reused existing source archive",
+        "verifiedAgainstPriorLock": false,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "fonts": null,
+      "features": {
+        "preserveDefaults": true,
+        "appDefaultFeatures": [],
+        "officialNativeAdditionalFeatures": [],
+        "optionalAppFeatures": []
+      },
+      "offlineExtraStaging": [
+        {
+          "kind": "optional-model",
+          "requiredForOfficialNativeParity": false,
+          "name": "MobileSAM",
+          "approxBytes": 40000000,
+          "installation": "Settings > Roto Brush download; preserve model license and cache behavior."
+        },
+        {
+          "kind": "optional-model",
+          "requiredForOfficialNativeParity": false,
+          "name": "MediaPipe Face Landmarker",
+          "approxBytes": 3800000,
+          "installation": "Settings > Face Tracking download; preserve model license and cache behavior."
+        }
+      ]
+    },
+    {
+      "id": "design",
+      "name": "KIO Design",
+      "upstreamName": "DesignCraft",
+      "source": {
+        "kind": "source",
+        "repository": "storytold/designcraft",
+        "commit": "11a51d5b665aec8d6e675bd107a8a01514f10d00",
+        "tag": "v0.8.0",
+        "url": "https://codeload.github.com/storytold/designcraft/tar.gz/11a51d5b665aec8d6e675bd107a8a01514f10d00",
+        "root": "designcraft-11a51d5b665aec8d6e675bd107a8a01514f10d00",
+        "sha256": "5044162f9e7c2260156419b7e2c69c87801c5facc88e6b7aaa3552aca70c2acf",
+        "bytes": 7805542,
+        "archiveMembers": 548,
+        "localCacheFile": ".cache/archives/designcraft-11a51d5b665aec8d6e675bd107a8a01514f10d00.tar.gz",
+        "reuse": "hardlink reused existing source archive",
+        "verifiedAgainstPriorLock": false,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "fonts": {
+        "kind": "fonts",
+        "repository": "storytold/craft-fonts",
+        "commit": "abb83316d96aa59c1cf64784289e378fe9fa5695",
+        "url": "https://codeload.github.com/storytold/craft-fonts/tar.gz/abb83316d96aa59c1cf64784289e378fe9fa5695",
+        "root": "craft-fonts-abb83316d96aa59c1cf64784289e378fe9fa5695",
+        "sha256": "53e41ed01ee81a0ef664601a73fb87281f1fd748e724f560c8128d7d33eb3328",
+        "bytes": 14570459,
+        "archiveMembers": 39,
+        "localCacheFile": ".cache/archives/craft-fonts-abb83316d96aa59c1cf64784289e378fe9fa5695.tar.gz",
+        "reuse": "downloaded pinned public codeload source",
+        "verifiedAgainstPriorLock": false,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "features": {
+        "preserveDefaults": true,
+        "appDefaultFeatures": [],
+        "officialNativeAdditionalFeatures": [],
+        "optionalAppFeatures": []
+      },
+      "offlineExtraStaging": [
+        {
+          "kind": "fonts",
+          "requiredForOfficialNativeParity": true,
+          "repo": "storytold/craft-fonts",
+          "commit": "abb83316d96aa59c1cf64784289e378fe9fa5695",
+          "buildEnvironment": {
+            "CRAFT_FONTS_DIR": "<absolute-path-to-pinned-craft-fonts>",
+            "CRAFT_FONTS_REQUIRED": "1"
+          },
+          "staging": "Embedded at compile time; also copy font OFL license files into the package using upstream packaging helpers."
+        }
+      ]
+    },
+    {
+      "id": "ui",
+      "name": "KIO UI",
+      "upstreamName": "FigCraft",
+      "source": {
+        "kind": "source",
+        "repository": "storytold/figcraft",
+        "commit": "833f0d2c27f0acbae5394848930ae531fc89c724",
+        "tag": "v0.6.0",
+        "url": "https://codeload.github.com/storytold/figcraft/tar.gz/833f0d2c27f0acbae5394848930ae531fc89c724",
+        "root": "figcraft-833f0d2c27f0acbae5394848930ae531fc89c724",
+        "sha256": "f327701beaf7a025a0f124c8551472ab998d2b07baf3949c8a2d86ebcf457e59",
+        "bytes": 8079741,
+        "archiveMembers": 944,
+        "localCacheFile": ".cache/archives/figcraft-833f0d2c27f0acbae5394848930ae531fc89c724.tar.gz",
+        "reuse": "hardlink reused existing source archive",
+        "verifiedAgainstPriorLock": false,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "fonts": {
+        "kind": "fonts",
+        "repository": "storytold/craft-fonts",
+        "commit": "43913056ce82a3fdad0ef69f6b88d1dc922a8104",
+        "url": "https://codeload.github.com/storytold/craft-fonts/tar.gz/43913056ce82a3fdad0ef69f6b88d1dc922a8104",
+        "root": "craft-fonts-43913056ce82a3fdad0ef69f6b88d1dc922a8104",
+        "sha256": "e2dd2bb3ae39e442ee67416b9bc29b7ca8ef906e8ff2caaf5a451aaa6c662057",
+        "bytes": 38766980,
+        "archiveMembers": 129,
+        "localCacheFile": ".cache/archives/craft-fonts-43913056ce82a3fdad0ef69f6b88d1dc922a8104.tar.gz",
+        "reuse": "downloaded pinned public codeload source",
+        "verifiedAgainstPriorLock": false,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "features": {
+        "preserveDefaults": true,
+        "appDefaultFeatures": [],
+        "officialNativeAdditionalFeatures": [],
+        "optionalAppFeatures": []
+      },
+      "offlineExtraStaging": [
+        {
+          "kind": "fonts",
+          "requiredForOfficialNativeParity": true,
+          "repo": "storytold/craft-fonts",
+          "commit": "43913056ce82a3fdad0ef69f6b88d1dc922a8104",
+          "buildEnvironment": {
+            "CRAFT_FONTS_DIR": "<absolute-path-to-pinned-craft-fonts>",
+            "CRAFT_FONTS_REQUIRED": "1"
+          },
+          "staging": "Embedded at compile time; also copy font OFL license files into the package using upstream packaging helpers."
+        }
+      ]
+    },
+    {
+      "id": "word",
+      "name": "KIO Word",
+      "upstreamName": "WordCraft",
+      "source": {
+        "kind": "source",
+        "repository": "storytold/wordcraft",
+        "commit": "fc41918814f62645b6746ed68e71e8c2c2e85d6f",
+        "tag": "v0.7.0",
+        "url": "https://codeload.github.com/storytold/wordcraft/tar.gz/fc41918814f62645b6746ed68e71e8c2c2e85d6f",
+        "root": "wordcraft-fc41918814f62645b6746ed68e71e8c2c2e85d6f",
+        "sha256": "ea7a64508f9df85878481f41ad961f8396be0e6a4cf0f9842844a86dc7a48fb6",
+        "bytes": 9370348,
+        "archiveMembers": 615,
+        "localCacheFile": ".cache/archives/wordcraft-fc41918814f62645b6746ed68e71e8c2c2e85d6f.tar.gz",
+        "reuse": "hardlink reused existing source archive",
+        "verifiedAgainstPriorLock": true,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "fonts": {
+        "kind": "fonts",
+        "repository": "storytold/craft-fonts",
+        "commit": "8dcdacd5153e64560d109541a47d806f26f048c0",
+        "url": "https://codeload.github.com/storytold/craft-fonts/tar.gz/8dcdacd5153e64560d109541a47d806f26f048c0",
+        "root": "craft-fonts-8dcdacd5153e64560d109541a47d806f26f048c0",
+        "sha256": "c0bfca8f4dd8c98825e598c0324c66d90609fe531b212a6c9a04f6852dc5387b",
+        "bytes": 28629163,
+        "archiveMembers": 45,
+        "localCacheFile": ".cache/archives/craft-fonts-8dcdacd5153e64560d109541a47d806f26f048c0.tar.gz",
+        "reuse": "hardlink reused existing source archive",
+        "verifiedAgainstPriorLock": true,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "features": {
+        "preserveDefaults": true,
+        "appDefaultFeatures": [],
+        "officialNativeAdditionalFeatures": [],
+        "optionalAppFeatures": []
+      },
+      "offlineExtraStaging": [
+        {
+          "kind": "fonts",
+          "requiredForOfficialNativeParity": true,
+          "repo": "storytold/craft-fonts",
+          "commit": "8dcdacd5153e64560d109541a47d806f26f048c0",
+          "buildEnvironment": {
+            "CRAFT_FONTS_DIR": "<absolute-path-to-pinned-craft-fonts>",
+            "CRAFT_FONTS_REQUIRED": "1"
+          },
+          "staging": "Embedded at compile time; also copy font OFL license files into the package using upstream packaging helpers."
+        }
+      ]
+    },
+    {
+      "id": "sound",
+      "name": "KIO Sound",
+      "upstreamName": "SoundCraft",
+      "source": {
+        "kind": "source",
+        "repository": "storytold/soundcraft",
+        "commit": "3a28a657692c1b98b28c276d8f61df9471074f0f",
+        "tag": "v0.7.0",
+        "url": "https://codeload.github.com/storytold/soundcraft/tar.gz/3a28a657692c1b98b28c276d8f61df9471074f0f",
+        "root": "soundcraft-3a28a657692c1b98b28c276d8f61df9471074f0f",
+        "sha256": "72a936c404b66a1210a74d3f81142910e868ea51150edd6bee10e6faba5d0325",
+        "bytes": 5186470,
+        "archiveMembers": 525,
+        "localCacheFile": ".cache/archives/soundcraft-3a28a657692c1b98b28c276d8f61df9471074f0f.tar.gz",
+        "reuse": "hardlink reused existing source archive",
+        "verifiedAgainstPriorLock": false,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "fonts": null,
+      "features": {
+        "preserveDefaults": true,
+        "appDefaultFeatures": [],
+        "officialNativeAdditionalFeatures": [],
+        "optionalAppFeatures": [
+          "asio"
+        ]
+      },
+      "offlineExtraStaging": []
+    },
+    {
+      "id": "deck",
+      "name": "KIO Deck",
+      "upstreamName": "DeckCraft",
+      "source": {
+        "kind": "source",
+        "repository": "storytold/deckcraft",
+        "commit": "d78e657e4cb1e490ceb5445785c052d9cf5ad963",
+        "tag": "v0.7.0",
+        "url": "https://codeload.github.com/storytold/deckcraft/tar.gz/d78e657e4cb1e490ceb5445785c052d9cf5ad963",
+        "root": "deckcraft-d78e657e4cb1e490ceb5445785c052d9cf5ad963",
+        "sha256": "e5dfbccdcbfe7d36566299e3d396bae606d49013fbfe8b2bb8afbfeda62a3f55",
+        "bytes": 3244089,
+        "archiveMembers": 557,
+        "localCacheFile": ".cache/archives/deckcraft-d78e657e4cb1e490ceb5445785c052d9cf5ad963.tar.gz",
+        "reuse": "hardlink reused existing source archive",
+        "verifiedAgainstPriorLock": true,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "fonts": {
+        "kind": "fonts",
+        "repository": "storytold/craft-fonts",
+        "commit": "43913056ce82a3fdad0ef69f6b88d1dc922a8104",
+        "url": "https://codeload.github.com/storytold/craft-fonts/tar.gz/43913056ce82a3fdad0ef69f6b88d1dc922a8104",
+        "root": "craft-fonts-43913056ce82a3fdad0ef69f6b88d1dc922a8104",
+        "sha256": "e2dd2bb3ae39e442ee67416b9bc29b7ca8ef906e8ff2caaf5a451aaa6c662057",
+        "bytes": 38766980,
+        "archiveMembers": 129,
+        "localCacheFile": ".cache/archives/craft-fonts-43913056ce82a3fdad0ef69f6b88d1dc922a8104.tar.gz",
+        "reuse": "downloaded pinned public codeload source",
+        "verifiedAgainstPriorLock": false,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "features": {
+        "preserveDefaults": true,
+        "appDefaultFeatures": [],
+        "officialNativeAdditionalFeatures": [],
+        "optionalAppFeatures": []
+      },
+      "offlineExtraStaging": [
+        {
+          "kind": "fonts",
+          "requiredForOfficialNativeParity": true,
+          "repo": "storytold/craft-fonts",
+          "commit": "43913056ce82a3fdad0ef69f6b88d1dc922a8104",
+          "buildEnvironment": {
+            "CRAFT_FONTS_DIR": "<absolute-path-to-pinned-craft-fonts>",
+            "CRAFT_FONTS_REQUIRED": "1"
+          },
+          "staging": "Embedded at compile time; also copy font OFL license files into the package using upstream packaging helpers."
+        }
+      ]
+    },
+    {
+      "id": "cad",
+      "name": "KIO Cad",
+      "upstreamName": "CADCraft",
+      "source": {
+        "kind": "source",
+        "repository": "storytold/cadcraft",
+        "commit": "fc4e98315a8d771b5ab832f0ade0b5e7b106df7f",
+        "tag": "v0.7.0",
+        "url": "https://codeload.github.com/storytold/cadcraft/tar.gz/fc4e98315a8d771b5ab832f0ade0b5e7b106df7f",
+        "root": "cadcraft-fc4e98315a8d771b5ab832f0ade0b5e7b106df7f",
+        "sha256": "039ee54bfbf6c25f49a24770a5ba0ef4c2d3125c26fa88bafa06da4048b34d17",
+        "bytes": 3979882,
+        "archiveMembers": 816,
+        "localCacheFile": ".cache/archives/cadcraft-fc4e98315a8d771b5ab832f0ade0b5e7b106df7f.tar.gz",
+        "reuse": "hardlink reused existing source archive",
+        "verifiedAgainstPriorLock": false,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "fonts": {
+        "kind": "fonts",
+        "repository": "storytold/craft-fonts",
+        "commit": "3d9ab3a132ed0eff457e424226a435a901da30d3",
+        "url": "https://codeload.github.com/storytold/craft-fonts/tar.gz/3d9ab3a132ed0eff457e424226a435a901da30d3",
+        "root": "craft-fonts-3d9ab3a132ed0eff457e424226a435a901da30d3",
+        "sha256": "bb8c4d2c32148760d2d47d77e8b222bc2b22fda1e85fcd72290fe7bfbb4689ee",
+        "bytes": 28766039,
+        "archiveMembers": 48,
+        "localCacheFile": ".cache/archives/craft-fonts-3d9ab3a132ed0eff457e424226a435a901da30d3.tar.gz",
+        "reuse": "downloaded pinned public codeload source",
+        "verifiedAgainstPriorLock": false,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "features": {
+        "preserveDefaults": true,
+        "appDefaultFeatures": [],
+        "officialNativeAdditionalFeatures": [],
+        "optionalAppFeatures": []
+      },
+      "offlineExtraStaging": [
+        {
+          "kind": "fonts",
+          "requiredForOfficialNativeParity": true,
+          "repo": "storytold/craft-fonts",
+          "commit": "3d9ab3a132ed0eff457e424226a435a901da30d3",
+          "buildEnvironment": {
+            "CRAFT_FONTS_DIR": "<absolute-path-to-pinned-craft-fonts>",
+            "CRAFT_FONTS_REQUIRED": "1"
+          },
+          "staging": "Embedded at compile time; also copy font OFL license files into the package using upstream packaging helpers."
+        }
+      ]
+    },
+    {
+      "id": "grid",
+      "name": "KIO Grid",
+      "upstreamName": "GridCraft",
+      "source": {
+        "kind": "source",
+        "repository": "storytold/gridcraft",
+        "commit": "d9d09f0baa912e88c5111107903fc8c640214b57",
+        "tag": "v0.7.0",
+        "url": "https://codeload.github.com/storytold/gridcraft/tar.gz/d9d09f0baa912e88c5111107903fc8c640214b57",
+        "root": "gridcraft-d9d09f0baa912e88c5111107903fc8c640214b57",
+        "sha256": "3f4fc387e910a3a4c6e435f33b9b123abb6d3347399d589f9b791a9f53c50b25",
+        "bytes": 4191411,
+        "archiveMembers": 498,
+        "localCacheFile": ".cache/archives/gridcraft-d9d09f0baa912e88c5111107903fc8c640214b57.tar.gz",
+        "reuse": "hardlink reused existing source archive",
+        "verifiedAgainstPriorLock": true,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "fonts": {
+        "kind": "fonts",
+        "repository": "storytold/craft-fonts",
+        "commit": "abb83316d96aa59c1cf64784289e378fe9fa5695",
+        "url": "https://codeload.github.com/storytold/craft-fonts/tar.gz/abb83316d96aa59c1cf64784289e378fe9fa5695",
+        "root": "craft-fonts-abb83316d96aa59c1cf64784289e378fe9fa5695",
+        "sha256": "53e41ed01ee81a0ef664601a73fb87281f1fd748e724f560c8128d7d33eb3328",
+        "bytes": 14570459,
+        "archiveMembers": 39,
+        "localCacheFile": ".cache/archives/craft-fonts-abb83316d96aa59c1cf64784289e378fe9fa5695.tar.gz",
+        "reuse": "downloaded pinned public codeload source",
+        "verifiedAgainstPriorLock": false,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "features": {
+        "preserveDefaults": true,
+        "appDefaultFeatures": [],
+        "officialNativeAdditionalFeatures": [],
+        "optionalAppFeatures": []
+      },
+      "offlineExtraStaging": [
+        {
+          "kind": "fonts",
+          "requiredForOfficialNativeParity": true,
+          "repo": "storytold/craft-fonts",
+          "commit": "abb83316d96aa59c1cf64784289e378fe9fa5695",
+          "buildEnvironment": {
+            "CRAFT_FONTS_DIR": "<absolute-path-to-pinned-craft-fonts>",
+            "CRAFT_FONTS_REQUIRED": "1"
+          },
+          "staging": "Embedded at compile time; also copy font OFL license files into the package using upstream packaging helpers."
+        }
+      ]
+    }
+  ]
+}

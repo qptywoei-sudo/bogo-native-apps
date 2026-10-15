@@ -1,0 +1,646 @@
+{
+  "schema": "kio.native-branding-patch.v1",
+  "programId": "deck",
+  "applicationId": "com.kio.deck",
+  "displayName": "KIO Deck",
+  "status": "source-patch-ready; native build and GUI QA pending",
+  "upstream": {
+    "repository": "https://github.com/storytold/deckcraft",
+    "release": "v0.7.0",
+    "commit": "d78e657e4cb1e490ceb5445785c052d9cf5ad963",
+    "sourceArchive": "deckcraft-d78e657e4cb1e490ceb5445785c052d9cf5ad963.tar.gz",
+    "sourceArchiveSha256": "e5dfbccdcbfe7d36566299e3d396bae606d49013fbfe8b2bb8afbfeda62a3f55"
+  },
+  "patch": {
+    "file": "deckcraft-v0.7.0-kio-deck.patch",
+    "sha256": "98ba1e6835eaf961f24b35a2f56b20e698f0d65d79007abd63458f2f5c4e2d56",
+    "bytes": 4455116
+  },
+  "counts": {
+    "upstreamFiles": 446,
+    "forkFiles": 443,
+    "changedPaths": 66,
+    "added": 19,
+    "removed": 22,
+    "modified": 25,
+    "protectedFilesByteIdentical": 331
+  },
+  "checks": {
+    "originalArchivePatchRoundtrip": true,
+    "protectedEngineDependenciesLicensesCreditsByteIdentical": true,
+    "upstreamGapDocumentsByteIdentical": true,
+    "platformMetadataParses": true,
+    "packageShellSyntax": true,
+    "patchWhitespace": true,
+    "originalIconByteIdentical": true,
+    "upstreamTrademarkLogoFilesRemoved": true,
+    "internalThemeIdentifierRetained": true,
+    "nativeBuildRun": false,
+    "GUIValidationRun": false
+  },
+  "files": [
+    {
+      "path": "ATTRIBUTION.md",
+      "before": {
+        "sha256": "e698cd8478b6b5d8b8dd78bc633948e50700435b57a6634a9f03bb1c6c6f285b",
+        "bytes": 7141
+      },
+      "after": {
+        "sha256": "d89293ffb6870eea6676748323d90ee71ef6957150514a6208067d5581a8314a",
+        "bytes": 12436
+      }
+    },
+    {
+      "path": "KIO-FORK.json",
+      "before": null,
+      "after": {
+        "sha256": "d6deae7322ec22efa7fc698ec5a81ea2f7f51c3aa334db3b3f48eb9d56e30932",
+        "bytes": 1536
+      }
+    },
+    {
+      "path": "KIO-FORK.md",
+      "before": null,
+      "after": {
+        "sha256": "85d4196efcbb08f9bd2582ac053d5af2ff28a6f7dfc331ea24d0e24e7cc69867",
+        "bytes": 2888
+      }
+    },
+    {
+      "path": "README.md",
+      "before": {
+        "sha256": "c6c2c577af9ff6109ad10d36425bbef78f56d2af1c55b289da46c576bf52e22b",
+        "bytes": 17255
+      },
+      "after": {
+        "sha256": "a4ac77e198557dcac28a4366fe3675118929fcb67a499005ce06d3d8305b9b49",
+        "bytes": 17233
+      }
+    },
+    {
+      "path": "apps/deckcraft/build.rs",
+      "before": {
+        "sha256": "893022bd3711b8df0b56fdaab316c8841bda4bc0d24fe6c27beeb08da5cc9493",
+        "bytes": 1456
+      },
+      "after": {
+        "sha256": "258c8bac078a9e3f43cc9c6432bdd3da6048af3b713327132cb4dc68898ee6a2",
+        "bytes": 1436
+      }
+    },
+    {
+      "path": "apps/deckcraft/src/logging.rs",
+      "before": {
+        "sha256": "a877b620f88345c07d6922a825c7fa34eb2fa70b375086b5285e9b4453985b99",
+        "bytes": 24576
+      },
+      "after": {
+        "sha256": "24b662de6cf55e67afce7b6bcd0bdc05d76ee3eda7ddcea1a2720137400e9d31",
+        "bytes": 24574
+      }
+    },
+    {
+      "path": "apps/deckcraft/src/main.rs",
+      "before": {
+        "sha256": "12b8ac3cdcdfc5b1185600f0f729a2760ae991ffacfea487c59bbea065832847",
+        "bytes": 9841
+      },
+      "after": {
+        "sha256": "9f931df6a8056bd232b2c04cf9d1264f6c6112bf64468857cf76df0af49d71f3",
+        "bytes": 9822
+      }
+    },
+    {
+      "path": "assets/app-icon/deckcraft-1024.png",
+      "before": {
+        "sha256": "457cb046a1a4f2e13f06cf7e2e071cb48f6011633ed629b99ff348be4ca91ce0",
+        "bytes": 36607
+      },
+      "after": {
+        "sha256": "97c262ea17a07c10e9ea2531f1fd9fdaf2da319f2ec91929187e2e1062c16481",
+        "bytes": 354745
+      }
+    },
+    {
+      "path": "assets/app-icon/deckcraft-macos-512.png",
+      "before": null,
+      "after": {
+        "sha256": "834beb0d6b8b9304aff6794f8bcfe2d2efc3aacc52bc9b338f481eb5217c91a8",
+        "bytes": 200719
+      }
+    },
+    {
+      "path": "assets/app-icon/deckcraft.icns",
+      "before": {
+        "sha256": "c00e0efeae23fbb3651976f9c1b5a062b6327d7ab2f5602b339204208b0283a6",
+        "bytes": 110107
+      },
+      "after": {
+        "sha256": "b779cf63322b3744b24a0e1827fbb634195ff4d4acd49c075b07fb43ca84bb46",
+        "bytes": 1072692
+      }
+    },
+    {
+      "path": "assets/app-icon/deckcraft.ico",
+      "before": {
+        "sha256": "ceb73e008aa2cdf4d05d6375da32c5536a2bc2637bee59cdf441e2f9f792a9cd",
+        "bytes": 22252
+      },
+      "after": {
+        "sha256": "3cfa622f0449a5f47283eff6a13db99ccc05fc252b3b413c8d4f20762ec5294b",
+        "bytes": 116588
+      }
+    },
+    {
+      "path": "assets/app-icon/deckcraft.svg",
+      "before": null,
+      "after": {
+        "sha256": "fbbf62f6a33522f2ccf7e72a47724cb4de9ddee0e0de4a9700a501bb1282d743",
+        "bytes": 473159
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/128x128/apps/ai.storyteller.deckcraft.png",
+      "before": {
+        "sha256": "1bf98b43bb0b21cb038ce063e71b9922e7f48c10d5b99afd046aa6c30642ca69",
+        "bytes": 4791
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/128x128/apps/com.kio.deck.png",
+      "before": null,
+      "after": {
+        "sha256": "1ff2972054bc15a276a4e883127f7f7e665588ca3342bc3935e468f4f24f69ac",
+        "bytes": 23014
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/16x16/apps/ai.storyteller.deckcraft.png",
+      "before": {
+        "sha256": "a1f4766da1452f20a1c85292b799e6ee47bd2207e240d08de445c54882a6d379",
+        "bytes": 818
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/16x16/apps/com.kio.deck.png",
+      "before": null,
+      "after": {
+        "sha256": "6a0248f2904be37319175c3559aa1a0c022d83916003188200c7a6d00149ef68",
+        "bytes": 840
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/24x24/apps/ai.storyteller.deckcraft.png",
+      "before": {
+        "sha256": "c2b810c537c463a414251c737d16863137c5d5b4c5f5b8f88d41b0957821876e",
+        "bytes": 1147
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/24x24/apps/com.kio.deck.png",
+      "before": null,
+      "after": {
+        "sha256": "1ec0475d302af447a0c4b891ac2bf8cff1f3ff12ffa85203f3df74a67d74373b",
+        "bytes": 1444
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/256x256/apps/ai.storyteller.deckcraft.png",
+      "before": {
+        "sha256": "66343901b993332bceadf13277e6a028b80b2fb3a1e215b841c855be731e5130",
+        "bytes": 9327
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/256x256/apps/com.kio.deck.png",
+      "before": null,
+      "after": {
+        "sha256": "0c2c71d3bf01fab11b6f30d5f4c0b45e77039fb1f798c39feacd0e6148b6ab74",
+        "bytes": 77874
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/32x32/apps/ai.storyteller.deckcraft.png",
+      "before": {
+        "sha256": "61ce7f8438d6738d42cb6a1697b561ba11b25f43d1ab7f9c7a2ef07bbcf72f4c",
+        "bytes": 1475
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/32x32/apps/com.kio.deck.png",
+      "before": null,
+      "after": {
+        "sha256": "2d263264b1fcfc306e3060612ae577c0d804964f40732ded19508f08d34e59e3",
+        "bytes": 2225
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/48x48/apps/ai.storyteller.deckcraft.png",
+      "before": {
+        "sha256": "114652a038ffba2d571398d8338657fa34d94e8a0dc7d4696b608d325851e23e",
+        "bytes": 2057
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/48x48/apps/com.kio.deck.png",
+      "before": null,
+      "after": {
+        "sha256": "e9561f2805bc53d1f512d1c73a04322afc1beabe8cd3bbfbcba76fa7a9189e60",
+        "bytes": 4339
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/512x512/apps/ai.storyteller.deckcraft.png",
+      "before": {
+        "sha256": "1c40489926085fd2d998fa3a15c1c22f3eed521e0049e79f19772f1b4a59a2aa",
+        "bytes": 20164
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/512x512/apps/com.kio.deck.png",
+      "before": null,
+      "after": {
+        "sha256": "834beb0d6b8b9304aff6794f8bcfe2d2efc3aacc52bc9b338f481eb5217c91a8",
+        "bytes": 200719
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/64x64/apps/ai.storyteller.deckcraft.png",
+      "before": {
+        "sha256": "e38cec9053092960b1d320edddc4e0bbaf3af1dc9cbe094c014ce633b8db796e",
+        "bytes": 2519
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/64x64/apps/com.kio.deck.png",
+      "before": null,
+      "after": {
+        "sha256": "b356421a368ea6e8bed336e517940a7c9f41d04b3368601e73475f8d82790536",
+        "bytes": 6734
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/scalable/apps/ai.storyteller.deckcraft.svg",
+      "before": {
+        "sha256": "23eedc47e14cea6f4cc6724b13aec3e668e4e0177f6cee1f072f428385e0e6dd",
+        "bytes": 669
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/scalable/apps/com.kio.deck.svg",
+      "before": null,
+      "after": {
+        "sha256": "fbbf62f6a33522f2ccf7e72a47724cb4de9ddee0e0de4a9700a501bb1282d743",
+        "bytes": 473159
+      }
+    },
+    {
+      "path": "assets/app-icon/kio-deck.png",
+      "before": null,
+      "after": {
+        "sha256": "97c262ea17a07c10e9ea2531f1fd9fdaf2da319f2ec91929187e2e1062c16481",
+        "bytes": 354745
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/backstage.rs",
+      "before": {
+        "sha256": "3d2f1500c402f5fe430cbe5047de9876c87ad6688836f8a7837566ca7d464427",
+        "bytes": 54840
+      },
+      "after": {
+        "sha256": "1f82f7c10253733f6ab964527f3699250b99206b65caa78d8e73af6342ca1d4d",
+        "bytes": 54821
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/backstage_tests.rs",
+      "before": {
+        "sha256": "8cb717645a80be6942e067ee5a4a6af7a0092007c697e613564c6a973672b5e4",
+        "bytes": 18330
+      },
+      "after": {
+        "sha256": "de12ccfcef207f99dbf0838107020279e9b3bfe3328018ef113bac18b918a33b",
+        "bytes": 18329
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/dialogs.rs",
+      "before": {
+        "sha256": "335870d4cd959690db850beefc59b37b66b16e9c76abec69fe977a0efbe24eec",
+        "bytes": 39488
+      },
+      "after": {
+        "sha256": "0f70f1c08cb29546293083931d81ddb5f1cef9f8d4f6f841931e4b9d1dc8dda8",
+        "bytes": 39618
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/lib.rs",
+      "before": {
+        "sha256": "9dd339ad5a35164aec6639613814f21ad621c0279477f7c412571a65e70ff70c",
+        "bytes": 60935
+      },
+      "after": {
+        "sha256": "28ab61b56498553db45a084ce57e28e4f276542aaf3b977352bfb848629555ff",
+        "bytes": 60932
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/menus.rs",
+      "before": {
+        "sha256": "82921fef8e38e1b2b3710a4f4d01fcb09bdde10b4c0a858939720997209df644",
+        "bytes": 10206
+      },
+      "after": {
+        "sha256": "ade438003833a2385cd5a96e829f91ca2a49b6d97b4bae484252efa2f55ca0ae",
+        "bytes": 10205
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/ribbon.rs",
+      "before": {
+        "sha256": "6251b0e452e315f4acb566e217a7bbece40a61fc5224bf0a13f19b2baed71492",
+        "bytes": 109360
+      },
+      "after": {
+        "sha256": "c5dea35f318093f9d66c154e9c0167a4a8714204def2bb261e367203a85446db",
+        "bytes": 109359
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/show.rs",
+      "before": {
+        "sha256": "05f4cea92881803cb00de56330ec608ae5a2587495e0609316375202f51b37e2",
+        "bytes": 40175
+      },
+      "after": {
+        "sha256": "9becfffd5971c30fc3ba4fdff279fcac881cf65c97af8c8cf983728608194df7",
+        "bytes": 40174
+      }
+    },
+    {
+      "path": "docs/brand/artcraft-logo-white.png",
+      "before": {
+        "sha256": "8b86aeb06a12a90ba77a60e0d90329272310e244ee5c1f9b161b391280ca79d8",
+        "bytes": 32161
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-logo-white.svg",
+      "before": {
+        "sha256": "a3e03dc49f9ad4225b8517d5424309c8d1c864d3996d862190d9cc797d5af427",
+        "bytes": 5394
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-logo.png",
+      "before": {
+        "sha256": "08fc6d9d3717e8f13417bac6f9025b50e11d1e0b32e9e000883d2fe0c4a0c67b",
+        "bytes": 31302
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-logo.svg",
+      "before": {
+        "sha256": "3188971e1affdf4f6be4fa65f715376a7a305e6aa741ec78b0296c8f934eff08",
+        "bytes": 5394
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-mark-black.png",
+      "before": {
+        "sha256": "5954cc0306e1b9d7beb47097e2e842157113a39d9aba078b57304902687936a9",
+        "bytes": 26793
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-mark-black.svg",
+      "before": {
+        "sha256": "570adcb4f7ba8ca0647f97074476bab81d3272988f1cdee52efa21bf026036a4",
+        "bytes": 341
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-mark.png",
+      "before": {
+        "sha256": "9d372157a949c147318561e629b11561c28b7cbc14c84b516a3fe6e84d8fbbad",
+        "bytes": 24715
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-mark.svg",
+      "before": {
+        "sha256": "f87af81b6fa411da8820eed2bfdcc54c0ee9cd453b4e868c64f56c69db142d0e",
+        "bytes": 341
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/freebsd/package.sh",
+      "before": {
+        "sha256": "0751fbc4e75625d138e081f01e976edd10ad266d61a62908646616ced63a5ab5",
+        "bytes": 1812
+      },
+      "after": {
+        "sha256": "a4bf9d21b3b27c40f35dba83e3a49e41e7e4a006880b20b6ed72a7d4fe447d03",
+        "bytes": 1799
+      }
+    },
+    {
+      "path": "packaging/icons.sh",
+      "before": {
+        "sha256": "0bb08c2faa132772578f63a49317f146574a4166cc3aae9aa907eccf62a4bb02",
+        "bytes": 1695
+      },
+      "after": {
+        "sha256": "cdfe9a7a22698b685bc36d1d34e5090ff4ff39102c35ab95f0e98bd2e45c4750",
+        "bytes": 1682
+      }
+    },
+    {
+      "path": "packaging/linux/ai.storyteller.deckcraft.desktop",
+      "before": {
+        "sha256": "5b949eb272d575ca860c942a3882b435d77f653d77fa943d6565b345541da0b9",
+        "bytes": 603
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/linux/ai.storyteller.deckcraft.metainfo.xml.in",
+      "before": {
+        "sha256": "69a8efae069660231bfd0e44eaf72b1c5ddfb76346c19e5e60304d5a7a55bc5a",
+        "bytes": 2286
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/linux/ai.storyteller.deckcraft.mime.xml",
+      "before": {
+        "sha256": "c3d96b105a96482ee89d8e79d4c5846af600009853cf82852bd4a8d774cea301",
+        "bytes": 353
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/linux/com.kio.deck.desktop",
+      "before": null,
+      "after": {
+        "sha256": "2ac91c3dcdcc028aedcd6e73627231fd6c0401ae0378dd347b1fffaab802f4c9",
+        "bytes": 578
+      }
+    },
+    {
+      "path": "packaging/linux/com.kio.deck.metainfo.xml.in",
+      "before": null,
+      "after": {
+        "sha256": "8266204eef46315b4fd3f54bafda67ce7a88a9ba76c889bbf7ae4fc96ec491e9",
+        "bytes": 2223
+      }
+    },
+    {
+      "path": "packaging/linux/com.kio.deck.mime.xml",
+      "before": null,
+      "after": {
+        "sha256": "a95baf0d261cee979cd64aa0981232e84942d16843fc951714761d0a3a12c916",
+        "bytes": 340
+      }
+    },
+    {
+      "path": "packaging/linux/flatpak-bundle.sh",
+      "before": {
+        "sha256": "e34e409c7386aad5b09c58e46f2a6957986cddaed10a515e24259595805dcd84",
+        "bytes": 3092
+      },
+      "after": {
+        "sha256": "41d08769c44da6cec3551813c311c7c2a873fceed76196edf021fd797ba26735",
+        "bytes": 3066
+      }
+    },
+    {
+      "path": "packaging/linux/flatpak/ai.storyteller.deckcraft.bundle.yml",
+      "before": {
+        "sha256": "52ef6e9414bc4356e886e19ddd01b2e59ad7b39d2f8d01ec761a51ec243bceb5",
+        "bytes": 3109
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/linux/flatpak/ai.storyteller.deckcraft.yml",
+      "before": {
+        "sha256": "4a721bbe8278bc54b9742838cc5a29fc43d9e784a95c10471e3c2f16ef80bf8a",
+        "bytes": 3338
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/linux/flatpak/com.kio.deck.bundle.yml",
+      "before": null,
+      "after": {
+        "sha256": "9ba324be81135be232a06a6a8e5d0bef4822005594b76755bc3bccc831a11747",
+        "bytes": 3001
+      }
+    },
+    {
+      "path": "packaging/linux/flatpak/com.kio.deck.yml",
+      "before": null,
+      "after": {
+        "sha256": "1091e2ba741ab345a569336c6b2b37b93d785e89f4d43273a4f467052af74fd1",
+        "bytes": 3205
+      }
+    },
+    {
+      "path": "packaging/linux/nfpm.yaml",
+      "before": {
+        "sha256": "ff9a5af57c0e7cab6df8f2c2b7bc9f2913fd59fdda8f2d94e0ea9192de97ea87",
+        "bytes": 2228
+      },
+      "after": {
+        "sha256": "33b8158e7bdda988f54cd064d2f87ae1ea7968f5fa867287a298c0bc311c4583",
+        "bytes": 2210
+      }
+    },
+    {
+      "path": "packaging/linux/package.sh",
+      "before": {
+        "sha256": "3093157b5639932629428cb14e56d50401c3b12e99f2d845ac2489b3877a979f",
+        "bytes": 6857
+      },
+      "after": {
+        "sha256": "1e4ec77e8ac631b4085851f340c0c29f1091ab30d6b8b5c94a7ffcfcd5a0c7dc",
+        "bytes": 6841
+      }
+    },
+    {
+      "path": "packaging/macos/Info.plist.in",
+      "before": {
+        "sha256": "608a153816bb9f15930dc53a6af57c8c1dd3984972f7780cfb0d0113219d19bb",
+        "bytes": 3240
+      },
+      "after": {
+        "sha256": "14a98ba00265d8f6eea2e67a375e1b3fc6c302d6ac848f0f2b9c1c4c01ebda37",
+        "bytes": 3265
+      }
+    },
+    {
+      "path": "packaging/macos/package.sh",
+      "before": {
+        "sha256": "6b73a31b522b84b342bf9c50fe5259f62bb4592e5452517a0a5bf215046a48a6",
+        "bytes": 7286
+      },
+      "after": {
+        "sha256": "ffd210b91847373582a17ef9d079233990f06c30eb63666e28ad3d69cff4a07d",
+        "bytes": 7099
+      }
+    },
+    {
+      "path": "packaging/windows/deckcraft.wxs",
+      "before": {
+        "sha256": "1204ef8bdba9334709fc07227733c5867a34bdd4f865aea8163f5ace587f09d9",
+        "bytes": 4626
+      },
+      "after": {
+        "sha256": "a0c8f87ecd4b2cf44924fbc360e9bc06c24676040ac67d9d92194a37edd1f3a9",
+        "bytes": 4585
+      }
+    },
+    {
+      "path": "packaging/windows/package.ps1",
+      "before": {
+        "sha256": "a006d0904c5a6c27d5e3dbf767fbe548d6ad0f711ef9d6f0068e91057d45d999",
+        "bytes": 6859
+      },
+      "after": {
+        "sha256": "36ec4cbdb414d990858c59079cbff78cee673e9f49ee2010501cf32ddc342b2f",
+        "bytes": 6857
+      }
+    },
+    {
+      "path": "packaging/windows/sign.ps1",
+      "before": {
+        "sha256": "4abeac1de0133c7285d9a29492a5e37a59d220294e4023e3931a543b01ee389d",
+        "bytes": 4797
+      },
+      "after": {
+        "sha256": "89d240bc1c9d9c436fbaa3cb0b21fb67c8b5c65883cffc3cff4bd2750475ca2f",
+        "bytes": 4796
+      }
+    }
+  ]
+}

@@ -1,0 +1,890 @@
+{
+  "schema": "kio.native-branding-patch.v1",
+  "programId": "word",
+  "upstream": {
+    "repository": "https://github.com/storytold/wordcraft",
+    "release": "v0.7.0",
+    "commit": "fc41918814f62645b6746ed68e71e8c2c2e85d6f",
+    "sourceArchive": "wordcraft-fc41918814f62645b6746ed68e71e8c2c2e85d6f.tar.gz",
+    "sourceArchiveSha256": "ea7a64508f9df85878481f41ad961f8396be0e6a4cf0f9842844a86dc7a48fb6"
+  },
+  "applicationId": "com.kio.word",
+  "displayName": "KIO Word",
+  "patch": {
+    "file": "wordcraft-v0.7.0-kio-word.patch",
+    "sha256": "f00037e3815c6e5b835d31dbbd326fe96663105778e4bfedc72b93e383ba9aac",
+    "bytes": 4730055
+  },
+  "counts": {
+    "upstreamFiles": 514,
+    "forkFiles": 509,
+    "changedPaths": 88,
+    "added": 17,
+    "removed": 22,
+    "modified": 49,
+    "protectedFilesByteIdentical": 282
+  },
+  "checks": {
+    "originalArchivePatchRoundtrip": true,
+    "protectedEngineDependenciesLicensesCreditsByteIdentical": true,
+    "platformMetadataParses": true,
+    "originalIconByteIdentical": true,
+    "upstreamTrademarkLogoFilesRemoved": true,
+    "translationCatalogSyntaxAndUniqueKeys": true,
+    "nativeBuildRunByBrandingAgent": false,
+    "cargoFmt": "unavailable: rustfmt component absent"
+  },
+  "files": [
+    {
+      "path": "ATTRIBUTION.md",
+      "before": {
+        "sha256": "2a28a5dae997462cce0b6bcb64d8f4de800f61ad3c6c09a33fdeec3f54ca13c2",
+        "bytes": 19013
+      },
+      "after": {
+        "sha256": "486cec47cdfd123980e40b5bcb0e567a6e52c912bd34f80f6670461f5b5fd820",
+        "bytes": 25725
+      }
+    },
+    {
+      "path": "KIO-FORK.json",
+      "before": null,
+      "after": {
+        "sha256": "a92eacd93c143c26b15a2708388ee1f62c533d76772bfd3575531d776d916cdb",
+        "bytes": 1707
+      }
+    },
+    {
+      "path": "KIO-FORK.md",
+      "before": null,
+      "after": {
+        "sha256": "aefc7a51b635b545242e95b81eed4fafceb865205a80b6d951a1455bdd6cd277",
+        "bytes": 3567
+      }
+    },
+    {
+      "path": "README.md",
+      "before": {
+        "sha256": "77656bd3786db1e9378eda9eb8f15ebe8eb0b90a47d674f712702fb3b4819f9c",
+        "bytes": 25687
+      },
+      "after": {
+        "sha256": "afef892a82a9038754f1d82d970f3f614391375a35136fbe5bcf8cf063d0a993",
+        "bytes": 25816
+      }
+    },
+    {
+      "path": "apps/wordcraft/build.rs",
+      "before": {
+        "sha256": "fc4a6595b28e606b90a1327be38020b3415791714e9460956190c74a94835bb4",
+        "bytes": 1457
+      },
+      "after": {
+        "sha256": "9ef359a3392cdeafeff3817493f1f81d3d4370f97902b67951dd08728f05f9da",
+        "bytes": 1437
+      }
+    },
+    {
+      "path": "apps/wordcraft/src/clipboard.rs",
+      "before": {
+        "sha256": "a41cc642d6712ad215d79dbded852c8da53c1a292b22b178ab83c6fb71a8d272",
+        "bytes": 8394
+      },
+      "after": {
+        "sha256": "0c328fe3e7affcaf945516e860d9386a988c7fbe319dfa7975e2bc5700febea4",
+        "bytes": 8393
+      }
+    },
+    {
+      "path": "apps/wordcraft/src/default_apps.rs",
+      "before": {
+        "sha256": "435135395ba61df232b8fba5c303deaa866861c58b3c87f28c282587fd26acd0",
+        "bytes": 9306
+      },
+      "after": {
+        "sha256": "6ff0b39e2aba995392fa9b7681400e76774fba60fc8f60ba813789f9cbf82a03",
+        "bytes": 9256
+      }
+    },
+    {
+      "path": "apps/wordcraft/src/main.rs",
+      "before": {
+        "sha256": "6f1f7d9442d604397d6e01551388929883fadf9b1a2d00728ed76508804afe7d",
+        "bytes": 15387
+      },
+      "after": {
+        "sha256": "9b018cff4fc5060f9366f39fac40552fe826b07964417fadbaecf31eca363da6",
+        "bytes": 15360
+      }
+    },
+    {
+      "path": "apps/wordcraft/src/print.rs",
+      "before": {
+        "sha256": "30ea257b518619c234751f1a9369263b24678c47260d2cf3394882b7cb01c3bd",
+        "bytes": 3201
+      },
+      "after": {
+        "sha256": "94be41dd3f687568b75f397807167d6455ab54a00f84afd46bb131f6691b6973",
+        "bytes": 3200
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/128x128/apps/ai.storyteller.wordcraft.png",
+      "before": {
+        "sha256": "96505c7153c1b8a7e0cf0f90353fae669f4ed9de5524ba50ba99af79003cff43",
+        "bytes": 3350
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/128x128/apps/com.kio.word.png",
+      "before": null,
+      "after": {
+        "sha256": "58262c85c77a5a874599867ae9bd89cfb35525bae5bdae5332121252f446174d",
+        "bytes": 23099
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/16x16/apps/ai.storyteller.wordcraft.png",
+      "before": {
+        "sha256": "eebd190c6d2c7380398c2678a0a6bfaa6482efe2dabb8be17907b0669a82830c",
+        "bytes": 604
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/16x16/apps/com.kio.word.png",
+      "before": null,
+      "after": {
+        "sha256": "a430ec5f74e3cbcde286f914f0de316f776fdb45a51d7b4f5ea8dd0ef9328eed",
+        "bytes": 795
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/24x24/apps/ai.storyteller.wordcraft.png",
+      "before": {
+        "sha256": "a72393249162dd7ce3e23647a23066dfd3de1c13da5875983a7829aeeeccbf1c",
+        "bytes": 1001
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/24x24/apps/com.kio.word.png",
+      "before": null,
+      "after": {
+        "sha256": "0681d1b8e1162349f6b95e405e289150a9fc118c13f7d712764b8fbd828e28b7",
+        "bytes": 1387
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/256x256/apps/ai.storyteller.wordcraft.png",
+      "before": {
+        "sha256": "7c1791408282d01e8c5d0cb1f4080971eaa412c60518694a1cec1e60b23c7406",
+        "bytes": 6388
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/256x256/apps/com.kio.word.png",
+      "before": null,
+      "after": {
+        "sha256": "1f16ad38535934b3f53826bb189153f7dba1079b7ac04245cefa849d9523f3d3",
+        "bytes": 78022
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/32x32/apps/ai.storyteller.wordcraft.png",
+      "before": {
+        "sha256": "ac7b8eeef940a494bc39e0a7bda620aa35f8a3e8ebd9a4ac5716e6cf7dcbd650",
+        "bytes": 1255
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/32x32/apps/com.kio.word.png",
+      "before": null,
+      "after": {
+        "sha256": "988bc012a25b392ede110374674bd6120202b93c7d127e5f6574ddf792ef8dd8",
+        "bytes": 2190
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/48x48/apps/ai.storyteller.wordcraft.png",
+      "before": {
+        "sha256": "ecf1d09ded8baa2fc238ba4df9ae902fe0d8e240706fffb8e0417c3521dc0042",
+        "bytes": 1569
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/48x48/apps/com.kio.word.png",
+      "before": null,
+      "after": {
+        "sha256": "7ab5b7eed07d51d4142b5920701b5e447bdfda42b633babdb107c7b60c0dbf52",
+        "bytes": 4254
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/512x512/apps/ai.storyteller.wordcraft.png",
+      "before": {
+        "sha256": "5d1db7667067a36732acbca87bb988e79898ffab06613f618022fae5e4d08beb",
+        "bytes": 13836
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/512x512/apps/com.kio.word.png",
+      "before": null,
+      "after": {
+        "sha256": "7b3db37daa304605d56fdfafc94be83b97deaf00591fcd950a61765f702b4827",
+        "bytes": 199657
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/64x64/apps/ai.storyteller.wordcraft.png",
+      "before": {
+        "sha256": "4afafced857df9dbac4df8c8add2c0dc21ab9d2d9a7bcdcbb23feda84910c13a",
+        "bytes": 1904
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/64x64/apps/com.kio.word.png",
+      "before": null,
+      "after": {
+        "sha256": "5c592680adc76f7a990ccb1e96d87332a1c0e2b4ea456448680f19196c0f6f0d",
+        "bytes": 6783
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/scalable/apps/ai.storyteller.wordcraft.svg",
+      "before": {
+        "sha256": "9a68cb7f7d11df7e5001125d3bd7fad2f5cc4dcdb1df66006cbcfae887e61b46",
+        "bytes": 961
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/scalable/apps/com.kio.word.svg",
+      "before": null,
+      "after": {
+        "sha256": "d93930c4f5f76cbe45e81ad48b7b67c5d9b4642a4d11bc70a97009f3814a4da1",
+        "bytes": 477251
+      }
+    },
+    {
+      "path": "assets/app-icon/kio-word.png",
+      "before": null,
+      "after": {
+        "sha256": "3ef9864ef7bca04e7c4f2e99adf3f490f18747e16003889bd7cc12b1d62b59cb",
+        "bytes": 357815
+      }
+    },
+    {
+      "path": "assets/app-icon/wordcraft-1024.png",
+      "before": {
+        "sha256": "9525114a2a5e7fc84584b0438a2011ca33f4a30884e40561a1715fbbe7b0c647",
+        "bytes": 30941
+      },
+      "after": {
+        "sha256": "3ef9864ef7bca04e7c4f2e99adf3f490f18747e16003889bd7cc12b1d62b59cb",
+        "bytes": 357815
+      }
+    },
+    {
+      "path": "assets/app-icon/wordcraft-macos-512.png",
+      "before": {
+        "sha256": "5a8a4476c1fb67123f803a8ab7a7a0dbd9912675ae54d695c17e74454913ceae",
+        "bytes": 12242
+      },
+      "after": {
+        "sha256": "7b3db37daa304605d56fdfafc94be83b97deaf00591fcd950a61765f702b4827",
+        "bytes": 199657
+      }
+    },
+    {
+      "path": "assets/app-icon/wordcraft.icns",
+      "before": {
+        "sha256": "02ac9dcb7ee06858416c7ef70ca2b359cad38dbef4a0b526bb1f28953d90170f",
+        "bytes": 110290
+      },
+      "after": {
+        "sha256": "70f8309d74f33b2284779713971671d955a4d217ce66abf167ab4b6689ba7182",
+        "bytes": 1072255
+      }
+    },
+    {
+      "path": "assets/app-icon/wordcraft.ico",
+      "before": {
+        "sha256": "53a23dcf66260f44d87d4d143d633395f3e967f391eda47e6e9cc3a52f820225",
+        "bytes": 18378
+      },
+      "after": {
+        "sha256": "67dc5a35dc985839bd7668537f05194241d1870ed5bc968cc39fc78841ffec16",
+        "bytes": 116648
+      }
+    },
+    {
+      "path": "assets/app-icon/wordcraft.svg",
+      "before": {
+        "sha256": "9a68cb7f7d11df7e5001125d3bd7fad2f5cc4dcdb1df66006cbcfae887e61b46",
+        "bytes": 961
+      },
+      "after": {
+        "sha256": "d93930c4f5f76cbe45e81ad48b7b67c5d9b4642a4d11bc70a97009f3814a4da1",
+        "bytes": 477251
+      }
+    },
+    {
+      "path": "crates/control-key/src/lib.rs",
+      "before": {
+        "sha256": "39285b25cc780ae8ef5235835c48a0373993e9d1462bcc6cbc639f19b580b38d",
+        "bytes": 3524
+      },
+      "after": {
+        "sha256": "3c90ab15b379a0a0d5fc15c866556a70acfa769b559b8d813ad6d37c577f498c",
+        "bytes": 3525
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/backstage.rs",
+      "before": {
+        "sha256": "bd92ad9c28e3a2f2ed34b475d396c8633364c47b1ab3bd8a5415393cd3253d0d",
+        "bytes": 32607
+      },
+      "after": {
+        "sha256": "6f53ec4e12bb407ddd54e020712c0325c5b4677b5edae23a9d16f6c9d774c15e",
+        "bytes": 32605
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/canvas.rs",
+      "before": {
+        "sha256": "0bd48e26bdd2bf48913818a01f5086f60a2dd72ba63038296ef29d514ccc4cd9",
+        "bytes": 191227
+      },
+      "after": {
+        "sha256": "bfafd53789b2577656996f7094efeb3c3a86c0de9c8e99cb376045815162cb7e",
+        "bytes": 191225
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/chrome.rs",
+      "before": {
+        "sha256": "8a4ec75728fdbe0ff0f129e63b63197b7770f0d621c1660fa39478ad16056c99",
+        "bytes": 31015
+      },
+      "after": {
+        "sha256": "4b687c908da42e6299e7fd6e28259bfb357fb95f5f67fdf8550b16099190cb59",
+        "bytes": 31014
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/dialogs.rs",
+      "before": {
+        "sha256": "1670cf523d8882672d16ef55fe1584f08e38b9bf6f3874be414d2fa0ba6eec8e",
+        "bytes": 170885
+      },
+      "after": {
+        "sha256": "22d9056fa1b23386e087c2a71f3f060c838d0b32ea57dbd9dcc664aaa500d904",
+        "bytes": 170642
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/file_browser.rs",
+      "before": {
+        "sha256": "b160d0f701db4fa955b88a8e6c5530d79484194e7f808862631a6216cf7d4d5a",
+        "bytes": 22716
+      },
+      "after": {
+        "sha256": "20f255de81cd366461194223721195658d233754deec34af1e645b2117b7b7ce",
+        "bytes": 22715
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/bg.tsv",
+      "before": {
+        "sha256": "e08ac0478319d6c6edfeb533f3c11c4812ed64c4855f1e635373eeec06727d66",
+        "bytes": 147197
+      },
+      "after": {
+        "sha256": "9d4f357d7c8f5524930dd0ed7ccc4e5c626433f91b542970501308299b21e720",
+        "bytes": 147169
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/cs.tsv",
+      "before": {
+        "sha256": "6aa44290488639e3473b1817859a854d51ce6a6b3f107b2ca27f21c4aa282cdd",
+        "bytes": 85883
+      },
+      "after": {
+        "sha256": "d7b3e81fccdc3aa4a69ff9ac1e23ac4178a9b1d65f979b55cf77280e1f5631d6",
+        "bytes": 85858
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/de.tsv",
+      "before": {
+        "sha256": "edcf2668f052bdff904c9fedebca0e1c309fd5b19849fffedf28aab1b2db5898",
+        "bytes": 87075
+      },
+      "after": {
+        "sha256": "27ebc8cc4c601c9d34b10e787c4e5fda6e832ef394a23556cb8dbccf922eabe7",
+        "bytes": 87057
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/es.tsv",
+      "before": {
+        "sha256": "31122c666ebc791b719f03accf6b524bd53582584adbd060badec4b5c5036bdd",
+        "bytes": 102362
+      },
+      "after": {
+        "sha256": "8b1761ccabe15d811c868bed70291bcf818248d2c53c10e4c5178948e9d4c53f",
+        "bytes": 102336
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/et.tsv",
+      "before": {
+        "sha256": "066dda15a8306b89dd0897b45cf80b680c5211c076f001bcc37ffb6b0f0a4519",
+        "bytes": 81325
+      },
+      "after": {
+        "sha256": "82f5a32846d2ee83df0a05ae95943cb3d63f68e18d5007cc90cec460639d0c0c",
+        "bytes": 81299
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/fr.tsv",
+      "before": {
+        "sha256": "09ea92bee0a4516ef669ecada21e5fd09aef11331ff52f1ecbe73b39bc39e4c8",
+        "bytes": 91669
+      },
+      "after": {
+        "sha256": "dcfbde99882e14a85522ee511363bb6f4d8b3e58f185e6e866a0271d13f84482",
+        "bytes": 91650
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/hu.tsv",
+      "before": {
+        "sha256": "6ecde585c72a2eebb0f917aadb85534d0c95bd27ecc255b05356b41fae34f07a",
+        "bytes": 106539
+      },
+      "after": {
+        "sha256": "846639c63ce30bbbbec7c8b05da20d7d01ce5285989601047ea5ec9fd19b879e",
+        "bytes": 106497
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/it.tsv",
+      "before": {
+        "sha256": "67866ba10458097933d461bafb4b88b496359db21c3378e999094af8f1782870",
+        "bytes": 101841
+      },
+      "after": {
+        "sha256": "ff62a07b5f3d06fa5121522abe8124d414c69e6f3cb35cbfe580e9af74d0046c",
+        "bytes": 101814
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/ja.tsv",
+      "before": {
+        "sha256": "b09ea816ad1166071e63949f954e4bb6aef9fbb80da177e64bd5196d560f562d",
+        "bytes": 91747
+      },
+      "after": {
+        "sha256": "5b65849763174296f1940eb9b910e20119305370075a697249c62aa533adf84d",
+        "bytes": 91721
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/pl.tsv",
+      "before": {
+        "sha256": "3fa47c54688b88ca5ca80eecf505cbc844bb300b2074138a0af2ed4f701f4c6f",
+        "bytes": 102392
+      },
+      "after": {
+        "sha256": "3b428127615c98d5c644343ba630965f0017f976b513e5463a25a5594f814b27",
+        "bytes": 102362
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/pt-br.tsv",
+      "before": {
+        "sha256": "55cbfddeaff3b202f42bb242481ca82dcd1c376fda6dc75caaca4437007b94a9",
+        "bytes": 86585
+      },
+      "after": {
+        "sha256": "4ea8c00067332d20d3e003f8bb9c82d944c10b1bf10338d8338f9f393da1217b",
+        "bytes": 86571
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/ru.tsv",
+      "before": {
+        "sha256": "8a4ef1216057cc85dbed5f8b513743e395fec8b165544a04211cd4edd60c46c2",
+        "bytes": 142671
+      },
+      "after": {
+        "sha256": "ca8ed182a7cf725afaa72cdb56a904a904383d55b17636ea51ef06d69ac2313c",
+        "bytes": 142642
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/sr-latn.tsv",
+      "before": {
+        "sha256": "0c77aad367a9de2be8312930ec44582885afa9bfd9bf2aa8f6bf3e485e5d7351",
+        "bytes": 81656
+      },
+      "after": {
+        "sha256": "f12e5e92e2fe6a755e09982c25b2666ef08acd5efa4447695ace4c8d42fab6a1",
+        "bytes": 81649
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/sr.tsv",
+      "before": {
+        "sha256": "38a3ce054c40f5750fe10ad4e24383272122c710e9965ff4c468576418d992ff",
+        "bytes": 112463
+      },
+      "after": {
+        "sha256": "74d171e62d9a29a5eab71af5bbb0d6401b8c65c4e460327b056cc98a1dea0537",
+        "bytes": 112477
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/tests.rs",
+      "before": {
+        "sha256": "7ca141571760a18f17fa85854d4a6f647892a246dd36e8bb44e692503a1e1592",
+        "bytes": 64327
+      },
+      "after": {
+        "sha256": "6dce7776daaea1ef162162e6d5c6f7ff4c829c9994e39be905467c8fe8f14548",
+        "bytes": 64320
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/tr.tsv",
+      "before": {
+        "sha256": "43e1525f98b8f8ccde381a41e52505825825e64ac8158bb4953ea474439ef8bc",
+        "bytes": 100966
+      },
+      "after": {
+        "sha256": "e228e6e171ac07a35fd4d52627a687fb8e8d5b54c3c4821a387daecc687762b6",
+        "bytes": 100953
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/uk.tsv",
+      "before": {
+        "sha256": "d6f8bb90a69b98e72c12577d153b18606dc40226b4ed35514c75adbdfa35926c",
+        "bytes": 118098
+      },
+      "after": {
+        "sha256": "e6a27e718b74a6a5a485b087cac74066855103e764a677e16d9379bf3a161fd3",
+        "bytes": 118081
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/zh-hans.tsv",
+      "before": {
+        "sha256": "5ceee00d043a9a0e24c3f1b04fd6a91a065019380e270b7aed70d9172cbbe8c9",
+        "bytes": 76130
+      },
+      "after": {
+        "sha256": "0ad35c94b38b5a3237162d59540987578f2841b8bff1306020d21fab182eabf9",
+        "bytes": 76102
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/zh-hant.tsv",
+      "before": {
+        "sha256": "ffcca2d14d323c68cba0e84bb1911fb769b7aa8a0725463141581095f26a5ace",
+        "bytes": 76454
+      },
+      "after": {
+        "sha256": "17e8e8ab7283e634636fd96d5084a14e0a6361e0d78e1d0f92646ad75f89e711",
+        "bytes": 76427
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/lib.rs",
+      "before": {
+        "sha256": "4f09be3449079f83e26fc7aad951c90317937d24648d97d8bebfa8f039168c9d",
+        "bytes": 243317
+      },
+      "after": {
+        "sha256": "0cef3bc867bd6d84a8f00c79a31c315e3fb79a5b0fe1f1e1157459298164ebc1",
+        "bytes": 243308
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/options.rs",
+      "before": {
+        "sha256": "4164d55ea90e6eceea8e43f502656ad0647c5a68c5cfb2ddfab0bbab7c17cebd",
+        "bytes": 39576
+      },
+      "after": {
+        "sha256": "a5b117d627b7a92d76a2403fcdbf37b039dc728ffc17a6b6d579bd3d979677b7",
+        "bytes": 39566
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/zotero.rs",
+      "before": {
+        "sha256": "46cf5e4b5079ba0fc61f5e0309703d678abbf7ae7463df4def2f59cd5ebcf7bc",
+        "bytes": 15050
+      },
+      "after": {
+        "sha256": "5f342d1a55c8685993243846759fbfd70d2ad5e9b3e123698a65e7fc2e845453",
+        "bytes": 15046
+      }
+    },
+    {
+      "path": "docs/brand/artcraft-logo-white.png",
+      "before": {
+        "sha256": "8b86aeb06a12a90ba77a60e0d90329272310e244ee5c1f9b161b391280ca79d8",
+        "bytes": 32161
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-logo-white.svg",
+      "before": {
+        "sha256": "a3e03dc49f9ad4225b8517d5424309c8d1c864d3996d862190d9cc797d5af427",
+        "bytes": 5394
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-logo.png",
+      "before": {
+        "sha256": "08fc6d9d3717e8f13417bac6f9025b50e11d1e0b32e9e000883d2fe0c4a0c67b",
+        "bytes": 31302
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-logo.svg",
+      "before": {
+        "sha256": "3188971e1affdf4f6be4fa65f715376a7a305e6aa741ec78b0296c8f934eff08",
+        "bytes": 5394
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-mark-black.png",
+      "before": {
+        "sha256": "5954cc0306e1b9d7beb47097e2e842157113a39d9aba078b57304902687936a9",
+        "bytes": 26793
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-mark-black.svg",
+      "before": {
+        "sha256": "570adcb4f7ba8ca0647f97074476bab81d3272988f1cdee52efa21bf026036a4",
+        "bytes": 341
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-mark.png",
+      "before": {
+        "sha256": "9d372157a949c147318561e629b11561c28b7cbc14c84b516a3fe6e84d8fbbad",
+        "bytes": 24715
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-mark.svg",
+      "before": {
+        "sha256": "f87af81b6fa411da8820eed2bfdcc54c0ee9cd453b4e868c64f56c69db142d0e",
+        "bytes": 341
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/env.sh",
+      "before": {
+        "sha256": "a11a1b9eef1a98dfffa4b029b72dbfa18dcb9c91b99d0949ff1297e798a2a678",
+        "bytes": 2618
+      },
+      "after": {
+        "sha256": "ba2081a6d85836ba5258673d5d674820205d023e5f0c32b60ad702504390563c",
+        "bytes": 2666
+      }
+    },
+    {
+      "path": "packaging/icons.sh",
+      "before": {
+        "sha256": "2f115fafc18c6603d46bc50f61ea3eff67a1fc7452d271c48a8c9deba8bc2550",
+        "bytes": 2168
+      },
+      "after": {
+        "sha256": "ff8eccce472c98f3f304bd15659e2c55505b939dc6f7edd0ca7a2559a2db2055",
+        "bytes": 2156
+      }
+    },
+    {
+      "path": "packaging/linux/ai.storyteller.wordcraft.desktop",
+      "before": {
+        "sha256": "baa87100d059363f05e90dade3c61b5c31e36820af4d96642b3babe5c264c18b",
+        "bytes": 784
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/linux/ai.storyteller.wordcraft.metainfo.xml.in",
+      "before": {
+        "sha256": "13c0878456ebc29215ee8b767be74bfc91de6b0426b261056905b1b0f556493e",
+        "bytes": 3069
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/linux/ai.storyteller.wordcraft.mime.xml",
+      "before": {
+        "sha256": "0e5f0264eb16018949270b22da03aa49e8bcb3f1683da4e8e4dd7c17cc06417e",
+        "bytes": 126
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/linux/com.kio.word.desktop",
+      "before": null,
+      "after": {
+        "sha256": "ca2e6da29a1f2db8c9f655817d74fcb9c5ef1fdfe4412488d5e616b5609dc59b",
+        "bytes": 759
+      }
+    },
+    {
+      "path": "packaging/linux/com.kio.word.metainfo.xml.in",
+      "before": null,
+      "after": {
+        "sha256": "ae602eba0ba5c2a0c711fc0ecc22c85ea1d6adad493daa31f0ca8ab995aa670e",
+        "bytes": 3005
+      }
+    },
+    {
+      "path": "packaging/linux/com.kio.word.mime.xml",
+      "before": null,
+      "after": {
+        "sha256": "0e5f0264eb16018949270b22da03aa49e8bcb3f1683da4e8e4dd7c17cc06417e",
+        "bytes": 126
+      }
+    },
+    {
+      "path": "packaging/linux/flatpak-bundle.sh",
+      "before": {
+        "sha256": "f04dea912da79ee87f97f397c7a11cb816c371df5e073faf23cada9196d0021e",
+        "bytes": 3087
+      },
+      "after": {
+        "sha256": "7f2018cd8bf0f6cad4dac872bce834a0a8a7b0dfbfefbe47bcdb1a166e4b111a",
+        "bytes": 3061
+      }
+    },
+    {
+      "path": "packaging/linux/flatpak/ai.storyteller.wordcraft.bundle.yml",
+      "before": {
+        "sha256": "d61f4519f19815f325eefe215c8b6b0763e176dcdbd0f739c08ef347677dbc72",
+        "bytes": 3023
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/linux/flatpak/ai.storyteller.wordcraft.yml",
+      "before": {
+        "sha256": "0b485b295af7db3d453954d4688b240b11704f29b5d009d25535e37c06ff4f2d",
+        "bytes": 3394
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/linux/flatpak/com.kio.word.bundle.yml",
+      "before": null,
+      "after": {
+        "sha256": "631dde94907f93be751deb5257df42958243996aeef48bbba8e1980daaed2e9d",
+        "bytes": 2915
+      }
+    },
+    {
+      "path": "packaging/linux/flatpak/com.kio.word.yml",
+      "before": null,
+      "after": {
+        "sha256": "e33a791536b02605afcd60a330e0997616c195942e3d45bd802ec72aaacebf2c",
+        "bytes": 3261
+      }
+    },
+    {
+      "path": "packaging/linux/package.sh",
+      "before": {
+        "sha256": "8701a5968e1327120cfca356d97af091c035c0c7ec2860a0f23e72dc6b2eaa2b",
+        "bytes": 6877
+      },
+      "after": {
+        "sha256": "a36370e9fd8935e89a38f7ebdfe1cd35603055e99eaeba583f8ed709acfb407b",
+        "bytes": 6861
+      }
+    },
+    {
+      "path": "packaging/macos/Info.plist.in",
+      "before": {
+        "sha256": "44e7c698480eb7f7fb331e2aad4b59a18ed88fc6a904baa76e4f72f0c217b76b",
+        "bytes": 2558
+      },
+      "after": {
+        "sha256": "bb96cfab8aa528a858e145731b8c253bc90709720a8ad36f9beb4b2baa7ce975",
+        "bytes": 2597
+      }
+    },
+    {
+      "path": "packaging/macos/package.sh",
+      "before": {
+        "sha256": "81e41136960e0c46b75d6b895da2be9441ac4abbdfc3151d2d3eb84fafb25cb9",
+        "bytes": 7301
+      },
+      "after": {
+        "sha256": "3e89cadc134bbf234236286a452108d788266c07a92a064f65e5873dc8947e5a",
+        "bytes": 7114
+      }
+    },
+    {
+      "path": "packaging/windows/package.ps1",
+      "before": {
+        "sha256": "10ac97ebb95df7224b722966cfb9afb968e7a0f8a194ce53062281ae75b4fc26",
+        "bytes": 9054
+      },
+      "after": {
+        "sha256": "428ca8939c988d8d1d7e61b01aad4357de2e7c582a4f2b909b4d9d55a36bfe6c",
+        "bytes": 9049
+      }
+    },
+    {
+      "path": "packaging/windows/sign.ps1",
+      "before": {
+        "sha256": "b57139078becd1aff4573776a1a78b5931a977e9f4550481745ad42f963a9802",
+        "bytes": 4797
+      },
+      "after": {
+        "sha256": "d101a13e2ae37d9153de809f294f97744a0d1ea44572f72d6ed0e9136fc8b503",
+        "bytes": 4796
+      }
+    },
+    {
+      "path": "packaging/windows/wordcraft.wxs",
+      "before": {
+        "sha256": "89db42e2f44af9d90697a846f1a5844bf1ab7e25b7aaa762b1d6eea2373a98ca",
+        "bytes": 12984
+      },
+      "after": {
+        "sha256": "94eb9739544503978567beda901bad7fef9eb5c503be6e45523cd503e7ce3832",
+        "bytes": 12888
+      }
+    }
+  ]
+}

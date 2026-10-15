@@ -1,0 +1,141 @@
+name: Full native KIO applications (manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      app:
+        description: Complete original native application to build
+        type: choice
+        options: [all, photo, vector, film, light, pdf, effect, design, ui, word, sound, deck, cad, grid]
+        default: grid
+        required: true
+      publish_draft:
+        description: Create draft releases only after native and source jobs pass
+        type: boolean
+        default: false
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: full-native-apps-${{ inputs.app }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  select:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    outputs:
+      native: ${{ steps.matrix.outputs.native }}
+      source: ${{ steps.matrix.outputs.source }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - run: python3 -m unittest discover -s tests -v
+      - id: matrix
+        name: Validate immutable source locks and derive an allowlisted matrix
+        env:
+          KIO_SELECTED_APP: ${{ inputs.app }}
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess
+          native = subprocess.check_output(['python3', 'scripts/full_native.py', 'matrix', '--app', os.environ['KIO_SELECTED_APP']], text=True).strip()
+          rows = json.loads(native)['include']
+          source = {'app': list(dict.fromkeys(x['app'] for x in rows))}
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+              out.write('native=' + native + '\n')
+              out.write('source=' + json.dumps(source, separators=(',', ':')) + '\n')
+          PY
+
+  native:
+    needs: select
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix: ${{ fromJSON(needs.select.outputs.native) }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 180
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - name: Install locked Rust compiler and actual native target
+        run: rustup toolchain install 1.95.0 --profile minimal --target ${{ matrix.target }}
+      - name: Install original WiX prerequisite for full native MSI
+        if: matrix.platform == 'windows-x64'
+        shell: pwsh
+        run: |
+          dotnet tool install --global wix --version 5.0.2
+          if ($LASTEXITCODE -ne 0) { throw 'WiX installation failed' }
+          wix extension add -g WixToolset.UI.wixext/5.0.2 WixToolset.Util.wixext/5.0.2
+          if ($LASTEXITCODE -ne 0) { throw 'WiX extensions installation failed' }
+      - name: Verify all original public source, font and branding bytes
+        run: ${{ matrix.python }} scripts/full_native.py prepare --app ${{ matrix.app }}
+      - name: Build full original GUI and CLI with native features, test original engine and formats
+        run: ${{ matrix.python }} scripts/full_native.py build --app ${{ matrix.app }} --platform ${{ matrix.platform }}
+      - name: Package real native apps, full legal material and mandatory offline resources
+        run: ${{ matrix.python }} scripts/full_native.py package --app ${{ matrix.app }} --platform ${{ matrix.platform }}
+      - name: Check exact release filenames, SHA-256 and byte counts
+        run: ${{ matrix.python }} scripts/full_native.py verify --app ${{ matrix.app }} --platform ${{ matrix.platform }} --directory dist/${{ matrix.app }}-${{ matrix.platform }}
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: ${{ matrix.app }}-${{ matrix.platform }}
+          path: dist/${{ matrix.app }}-${{ matrix.platform }}/
+          if-no-files-found: error
+          retention-days: 14
+
+  full-source:
+    needs: select
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix: ${{ fromJSON(needs.select.outputs.source) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - run: python3 scripts/full_native.py prepare --app ${{ matrix.app }}
+      - name: Package complete modified source, pinned fonts, locks, patch and reproducible instructions
+        run: python3 scripts/full_native.py source --app ${{ matrix.app }}
+      - run: python3 scripts/full_native.py verify --app ${{ matrix.app }} --platform source --directory dist/${{ matrix.app }}-source
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: ${{ matrix.app }}-source
+          path: dist/${{ matrix.app }}-source/
+          if-no-files-found: error
+          retention-days: 14
+
+  publish-draft:
+    if: github.event_name == 'workflow_dispatch' && inputs.publish_draft && github.ref == 'refs/heads/main'
+    needs: [native, full-source]
+    permissions:
+      contents: write
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          path: publish-inputs
+          merge-multiple: false
+      - name: Verify each exact app source/patch/platform before creating drafts
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          KIO_PUBLISH_DRAFT: 'true'
+          KIO_SELECTED_APP: ${{ inputs.app }}
+        run: python3 scripts/full_native.py publish-draft --app "$KIO_SELECTED_APP" --directory publish-inputs

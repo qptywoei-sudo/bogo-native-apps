@@ -1,0 +1,1676 @@
+{
+  "schema": 1,
+  "scope": "Full original native application workspaces, with original default features and official native additions. Build readiness is not release completion.",
+  "applications": [
+    {
+      "id": "photo",
+      "name": "KIO Photo",
+      "assetPrefix": "KIO-Photo",
+      "version": "0.9.0-kio.1",
+      "upstreamVersion": "0.9.0",
+      "rust": "1.95.0",
+      "sourceDateEpoch": 1791987365,
+      "source": {
+        "kind": "source",
+        "repository": "storytold/photocraft",
+        "commit": "c699e3cda69f4852b43c0b191ab0091aaeff9d6a",
+        "tag": "v0.9.0",
+        "url": "https://codeload.github.com/storytold/photocraft/tar.gz/c699e3cda69f4852b43c0b191ab0091aaeff9d6a",
+        "root": "photocraft-c699e3cda69f4852b43c0b191ab0091aaeff9d6a",
+        "sha256": "3f682751d94a36d9f85b80fb5e34bf9b893c97e64dd9d9d8f02c68daac4b4c35",
+        "bytes": 18442275,
+        "archiveMembers": 2028,
+        "localCacheFile": ".cache/archives/photocraft-c699e3cda69f4852b43c0b191ab0091aaeff9d6a.tar.gz",
+        "reuse": "downloaded pinned public codeload source",
+        "verifiedAgainstPriorLock": true,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "fonts": {
+        "kind": "fonts",
+        "repository": "storytold/craft-fonts",
+        "commit": "abb83316d96aa59c1cf64784289e378fe9fa5695",
+        "url": "https://codeload.github.com/storytold/craft-fonts/tar.gz/abb83316d96aa59c1cf64784289e378fe9fa5695",
+        "root": "craft-fonts-abb83316d96aa59c1cf64784289e378fe9fa5695",
+        "sha256": "53e41ed01ee81a0ef664601a73fb87281f1fd748e724f560c8128d7d33eb3328",
+        "bytes": 14570459,
+        "archiveMembers": 39,
+        "localCacheFile": ".cache/archives/craft-fonts-abb83316d96aa59c1cf64784289e378fe9fa5695.tar.gz",
+        "reuse": "downloaded pinned public codeload source",
+        "verifiedAgainstPriorLock": false,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "branding": {
+        "patch": "patches/photo/photocraft-v0.9.0-kio-photo.patch",
+        "sha256": "5616d6da79ac4ffb1be04b7dcb616f3ff6e9dacd698d09ba31f791a6bec6998c",
+        "manifest": "patches/photo/manifest.json",
+        "manifestSha256": "5c4ebbe4a66a6702d92e89f2d9673aa21c244f278c87c5760aacd7ee116192f8"
+      },
+      "cargoPackages": [
+        "photocraft",
+        "photocraft-cli"
+      ],
+      "cargoArgs": [
+        "build",
+        "--release",
+        "--locked",
+        "-p",
+        "photocraft",
+        "-p",
+        "photocraft-cli",
+        "--features",
+        "heif"
+      ],
+      "testPackages": [
+        "photocraft-engine",
+        "photocraft-io"
+      ],
+      "binaries": {
+        "app": "photocraft",
+        "cli": "photocraft-cli"
+      },
+      "bundleId": "com.kio.photo",
+      "features": {
+        "preserveDefaults": true,
+        "appDefaultFeatures": [],
+        "officialNativeAdditionalFeatures": [
+          "heif"
+        ],
+        "optionalAppFeatures": [
+          "heif"
+        ]
+      },
+      "extras": [
+        {
+          "kind": "fonts",
+          "requiredForOfficialNativeParity": true,
+          "repo": "storytold/craft-fonts",
+          "commit": "abb83316d96aa59c1cf64784289e378fe9fa5695",
+          "buildEnvironment": {
+            "CRAFT_FONTS_DIR": "<absolute-path-to-pinned-craft-fonts>",
+            "CRAFT_FONTS_REQUIRED": "1"
+          },
+          "staging": "Embedded at compile time; also copy font OFL license files into the package using upstream packaging helpers."
+        }
+      ],
+      "upstreamGaps": "Upstream explicitly says it is not yet a Photoshop replacement for daily professional work. AI/generative, tool depth, typography and plugin gaps remain.",
+      "icon": "assets/app-icon/photocraft.icns",
+      "originalPackaging": {
+        "packages": [
+          "photocraft",
+          "photocraft-cli"
+        ],
+        "cargoArgs": [
+          "build",
+          "--release",
+          "--locked",
+          "-p",
+          "photocraft",
+          "-p",
+          "photocraft-cli",
+          "--features",
+          "heif"
+        ],
+        "macosPackagingScript": "packaging/macos/package.sh",
+        "macosPackagingArgs": [
+          "--arch",
+          "aarch64"
+        ],
+        "windowsPackagingScript": "packaging/windows/package.ps1",
+        "windowsPackagingArgs": [
+          "-Arch",
+          "x64"
+        ],
+        "webPackagingScript": "packaging/web/package.sh"
+      },
+      "versionOutputNames": {
+        "app": "photocraft",
+        "cli": "photocraft-cli"
+      },
+      "windowsGuiVersionCheck": "stdout"
+    },
+    {
+      "id": "vector",
+      "name": "KIO Vector",
+      "assetPrefix": "KIO-Vector",
+      "version": "0.11.0-kio.1",
+      "upstreamVersion": "0.11.0",
+      "rust": "1.95.0",
+      "sourceDateEpoch": 1791983133,
+      "source": {
+        "kind": "source",
+        "repository": "storytold/vectorcraft",
+        "commit": "0a33cff3f6e2a1e9e672f4c3816f58cd8d3d032e",
+        "tag": "v0.11.0",
+        "url": "https://codeload.github.com/storytold/vectorcraft/tar.gz/0a33cff3f6e2a1e9e672f4c3816f58cd8d3d032e",
+        "root": "vectorcraft-0a33cff3f6e2a1e9e672f4c3816f58cd8d3d032e",
+        "sha256": "91582b06374205c80a07c58da465c4fd681452777ded9678c240cfca7e39489f",
+        "bytes": 16453954,
+        "archiveMembers": 1802,
+        "localCacheFile": ".cache/archives/vectorcraft-0a33cff3f6e2a1e9e672f4c3816f58cd8d3d032e.tar.gz",
+        "reuse": "hardlink reused existing source archive",
+        "verifiedAgainstPriorLock": true,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "fonts": {
+        "kind": "fonts",
+        "repository": "storytold/craft-fonts",
+        "commit": "3d9ab3a132ed0eff457e424226a435a901da30d3",
+        "url": "https://codeload.github.com/storytold/craft-fonts/tar.gz/3d9ab3a132ed0eff457e424226a435a901da30d3",
+        "root": "craft-fonts-3d9ab3a132ed0eff457e424226a435a901da30d3",
+        "sha256": "bb8c4d2c32148760d2d47d77e8b222bc2b22fda1e85fcd72290fe7bfbb4689ee",
+        "bytes": 28766039,
+        "archiveMembers": 48,
+        "localCacheFile": ".cache/archives/craft-fonts-3d9ab3a132ed0eff457e424226a435a901da30d3.tar.gz",
+        "reuse": "downloaded pinned public codeload source",
+        "verifiedAgainstPriorLock": false,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "branding": {
+        "patch": "patches/vector/vectorcraft-v0.11.0-kio-vector.patch",
+        "sha256": "a9d8d399483481efd0a33758ac11b9030d5d6e34f67ad0f620c7d731d3f6047a",
+        "manifest": "patches/vector/manifest.json",
+        "manifestSha256": "b7d4dae4e8ff57f0442cff84d814ed3701588435475e44a1770573f5cb2cb4f1"
+      },
+      "cargoPackages": [
+        "vectorcraft",
+        "vectorcraft-cli"
+      ],
+      "cargoArgs": [
+        "build",
+        "--release",
+        "--locked",
+        "-p",
+        "vectorcraft",
+        "-p",
+        "vectorcraft-cli"
+      ],
+      "testPackages": [
+        "vectorcraft-engine"
+      ],
+      "binaries": {
+        "app": "vectorcraft",
+        "cli": "vectorcraft-cli"
+      },
+      "bundleId": "com.kio.vector",
+      "features": {
+        "preserveDefaults": true,
+        "appDefaultFeatures": [
+          "wgpu",
+          "accessibility"
+        ],
+        "officialNativeAdditionalFeatures": [],
+        "optionalAppFeatures": []
+      },
+      "extras": [
+        {
+          "kind": "fonts",
+          "requiredForOfficialNativeParity": true,
+          "repo": "storytold/craft-fonts",
+          "commit": "3d9ab3a132ed0eff457e424226a435a901da30d3",
+          "buildEnvironment": {
+            "CRAFT_FONTS_DIR": "<absolute-path-to-pinned-craft-fonts>",
+            "CRAFT_FONTS_REQUIRED": "1"
+          },
+          "staging": "Embedded at compile time; also copy font OFL license files into the package using upstream packaging helpers."
+        }
+      ],
+      "upstreamGaps": "Alpha vector editor. Illustrator editing-data exchange and exact tool behavior remain incomplete; Affinity import only.",
+      "icon": "assets/app-icon/vectorcraft.icns",
+      "originalPackaging": {
+        "packages": [
+          "vectorcraft",
+          "vectorcraft-cli"
+        ],
+        "cargoArgs": [
+          "build",
+          "--release",
+          "--locked",
+          "-p",
+          "vectorcraft",
+          "-p",
+          "vectorcraft-cli"
+        ],
+        "macosPackagingScript": "packaging/macos/package.sh",
+        "macosPackagingArgs": [
+          "--arch",
+          "aarch64"
+        ],
+        "windowsPackagingScript": "packaging/windows/package.ps1",
+        "windowsPackagingArgs": [
+          "-Arch",
+          "x64"
+        ],
+        "webPackagingScript": "packaging/web/package.sh"
+      },
+      "versionOutputNames": {
+        "app": "vectorcraft",
+        "cli": "vectorcraft-cli"
+      },
+      "windowsGuiVersionCheck": "stdout"
+    },
+    {
+      "id": "film",
+      "name": "KIO Film",
+      "assetPrefix": "KIO-Film",
+      "version": "0.8.0-kio.1",
+      "upstreamVersion": "0.8.0",
+      "rust": "1.95.0",
+      "sourceDateEpoch": 1791987306,
+      "source": {
+        "kind": "source",
+        "repository": "storytold/filmcraft",
+        "commit": "f03e21556d8e3a7155b91892d958debd5255d7af",
+        "tag": "v0.8.0",
+        "url": "https://codeload.github.com/storytold/filmcraft/tar.gz/f03e21556d8e3a7155b91892d958debd5255d7af",
+        "root": "filmcraft-f03e21556d8e3a7155b91892d958debd5255d7af",
+        "sha256": "ee62f9048c0088ae47283b4b7ae37a31a2319a27ebdd6af36b43f4999ea55d45",
+        "bytes": 20295015,
+        "archiveMembers": 1622,
+        "localCacheFile": ".cache/archives/filmcraft-f03e21556d8e3a7155b91892d958debd5255d7af.tar.gz",
+        "reuse": "downloaded pinned public codeload source",
+        "verifiedAgainstPriorLock": true,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "fonts": {
+        "kind": "fonts",
+        "repository": "storytold/craft-fonts",
+        "commit": "abb83316d96aa59c1cf64784289e378fe9fa5695",
+        "url": "https://codeload.github.com/storytold/craft-fonts/tar.gz/abb83316d96aa59c1cf64784289e378fe9fa5695",
+        "root": "craft-fonts-abb83316d96aa59c1cf64784289e378fe9fa5695",
+        "sha256": "53e41ed01ee81a0ef664601a73fb87281f1fd748e724f560c8128d7d33eb3328",
+        "bytes": 14570459,
+        "archiveMembers": 39,
+        "localCacheFile": ".cache/archives/craft-fonts-abb83316d96aa59c1cf64784289e378fe9fa5695.tar.gz",
+        "reuse": "downloaded pinned public codeload source",
+        "verifiedAgainstPriorLock": false,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "branding": {
+        "patch": "patches/film/filmcraft-v0.8.0-kio-film.patch",
+        "sha256": "5ebb0bb092fedbbb03f6b56ca268ff4b3f140c6b5273f68a75251e51847a11c8",
+        "manifest": "patches/film/manifest.json",
+        "manifestSha256": "86df72688cc4bc1476dca17803356084fe8fe8b2341974002cec5a2df696b616"
+      },
+      "cargoPackages": [
+        "filmcraft",
+        "filmcraft-cli"
+      ],
+      "cargoArgs": [
+        "build",
+        "--release",
+        "--locked",
+        "-p",
+        "filmcraft",
+        "-p",
+        "filmcraft-cli"
+      ],
+      "testPackages": [
+        "filmcraft-engine"
+      ],
+      "binaries": {
+        "app": "filmcraft",
+        "cli": "filmcraft-cli"
+      },
+      "bundleId": "com.kio.film",
+      "features": {
+        "preserveDefaults": true,
+        "appDefaultFeatures": [],
+        "officialNativeAdditionalFeatures": [],
+        "optionalAppFeatures": [
+          "whisper",
+          "neural-voices"
+        ]
+      },
+      "extras": [
+        {
+          "kind": "fonts",
+          "requiredForOfficialNativeParity": true,
+          "repo": "storytold/craft-fonts",
+          "commit": "abb83316d96aa59c1cf64784289e378fe9fa5695",
+          "buildEnvironment": {
+            "CRAFT_FONTS_DIR": "<absolute-path-to-pinned-craft-fonts>",
+            "CRAFT_FONTS_REQUIRED": "1"
+          },
+          "staging": "Embedded at compile time; also copy font OFL license files into the package using upstream packaging helpers."
+        },
+        {
+          "kind": "optional-models",
+          "requiredForOfficialNativeParity": false,
+          "notes": "Whisper speech transcription and Kokoro neural voices require optional compile features; upstream official native package scripts do not enable them by default. Preserve optional extension capability without claiming it is bundled."
+        }
+      ],
+      "upstreamGaps": "Cannot open Premiere .prproj; no VST3/AU/OpenFX hosting; footage performance, platform testing and delivery-codec limitations remain.",
+      "icon": "assets/app-icon/filmcraft.icns",
+      "originalPackaging": {
+        "packages": [
+          "filmcraft",
+          "filmcraft-cli"
+        ],
+        "cargoArgs": [
+          "build",
+          "--release",
+          "--locked",
+          "-p",
+          "filmcraft",
+          "-p",
+          "filmcraft-cli"
+        ],
+        "macosPackagingScript": "packaging/macos/package.sh",
+        "macosPackagingArgs": [
+          "--arch",
+          "aarch64"
+        ],
+        "windowsPackagingScript": "packaging/windows/package.ps1",
+        "windowsPackagingArgs": [
+          "-Arch",
+          "x64"
+        ],
+        "webPackagingScript": "packaging/web/package.sh"
+      },
+      "originalArchivePathExceptions": [
+        {
+          "path": "crates/h264enc/target/agent-h264enc/fixtures/h264enc/oracle/avcc.h264",
+          "sha256": "19c8cfb5a7341d998a2d232d18bbc33a255ee168e6e35c67a284e984331660e0",
+          "bytes": 15264,
+          "reason": "Exact public upstream codec test oracle fixture"
+        },
+        {
+          "path": "crates/h264enc/target/agent-h264enc/fixtures/h264enc/oracle/baseline_lowqp_slices.h264",
+          "sha256": "b76a14fd3f88b4ebda1b0d2357f421582e3fde1543838033706f205659546c00",
+          "bytes": 79356,
+          "reason": "Exact public upstream codec test oracle fixture"
+        },
+        {
+          "path": "crates/h264enc/target/agent-h264enc/fixtures/h264enc/oracle/baseline_speed.h264",
+          "sha256": "78435070ec354953aa97656030a3b0790cd2001ec55719c7e02d1f0bc9397ed5",
+          "bytes": 26145,
+          "reason": "Exact public upstream codec test oracle fixture"
+        },
+        {
+          "path": "crates/h264enc/target/agent-h264enc/fixtures/h264enc/oracle/bframes.h264",
+          "sha256": "4867c86c3e1034b5ca518557f4a5f127ad722bdce3a6eb56af4314aeb879d97d",
+          "bytes": 14029,
+          "reason": "Exact public upstream codec test oracle fixture"
+        },
+        {
+          "path": "crates/h264enc/target/agent-h264enc/fixtures/h264enc/oracle/cbr.h264",
+          "sha256": "1eb919757cd8b9fcc3aa55890ce49e8a1639923456d0718c723ffd3095108056",
+          "bytes": 569281,
+          "reason": "Exact public upstream codec test oracle fixture"
+        },
+        {
+          "path": "crates/h264enc/target/agent-h264enc/fixtures/h264enc/oracle/high_crf_b2.h264",
+          "sha256": "592f944844e322597c8f9aa79189128fd80d2e2a85066f07fc9c5053dd23e41d",
+          "bytes": 75092,
+          "reason": "Exact public upstream codec test oracle fixture"
+        },
+        {
+          "path": "crates/h264enc/target/agent-h264enc/fixtures/h264enc/oracle/high_quality_b3_slices.h264",
+          "sha256": "3e0e65882c14f0a1a30fe3a3b8cdc8a2cb061f75250c2d6f9aabdf54033a67d3",
+          "bytes": 73167,
+          "reason": "Exact public upstream codec test oracle fixture"
+        },
+        {
+          "path": "crates/h264enc/target/agent-h264enc/fixtures/h264enc/oracle/high_speed_odd_size.h264",
+          "sha256": "e1469ccab40727dd7aacdcf6eefd756b0f6faf7d264c2d8c10806c0e51730037",
+          "bytes": 13984,
+          "reason": "Exact public upstream codec test oracle fixture"
+        },
+        {
+          "path": "crates/h264enc/target/agent-h264enc/fixtures/h264enc/oracle/main_b2.h264",
+          "sha256": "aeba644861cbf1459f3259bb7db7773bb76ffdedfd4470fec9ed13805d52d828",
+          "bytes": 23330,
+          "reason": "Exact public upstream codec test oracle fixture"
+        },
+        {
+          "path": "crates/h264enc/target/agent-h264enc/fixtures/h264enc/oracle/mandelbrot.h264",
+          "sha256": "f1b9e97cfbcd2a86935d1be330088897ca872cc80621336316711518de249535",
+          "bytes": 84328,
+          "reason": "Exact public upstream codec test oracle fixture"
+        },
+        {
+          "path": "crates/h264enc/target/agent-h264enc/fixtures/h264enc/oracle/psnr1080.h264",
+          "sha256": "c54ff0d60be3230c86469f2a32e77a57b30430bf9f40dc3aca4a8cbcfc557fb3",
+          "bytes": 1337708,
+          "reason": "Exact public upstream codec test oracle fixture"
+        },
+        {
+          "path": "crates/h264enc/target/agent-h264enc/fixtures/h264enc/oracle/testsrc2.h264",
+          "sha256": "b5bcef3c1ce11a7aeb6b14fd714f171cd226bd8609de84801d5ea49baa1d3928",
+          "bytes": 52896,
+          "reason": "Exact public upstream codec test oracle fixture"
+        },
+        {
+          "path": "crates/h264enc/target/agent-h264enc/fixtures/h264enc/oracle/twopass.h264",
+          "sha256": "bc46e26ec557241e008d0cfa1395168803e9e1953e8503979879b41a06a86cc9",
+          "bytes": 315083,
+          "reason": "Exact public upstream codec test oracle fixture"
+        },
+        {
+          "path": "crates/h264enc/target/agent-h264enc/fixtures/h264enc/oracle/vbr1pass.h264",
+          "sha256": "036828d3680e84325e0b7fbb72092a6addf272b5c35a89b8090adcc87219a472",
+          "bytes": 367892,
+          "reason": "Exact public upstream codec test oracle fixture"
+        }
+      ],
+      "versionOutputNames": {
+        "app": "filmcraft",
+        "cli": "filmcraft-cli"
+      },
+      "windowsGuiVersionCheck": "pe-resource"
+    },
+    {
+      "id": "light",
+      "name": "KIO Light",
+      "assetPrefix": "KIO-Light",
+      "version": "0.8.0-kio.1",
+      "upstreamVersion": "0.8.0",
+      "rust": "1.95.0",
+      "sourceDateEpoch": 1791984895,
+      "source": {
+        "kind": "source",
+        "repository": "storytold/lightcraft",
+        "commit": "16dbb90499d3c63a6582fcbba1b2550a6e2da032",
+        "tag": "v0.8.0",
+        "url": "https://codeload.github.com/storytold/lightcraft/tar.gz/16dbb90499d3c63a6582fcbba1b2550a6e2da032",
+        "root": "lightcraft-16dbb90499d3c63a6582fcbba1b2550a6e2da032",
+        "sha256": "6d0d035eacb385f2b810db1d6166c13190c71c8ae8904a3d410cc1530a88a588",
+        "bytes": 16214739,
+        "archiveMembers": 973,
+        "localCacheFile": ".cache/archives/lightcraft-16dbb90499d3c63a6582fcbba1b2550a6e2da032.tar.gz",
+        "reuse": "downloaded pinned public codeload source",
+        "verifiedAgainstPriorLock": true,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "fonts": {
+        "kind": "fonts",
+        "repository": "storytold/craft-fonts",
+        "commit": "8dcdacd5153e64560d109541a47d806f26f048c0",
+        "url": "https://codeload.github.com/storytold/craft-fonts/tar.gz/8dcdacd5153e64560d109541a47d806f26f048c0",
+        "root": "craft-fonts-8dcdacd5153e64560d109541a47d806f26f048c0",
+        "sha256": "c0bfca8f4dd8c98825e598c0324c66d90609fe531b212a6c9a04f6852dc5387b",
+        "bytes": 28629163,
+        "archiveMembers": 45,
+        "localCacheFile": ".cache/archives/craft-fonts-8dcdacd5153e64560d109541a47d806f26f048c0.tar.gz",
+        "reuse": "hardlink reused existing source archive",
+        "verifiedAgainstPriorLock": true,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "branding": {
+        "patch": "patches/light/lightcraft-v0.8.0-kio-light.patch",
+        "sha256": "fba2ca35ab09ad1a88365bba9bdcfcf4d5f28b317841c5bef421fbede28d9854",
+        "manifest": "patches/light/manifest.json",
+        "manifestSha256": "c73ebd9f56981344b0ffe4d1a5c0683676c5cd0e532ed440091aae524b39230e"
+      },
+      "cargoPackages": [
+        "lightcraft",
+        "lightcraft-cli"
+      ],
+      "cargoArgs": [
+        "build",
+        "--release",
+        "--locked",
+        "-p",
+        "lightcraft",
+        "-p",
+        "lightcraft-cli",
+        "--features",
+        "lightcraft/heif,lightcraft-cli/heif"
+      ],
+      "testPackages": [
+        "lightcraft-denoise-core",
+        "lightcraft-engine"
+      ],
+      "binaries": {
+        "app": "lightcraft",
+        "cli": "lightcraft-cli"
+      },
+      "bundleId": "com.kio.light",
+      "features": {
+        "preserveDefaults": true,
+        "appDefaultFeatures": [
+          "denoise"
+        ],
+        "officialNativeAdditionalFeatures": [
+          "lightcraft/heif",
+          "lightcraft-cli/heif"
+        ],
+        "optionalAppFeatures": [
+          "heif",
+          "rawnind-model"
+        ]
+      },
+      "extras": [
+        {
+          "kind": "fonts",
+          "requiredForOfficialNativeParity": true,
+          "repo": "storytold/craft-fonts",
+          "commit": "8dcdacd5153e64560d109541a47d806f26f048c0",
+          "buildEnvironment": {
+            "CRAFT_FONTS_DIR": "<absolute-path-to-pinned-craft-fonts>",
+            "CRAFT_FONTS_REQUIRED": "1"
+          },
+          "staging": "Embedded at compile time; also copy font OFL license files into the package using upstream packaging helpers."
+        }
+      ],
+      "upstreamGaps": "RAW support and camera color calibration vary by camera; unsupported variants may use embedded JPEG previews; some masking is heuristic.",
+      "icon": "assets/app-icon/lightcraft.icns",
+      "originalPackaging": {
+        "packages": [
+          "lightcraft",
+          "lightcraft-cli"
+        ],
+        "cargoArgs": [
+          "build",
+          "--release",
+          "--locked",
+          "-p",
+          "lightcraft",
+          "-p",
+          "lightcraft-cli",
+          "--features",
+          "lightcraft/heif,lightcraft-cli/heif"
+        ],
+        "macosPackagingScript": "packaging/macos/package.sh",
+        "macosPackagingArgs": [
+          "--arch",
+          "aarch64"
+        ],
+        "windowsPackagingScript": "packaging/windows/package.ps1",
+        "windowsPackagingArgs": [
+          "-Arch",
+          "x64"
+        ],
+        "webPackagingScript": "packaging/web/package.sh"
+      },
+      "versionOutputNames": {
+        "app": "lightcraft",
+        "cli": "lightcraft-cli"
+      },
+      "windowsGuiVersionCheck": "stdout"
+    },
+    {
+      "id": "pdf",
+      "name": "KIO PDF",
+      "assetPrefix": "KIO-PDF",
+      "version": "0.8.0-kio.1",
+      "upstreamVersion": "0.8.0",
+      "rust": "1.95.0",
+      "sourceDateEpoch": 1791983188,
+      "source": {
+        "kind": "source",
+        "repository": "storytold/pdfcraft",
+        "commit": "9931329b9fae0b05373b4dc3ac7c58541f0891a4",
+        "tag": "v0.8.0",
+        "url": "https://codeload.github.com/storytold/pdfcraft/tar.gz/9931329b9fae0b05373b4dc3ac7c58541f0891a4",
+        "root": "pdfcraft-9931329b9fae0b05373b4dc3ac7c58541f0891a4",
+        "sha256": "953f32944503e09323c4d66aac2528974cb04f94acfc1a4dfe50c1a86f0091ed",
+        "bytes": 14600876,
+        "archiveMembers": 1550,
+        "localCacheFile": ".cache/archives/pdfcraft-9931329b9fae0b05373b4dc3ac7c58541f0891a4.tar.gz",
+        "reuse": "downloaded pinned public codeload source",
+        "verifiedAgainstPriorLock": true,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "fonts": {
+        "kind": "fonts",
+        "repository": "storytold/craft-fonts",
+        "commit": "3d9ab3a132ed0eff457e424226a435a901da30d3",
+        "url": "https://codeload.github.com/storytold/craft-fonts/tar.gz/3d9ab3a132ed0eff457e424226a435a901da30d3",
+        "root": "craft-fonts-3d9ab3a132ed0eff457e424226a435a901da30d3",
+        "sha256": "bb8c4d2c32148760d2d47d77e8b222bc2b22fda1e85fcd72290fe7bfbb4689ee",
+        "bytes": 28766039,
+        "archiveMembers": 48,
+        "localCacheFile": ".cache/archives/craft-fonts-3d9ab3a132ed0eff457e424226a435a901da30d3.tar.gz",
+        "reuse": "downloaded pinned public codeload source",
+        "verifiedAgainstPriorLock": false,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "branding": {
+        "patch": "patches/pdf/pdfcraft-v0.8.0-kio-pdf.patch",
+        "sha256": "51acf636a116dfe3f452b5f5845532ea1e961b587afa1bb4d3fb27c721767ba5",
+        "manifest": "patches/pdf/manifest.json",
+        "manifestSha256": "3794670bac7b02f30963dfa58cacf304993ec9b7253e0605e648d319f631e271"
+      },
+      "cargoPackages": [
+        "pdfcraft",
+        "pdfcraft-cli"
+      ],
+      "cargoArgs": [
+        "build",
+        "--release",
+        "--locked",
+        "-p",
+        "pdfcraft",
+        "-p",
+        "pdfcraft-cli"
+      ],
+      "testPackages": [
+        "pdfcraft-engine"
+      ],
+      "binaries": {
+        "app": "pdfcraft",
+        "cli": "pdfcraft-cli"
+      },
+      "bundleId": "com.kio.pdf",
+      "features": {
+        "preserveDefaults": true,
+        "appDefaultFeatures": [],
+        "officialNativeAdditionalFeatures": [],
+        "optionalAppFeatures": []
+      },
+      "extras": [
+        {
+          "kind": "fonts",
+          "requiredForOfficialNativeParity": true,
+          "repo": "storytold/craft-fonts",
+          "commit": "3d9ab3a132ed0eff457e424226a435a901da30d3",
+          "buildEnvironment": {
+            "CRAFT_FONTS_DIR": "<absolute-path-to-pinned-craft-fonts>",
+            "CRAFT_FONTS_REQUIRED": "1"
+          },
+          "staging": "Embedded at compile time; also copy font OFL license files into the package using upstream packaging helpers."
+        },
+        {
+          "kind": "ocr-models",
+          "requiredForOfficialNativeParity": true,
+          "prepareCommand": [
+            "cargo",
+            "xtask",
+            "models",
+            "<staging-models-directory>"
+          ],
+          "macosDestination": "<App>.app/Contents/Resources/models",
+          "windowsDestination": "<directory-containing-exe>/models",
+          "requiredCompanions": [
+            "ATTRIBUTION.txt",
+            "*.LICENCE.txt"
+          ],
+          "notes": "Upstream package scripts fetch and stage all OCR models before code signing. Do not ship only the executable."
+        }
+      ],
+      "upstreamGaps": "Existing-text edits, non-Latin OCR, Office conversion, signatures, print fidelity and professional PDF workflows remain incomplete.",
+      "icon": "assets/app-icon/pdfcraft.icns",
+      "originalPackaging": {
+        "packages": [
+          "pdfcraft",
+          "pdfcraft-cli"
+        ],
+        "cargoArgs": [
+          "build",
+          "--release",
+          "--locked",
+          "-p",
+          "pdfcraft",
+          "-p",
+          "pdfcraft-cli"
+        ],
+        "macosPackagingScript": "packaging/macos/package.sh",
+        "macosPackagingArgs": [
+          "--arch",
+          "aarch64"
+        ],
+        "windowsPackagingScript": "packaging/windows/package.ps1",
+        "windowsPackagingArgs": [
+          "-Arch",
+          "x64"
+        ],
+        "webPackagingScript": "packaging/web/package.sh"
+      },
+      "originalArchivePathExceptions": [
+        {
+          "path": "crates/sign/tests/data/chain.p12",
+          "sha256": "ee84857631866918d90e9352c071c91e17181e9a3235d147d0a4e54f26820a10",
+          "bytes": 3044,
+          "reason": "Exact public upstream synthetic signing test certificate; not a user/publisher credential"
+        },
+        {
+          "path": "crates/sign/tests/data/ec-legacy.p12",
+          "sha256": "47de17ef0f8fac5b02080d3e5a917cbdd6f6f8b1af43b3fb498f312800a1fd7a",
+          "bytes": 1047,
+          "reason": "Exact public upstream synthetic signing test certificate; not a user/publisher credential"
+        },
+        {
+          "path": "crates/sign/tests/data/ec-p256.p12",
+          "sha256": "fbaad3e004e19d86f44d4446e99d885402ea865beb6d0c55bbf8dcb2719da1c0",
+          "bytes": 1112,
+          "reason": "Exact public upstream synthetic signing test certificate; not a user/publisher credential"
+        },
+        {
+          "path": "crates/sign/tests/data/ec-p384.p12",
+          "sha256": "e50b2c9f59bca47525ae0c4d87000066e041341160e1189bb76c1cfb0816f0a5",
+          "bytes": 1162,
+          "reason": "Exact public upstream synthetic signing test certificate; not a user/publisher credential"
+        },
+        {
+          "path": "crates/sign/tests/data/rsa-aes.p12",
+          "sha256": "67b64bd68ae331b176747747edf550d8c48514d4190202711edd53bbacd56d29",
+          "bytes": 2714,
+          "reason": "Exact public upstream synthetic signing test certificate; not a user/publisher credential"
+        },
+        {
+          "path": "crates/sign/tests/data/rsa-legacy.p12",
+          "sha256": "b5350ec838e04b923de21f0c4e76b6072b9df15671c63e33a33973dcfabb1eb5",
+          "bytes": 2556,
+          "reason": "Exact public upstream synthetic signing test certificate; not a user/publisher credential"
+        }
+      ],
+      "versionOutputNames": {
+        "app": "pdfcraft",
+        "cli": "pdfcraft-cli"
+      },
+      "windowsGuiVersionCheck": "stdout"
+    },
+    {
+      "id": "effect",
+      "name": "KIO Effect",
+      "assetPrefix": "KIO-Effect",
+      "version": "0.10.0-kio.1",
+      "upstreamVersion": "0.10.0",
+      "rust": "1.95.0",
+      "sourceDateEpoch": 1791987334,
+      "source": {
+        "kind": "source",
+        "repository": "storytold/effectcraft",
+        "commit": "05955c08b4fd025f1a09882df72e6dbff1a8148a",
+        "tag": "v0.10.0",
+        "url": "https://codeload.github.com/storytold/effectcraft/tar.gz/05955c08b4fd025f1a09882df72e6dbff1a8148a",
+        "root": "effectcraft-05955c08b4fd025f1a09882df72e6dbff1a8148a",
+        "sha256": "a160b94d9837906e3f129697f8c62ffb80d8342cb2787b2cfa439c0485098f43",
+        "bytes": 11625180,
+        "archiveMembers": 1266,
+        "localCacheFile": ".cache/archives/effectcraft-05955c08b4fd025f1a09882df72e6dbff1a8148a.tar.gz",
+        "reuse": "hardlink reused existing source archive",
+        "verifiedAgainstPriorLock": false,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "fonts": null,
+      "branding": {
+        "patch": "patches/effect/effectcraft-v0.10.0-kio-effect.patch",
+        "sha256": "b4f0adb7ff63ec467c98c29f2c624fd8e123349b4c41efcd0c9536fae18f80a2",
+        "manifest": "patches/effect/manifest.json",
+        "manifestSha256": "acefcfe7790f17e95ea1656a9397e1c3d6a9e31c6ccbca42b13e8bd7bd656d3c"
+      },
+      "cargoPackages": [
+        "effectcraft",
+        "effectcraft-cli"
+      ],
+      "cargoArgs": [
+        "build",
+        "--release",
+        "--locked",
+        "-p",
+        "effectcraft",
+        "-p",
+        "effectcraft-cli"
+      ],
+      "testPackages": [
+        "effectcraft-engine"
+      ],
+      "binaries": {
+        "app": "effectcraft",
+        "cli": "effectcraft-cli"
+      },
+      "bundleId": "com.kio.effect",
+      "features": {
+        "preserveDefaults": true,
+        "appDefaultFeatures": [],
+        "officialNativeAdditionalFeatures": [],
+        "optionalAppFeatures": []
+      },
+      "extras": [
+        {
+          "kind": "optional-model",
+          "requiredForOfficialNativeParity": false,
+          "name": "MobileSAM",
+          "approxBytes": 40000000,
+          "installation": "Settings > Roto Brush download; preserve model license and cache behavior."
+        },
+        {
+          "kind": "optional-model",
+          "requiredForOfficialNativeParity": false,
+          "name": "MediaPipe Face Landmarker",
+          "approxBytes": 3800000,
+          "installation": "Settings > Face Tracking download; preserve model license and cache behavior."
+        }
+      ],
+      "upstreamGaps": "Cannot open .aep/.aepx or host After Effects plugins. No automated render parity against After Effects; optional ML models are not parity verified.",
+      "icon": "assets/app-icon/effectcraft.icns",
+      "originalPackaging": {
+        "packages": [
+          "effectcraft",
+          "effectcraft-cli"
+        ],
+        "cargoArgs": [
+          "build",
+          "--release",
+          "--locked",
+          "-p",
+          "effectcraft",
+          "-p",
+          "effectcraft-cli"
+        ],
+        "macosPackagingScript": "packaging/macos/package.sh",
+        "macosPackagingArgs": [
+          "--arch",
+          "aarch64"
+        ],
+        "windowsPackagingScript": "packaging/windows/package.ps1",
+        "windowsPackagingArgs": [
+          "-Arch",
+          "x64"
+        ],
+        "webPackagingScript": "packaging/web/package.sh"
+      },
+      "versionOutputNames": {
+        "app": "effectcraft",
+        "cli": "effectcraft-cli"
+      },
+      "windowsGuiVersionCheck": "stdout"
+    },
+    {
+      "id": "design",
+      "name": "KIO Design",
+      "assetPrefix": "KIO-Design",
+      "version": "0.8.0-kio.1",
+      "upstreamVersion": "0.8.0",
+      "rust": "1.95.0",
+      "sourceDateEpoch": 1791983217,
+      "source": {
+        "kind": "source",
+        "repository": "storytold/designcraft",
+        "commit": "11a51d5b665aec8d6e675bd107a8a01514f10d00",
+        "tag": "v0.8.0",
+        "url": "https://codeload.github.com/storytold/designcraft/tar.gz/11a51d5b665aec8d6e675bd107a8a01514f10d00",
+        "root": "designcraft-11a51d5b665aec8d6e675bd107a8a01514f10d00",
+        "sha256": "5044162f9e7c2260156419b7e2c69c87801c5facc88e6b7aaa3552aca70c2acf",
+        "bytes": 7805542,
+        "archiveMembers": 548,
+        "localCacheFile": ".cache/archives/designcraft-11a51d5b665aec8d6e675bd107a8a01514f10d00.tar.gz",
+        "reuse": "hardlink reused existing source archive",
+        "verifiedAgainstPriorLock": false,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "fonts": {
+        "kind": "fonts",
+        "repository": "storytold/craft-fonts",
+        "commit": "abb83316d96aa59c1cf64784289e378fe9fa5695",
+        "url": "https://codeload.github.com/storytold/craft-fonts/tar.gz/abb83316d96aa59c1cf64784289e378fe9fa5695",
+        "root": "craft-fonts-abb83316d96aa59c1cf64784289e378fe9fa5695",
+        "sha256": "53e41ed01ee81a0ef664601a73fb87281f1fd748e724f560c8128d7d33eb3328",
+        "bytes": 14570459,
+        "archiveMembers": 39,
+        "localCacheFile": ".cache/archives/craft-fonts-abb83316d96aa59c1cf64784289e378fe9fa5695.tar.gz",
+        "reuse": "downloaded pinned public codeload source",
+        "verifiedAgainstPriorLock": false,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "branding": {
+        "patch": "patches/design/designcraft-v0.8.0-kio-design.patch",
+        "sha256": "7194f461cba04891621767cf4f26576508432600fcadf2455d37ff3534d65b5c",
+        "manifest": "patches/design/manifest.json",
+        "manifestSha256": "d1677370e277dff2044985eca3d792bcf2aac84bd1c2c7929956d9a7d8df32d7"
+      },
+      "cargoPackages": [
+        "designcraft",
+        "designcraft-cli"
+      ],
+      "cargoArgs": [
+        "build",
+        "--release",
+        "--locked",
+        "-p",
+        "designcraft",
+        "-p",
+        "designcraft-cli"
+      ],
+      "testPackages": [
+        "designcraft-engine"
+      ],
+      "binaries": {
+        "app": "designcraft",
+        "cli": "designcraft-cli"
+      },
+      "bundleId": "com.kio.design",
+      "features": {
+        "preserveDefaults": true,
+        "appDefaultFeatures": [],
+        "officialNativeAdditionalFeatures": [],
+        "optionalAppFeatures": []
+      },
+      "extras": [
+        {
+          "kind": "fonts",
+          "requiredForOfficialNativeParity": true,
+          "repo": "storytold/craft-fonts",
+          "commit": "abb83316d96aa59c1cf64784289e378fe9fa5695",
+          "buildEnvironment": {
+            "CRAFT_FONTS_DIR": "<absolute-path-to-pinned-craft-fonts>",
+            "CRAFT_FONTS_REQUIRED": "1"
+          },
+          "staging": "Embedded at compile time; also copy font OFL license files into the package using upstream packaging helpers."
+        }
+      ],
+      "upstreamGaps": "Pre-alpha; cannot open .indd; real-file IDML issues and a documented core-workflow gate remain; InDesign scripts/plugins unsupported.",
+      "icon": "assets/app-icon/designcraft.icns",
+      "originalPackaging": {
+        "packages": [
+          "designcraft",
+          "designcraft-cli"
+        ],
+        "cargoArgs": [
+          "build",
+          "--release",
+          "--locked",
+          "-p",
+          "designcraft",
+          "-p",
+          "designcraft-cli"
+        ],
+        "macosPackagingScript": "packaging/macos/package.sh",
+        "macosPackagingArgs": [
+          "--arch",
+          "aarch64"
+        ],
+        "windowsPackagingScript": "packaging/windows/package.ps1",
+        "windowsPackagingArgs": [
+          "-Arch",
+          "x64"
+        ],
+        "webPackagingScript": "packaging/web/package.sh"
+      },
+      "versionOutputNames": {
+        "app": "designcraft",
+        "cli": "designcraft-cli"
+      },
+      "windowsGuiVersionCheck": "stdout"
+    },
+    {
+      "id": "ui",
+      "name": "KIO UI",
+      "assetPrefix": "KIO-UI",
+      "version": "0.6.0-kio.1",
+      "upstreamVersion": "0.6.0",
+      "rust": "1.95.0",
+      "sourceDateEpoch": 1791983159,
+      "source": {
+        "kind": "source",
+        "repository": "storytold/figcraft",
+        "commit": "833f0d2c27f0acbae5394848930ae531fc89c724",
+        "tag": "v0.6.0",
+        "url": "https://codeload.github.com/storytold/figcraft/tar.gz/833f0d2c27f0acbae5394848930ae531fc89c724",
+        "root": "figcraft-833f0d2c27f0acbae5394848930ae531fc89c724",
+        "sha256": "f327701beaf7a025a0f124c8551472ab998d2b07baf3949c8a2d86ebcf457e59",
+        "bytes": 8079741,
+        "archiveMembers": 944,
+        "localCacheFile": ".cache/archives/figcraft-833f0d2c27f0acbae5394848930ae531fc89c724.tar.gz",
+        "reuse": "hardlink reused existing source archive",
+        "verifiedAgainstPriorLock": false,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "fonts": {
+        "kind": "fonts",
+        "repository": "storytold/craft-fonts",
+        "commit": "43913056ce82a3fdad0ef69f6b88d1dc922a8104",
+        "url": "https://codeload.github.com/storytold/craft-fonts/tar.gz/43913056ce82a3fdad0ef69f6b88d1dc922a8104",
+        "root": "craft-fonts-43913056ce82a3fdad0ef69f6b88d1dc922a8104",
+        "sha256": "e2dd2bb3ae39e442ee67416b9bc29b7ca8ef906e8ff2caaf5a451aaa6c662057",
+        "bytes": 38766980,
+        "archiveMembers": 129,
+        "localCacheFile": ".cache/archives/craft-fonts-43913056ce82a3fdad0ef69f6b88d1dc922a8104.tar.gz",
+        "reuse": "downloaded pinned public codeload source",
+        "verifiedAgainstPriorLock": false,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "branding": {
+        "patch": "patches/ui/figcraft-v0.6.0-kio-ui.patch",
+        "sha256": "79667c766c7402a3993587aa43f20b713a19d29b5c8213ac5948e423143d3eda",
+        "manifest": "patches/ui/manifest.json",
+        "manifestSha256": "19b77faf2d01ab0101bd198661bbed33349aaec6596c4e873b01a4669663dcd3"
+      },
+      "cargoPackages": [
+        "figcraft",
+        "figcraft-cli"
+      ],
+      "cargoArgs": [
+        "build",
+        "--release",
+        "--locked",
+        "-p",
+        "figcraft",
+        "-p",
+        "figcraft-cli"
+      ],
+      "testPackages": [
+        "figcraft-engine"
+      ],
+      "binaries": {
+        "app": "figcraft",
+        "cli": "figcraft-cli"
+      },
+      "bundleId": "com.kio.ui",
+      "features": {
+        "preserveDefaults": true,
+        "appDefaultFeatures": [],
+        "officialNativeAdditionalFeatures": [],
+        "optionalAppFeatures": []
+      },
+      "extras": [
+        {
+          "kind": "fonts",
+          "requiredForOfficialNativeParity": true,
+          "repo": "storytold/craft-fonts",
+          "commit": "43913056ce82a3fdad0ef69f6b88d1dc922a8104",
+          "buildEnvironment": {
+            "CRAFT_FONTS_DIR": "<absolute-path-to-pinned-craft-fonts>",
+            "CRAFT_FONTS_REQUIRED": "1"
+          },
+          "staging": "Embedded at compile time; also copy font OFL license files into the package using upstream packaging helpers."
+        }
+      ],
+      "upstreamGaps": "Alpha; .fig import is best effort, multiplayer is an early preview without accounts/teams/cloud, and broader Figma compatibility remains incomplete.",
+      "icon": "assets/app-icon/figcraft.icns",
+      "originalPackaging": {
+        "packages": [
+          "figcraft",
+          "figcraft-cli"
+        ],
+        "cargoArgs": [
+          "build",
+          "--release",
+          "--locked",
+          "-p",
+          "figcraft",
+          "-p",
+          "figcraft-cli"
+        ],
+        "macosPackagingScript": "packaging/macos/package.sh",
+        "macosPackagingArgs": [
+          "--arch",
+          "aarch64"
+        ],
+        "windowsPackagingScript": "packaging/windows/package.ps1",
+        "windowsPackagingArgs": [
+          "-Arch",
+          "x64"
+        ],
+        "webPackagingScript": "packaging/web/package.sh"
+      },
+      "versionOutputNames": {
+        "app": "KIO UI",
+        "cli": "figcraft-cli"
+      },
+      "windowsGuiVersionCheck": "stdout"
+    },
+    {
+      "id": "word",
+      "name": "KIO Word",
+      "assetPrefix": "KIO-Word",
+      "version": "0.7.0-kio.1",
+      "upstreamVersion": "0.7.0",
+      "rust": "1.95.0",
+      "sourceDateEpoch": 1791983245,
+      "source": {
+        "kind": "source",
+        "repository": "storytold/wordcraft",
+        "commit": "fc41918814f62645b6746ed68e71e8c2c2e85d6f",
+        "tag": "v0.7.0",
+        "url": "https://codeload.github.com/storytold/wordcraft/tar.gz/fc41918814f62645b6746ed68e71e8c2c2e85d6f",
+        "root": "wordcraft-fc41918814f62645b6746ed68e71e8c2c2e85d6f",
+        "sha256": "ea7a64508f9df85878481f41ad961f8396be0e6a4cf0f9842844a86dc7a48fb6",
+        "bytes": 9370348,
+        "archiveMembers": 615,
+        "localCacheFile": ".cache/archives/wordcraft-fc41918814f62645b6746ed68e71e8c2c2e85d6f.tar.gz",
+        "reuse": "hardlink reused existing source archive",
+        "verifiedAgainstPriorLock": true,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "fonts": {
+        "kind": "fonts",
+        "repository": "storytold/craft-fonts",
+        "commit": "8dcdacd5153e64560d109541a47d806f26f048c0",
+        "url": "https://codeload.github.com/storytold/craft-fonts/tar.gz/8dcdacd5153e64560d109541a47d806f26f048c0",
+        "root": "craft-fonts-8dcdacd5153e64560d109541a47d806f26f048c0",
+        "sha256": "c0bfca8f4dd8c98825e598c0324c66d90609fe531b212a6c9a04f6852dc5387b",
+        "bytes": 28629163,
+        "archiveMembers": 45,
+        "localCacheFile": ".cache/archives/craft-fonts-8dcdacd5153e64560d109541a47d806f26f048c0.tar.gz",
+        "reuse": "hardlink reused existing source archive",
+        "verifiedAgainstPriorLock": true,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "branding": {
+        "patch": "patches/word/wordcraft-v0.7.0-kio-word.patch",
+        "sha256": "f00037e3815c6e5b835d31dbbd326fe96663105778e4bfedc72b93e383ba9aac",
+        "manifest": "patches/word/manifest.json",
+        "manifestSha256": "53166111cfa99b6073fd8640f7c5145f8fd5a20db1812626559c40ae1d79ef6d"
+      },
+      "cargoPackages": [
+        "wordcraft",
+        "wordcraft-cli"
+      ],
+      "cargoArgs": [
+        "build",
+        "--release",
+        "--locked",
+        "-p",
+        "wordcraft",
+        "-p",
+        "wordcraft-cli"
+      ],
+      "testPackages": [
+        "wordcraft-docx",
+        "wordcraft-engine",
+        "wordcraft-formats"
+      ],
+      "binaries": {
+        "app": "wordcraft",
+        "cli": "wordcraft-cli"
+      },
+      "bundleId": "com.kio.word",
+      "features": {
+        "preserveDefaults": true,
+        "appDefaultFeatures": [],
+        "officialNativeAdditionalFeatures": [],
+        "optionalAppFeatures": []
+      },
+      "extras": [
+        {
+          "kind": "fonts",
+          "requiredForOfficialNativeParity": true,
+          "repo": "storytold/craft-fonts",
+          "commit": "8dcdacd5153e64560d109541a47d806f26f048c0",
+          "buildEnvironment": {
+            "CRAFT_FONTS_DIR": "<absolute-path-to-pinned-craft-fonts>",
+            "CRAFT_FONTS_REQUIRED": "1"
+          },
+          "staging": "Embedded at compile time; also copy font OFL license files into the package using upstream packaging helpers."
+        }
+      ],
+      "upstreamGaps": "Alpha; real DOCX fidelity, chart/SmartArt round trips, pagination, stability and native printing need further work.",
+      "icon": "assets/app-icon/wordcraft.icns",
+      "originalPackaging": {
+        "packages": [
+          "wordcraft",
+          "wordcraft-cli"
+        ],
+        "cargoArgs": [
+          "build",
+          "--release",
+          "--locked",
+          "-p",
+          "wordcraft",
+          "-p",
+          "wordcraft-cli"
+        ],
+        "macosPackagingScript": "packaging/macos/package.sh",
+        "macosPackagingArgs": [
+          "--arch",
+          "aarch64"
+        ],
+        "windowsPackagingScript": "packaging/windows/package.ps1",
+        "windowsPackagingArgs": [
+          "-Arch",
+          "x64"
+        ],
+        "webPackagingScript": "packaging/web/package.sh"
+      },
+      "versionOutputNames": {
+        "app": "wordcraft",
+        "cli": "wordcraft-cli"
+      },
+      "windowsGuiVersionCheck": "stdout"
+    },
+    {
+      "id": "sound",
+      "name": "KIO Sound",
+      "assetPrefix": "KIO-Sound",
+      "version": "0.7.0-kio.1",
+      "upstreamVersion": "0.7.0",
+      "rust": "1.95.0",
+      "sourceDateEpoch": 1791984839,
+      "source": {
+        "kind": "source",
+        "repository": "storytold/soundcraft",
+        "commit": "3a28a657692c1b98b28c276d8f61df9471074f0f",
+        "tag": "v0.7.0",
+        "url": "https://codeload.github.com/storytold/soundcraft/tar.gz/3a28a657692c1b98b28c276d8f61df9471074f0f",
+        "root": "soundcraft-3a28a657692c1b98b28c276d8f61df9471074f0f",
+        "sha256": "72a936c404b66a1210a74d3f81142910e868ea51150edd6bee10e6faba5d0325",
+        "bytes": 5186470,
+        "archiveMembers": 525,
+        "localCacheFile": ".cache/archives/soundcraft-3a28a657692c1b98b28c276d8f61df9471074f0f.tar.gz",
+        "reuse": "hardlink reused existing source archive",
+        "verifiedAgainstPriorLock": false,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "fonts": null,
+      "branding": {
+        "patch": "patches/sound/soundcraft-v0.7.0-kio-sound.patch",
+        "sha256": "3a29f33c98351c5af913fbd654c841fd410ccde4fe01824c5343a3a37ed1f5a9",
+        "manifest": "patches/sound/manifest.json",
+        "manifestSha256": "aff00e78a7c345f6db92a265bef6c7e0de369ac9b13217f067632edec531ada4"
+      },
+      "cargoPackages": [
+        "soundcraft",
+        "soundcraft-cli"
+      ],
+      "cargoArgs": [
+        "build",
+        "--release",
+        "--locked",
+        "-p",
+        "soundcraft",
+        "-p",
+        "soundcraft-cli"
+      ],
+      "testPackages": [
+        "soundcraft-audio-io",
+        "soundcraft-engine"
+      ],
+      "binaries": {
+        "app": "soundcraft",
+        "cli": "soundcraft-cli"
+      },
+      "bundleId": "com.kio.sound",
+      "features": {
+        "preserveDefaults": true,
+        "appDefaultFeatures": [],
+        "officialNativeAdditionalFeatures": [],
+        "optionalAppFeatures": [
+          "asio"
+        ]
+      },
+      "extras": [],
+      "upstreamGaps": "Pre-alpha; audio-interface/buffer selection, live MIDI-controller recording and AAF/OMF session interchange remain missing.",
+      "icon": "assets/app-icon/soundcraft.icns",
+      "originalPackaging": {
+        "packages": [
+          "soundcraft",
+          "soundcraft-cli"
+        ],
+        "cargoArgs": [
+          "build",
+          "--release",
+          "--locked",
+          "-p",
+          "soundcraft",
+          "-p",
+          "soundcraft-cli"
+        ],
+        "macosPackagingScript": "packaging/macos/package.sh",
+        "macosPackagingArgs": [
+          "--arch",
+          "aarch64"
+        ],
+        "windowsPackagingScript": "packaging/windows/package.ps1",
+        "windowsPackagingArgs": [
+          "-Arch",
+          "x64"
+        ],
+        "webPackagingScript": "packaging/web/package.sh"
+      },
+      "versionOutputNames": {
+        "app": "KIO Sound",
+        "cli": "SoundCraft CLI"
+      },
+      "windowsGuiVersionCheck": "stdout"
+    },
+    {
+      "id": "deck",
+      "name": "KIO Deck",
+      "assetPrefix": "KIO-Deck",
+      "version": "0.7.0-kio.1",
+      "upstreamVersion": "0.7.0",
+      "rust": "1.95.0",
+      "sourceDateEpoch": 1791984783,
+      "source": {
+        "kind": "source",
+        "repository": "storytold/deckcraft",
+        "commit": "d78e657e4cb1e490ceb5445785c052d9cf5ad963",
+        "tag": "v0.7.0",
+        "url": "https://codeload.github.com/storytold/deckcraft/tar.gz/d78e657e4cb1e490ceb5445785c052d9cf5ad963",
+        "root": "deckcraft-d78e657e4cb1e490ceb5445785c052d9cf5ad963",
+        "sha256": "e5dfbccdcbfe7d36566299e3d396bae606d49013fbfe8b2bb8afbfeda62a3f55",
+        "bytes": 3244089,
+        "archiveMembers": 557,
+        "localCacheFile": ".cache/archives/deckcraft-d78e657e4cb1e490ceb5445785c052d9cf5ad963.tar.gz",
+        "reuse": "hardlink reused existing source archive",
+        "verifiedAgainstPriorLock": true,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "fonts": {
+        "kind": "fonts",
+        "repository": "storytold/craft-fonts",
+        "commit": "43913056ce82a3fdad0ef69f6b88d1dc922a8104",
+        "url": "https://codeload.github.com/storytold/craft-fonts/tar.gz/43913056ce82a3fdad0ef69f6b88d1dc922a8104",
+        "root": "craft-fonts-43913056ce82a3fdad0ef69f6b88d1dc922a8104",
+        "sha256": "e2dd2bb3ae39e442ee67416b9bc29b7ca8ef906e8ff2caaf5a451aaa6c662057",
+        "bytes": 38766980,
+        "archiveMembers": 129,
+        "localCacheFile": ".cache/archives/craft-fonts-43913056ce82a3fdad0ef69f6b88d1dc922a8104.tar.gz",
+        "reuse": "downloaded pinned public codeload source",
+        "verifiedAgainstPriorLock": false,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "branding": {
+        "patch": "patches/deck/deckcraft-v0.7.0-kio-deck.patch",
+        "sha256": "98ba1e6835eaf961f24b35a2f56b20e698f0d65d79007abd63458f2f5c4e2d56",
+        "manifest": "patches/deck/manifest.json",
+        "manifestSha256": "9fe34ef2440fda990f93c0071b8ec272ddbcfb7bede94872f53bb146dc86ecfb"
+      },
+      "cargoPackages": [
+        "deckcraft",
+        "deckcraft-cli"
+      ],
+      "cargoArgs": [
+        "build",
+        "--release",
+        "--locked",
+        "-p",
+        "deckcraft",
+        "-p",
+        "deckcraft-cli"
+      ],
+      "testPackages": [
+        "deckcraft-engine",
+        "deckcraft-pptx"
+      ],
+      "binaries": {
+        "app": "deckcraft",
+        "cli": "deckcraft-cli"
+      },
+      "bundleId": "com.kio.deck",
+      "features": {
+        "preserveDefaults": true,
+        "appDefaultFeatures": [],
+        "officialNativeAdditionalFeatures": [],
+        "optionalAppFeatures": []
+      },
+      "extras": [
+        {
+          "kind": "fonts",
+          "requiredForOfficialNativeParity": true,
+          "repo": "storytold/craft-fonts",
+          "commit": "43913056ce82a3fdad0ef69f6b88d1dc922a8104",
+          "buildEnvironment": {
+            "CRAFT_FONTS_DIR": "<absolute-path-to-pinned-craft-fonts>",
+            "CRAFT_FONTS_REQUIRED": "1"
+          },
+          "staging": "Embedded at compile time; also copy font OFL license files into the package using upstream packaging helpers."
+        }
+      ],
+      "upstreamGaps": "Alpha; feature presence is incomplete and professional PowerPoint parity is an upstream estimate, not an independent compatibility validation.",
+      "icon": "assets/app-icon/deckcraft.icns",
+      "originalPackaging": {
+        "packages": [
+          "deckcraft",
+          "deckcraft-cli"
+        ],
+        "cargoArgs": [
+          "build",
+          "--release",
+          "--locked",
+          "-p",
+          "deckcraft",
+          "-p",
+          "deckcraft-cli"
+        ],
+        "macosPackagingScript": "packaging/macos/package.sh",
+        "macosPackagingArgs": [
+          "--arch",
+          "aarch64"
+        ],
+        "windowsPackagingScript": "packaging/windows/package.ps1",
+        "windowsPackagingArgs": [
+          "-Arch",
+          "x64"
+        ],
+        "webPackagingScript": "packaging/web/package.sh"
+      },
+      "versionOutputNames": {
+        "app": "deckcraft",
+        "cli": "deckcraft-cli"
+      },
+      "windowsGuiVersionCheck": "stdout"
+    },
+    {
+      "id": "cad",
+      "name": "KIO Cad",
+      "assetPrefix": "KIO-Cad",
+      "version": "0.7.0-kio.1",
+      "upstreamVersion": "0.7.0",
+      "rust": "1.95.0",
+      "sourceDateEpoch": 1791984867,
+      "source": {
+        "kind": "source",
+        "repository": "storytold/cadcraft",
+        "commit": "fc4e98315a8d771b5ab832f0ade0b5e7b106df7f",
+        "tag": "v0.7.0",
+        "url": "https://codeload.github.com/storytold/cadcraft/tar.gz/fc4e98315a8d771b5ab832f0ade0b5e7b106df7f",
+        "root": "cadcraft-fc4e98315a8d771b5ab832f0ade0b5e7b106df7f",
+        "sha256": "039ee54bfbf6c25f49a24770a5ba0ef4c2d3125c26fa88bafa06da4048b34d17",
+        "bytes": 3979882,
+        "archiveMembers": 816,
+        "localCacheFile": ".cache/archives/cadcraft-fc4e98315a8d771b5ab832f0ade0b5e7b106df7f.tar.gz",
+        "reuse": "hardlink reused existing source archive",
+        "verifiedAgainstPriorLock": false,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "fonts": {
+        "kind": "fonts",
+        "repository": "storytold/craft-fonts",
+        "commit": "3d9ab3a132ed0eff457e424226a435a901da30d3",
+        "url": "https://codeload.github.com/storytold/craft-fonts/tar.gz/3d9ab3a132ed0eff457e424226a435a901da30d3",
+        "root": "craft-fonts-3d9ab3a132ed0eff457e424226a435a901da30d3",
+        "sha256": "bb8c4d2c32148760d2d47d77e8b222bc2b22fda1e85fcd72290fe7bfbb4689ee",
+        "bytes": 28766039,
+        "archiveMembers": 48,
+        "localCacheFile": ".cache/archives/craft-fonts-3d9ab3a132ed0eff457e424226a435a901da30d3.tar.gz",
+        "reuse": "downloaded pinned public codeload source",
+        "verifiedAgainstPriorLock": false,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "branding": {
+        "patch": "patches/cad/cadcraft-v0.7.0-kio-cad.patch",
+        "sha256": "592a551c831b67e0080c116c879553247daaa66b1ce09c62196b5b850425f9b1",
+        "manifest": "patches/cad/manifest.json",
+        "manifestSha256": "141bbed39e0783e00b6bd06d7e1830ce57916d392457f4ad6fec4cfca689372b"
+      },
+      "cargoPackages": [
+        "cadcraft",
+        "cadcraft-cli"
+      ],
+      "cargoArgs": [
+        "build",
+        "--release",
+        "--locked",
+        "-p",
+        "cadcraft",
+        "-p",
+        "cadcraft-cli"
+      ],
+      "testPackages": [
+        "cadcraft-engine",
+        "cadcraft-io"
+      ],
+      "binaries": {
+        "app": "cadcraft",
+        "cli": "cadcraft-cli"
+      },
+      "bundleId": "com.kio.cad",
+      "features": {
+        "preserveDefaults": true,
+        "appDefaultFeatures": [],
+        "officialNativeAdditionalFeatures": [],
+        "optionalAppFeatures": []
+      },
+      "extras": [
+        {
+          "kind": "fonts",
+          "requiredForOfficialNativeParity": true,
+          "repo": "storytold/craft-fonts",
+          "commit": "3d9ab3a132ed0eff457e424226a435a901da30d3",
+          "buildEnvironment": {
+            "CRAFT_FONTS_DIR": "<absolute-path-to-pinned-craft-fonts>",
+            "CRAFT_FONTS_REQUIRED": "1"
+          },
+          "staging": "Embedded at compile time; also copy font OFL license files into the package using upstream packaging helpers."
+        }
+      ],
+      "upstreamGaps": "Early development; preserve the complete native CAD command/engine/workspace, but do not label it an independently validated AutoCAD replacement.",
+      "icon": "assets/app-icon/cadcraft.icns",
+      "originalPackaging": {
+        "packages": [
+          "cadcraft",
+          "cadcraft-cli"
+        ],
+        "cargoArgs": [
+          "build",
+          "--release",
+          "--locked",
+          "-p",
+          "cadcraft",
+          "-p",
+          "cadcraft-cli"
+        ],
+        "macosPackagingScript": "packaging/macos/package.sh",
+        "macosPackagingArgs": [
+          "--arch",
+          "aarch64"
+        ],
+        "windowsPackagingScript": "packaging/windows/package.ps1",
+        "windowsPackagingArgs": [
+          "-Arch",
+          "x64"
+        ],
+        "webPackagingScript": "packaging/web/package.sh"
+      },
+      "versionOutputNames": {
+        "app": "cadcraft",
+        "cli": "cadcraft-cli"
+      },
+      "windowsGuiVersionCheck": "stdout"
+    },
+    {
+      "id": "grid",
+      "name": "KIO Grid",
+      "assetPrefix": "KIO-Grid",
+      "version": "0.7.0-kio.1",
+      "upstreamVersion": "0.7.0",
+      "rust": "1.95.0",
+      "sourceDateEpoch": 1791984810,
+      "source": {
+        "kind": "source",
+        "repository": "storytold/gridcraft",
+        "commit": "d9d09f0baa912e88c5111107903fc8c640214b57",
+        "tag": "v0.7.0",
+        "url": "https://codeload.github.com/storytold/gridcraft/tar.gz/d9d09f0baa912e88c5111107903fc8c640214b57",
+        "root": "gridcraft-d9d09f0baa912e88c5111107903fc8c640214b57",
+        "sha256": "3f4fc387e910a3a4c6e435f33b9b123abb6d3347399d589f9b791a9f53c50b25",
+        "bytes": 4191411,
+        "archiveMembers": 498,
+        "localCacheFile": ".cache/archives/gridcraft-d9d09f0baa912e88c5111107903fc8c640214b57.tar.gz",
+        "reuse": "hardlink reused existing source archive",
+        "verifiedAgainstPriorLock": true,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "fonts": {
+        "kind": "fonts",
+        "repository": "storytold/craft-fonts",
+        "commit": "abb83316d96aa59c1cf64784289e378fe9fa5695",
+        "url": "https://codeload.github.com/storytold/craft-fonts/tar.gz/abb83316d96aa59c1cf64784289e378fe9fa5695",
+        "root": "craft-fonts-abb83316d96aa59c1cf64784289e378fe9fa5695",
+        "sha256": "53e41ed01ee81a0ef664601a73fb87281f1fd748e724f560c8128d7d33eb3328",
+        "bytes": 14570459,
+        "archiveMembers": 39,
+        "localCacheFile": ".cache/archives/craft-fonts-abb83316d96aa59c1cf64784289e378fe9fa5695.tar.gz",
+        "reuse": "downloaded pinned public codeload source",
+        "verifiedAgainstPriorLock": false,
+        "validation": "Complete source archive bytes SHA256 + tar member single-root/path validation; not extracted and no code executed"
+      },
+      "branding": {
+        "patch": "patches/grid/gridcraft-v0.7.0-kio-grid.patch",
+        "sha256": "d7e7ad64d2abb95dca15f06292a8dc4379ef2cc1d5952dceb81f55495e5183de",
+        "manifest": "patches/grid/manifest.json",
+        "manifestSha256": "f9035fa1c55f9d4bfb999a2176b3dd5675ce909229aa2c87a45e14b71e9a049c"
+      },
+      "cargoPackages": [
+        "gridcraft",
+        "gridcraft-cli"
+      ],
+      "cargoArgs": [
+        "build",
+        "--release",
+        "--locked",
+        "-p",
+        "gridcraft",
+        "-p",
+        "gridcraft-cli"
+      ],
+      "testPackages": [
+        "gridcraft-core",
+        "gridcraft-engine",
+        "gridcraft-formula",
+        "gridcraft-xlsx"
+      ],
+      "binaries": {
+        "app": "gridcraft",
+        "cli": "gridcraft-cli"
+      },
+      "bundleId": "com.kio.grid",
+      "features": {
+        "preserveDefaults": true,
+        "appDefaultFeatures": [],
+        "officialNativeAdditionalFeatures": [],
+        "optionalAppFeatures": []
+      },
+      "extras": [
+        {
+          "kind": "fonts",
+          "requiredForOfficialNativeParity": true,
+          "repo": "storytold/craft-fonts",
+          "commit": "abb83316d96aa59c1cf64784289e378fe9fa5695",
+          "buildEnvironment": {
+            "CRAFT_FONTS_DIR": "<absolute-path-to-pinned-craft-fonts>",
+            "CRAFT_FONTS_REQUIRED": "1"
+          },
+          "staging": "Embedded at compile time; also copy font OFL license files into the package using upstream packaging helpers."
+        }
+      ],
+      "upstreamGaps": "Alpha; XLSX fidelity, very large workbooks, threaded recalculation, chart depth, scripts and legacy XLS import remain incomplete.",
+      "icon": "assets/app-icon/gridcraft.icns",
+      "originalPackaging": {
+        "packages": [
+          "gridcraft",
+          "gridcraft-cli"
+        ],
+        "cargoArgs": [
+          "build",
+          "--release",
+          "--locked",
+          "-p",
+          "gridcraft",
+          "-p",
+          "gridcraft-cli"
+        ],
+        "macosPackagingScript": "packaging/macos/package.sh",
+        "macosPackagingArgs": [
+          "--arch",
+          "aarch64"
+        ],
+        "windowsPackagingScript": "packaging/windows/package.ps1",
+        "windowsPackagingArgs": [
+          "-Arch",
+          "x64"
+        ],
+        "webPackagingScript": "packaging/web/package.sh"
+      },
+      "versionOutputNames": {
+        "app": "KIO Grid",
+        "cli": "gridcraft-cli"
+      },
+      "windowsGuiVersionCheck": "stdout"
+    }
+  ]
+}

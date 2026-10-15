@@ -1,0 +1,828 @@
+{
+  "schema": "kio.native-branding-patch.v1",
+  "programId": "grid",
+  "applicationId": "com.kio.grid",
+  "displayName": "KIO Grid",
+  "status": "source-patch-ready; native build and GUI QA pending",
+  "upstream": {
+    "repository": "https://github.com/storytold/gridcraft",
+    "release": "v0.7.0",
+    "commit": "d9d09f0baa912e88c5111107903fc8c640214b57",
+    "sourceArchive": "gridcraft-d9d09f0baa912e88c5111107903fc8c640214b57.tar.gz",
+    "sourceArchiveSha256": "3f4fc387e910a3a4c6e435f33b9b123abb6d3347399d589f9b791a9f53c50b25"
+  },
+  "patch": {
+    "file": "gridcraft-v0.7.0-kio-grid.patch",
+    "sha256": "d7e7ad64d2abb95dca15f06292a8dc4379ef2cc1d5952dceb81f55495e5183de",
+    "bytes": 4735300
+  },
+  "counts": {
+    "upstreamFiles": 411,
+    "forkFiles": 406,
+    "changedPaths": 82,
+    "added": 17,
+    "removed": 22,
+    "modified": 43,
+    "protectedFilesByteIdentical": 218
+  },
+  "checks": {
+    "originalArchivePatchRoundtrip": true,
+    "protectedEngineDependenciesLicensesCreditsByteIdentical": true,
+    "upstreamGapDocumentsByteIdentical": true,
+    "platformMetadataParses": true,
+    "packageShellSyntax": true,
+    "patchWhitespace": true,
+    "originalIconByteIdentical": true,
+    "upstreamTrademarkLogoFilesRemoved": true,
+    "internalThemeIdentifierRetained": true,
+    "nativeBuildRun": false,
+    "GUIValidationRun": false
+  },
+  "files": [
+    {
+      "path": "ATTRIBUTION.md",
+      "before": {
+        "sha256": "56b465eebb50e1b424c33291119529e45c8636b806d4432199ba7d57bc555c50",
+        "bytes": 8370
+      },
+      "after": {
+        "sha256": "e5d6e2cc98035c4a586f63e175ec90c5bc0d42898b26366ee47956acd26f4f43",
+        "bytes": 13962
+      }
+    },
+    {
+      "path": "KIO-FORK.json",
+      "before": null,
+      "after": {
+        "sha256": "0509f2197be3b8a21fb80d3977954ff651ec222c1293625e92b25c8fe046944e",
+        "bytes": 1536
+      }
+    },
+    {
+      "path": "KIO-FORK.md",
+      "before": null,
+      "after": {
+        "sha256": "67855d495e57cdca8bdc0aab3d94beefd2ff27e659e302ccf15ea8012d33b834",
+        "bytes": 2893
+      }
+    },
+    {
+      "path": "README.md",
+      "before": {
+        "sha256": "a5a5c13aa963fe48621e06e37a9d07da57455703052aaa44b2a0ab1c80981201",
+        "bytes": 22970
+      },
+      "after": {
+        "sha256": "df5ffd89f41a352f3994c1f4ef6b7df167308aeec86d6a3d31da2467d4050e0e",
+        "bytes": 22996
+      }
+    },
+    {
+      "path": "apps/gridcraft/build.rs",
+      "before": {
+        "sha256": "e52ea18cb3009de6896dbede95f540b40e065bf3923d4067ff40ae47ab9c2f55",
+        "bytes": 1454
+      },
+      "after": {
+        "sha256": "58531bbeb1450e453e071dc8305214d43e49c11095966bcde47878bd6deacb13",
+        "bytes": 1434
+      }
+    },
+    {
+      "path": "apps/gridcraft/src/main.rs",
+      "before": {
+        "sha256": "539121f81f40b67ee599ac0590e58c8e120d11b4cd3a88540c53c955bce342bc",
+        "bytes": 18799
+      },
+      "after": {
+        "sha256": "17768735a242261e5c53c864bebb8df5ace832b4012ca542f5d4ed0bcbbdc604",
+        "bytes": 18779
+      }
+    },
+    {
+      "path": "apps/gridcraft/src/native_menu.rs",
+      "before": {
+        "sha256": "d39f2a907bc73ac77521fb8823c552e15fe5f5292f9343ce8121aeee659204c9",
+        "bytes": 15286
+      },
+      "after": {
+        "sha256": "4eaa899588abe8e5e41bb9eb9a39c244c6349505bd21a6a794f794612bfdca46",
+        "bytes": 15285
+      }
+    },
+    {
+      "path": "apps/gridcraft/src/print.rs",
+      "before": {
+        "sha256": "91f01273763c3027b07871fafd5d9de5146b8d012be064ca47b54beb60d21e28",
+        "bytes": 3167
+      },
+      "after": {
+        "sha256": "c5b901034a45ec9f8a0970a5a5b9150b222232608989484b01319dacbdb3c84f",
+        "bytes": 3166
+      }
+    },
+    {
+      "path": "apps/gridcraft/tests/mac_menu_appkit.rs",
+      "before": {
+        "sha256": "47a04527e7da551290a65be03a03e80951877147863fa14ad1680025be774c6a",
+        "bytes": 1585
+      },
+      "after": {
+        "sha256": "a4ad90c5cef2b17f2bf6e1ef762eca84668332efbffdd00810cb561ba008d015",
+        "bytes": 1584
+      }
+    },
+    {
+      "path": "assets/app-icon/gridcraft-1024.png",
+      "before": {
+        "sha256": "4a0be45716f47412b5855045bb894fdc43b11e9f25041ebcb5ae4be8182abe44",
+        "bytes": 44149
+      },
+      "after": {
+        "sha256": "6f76ca4d430ab54b42b1831415b3182ccfbb37a716b3f108709e8e804d83545b",
+        "bytes": 370385
+      }
+    },
+    {
+      "path": "assets/app-icon/gridcraft-macos-512.png",
+      "before": {
+        "sha256": "66ab22c4150ec2572f248434af266c256e007ab867b6b40b7a4fc8a11082f631",
+        "bytes": 16994
+      },
+      "after": {
+        "sha256": "47412275868a5829897bf7db5b817ab5d8ef00dacfbe6950bfa2f5f7201637f9",
+        "bytes": 205289
+      }
+    },
+    {
+      "path": "assets/app-icon/gridcraft.icns",
+      "before": {
+        "sha256": "3f34ff72ddb60543472aad68a89575393a461fde75e1d6e53fe0d11f9362c60d",
+        "bytes": 145377
+      },
+      "after": {
+        "sha256": "c817d399a62f713a4d9d04463ea67d55a1ff387f2f86b534da1d742381af6dc8",
+        "bytes": 1102280
+      }
+    },
+    {
+      "path": "assets/app-icon/gridcraft.ico",
+      "before": {
+        "sha256": "f5693fcf3f71695d5ab332d24377c80e0315f952c24ae1eb3b4203bad9ea7f07",
+        "bytes": 26895
+      },
+      "after": {
+        "sha256": "d4d430878e0d810f3172d4fa735b66f72a6f43681c07002e387b34743304366c",
+        "bytes": 117750
+      }
+    },
+    {
+      "path": "assets/app-icon/gridcraft.svg",
+      "before": {
+        "sha256": "930dddff2410172ee96486f6ab627abed44ad5f4d760e1cab8247a4d74d94cba",
+        "bytes": 1691
+      },
+      "after": {
+        "sha256": "a439c74cfbb5da0ff8dbd63c86ed5a0f0bf63f1199d3b3eee222ff9a17a52151",
+        "bytes": 494011
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/128x128/apps/ai.storyteller.gridcraft.png",
+      "before": {
+        "sha256": "01ef35442b8d466b52068fda67ab740309321c8bc813b62b9207dfc4116208e7",
+        "bytes": 4785
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/128x128/apps/com.kio.grid.png",
+      "before": null,
+      "after": {
+        "sha256": "02978948dc18ec508a355153de9109624f60c26e22e67c18d0267a709dabc80e",
+        "bytes": 23097
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/16x16/apps/ai.storyteller.gridcraft.png",
+      "before": {
+        "sha256": "1d1e9bdef42b53abed62f18188806153135e773f1d1a5b86040a3ce1a5f2406c",
+        "bytes": 704
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/16x16/apps/com.kio.grid.png",
+      "before": null,
+      "after": {
+        "sha256": "98738a1f304949c05b477cd1c581442afa512075cf08aec377c57a1da0f6cd35",
+        "bytes": 794
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/24x24/apps/ai.storyteller.gridcraft.png",
+      "before": {
+        "sha256": "7e3976bf583decd37463c33bc3794c9b1eff5916d7b604c43d2dd8140ca3c50b",
+        "bytes": 1264
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/24x24/apps/com.kio.grid.png",
+      "before": null,
+      "after": {
+        "sha256": "bb7d828b6d6203ff2fadc99466c957ecea558c0f6fac9d23a102334d969cb8e2",
+        "bytes": 1408
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/256x256/apps/ai.storyteller.gridcraft.png",
+      "before": {
+        "sha256": "3d8cb180ae9ea3691051e8d2309e79baf6f69e0a86276bf50265b5867ff26e41",
+        "bytes": 9021
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/256x256/apps/com.kio.grid.png",
+      "before": null,
+      "after": {
+        "sha256": "940789db7e713ec31fc5cb438a8bd25ec1f21b3627ed59382760428b861bb01a",
+        "bytes": 79057
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/32x32/apps/ai.storyteller.gridcraft.png",
+      "before": {
+        "sha256": "9533a37f40b3f70f381f93283790c6bb3d2bdab03e1fb7ba1ca16588e484c122",
+        "bytes": 1828
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/32x32/apps/com.kio.grid.png",
+      "before": null,
+      "after": {
+        "sha256": "0caa7364f65d1ff62df1ebbb5272c336cbd7dc184c099338b80a7ffd465cd3ed",
+        "bytes": 2223
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/48x48/apps/ai.storyteller.gridcraft.png",
+      "before": {
+        "sha256": "fcd5c33b4760d143d3305062d8218cc2f2e7d75918dfa598336b6a50c5fc4543",
+        "bytes": 2753
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/48x48/apps/com.kio.grid.png",
+      "before": null,
+      "after": {
+        "sha256": "9fe0ac7714ff141109be5084c9abff708350c0ec7c335925064747f6a9c20a61",
+        "bytes": 4279
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/512x512/apps/ai.storyteller.gridcraft.png",
+      "before": {
+        "sha256": "482b8fb02e0753fe0ab90e682adcce2fc8e68f63860b927a2e818a3a777bccce",
+        "bytes": 20444
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/512x512/apps/com.kio.grid.png",
+      "before": null,
+      "after": {
+        "sha256": "47412275868a5829897bf7db5b817ab5d8ef00dacfbe6950bfa2f5f7201637f9",
+        "bytes": 205289
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/64x64/apps/ai.storyteller.gridcraft.png",
+      "before": {
+        "sha256": "ca40a583be820b1251dd00a175cfbe4edeed5d5b1c51036ed7bf53a19c8cfcad",
+        "bytes": 3050
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/64x64/apps/com.kio.grid.png",
+      "before": null,
+      "after": {
+        "sha256": "9fb73789b2b8a03c9bfdea52d941e9f732d9b7e7370d522f10f51814f88188d7",
+        "bytes": 6774
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/scalable/apps/ai.storyteller.gridcraft.svg",
+      "before": {
+        "sha256": "930dddff2410172ee96486f6ab627abed44ad5f4d760e1cab8247a4d74d94cba",
+        "bytes": 1691
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/scalable/apps/com.kio.grid.svg",
+      "before": null,
+      "after": {
+        "sha256": "a439c74cfbb5da0ff8dbd63c86ed5a0f0bf63f1199d3b3eee222ff9a17a52151",
+        "bytes": 494011
+      }
+    },
+    {
+      "path": "assets/app-icon/kio-grid.png",
+      "before": null,
+      "after": {
+        "sha256": "6f76ca4d430ab54b42b1831415b3182ccfbb37a716b3f108709e8e804d83545b",
+        "bytes": 370385
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/backstage.rs",
+      "before": {
+        "sha256": "8bf1e14ef13054d4cd0893c2d37bbdb616aefff95b2a6f3df206662dc75cae3e",
+        "bytes": 48303
+      },
+      "after": {
+        "sha256": "d53127c373cb9c099c5fc5d71b2bfcf0484762979cb31b4c29d6cea7f53dde15",
+        "bytes": 48299
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/dialogs.rs",
+      "before": {
+        "sha256": "617f673ba0d346f6891e860c63e0dac1ddd433e1c684de27ed17890f8e758ad2",
+        "bytes": 127732
+      },
+      "after": {
+        "sha256": "f01402bbe19813c9780c6514e7b7fe2ea019befd3cb8d164f9a44b48c2b62d41",
+        "bytes": 127881
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/formula_bar.rs",
+      "before": {
+        "sha256": "45ce890b31b0aaf3f4df30a7acd83296c119f53af8195ae07390b0c56ab5c5bb",
+        "bytes": 24011
+      },
+      "after": {
+        "sha256": "1672cae6a1364f696169dbc6bc97262bb340d37bae2c9022f39371cd6646a02a",
+        "bytes": 24010
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/grid.rs",
+      "before": {
+        "sha256": "939ee0012ca201d3751f4f1fc087d51f64870dc42ab4f3c700211933f9b3c570",
+        "bytes": 170444
+      },
+      "after": {
+        "sha256": "978e7b9b3b7941470b8087227091077a90113285bc06bb9b26926f31e933afe8",
+        "bytes": 170442
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n.rs",
+      "before": {
+        "sha256": "87087399c3e1b12fcbcf7bd8af1ad9a55dda3619abb01368339ba61894ccbc8e",
+        "bytes": 33248
+      },
+      "after": {
+        "sha256": "1fcbafeddcc3c1f25e6dc81be44accd5cc9fcf6f004ab0d9092b94139b122c1d",
+        "bytes": 33246
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/cs.rs",
+      "before": {
+        "sha256": "e640a4424b7eceaa696864b6d6ba8130a829a6bd5fa2d163a51686ce29afce74",
+        "bytes": 26515
+      },
+      "after": {
+        "sha256": "932ecef516729a781f91aae7e7f366dbb487ea3f882253186f95528e70c221c8",
+        "bytes": 26511
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/de.rs",
+      "before": {
+        "sha256": "0135aab808e7519f0969872354fa94bbd97d230ce2a4e231bd1d14dcf6efa1ea",
+        "bytes": 20311
+      },
+      "after": {
+        "sha256": "3f67d809e85ed55bdeaba0706b41258dc2fe9b58017d69d9769d413aa11e119d",
+        "bytes": 20309
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/es.rs",
+      "before": {
+        "sha256": "d8dba103aac6ea3f473211650d442cb3110280dd6304e18e7d9089c62be46764",
+        "bytes": 21932
+      },
+      "after": {
+        "sha256": "7c19dd02f949d42cbdd7878ece158f12d2c95fcaf1ff39587ae036b545de1fb1",
+        "bytes": 21930
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/fr.rs",
+      "before": {
+        "sha256": "b35fcc3fb7724f60bee249c0966cfb5c358d3270c8acc3ce56355fee5b569540",
+        "bytes": 20957
+      },
+      "after": {
+        "sha256": "445e6df46634f0da58169c713d83884cbaf6f4d5b35ae7bf34e236c474b75302",
+        "bytes": 20955
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/ko.rs",
+      "before": {
+        "sha256": "4d6a918a8efa82e48e34ffff387ada3b8174ab437dd7ce0ac0b83976a8f725e3",
+        "bytes": 19963
+      },
+      "after": {
+        "sha256": "487f5095de734a4dec92e5675eefbe2254bd65fab1fa3484e78d1e9abb61ce27",
+        "bytes": 19961
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/pt.rs",
+      "before": {
+        "sha256": "04cb5321e949f940fae8e2ad38d35a2122eb7061d1a839232d8ea573d58fa5f0",
+        "bytes": 49025
+      },
+      "after": {
+        "sha256": "4c75be5c3902da4acfb87d1645e0e620c334dbf8536cd42f1a616ca5fac15568",
+        "bytes": 49019
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/ru.rs",
+      "before": {
+        "sha256": "74fec047959d9d3e9f6c374b21b8287b5e7b2f93b98904b485419c9777b3b9d4",
+        "bytes": 26091
+      },
+      "after": {
+        "sha256": "51fe6ea71bb917fd4b62323514f95d390f495bcbcff605641f2dc1e12fbc5cd9",
+        "bytes": 26089
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/sr.rs",
+      "before": {
+        "sha256": "b040bca8820d622605cb92a3ff5e5ff436c80d1d97916dc833bd624a714b625b",
+        "bytes": 19617
+      },
+      "after": {
+        "sha256": "d31eba5a1d6815e72d65c990927959be5a198ca2862e8a3c6eb6d193617cd34c",
+        "bytes": 19615
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/zh.rs",
+      "before": {
+        "sha256": "af865a5be216cb9f9194647d967282aef999cb090e4f6a9661089c675128e9e2",
+        "bytes": 18521
+      },
+      "after": {
+        "sha256": "0b0daa7419a12ac31fad42bc9a8d22555c0986e67934d5cf428c5481903a61fc",
+        "bytes": 18519
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/keytips/keytip_table/generated.rs",
+      "before": {
+        "sha256": "7b2a4e8464ccd65102a8fdb6709848e207364541cc2c45e5f89a5d979d4202b2",
+        "bytes": 39590
+      },
+      "after": {
+        "sha256": "5bee1bf74f6ee48d107bf3a3820adf9a516b8169e48cfa7a61245cfc5691af1e",
+        "bytes": 39589
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/lib.rs",
+      "before": {
+        "sha256": "d8bf5aee01f7b0728e67343fe560d8a71ab2e8e8bff77ea93eb6bf2b91642939",
+        "bytes": 56224
+      },
+      "after": {
+        "sha256": "61063e2ac6baa9d7cd342071ef4ec136ebd6a18e9be20eb4cc016731e7e5c25c",
+        "bytes": 56216
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/ribbon.rs",
+      "before": {
+        "sha256": "2c9f9066326b617cefde8b45568d64ba404983d604f9f9daeb08d9bccc1cbeaf",
+        "bytes": 113977
+      },
+      "after": {
+        "sha256": "965ca0ea813b4d6989a9497a78cbf88596e962c90418ed2b0e270077b7dd8846",
+        "bytes": 113974
+      }
+    },
+    {
+      "path": "docs/brand/artcraft-logo-white.png",
+      "before": {
+        "sha256": "8b86aeb06a12a90ba77a60e0d90329272310e244ee5c1f9b161b391280ca79d8",
+        "bytes": 32161
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-logo-white.svg",
+      "before": {
+        "sha256": "a3e03dc49f9ad4225b8517d5424309c8d1c864d3996d862190d9cc797d5af427",
+        "bytes": 5394
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-logo.png",
+      "before": {
+        "sha256": "08fc6d9d3717e8f13417bac6f9025b50e11d1e0b32e9e000883d2fe0c4a0c67b",
+        "bytes": 31302
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-logo.svg",
+      "before": {
+        "sha256": "3188971e1affdf4f6be4fa65f715376a7a305e6aa741ec78b0296c8f934eff08",
+        "bytes": 5394
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-mark-black.png",
+      "before": {
+        "sha256": "5954cc0306e1b9d7beb47097e2e842157113a39d9aba078b57304902687936a9",
+        "bytes": 26793
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-mark-black.svg",
+      "before": {
+        "sha256": "570adcb4f7ba8ca0647f97074476bab81d3272988f1cdee52efa21bf026036a4",
+        "bytes": 341
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-mark.png",
+      "before": {
+        "sha256": "9d372157a949c147318561e629b11561c28b7cbc14c84b516a3fe6e84d8fbbad",
+        "bytes": 24715
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-mark.svg",
+      "before": {
+        "sha256": "f87af81b6fa411da8820eed2bfdcc54c0ee9cd453b4e868c64f56c69db142d0e",
+        "bytes": 341
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/env.sh",
+      "before": {
+        "sha256": "0d310776da13726587ee94cb3715f3346d33e1cff41f13a97c9d43ee5e4b19a4",
+        "bytes": 2618
+      },
+      "after": {
+        "sha256": "b5a0e7bc0872f58a671e62e59a1c314e773024e96d19f316e40322b7090db9fa",
+        "bytes": 2666
+      }
+    },
+    {
+      "path": "packaging/freebsd/package.sh",
+      "before": {
+        "sha256": "2603ed9515ec4ef469c70ff69558bb62efefc40702490d814bb6164ca443b85a",
+        "bytes": 2332
+      },
+      "after": {
+        "sha256": "4d695f646f1b2163fbed6334c0fab414b512ce11508ed34d04130d4820a3c57e",
+        "bytes": 2318
+      }
+    },
+    {
+      "path": "packaging/icons.sh",
+      "before": {
+        "sha256": "f4feea7ad3cb527ac7fd105c907c6341302fdb73b59c2def4a125a8a2299cf02",
+        "bytes": 2191
+      },
+      "after": {
+        "sha256": "8c80a80d9958866c08305c928daec605584e0f7809fd824557f93670bd9febfc",
+        "bytes": 2179
+      }
+    },
+    {
+      "path": "packaging/linux/ai.storyteller.gridcraft.desktop",
+      "before": {
+        "sha256": "8266c0cd41f1b853c0f64e0a4f492cde5c874adfab0460a7f2d7c24a68ab2f7c",
+        "bytes": 648
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/linux/ai.storyteller.gridcraft.metainfo.xml.in",
+      "before": {
+        "sha256": "bda1ded7806eb8c483f42486fa32f1b7d6abcff237254c6f36cb64c6341c13aa",
+        "bytes": 2875
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/linux/ai.storyteller.gridcraft.mime.xml",
+      "before": {
+        "sha256": "c500f4dedcfb73215b4700ea3aa196def83d40dae1b97cb6185a697e7c273420",
+        "bytes": 1502
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/linux/com.kio.grid.desktop",
+      "before": null,
+      "after": {
+        "sha256": "c78ed2fe9e9089fa66fb2040ed686aa844a5a16d7d516a97eea8075501868c85",
+        "bytes": 623
+      }
+    },
+    {
+      "path": "packaging/linux/com.kio.grid.metainfo.xml.in",
+      "before": null,
+      "after": {
+        "sha256": "225744919854b9da0d1010e0742596b05d258e16de28950944323dd77bcb0199",
+        "bytes": 2811
+      }
+    },
+    {
+      "path": "packaging/linux/com.kio.grid.mime.xml",
+      "before": null,
+      "after": {
+        "sha256": "82b043c6d8924ef442b1c1c7d7b75118d40500f57733f51bb99436b0c9650d13",
+        "bytes": 1501
+      }
+    },
+    {
+      "path": "packaging/linux/flatpak-bundle.sh",
+      "before": {
+        "sha256": "c930f481587b84f8df2f0b504b5c021661c71ab8de93c358a81df5bf641bcd66",
+        "bytes": 3087
+      },
+      "after": {
+        "sha256": "0e4c21b3afd0153e9baea908315dce6de60e2e4ca624d119e0b4ee3225bca3f0",
+        "bytes": 3061
+      }
+    },
+    {
+      "path": "packaging/linux/flatpak/ai.storyteller.gridcraft.bundle.yml",
+      "before": {
+        "sha256": "ba73725ebfd94dc4dd194122f16680b11015dee8655066f69ad2ac53912885cd",
+        "bytes": 2902
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/linux/flatpak/ai.storyteller.gridcraft.yml",
+      "before": {
+        "sha256": "644468933c0578b08f3d38bf108dbf8b97b816eb95df0e559daf1c9d384177a7",
+        "bytes": 3266
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/linux/flatpak/com.kio.grid.bundle.yml",
+      "before": null,
+      "after": {
+        "sha256": "c2a6383576229dc114631e35b035a7a391339813b2c7b6da5f6d85cf56b35f6e",
+        "bytes": 2782
+      }
+    },
+    {
+      "path": "packaging/linux/flatpak/com.kio.grid.yml",
+      "before": null,
+      "after": {
+        "sha256": "b5c911503416edde87fa9386af7386037ff3e7779044c5c949ed106ecbe31642",
+        "bytes": 3133
+      }
+    },
+    {
+      "path": "packaging/linux/nfpm.yaml",
+      "before": {
+        "sha256": "6bc270abba51ac5f4cd21563c03eb66c4a1d7ecbbf3c8aee027974d1f8cf195e",
+        "bytes": 2113
+      },
+      "after": {
+        "sha256": "ce26b833210952a05156336d94ac42c60bbd9d3c51dd460934570af3084347ba",
+        "bytes": 2095
+      }
+    },
+    {
+      "path": "packaging/linux/package.sh",
+      "before": {
+        "sha256": "5cf5a9bb3ff722b9b5c8381e507c600fe427cf0d3955037cb89c764cde2e2cd0",
+        "bytes": 6877
+      },
+      "after": {
+        "sha256": "e4b6e40e4c927c4c0bc4c0608d4894ce0750762cde34de43772a0646d8257598",
+        "bytes": 6861
+      }
+    },
+    {
+      "path": "packaging/macos/Info.plist.in",
+      "before": {
+        "sha256": "cd9d8014c2836a0c36480ed0403fbb8edbc6ab27beb9f72bb2dbcc456248320a",
+        "bytes": 6720
+      },
+      "after": {
+        "sha256": "b06c94f1b5b7e86ad2c3218b42be47d4d677c958ada447dc9129311382c449ca",
+        "bytes": 6759
+      }
+    },
+    {
+      "path": "packaging/macos/package.sh",
+      "before": {
+        "sha256": "40b65a4d985c4f72801071ed1d407eafdbea4b2674883f0fa77f5265bcf80993",
+        "bytes": 7280
+      },
+      "after": {
+        "sha256": "b4095d1d20e21b81cc3c065024bcfe2a9218b49d360aebf02523535960a52886",
+        "bytes": 7093
+      }
+    },
+    {
+      "path": "packaging/windows/app-build.rs.in",
+      "before": {
+        "sha256": "a880445cc1d159504d38c86dc4a1d64f6a305a7befc166c541e5bd933bcb08ec",
+        "bytes": 2083
+      },
+      "after": {
+        "sha256": "cb59a5f3b1fab8b4c8baaef93bae243b6e021293670575e57bf23d701dc3df33",
+        "bytes": 2080
+      }
+    },
+    {
+      "path": "packaging/windows/gridcraft.wxs",
+      "before": {
+        "sha256": "a6a4263705450ed6a3f6d87ae4f9093779d2ddb292cd4235fd272638bef18734",
+        "bytes": 15025
+      },
+      "after": {
+        "sha256": "b528952b1a139ea5d20584d4f1a3b83d7e2687e853269b3b3148ce3f3a61214f",
+        "bytes": 14947
+      }
+    },
+    {
+      "path": "packaging/windows/package.ps1",
+      "before": {
+        "sha256": "fdb683b533c600610f3e03237902faa48c0e62262c69df6af9a92c22fcaeddf3",
+        "bytes": 6934
+      },
+      "after": {
+        "sha256": "926f0c82c5b3ead396a6ec11a51f27dbf317d968c7baafcc66e3815a7d554a98",
+        "bytes": 6932
+      }
+    },
+    {
+      "path": "packaging/windows/preview-installer-dialogs.ps1",
+      "before": {
+        "sha256": "e5aca14268efb89d8b6dfde47519bf58145e356f7112e9808b3698df625d2de3",
+        "bytes": 5869
+      },
+      "after": {
+        "sha256": "567fbac2376596aa16c9563d2b1299217e9b17ce4acff3fece5cd5f8e664da26",
+        "bytes": 5868
+      }
+    },
+    {
+      "path": "packaging/windows/sign.ps1",
+      "before": {
+        "sha256": "dea742abe27f8f7b5a923da0632f5e0c6e52025c920f53588e1e8737328b9706",
+        "bytes": 4797
+      },
+      "after": {
+        "sha256": "325c984812dffb27ab412076ad09dc4d9e3bf6246fcb1eb0ce560d147c07e99f",
+        "bytes": 4796
+      }
+    },
+    {
+      "path": "packaging/windows/test-desktop-shortcut.ps1",
+      "before": {
+        "sha256": "2c60ba610d2b2f1b539ebacbdea3eb82ca1baeed3db7b19c94f370e9c01314f9",
+        "bytes": 11752
+      },
+      "after": {
+        "sha256": "db17986fc0c0cc0f3e1903d8b1b8e4fa4c9e438a900dbcebc07859c6694b6343",
+        "bytes": 11740
+      }
+    }
+  ]
+}

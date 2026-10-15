@@ -1,0 +1,1695 @@
+{
+  "schema": "kio.native-build-prerequisites.v1",
+  "scope": "photo",
+  "status": "read-only pinned source/packaging audit; no build/install/binary execution",
+  "sharedPrerequisites": {
+    "rust": "1.95, complete original Cargo.lock, preserve all default features",
+    "macos": [
+      "Apple clang/linker and platform SDK (CLT or Xcode)",
+      "Rust target aarch64-apple-darwin for current local build; x86_64-apple-darwin also required for an upstream-style universal binary",
+      "macOS packaging uses lipo, iconutil/sips, plutil, codesign, ditto and hdiutil",
+      "Keep platform entitlements and sign every delivered executable/bundle. Apple Developer ID + notarization requires the fork owner credentials. An ad-hoc build is not an officially notarized build."
+    ],
+    "windows": [
+      "MSVC toolchain + Windows SDK (rc.exe; signtool.exe for certificate signing)",
+      "WiX 5.0.2 + WiX UI extension when building upstream MSI; upstream portable ZIP does not inherently require MSI generation",
+      "Upstream packaging builds target with CARGO_TARGET_<TRIPLE>_RUSTFLAGS=-C target-feature=+crt-static; preserve this for a portable ZIP without external VC++ CRT requirement",
+      "Use actual requested architecture target and matching Windows build tools; retain source app+CLI machine binaries before final branded packaging"
+    ],
+    "packaging": [
+      "Ship original MIT/Apache licenses, NOTICE when present, asset/contributor/model attribution and KIO-FORK provenance",
+      "Copy all font OFL texts for the exact pinned font source, not only the app binary",
+      "Check actual produced executable imports and Mac linked libraries before asserting a standalone distribution"
+    ],
+    "notAutomaticallyRequired": [
+      "No mandatory FFmpeg executable/shared-library, ONNX Runtime DLL, vcpkg or nasm install/staging appears in the reviewed pinned Mac/Windows packaging commands. Do not infer such a dependency from codec/model names. This is a source/packaging audit, not a transitive-link or executed binary audit."
+    ]
+  },
+  "commonWorkflow": {
+    "repository": "https://github.com/storytold/craft-common-actions",
+    "commit": "f0808a5ccbc32869248193ffab0de98d733de451",
+    "file": ".github/workflows/release.yml",
+    "url": "https://github.com/storytold/craft-common-actions/blob/f0808a5ccbc32869248193ffab0de98d733de451/.github/workflows/release.yml",
+    "sha256": "8757b90346c7ea49167528be9ea028a74784950eadf9cc5021d3d35722f5068f",
+    "warning": "Pinned app callers reference @main. For reproducibility use this explicitly reviewed commit instead of mutable main. It checks out exact font ref, builds stable Rust for both Mac targets or Windows matrix, and delegates app packaging to the checked-out app scripts. No upstream signing credentials are provided or reused."
+  },
+  "applications": [
+    {
+      "kioId": "photo",
+      "kioName": "KIO Photo",
+      "repository": "storytold/photocraft",
+      "tag": "v0.9.0",
+      "releaseCommit": "c699e3cda69f4852b43c0b191ab0091aaeff9d6a",
+      "fontPin": "abb83316d96aa59c1cf64784289e378fe9fa5695",
+      "features": {
+        "preserveDefaults": true,
+        "appDefaultFeatures": [],
+        "officialNativeAdditionalFeatures": [
+          "heif"
+        ],
+        "optionalAppFeatures": [
+          "heif"
+        ]
+      },
+      "nativeBuild": {
+        "packages": [
+          "photocraft",
+          "photocraft-cli"
+        ],
+        "cargoArgs": [
+          "build",
+          "--release",
+          "--locked",
+          "-p",
+          "photocraft",
+          "-p",
+          "photocraft-cli",
+          "--features",
+          "heif"
+        ],
+        "macosPackagingScript": "packaging/macos/package.sh",
+        "macosPackagingArgs": [
+          "--arch",
+          "aarch64"
+        ],
+        "windowsPackagingScript": "packaging/windows/package.ps1",
+        "windowsPackagingArgs": [
+          "-Arch",
+          "x64"
+        ],
+        "webPackagingScript": "packaging/web/package.sh"
+      },
+      "pinnedGitDependencies": [
+        {
+          "crate": "craft-ui",
+          "repository": "https://github.com/storytold/craft-libs",
+          "revision": "5c874d51eeb3de70e735c8ce87a59a7dedd47675"
+        },
+        {
+          "crate": "craft-print",
+          "repository": "https://github.com/storytold/craft-libs",
+          "revision": "3d37da389a3618ab9b76109da11416e9ca4ea719"
+        }
+      ],
+      "offlineExtraStaging": [
+        {
+          "kind": "fonts",
+          "requiredForOfficialNativeParity": true,
+          "repo": "storytold/craft-fonts",
+          "commit": "abb83316d96aa59c1cf64784289e378fe9fa5695",
+          "buildEnvironment": {
+            "CRAFT_FONTS_DIR": "<absolute-path-to-pinned-craft-fonts>",
+            "CRAFT_FONTS_REQUIRED": "1"
+          },
+          "staging": "Embedded at compile time; also copy font OFL license files into the package using upstream packaging helpers."
+        }
+      ],
+      "evidence": [
+        {
+          "path": ".github/workflows/release.yml",
+          "url": "https://github.com/storytold/photocraft/blob/c699e3cda69f4852b43c0b191ab0091aaeff9d6a/.github/workflows/release.yml",
+          "sha256": "894339d2c8f52caaa85e188474b9faf2ab94e285b9f7ed2bee46dd928a558d3a",
+          "relevantLines": []
+        },
+        {
+          "path": "packaging/macos/package.sh",
+          "url": "https://github.com/storytold/photocraft/blob/c699e3cda69f4852b43c0b191ab0091aaeff9d6a/packaging/macos/package.sh",
+          "sha256": "f59c0e532eca862184fb5881035a74600e350ec34ed0639930b83e95ab6f4393",
+          "relevantLines": [
+            {
+              "line": 40,
+              "text": "SHORT_VERSION=\"${VERSION%%-*}\""
+            },
+            {
+              "line": 41,
+              "text": "WORK=\"$CARGO_TARGET_DIR/macos-package\""
+            },
+            {
+              "line": 61,
+              "text": "  (cd \"$ROOT\" && cargo build --release --locked -p photocraft -p photocraft-cli --features heif \"${args[@]}\")"
+            },
+            {
+              "line": 68,
+              "text": "  for t in \"${TARGETS[@]}\"; do inputs+=(\"$CARGO_TARGET_DIR/$t/release/$bin\"); done"
+            },
+            {
+              "line": 106,
+              "text": "# Licences of the embedded craft-fonts fonts (only when built with CRAFT_FONTS_DIR)."
+            },
+            {
+              "line": 107,
+              "text": "if [ -n \"${CRAFT_FONTS_DIR:-}\" ]; then"
+            },
+            {
+              "line": 109,
+              "text": "  copy_font_licences \"$APP/Contents/Resources/Licenses\""
+            },
+            {
+              "line": 111,
+              "text": "sed -e \"s/@VERSION@/$VERSION/g\" -e \"s/@SHORT_VERSION@/$SHORT_VERSION/g\" \\"
+            }
+          ]
+        },
+        {
+          "path": "packaging/windows/package.ps1",
+          "url": "https://github.com/storytold/photocraft/blob/c699e3cda69f4852b43c0b191ab0091aaeff9d6a/packaging/windows/package.ps1",
+          "sha256": "071dfe7d1185c4e0a4531b5f174e6b19716a8ceeae26b6285a7c6fab1ef9fc68",
+          "relevantLines": [
+            {
+              "line": 7,
+              "text": "    photocraft-<version>-windows-<arch>.msi            per-machine installer (WiX v5)"
+            },
+            {
+              "line": 10,
+              "text": "  The binaries link the C runtime statically (+crt-static), so neither the MSI nor the portable"
+            },
+            {
+              "line": 14,
+              "text": "  Needs: Rust (MSVC toolchain + the target), the Windows SDK (rc.exe, signtool.exe),"
+            },
+            {
+              "line": 15,
+              "text": "  and WiX v5: dotnet tool install --global wix --version 5.0.2"
+            },
+            {
+              "line": 16,
+              "text": "             wix extension add -g WixToolset.UI.wixext/5.0.2 WixToolset.Util.wixext/5.0.2"
+            },
+            {
+              "line": 51,
+              "text": "$TargetDir = if ($env:CARGO_TARGET_DIR) { $env:CARGO_TARGET_DIR } else { Join-Path $Root 'target' }"
+            },
+            {
+              "line": 62,
+              "text": "  $flagVar = 'CARGO_TARGET_' + ($Target.ToUpper() -replace '-', '_') + '_RUSTFLAGS'"
+            },
+            {
+              "line": 63,
+              "text": "  [Environment]::SetEnvironmentVariable($flagVar, '-C target-feature=+crt-static')"
+            },
+            {
+              "line": 66,
+              "text": "  Invoke-Native \"cargo build ($Target)\" { cargo build --release --locked -p photocraft -p photocraft-cli --features heif --target $Target }"
+            },
+            {
+              "line": 96,
+              "text": "# WiX's stock bitmaps: a 493x58 banner across the top of the inner pages (the page title is drawn"
+            },
+            {
+              "line": 134,
+              "text": "Invoke-Native 'wix build' {"
+            },
+            {
+              "line": 135,
+              "text": "  wix build (Join-Path $PSScriptRoot 'photocraft.wxs') -arch $Arch `"
+            },
+            {
+              "line": 136,
+              "text": "    -ext WixToolset.UI.wixext -ext WixToolset.Util.wixext `"
+            },
+            {
+              "line": 143,
+              "text": "  wix msi validate $Msi -ice ICE50 -intermediateFolder (Join-Path $Stage 'msi-validation')"
+            },
+            {
+              "line": 145,
+              "text": "# wix writes its debug symbols (.wixpdb) next to the MSI; keep them out of the release assets."
+            },
+            {
+              "line": 146,
+              "text": "Remove-Item -Force -ErrorAction SilentlyContinue ([IO.Path]::ChangeExtension($Msi, '.wixpdb'))"
+            },
+            {
+              "line": 158,
+              "text": "# Builds made with craft-fonts (CRAFT_FONTS_DIR, all official releases) embed its OFL-1.1 fonts:"
+            },
+            {
+              "line": 159,
+              "text": "# ship each font's licence as OFL-<family-dir>.txt."
+            },
+            {
+              "line": 160,
+              "text": "if ($env:CRAFT_FONTS_DIR) {"
+            },
+            {
+              "line": 161,
+              "text": "  Get-ChildItem -Path (Join-Path $env:CRAFT_FONTS_DIR 'fonts') -Directory -ErrorAction SilentlyContinue | ForEach-Object {"
+            }
+          ]
+        },
+        {
+          "path": "packaging/env.sh",
+          "url": "https://github.com/storytold/photocraft/blob/c699e3cda69f4852b43c0b191ab0091aaeff9d6a/packaging/env.sh",
+          "sha256": "3a11c7284a7b327450f31905b3c8c11e677cf867a12ffdbf620d6ce917bbd914",
+          "relevantLines": [
+            {
+              "line": 10,
+              "text": "#   CARGO_TARGET_DIR        cargo's target dir (default: $ROOT/target)"
+            },
+            {
+              "line": 40,
+              "text": "export CARGO_TARGET_DIR=\"${CARGO_TARGET_DIR:-$ROOT/target}\""
+            },
+            {
+              "line": 47,
+              "text": "# Copy licence and readme files that exist into a package directory."
+            },
+            {
+              "line": 53,
+              "text": "  copy_font_licences \"$dest\""
+            },
+            {
+              "line": 56,
+              "text": "# Builds made with craft-fonts (CRAFT_FONTS_DIR, all official releases) embed its fonts, which"
+            },
+            {
+              "line": 57,
+              "text": "# are OFL-1.1: ship each font's licence as OFL-<family-dir>.txt. No-op without CRAFT_FONTS_DIR."
+            },
+            {
+              "line": 58,
+              "text": "copy_font_licences() {"
+            },
+            {
+              "line": 60,
+              "text": "  [ -n \"${CRAFT_FONTS_DIR:-}\" ] || return 0"
+            },
+            {
+              "line": 61,
+              "text": "  for lic in \"$CRAFT_FONTS_DIR\"/fonts/*/OFL.txt; do"
+            }
+          ]
+        },
+        {
+          "path": "apps/photocraft/Cargo.toml",
+          "url": "https://github.com/storytold/photocraft/blob/c699e3cda69f4852b43c0b191ab0091aaeff9d6a/apps/photocraft/Cargo.toml",
+          "sha256": "2416a660686ec29fecbe0e2c5c33e6026b3538a1cb50563e3b7ed0e02e3ea6d3",
+          "relevantLines": [
+            {
+              "line": 12,
+              "text": "# it; official builds (CI, packaging/, release) build with `--features heif`."
+            }
+          ]
+        },
+        {
+          "path": "Cargo.toml",
+          "url": "https://github.com/storytold/photocraft/blob/c699e3cda69f4852b43c0b191ab0091aaeff9d6a/Cargo.toml",
+          "sha256": "6fd5847796b746e461e98eb121e9575f0ed93c79a28d08f55f20997e99dbfb12",
+          "relevantLines": []
+        }
+      ],
+      "requiredSidecars": [
+        "Original licenses/NOTICE/attribution",
+        "KIO provenance",
+        "Pinned font OFL licenses"
+      ],
+      "externalRuntimeStaging": "No additional codec/ORT DLL or dylib stage is specified by the pinned official native scripts reviewed.",
+      "critical": "Official native release HEIF feature must be enabled for BOTH GUI and CLI as recorded in cargoArgs. Plain default cargo build drops an upstream release capability. The scripts do not stage a libheif DLL or require vcpkg."
+    },
+    {
+      "kioId": "vector",
+      "kioName": "KIO Vector",
+      "repository": "storytold/vectorcraft",
+      "tag": "v0.11.0",
+      "releaseCommit": "0a33cff3f6e2a1e9e672f4c3816f58cd8d3d032e",
+      "fontPin": "3d9ab3a132ed0eff457e424226a435a901da30d3",
+      "features": {
+        "preserveDefaults": true,
+        "appDefaultFeatures": [
+          "wgpu",
+          "accessibility"
+        ],
+        "officialNativeAdditionalFeatures": [],
+        "optionalAppFeatures": []
+      },
+      "nativeBuild": {
+        "packages": [
+          "vectorcraft",
+          "vectorcraft-cli"
+        ],
+        "cargoArgs": [
+          "build",
+          "--release",
+          "--locked",
+          "-p",
+          "vectorcraft",
+          "-p",
+          "vectorcraft-cli"
+        ],
+        "macosPackagingScript": "packaging/macos/package.sh",
+        "macosPackagingArgs": [
+          "--arch",
+          "aarch64"
+        ],
+        "windowsPackagingScript": "packaging/windows/package.ps1",
+        "windowsPackagingArgs": [
+          "-Arch",
+          "x64"
+        ],
+        "webPackagingScript": "packaging/web/package.sh"
+      },
+      "pinnedGitDependencies": [
+        {
+          "crate": "craft-print",
+          "repository": "https://github.com/storytold/craft-libs",
+          "revision": "d991bf6792f8ade99c51358bf3c1d902c8cd96b5"
+        },
+        {
+          "crate": "craft-ui",
+          "repository": "https://github.com/storytold/craft-libs",
+          "revision": "5c874d51eeb3de70e735c8ce87a59a7dedd47675"
+        }
+      ],
+      "offlineExtraStaging": [
+        {
+          "kind": "fonts",
+          "requiredForOfficialNativeParity": true,
+          "repo": "storytold/craft-fonts",
+          "commit": "3d9ab3a132ed0eff457e424226a435a901da30d3",
+          "buildEnvironment": {
+            "CRAFT_FONTS_DIR": "<absolute-path-to-pinned-craft-fonts>",
+            "CRAFT_FONTS_REQUIRED": "1"
+          },
+          "staging": "Embedded at compile time; also copy font OFL license files into the package using upstream packaging helpers."
+        }
+      ],
+      "evidence": [
+        {
+          "path": ".github/workflows/release.yml",
+          "url": "https://github.com/storytold/vectorcraft/blob/0a33cff3f6e2a1e9e672f4c3816f58cd8d3d032e/.github/workflows/release.yml",
+          "sha256": "48bba9b40153810095cff9720fea7a8f6669beb9f1c1ea7af526460db1c7be3d",
+          "relevantLines": [
+            {
+              "line": 67,
+              "text": "    needs: version"
+            },
+            {
+              "line": 75,
+              "text": "      # Japanese, Chinese, Arabic and Thai fonts, embedded by crates/text/build.rs (CRAFT_FONTS_DIR on the build"
+            },
+            {
+              "line": 84,
+              "text": "          targets: aarch64-apple-darwin, x86_64-apple-darwin"
+            },
+            {
+              "line": 102,
+              "text": "          CRAFT_FONTS_DIR: ${{ github.workspace }}/craft-fonts"
+            },
+            {
+              "line": 103,
+              "text": "          CRAFT_FONTS_REQUIRED: \"1\""
+            },
+            {
+              "line": 117,
+              "text": "    needs: version"
+            },
+            {
+              "line": 126,
+              "text": "          # Windows on ARM: cross-compiled on the x64 runner, so signing and WiX run as above."
+            },
+            {
+              "line": 134,
+              "text": "      # Japanese, Chinese, Arabic and Thai fonts, embedded by crates/text/build.rs (CRAFT_FONTS_DIR on the build"
+            },
+            {
+              "line": 143,
+              "text": "          targets: ${{ matrix.target }}"
+            },
+            {
+              "line": 151,
+              "text": "      - name: Install WiX"
+            },
+            {
+              "line": 154,
+              "text": "          dotnet tool install --global wix --version 5.0.2"
+            },
+            {
+              "line": 155,
+              "text": "          wix extension add -g WixToolset.UI.wixext/5.0.2 WixToolset.Util.wixext/5.0.2"
+            },
+            {
+              "line": 167,
+              "text": "          CRAFT_FONTS_DIR: ${{ github.workspace }}/craft-fonts"
+            },
+            {
+              "line": 168,
+              "text": "          CRAFT_FONTS_REQUIRED: \"1\""
+            },
+            {
+              "line": 178,
+              "text": "    needs: version"
+            },
+            {
+              "line": 195,
+              "text": "      # Japanese, Chinese, Arabic and Thai fonts, embedded by crates/text/build.rs (CRAFT_FONTS_DIR on the build"
+            },
+            {
+              "line": 220,
+              "text": "          CRAFT_FONTS_DIR: ${{ github.workspace }}/craft-fonts"
+            },
+            {
+              "line": 221,
+              "text": "          CRAFT_FONTS_REQUIRED: \"1\""
+            },
+            {
+              "line": 247,
+              "text": "    needs: [version, linux]"
+            },
+            {
+              "line": 285,
+              "text": "    needs: version"
+            },
+            {
+              "line": 296,
+              "text": "      # Japanese, Chinese, Arabic and Thai fonts, embedded by crates/text/build.rs (CRAFT_FONTS_DIR in the VM)."
+            },
+            {
+              "line": 326,
+              "text": "            export CRAFT_FONTS_DIR=\"$PWD/craft-fonts\" CRAFT_FONTS_REQUIRED=1"
+            },
+            {
+              "line": 327,
+              "text": "            export CARGO_TARGET_DIR=/var/tmp/vectorcraft-target CARGO_BUILD_JOBS=4"
+            },
+            {
+              "line": 339,
+              "text": "    needs: version"
+            },
+            {
+              "line": 348,
+              "text": "      # Japanese, Chinese, Arabic and Thai fonts, embedded by crates/text/build.rs (CRAFT_FONTS_DIR on the build"
+            },
+            {
+              "line": 357,
+              "text": "          targets: wasm32-unknown-unknown"
+            },
+            {
+              "line": 371,
+              "text": "          CRAFT_FONTS_DIR: ${{ github.workspace }}/craft-fonts"
+            },
+            {
+              "line": 372,
+              "text": "          CRAFT_FONTS_REQUIRED: \"1\""
+            },
+            {
+              "line": 382,
+              "text": "    needs: version"
+            },
+            {
+              "line": 394,
+              "text": "      # Japanese, Chinese, Arabic and Thai fonts, embedded by crates/text/build.rs (CRAFT_FONTS_DIR on the build"
+            },
+            {
+              "line": 403,
+              "text": "          targets: riscv64gc-unknown-linux-gnu"
+            },
+            {
+              "line": 434,
+              "text": "          CRAFT_FONTS_DIR: ${{ github.workspace }}/craft-fonts"
+            },
+            {
+              "line": 435,
+              "text": "          CRAFT_FONTS_REQUIRED: \"1\""
+            },
+            {
+              "line": 436,
+              "text": "          CARGO_TARGET_RISCV64GC_UNKNOWN_LINUX_GNU_LINKER: riscv64-linux-gnu-gcc"
+            },
+            {
+              "line": 464,
+              "text": "    needs: [version, macos, windows, linux, linux-riscv64, flatpak, freebsd, web]"
+            }
+          ]
+        },
+        {
+          "path": "packaging/macos/package.sh",
+          "url": "https://github.com/storytold/vectorcraft/blob/0a33cff3f6e2a1e9e672f4c3816f58cd8d3d032e/packaging/macos/package.sh",
+          "sha256": "f01634f427f07cccc0f2e2978e0a65e536d01db961572bb21e93881e5d9707e1",
+          "relevantLines": [
+            {
+              "line": 40,
+              "text": "SHORT_VERSION=\"${VERSION%%-*}\""
+            },
+            {
+              "line": 41,
+              "text": "WORK=\"$CARGO_TARGET_DIR/macos-package\""
+            },
+            {
+              "line": 61,
+              "text": "  (cd \"$ROOT\" && cargo build --release --locked -p vectorcraft -p vectorcraft-cli \"${args[@]}\")"
+            },
+            {
+              "line": 68,
+              "text": "  for t in \"${TARGETS[@]}\"; do inputs+=(\"$CARGO_TARGET_DIR/$t/release/$bin\"); done"
+            },
+            {
+              "line": 106,
+              "text": "sed -e \"s/@VERSION@/$VERSION/g\" -e \"s/@SHORT_VERSION@/$SHORT_VERSION/g\" \\"
+            },
+            {
+              "line": 111,
+              "text": "# The licences of the craft-fonts fonts embedded in the binary (release builds)."
+            },
+            {
+              "line": 112,
+              "text": "copy_font_licences \"$APP/Contents/Resources\""
+            }
+          ]
+        },
+        {
+          "path": "packaging/windows/package.ps1",
+          "url": "https://github.com/storytold/vectorcraft/blob/0a33cff3f6e2a1e9e672f4c3816f58cd8d3d032e/packaging/windows/package.ps1",
+          "sha256": "aa90c2a23674699d4ad81b52fd58978cec0e64b93351641214a123ba065d52cd",
+          "relevantLines": [
+            {
+              "line": 7,
+              "text": "    vectorcraft-<version>-windows-<arch>.msi            per-machine installer (WiX v5)"
+            },
+            {
+              "line": 10,
+              "text": "  The binaries link the C runtime statically (+crt-static), so neither the MSI nor the portable"
+            },
+            {
+              "line": 14,
+              "text": "  Needs: Rust (MSVC toolchain + the target), the Windows SDK (rc.exe, signtool.exe),"
+            },
+            {
+              "line": 15,
+              "text": "  and WiX v5: dotnet tool install --global wix --version 5.0.2"
+            },
+            {
+              "line": 16,
+              "text": "             wix extension add -g WixToolset.UI.wixext/5.0.2 WixToolset.Util.wixext/5.0.2"
+            },
+            {
+              "line": 51,
+              "text": "$TargetDir = if ($env:CARGO_TARGET_DIR) { $env:CARGO_TARGET_DIR } else { Join-Path $Root 'target' }"
+            },
+            {
+              "line": 62,
+              "text": "  $flagVar = 'CARGO_TARGET_' + ($Target.ToUpper() -replace '-', '_') + '_RUSTFLAGS'"
+            },
+            {
+              "line": 63,
+              "text": "  [Environment]::SetEnvironmentVariable($flagVar, '-C target-feature=+crt-static')"
+            },
+            {
+              "line": 66,
+              "text": "  Invoke-Native \"cargo build ($Target)\" { cargo build --release --locked -p vectorcraft -p vectorcraft-cli --target $Target }"
+            },
+            {
+              "line": 96,
+              "text": "# WiX's stock bitmaps: a 493x58 banner across the top of the inner pages (the page title is drawn"
+            },
+            {
+              "line": 133,
+              "text": "Invoke-Native 'wix build' {"
+            },
+            {
+              "line": 134,
+              "text": "  wix build (Join-Path $PSScriptRoot 'vectorcraft.wxs') -arch $Arch `"
+            },
+            {
+              "line": 135,
+              "text": "    -ext WixToolset.UI.wixext -ext WixToolset.Util.wixext `"
+            },
+            {
+              "line": 141,
+              "text": "# wix writes its debug symbols (.wixpdb) next to the MSI; keep them out of the release assets."
+            },
+            {
+              "line": 142,
+              "text": "Remove-Item -Force -ErrorAction SilentlyContinue ([IO.Path]::ChangeExtension($Msi, '.wixpdb'))"
+            },
+            {
+              "line": 154,
+              "text": "# Built with craft-fonts (CRAFT_FONTS_DIR, release builds): the embedded fonts' licences."
+            },
+            {
+              "line": 155,
+              "text": "if ($env:CRAFT_FONTS_DIR) {"
+            },
+            {
+              "line": 156,
+              "text": "  foreach ($ofl in Get-ChildItem -Path (Join-Path $env:CRAFT_FONTS_DIR 'fonts\\*\\OFL.txt') -ErrorAction SilentlyContinue) {"
+            }
+          ]
+        },
+        {
+          "path": "packaging/env.sh",
+          "url": "https://github.com/storytold/vectorcraft/blob/0a33cff3f6e2a1e9e672f4c3816f58cd8d3d032e/packaging/env.sh",
+          "sha256": "daa33bbe2e5a3527fb3594c3c8b3890c52e2dc6f49c9c5bea1c2fde5602cf584",
+          "relevantLines": [
+            {
+              "line": 10,
+              "text": "#   CARGO_TARGET_DIR        cargo's target dir (default: $ROOT/target)"
+            },
+            {
+              "line": 40,
+              "text": "export CARGO_TARGET_DIR=\"${CARGO_TARGET_DIR:-$ROOT/target}\""
+            },
+            {
+              "line": 47,
+              "text": "# Copy licence and readme files that exist into a package directory."
+            },
+            {
+              "line": 53,
+              "text": "  copy_font_licences \"$dest\""
+            },
+            {
+              "line": 56,
+              "text": "# Built with craft-fonts (CRAFT_FONTS_DIR, set by release.yml): the embedded fonts' licences go with"
+            },
+            {
+              "line": 58,
+              "text": "copy_font_licences() {"
+            },
+            {
+              "line": 60,
+              "text": "  [ -n \"${CRAFT_FONTS_DIR:-}\" ] || return 0"
+            },
+            {
+              "line": 61,
+              "text": "  for ofl in \"$CRAFT_FONTS_DIR\"/fonts/*/OFL.txt; do"
+            }
+          ]
+        },
+        {
+          "path": "apps/vectorcraft/Cargo.toml",
+          "url": "https://github.com/storytold/vectorcraft/blob/0a33cff3f6e2a1e9e672f4c3816f58cd8d3d032e/apps/vectorcraft/Cargo.toml",
+          "sha256": "d888540a3f096e6d5a6afcdd156924b68bcaa53606c9e0cb6ee974d2435cdd42",
+          "relevantLines": [
+            {
+              "line": 16,
+              "text": "# Build with --no-default-features --features windows7 and the win7 Rust target."
+            }
+          ]
+        },
+        {
+          "path": "Cargo.toml",
+          "url": "https://github.com/storytold/vectorcraft/blob/0a33cff3f6e2a1e9e672f4c3816f58cd8d3d032e/Cargo.toml",
+          "sha256": "2c12bf60f50b030ad2300adf91b956a0a718f90699c8af62bbc7dd825e6077ca",
+          "relevantLines": []
+        }
+      ],
+      "requiredSidecars": [
+        "Original licenses/NOTICE/attribution",
+        "KIO provenance",
+        "Pinned font OFL licenses"
+      ],
+      "externalRuntimeStaging": "No additional codec/ORT DLL or dylib stage is specified by the pinned official native scripts reviewed."
+    },
+    {
+      "kioId": "film",
+      "kioName": "KIO Film",
+      "repository": "storytold/filmcraft",
+      "tag": "v0.8.0",
+      "releaseCommit": "f03e21556d8e3a7155b91892d958debd5255d7af",
+      "fontPin": "abb83316d96aa59c1cf64784289e378fe9fa5695",
+      "features": {
+        "preserveDefaults": true,
+        "appDefaultFeatures": [],
+        "officialNativeAdditionalFeatures": [],
+        "optionalAppFeatures": [
+          "whisper",
+          "neural-voices"
+        ]
+      },
+      "nativeBuild": {
+        "packages": [
+          "filmcraft",
+          "filmcraft-cli"
+        ],
+        "cargoArgs": [
+          "build",
+          "--release",
+          "--locked",
+          "-p",
+          "filmcraft",
+          "-p",
+          "filmcraft-cli"
+        ],
+        "macosPackagingScript": "packaging/macos/package.sh",
+        "macosPackagingArgs": [
+          "--arch",
+          "aarch64"
+        ],
+        "windowsPackagingScript": "packaging/windows/package.ps1",
+        "windowsPackagingArgs": [
+          "-Arch",
+          "x64"
+        ],
+        "webPackagingScript": "packaging/web/package.sh"
+      },
+      "pinnedGitDependencies": [
+        {
+          "crate": "craft-ui",
+          "repository": "https://github.com/storytold/craft-libs",
+          "revision": "5c874d51eeb3de70e735c8ce87a59a7dedd47675"
+        }
+      ],
+      "offlineExtraStaging": [
+        {
+          "kind": "fonts",
+          "requiredForOfficialNativeParity": true,
+          "repo": "storytold/craft-fonts",
+          "commit": "abb83316d96aa59c1cf64784289e378fe9fa5695",
+          "buildEnvironment": {
+            "CRAFT_FONTS_DIR": "<absolute-path-to-pinned-craft-fonts>",
+            "CRAFT_FONTS_REQUIRED": "1"
+          },
+          "staging": "Embedded at compile time; also copy font OFL license files into the package using upstream packaging helpers."
+        },
+        {
+          "kind": "optional-models",
+          "requiredForOfficialNativeParity": false,
+          "notes": "Whisper speech transcription and Kokoro neural voices require optional compile features; upstream official native package scripts do not enable them by default. Preserve optional extension capability without claiming it is bundled."
+        }
+      ],
+      "evidence": [
+        {
+          "path": ".github/workflows/release.yml",
+          "url": "https://github.com/storytold/filmcraft/blob/f03e21556d8e3a7155b91892d958debd5255d7af/.github/workflows/release.yml",
+          "sha256": "2278588b0cb8b6c921ec910bcd848e44f677712fa6c73bc0ab801a9ee0370ea2",
+          "relevantLines": []
+        },
+        {
+          "path": "packaging/macos/package.sh",
+          "url": "https://github.com/storytold/filmcraft/blob/f03e21556d8e3a7155b91892d958debd5255d7af/packaging/macos/package.sh",
+          "sha256": "8c88d64d8f187c38a1b3827520fc7b3d68a79de9c57309d32ad79f259be2388e",
+          "relevantLines": [
+            {
+              "line": 40,
+              "text": "SHORT_VERSION=\"${VERSION%%-*}\""
+            },
+            {
+              "line": 41,
+              "text": "WORK=\"$CARGO_TARGET_DIR/macos-package\""
+            },
+            {
+              "line": 61,
+              "text": "  (cd \"$ROOT\" && cargo build --release --locked -p filmcraft -p filmcraft-cli \"${args[@]}\")"
+            },
+            {
+              "line": 68,
+              "text": "  for t in \"${TARGETS[@]}\"; do inputs+=(\"$CARGO_TARGET_DIR/$t/release/$bin\"); done"
+            },
+            {
+              "line": 106,
+              "text": "sed -e \"s/@VERSION@/$VERSION/g\" -e \"s/@SHORT_VERSION@/$SHORT_VERSION/g\" \\"
+            },
+            {
+              "line": 111,
+              "text": "# licences of the embedded craft-fonts fonts (builds with CRAFT_FONTS_DIR)"
+            },
+            {
+              "line": 112,
+              "text": "copy_font_licences \"$APP/Contents/Resources\""
+            }
+          ]
+        },
+        {
+          "path": "packaging/windows/package.ps1",
+          "url": "https://github.com/storytold/filmcraft/blob/f03e21556d8e3a7155b91892d958debd5255d7af/packaging/windows/package.ps1",
+          "sha256": "1a675f9130264870e23d2679a2da8c29a3f5193512f06eba1c09c4c54c3384bf",
+          "relevantLines": [
+            {
+              "line": 7,
+              "text": "    filmcraft-<version>-windows-<arch>.msi            per-machine installer (WiX v5)"
+            },
+            {
+              "line": 10,
+              "text": "  The binaries link the C runtime statically (+crt-static), so neither the MSI nor the portable"
+            },
+            {
+              "line": 14,
+              "text": "  Needs: Rust (MSVC toolchain + the target), the Windows SDK (rc.exe, signtool.exe),"
+            },
+            {
+              "line": 15,
+              "text": "  and WiX v5: dotnet tool install --global wix --version 5.0.2"
+            },
+            {
+              "line": 50,
+              "text": "$TargetDir = if ($env:CARGO_TARGET_DIR) { $env:CARGO_TARGET_DIR } else { Join-Path $Root 'target' }"
+            },
+            {
+              "line": 61,
+              "text": "  $flagVar = 'CARGO_TARGET_' + ($Target.ToUpper() -replace '-', '_') + '_RUSTFLAGS'"
+            },
+            {
+              "line": 62,
+              "text": "  [Environment]::SetEnvironmentVariable($flagVar, '-C target-feature=+crt-static')"
+            },
+            {
+              "line": 65,
+              "text": "  Invoke-Native \"cargo build ($Target)\" { cargo build --release --locked -p filmcraft -p filmcraft-cli --target $Target }"
+            },
+            {
+              "line": 95,
+              "text": "Invoke-Native 'wix build' {"
+            },
+            {
+              "line": 96,
+              "text": "  wix build (Join-Path $PSScriptRoot 'filmcraft.wxs') -arch $Arch `"
+            },
+            {
+              "line": 100,
+              "text": "# wix writes its debug symbols (.wixpdb) next to the MSI; keep them out of the release assets."
+            },
+            {
+              "line": 101,
+              "text": "Remove-Item -Force -ErrorAction SilentlyContinue ([IO.Path]::ChangeExtension($Msi, '.wixpdb'))"
+            },
+            {
+              "line": 118,
+              "text": "# Licences of the embedded craft-fonts fonts (builds with CRAFT_FONTS_DIR) as OFL-<family>.txt."
+            },
+            {
+              "line": 119,
+              "text": "if ($env:CRAFT_FONTS_DIR) {"
+            },
+            {
+              "line": 120,
+              "text": "  foreach ($lic in Get-ChildItem -Path (Join-Path $env:CRAFT_FONTS_DIR 'fonts\\*\\OFL.txt') -ErrorAction SilentlyContinue) {"
+            }
+          ]
+        },
+        {
+          "path": "packaging/env.sh",
+          "url": "https://github.com/storytold/filmcraft/blob/f03e21556d8e3a7155b91892d958debd5255d7af/packaging/env.sh",
+          "sha256": "b5799fd53231df192ee6bf51ddb49fa805c881d0a6d464336f292be974962959",
+          "relevantLines": [
+            {
+              "line": 10,
+              "text": "#   CARGO_TARGET_DIR        cargo's target dir (default: $ROOT/target)"
+            },
+            {
+              "line": 40,
+              "text": "export CARGO_TARGET_DIR=\"${CARGO_TARGET_DIR:-$ROOT/target}\""
+            },
+            {
+              "line": 47,
+              "text": "# Copy licence and readme files that exist into a package directory, plus the licences of the"
+            },
+            {
+              "line": 48,
+              "text": "# craft-fonts fonts the build embedded (only when built with CRAFT_FONTS_DIR)."
+            },
+            {
+              "line": 54,
+              "text": "  copy_font_licences \"$dest\""
+            },
+            {
+              "line": 57,
+              "text": "# Copy each craft-fonts licence ($CRAFT_FONTS_DIR/fonts/<family>/OFL.txt) to <dest>/OFL-<family>.txt."
+            },
+            {
+              "line": 58,
+              "text": "# Does nothing without CRAFT_FONTS_DIR."
+            },
+            {
+              "line": 59,
+              "text": "copy_font_licences() {"
+            },
+            {
+              "line": 61,
+              "text": "  if [ -z \"${CRAFT_FONTS_DIR:-}\" ]; then return 0; fi"
+            },
+            {
+              "line": 62,
+              "text": "  for lic in \"$CRAFT_FONTS_DIR\"/fonts/*/OFL.txt; do"
+            }
+          ]
+        },
+        {
+          "path": "apps/filmcraft/Cargo.toml",
+          "url": "https://github.com/storytold/filmcraft/blob/f03e21556d8e3a7155b91892d958debd5255d7af/apps/filmcraft/Cargo.toml",
+          "sha256": "40a620a4eeb877141a0eb424a387abf43333155c101886642f55a80453662636",
+          "relevantLines": []
+        },
+        {
+          "path": "Cargo.toml",
+          "url": "https://github.com/storytold/filmcraft/blob/f03e21556d8e3a7155b91892d958debd5255d7af/Cargo.toml",
+          "sha256": "cb5176a2e9452dff1b5cda3eae6784463fb1d70a745ee12d0ad80ab7cb2060f9",
+          "relevantLines": []
+        }
+      ],
+      "requiredSidecars": [
+        "Original licenses/NOTICE/attribution",
+        "KIO provenance",
+        "Pinned font OFL licenses"
+      ],
+      "externalRuntimeStaging": "No additional codec/ORT DLL or dylib stage is specified by the pinned official native scripts reviewed.",
+      "optionalFeatures": "Official native package scripts use the app/CLI defaults. Whisper and neural-voices (Kokoro) are explicitly optional compile features and optional model downloads, not shipped by the default upstream release. Retain the source capabilities; do not claim these are bundled or newly enable them silently."
+    },
+    {
+      "kioId": "light",
+      "kioName": "KIO Light",
+      "repository": "storytold/lightcraft",
+      "tag": "v0.8.0",
+      "releaseCommit": "16dbb90499d3c63a6582fcbba1b2550a6e2da032",
+      "fontPin": "8dcdacd5153e64560d109541a47d806f26f048c0",
+      "features": {
+        "preserveDefaults": true,
+        "appDefaultFeatures": [
+          "denoise"
+        ],
+        "officialNativeAdditionalFeatures": [
+          "lightcraft/heif",
+          "lightcraft-cli/heif"
+        ],
+        "optionalAppFeatures": [
+          "heif",
+          "rawnind-model"
+        ]
+      },
+      "nativeBuild": {
+        "packages": [
+          "lightcraft",
+          "lightcraft-cli"
+        ],
+        "cargoArgs": [
+          "build",
+          "--release",
+          "--locked",
+          "-p",
+          "lightcraft",
+          "-p",
+          "lightcraft-cli",
+          "--features",
+          "lightcraft/heif,lightcraft-cli/heif"
+        ],
+        "macosPackagingScript": "packaging/macos/package.sh",
+        "macosPackagingArgs": [
+          "--arch",
+          "aarch64"
+        ],
+        "windowsPackagingScript": "packaging/windows/package.ps1",
+        "windowsPackagingArgs": [
+          "-Arch",
+          "x64"
+        ],
+        "webPackagingScript": "packaging/web/package.sh"
+      },
+      "pinnedGitDependencies": [
+        {
+          "crate": "craft-ui",
+          "repository": "https://github.com/storytold/craft-libs",
+          "revision": "5c874d51eeb3de70e735c8ce87a59a7dedd47675"
+        }
+      ],
+      "offlineExtraStaging": [
+        {
+          "kind": "fonts",
+          "requiredForOfficialNativeParity": true,
+          "repo": "storytold/craft-fonts",
+          "commit": "8dcdacd5153e64560d109541a47d806f26f048c0",
+          "buildEnvironment": {
+            "CRAFT_FONTS_DIR": "<absolute-path-to-pinned-craft-fonts>",
+            "CRAFT_FONTS_REQUIRED": "1"
+          },
+          "staging": "Embedded at compile time; also copy font OFL license files into the package using upstream packaging helpers."
+        }
+      ],
+      "evidence": [
+        {
+          "path": ".github/workflows/release.yml",
+          "url": "https://github.com/storytold/lightcraft/blob/16dbb90499d3c63a6582fcbba1b2550a6e2da032/.github/workflows/release.yml",
+          "sha256": "793412ba383f5adf0f8014416f4b5f3eeb3fd461f44e0be56912d58236c99f21",
+          "relevantLines": [
+            {
+              "line": 69,
+              "text": "    needs: version"
+            },
+            {
+              "line": 85,
+              "text": "          targets: aarch64-apple-darwin, x86_64-apple-darwin"
+            },
+            {
+              "line": 100,
+              "text": "          CRAFT_FONTS_DIR: ${{ github.workspace }}/craft-fonts"
+            },
+            {
+              "line": 101,
+              "text": "          CRAFT_FONTS_REQUIRED: \"1\""
+            },
+            {
+              "line": 118,
+              "text": "    needs: version"
+            },
+            {
+              "line": 127,
+              "text": "          # Windows on ARM: cross-compiled on the x64 runner, so signing and WiX run as above."
+            },
+            {
+              "line": 143,
+              "text": "          targets: ${{ matrix.target }}"
+            },
+            {
+              "line": 151,
+              "text": "      # package.ps1 adds the matching WixToolset.UI/Util.wixext (5.0.2) to the global extension cache."
+            },
+            {
+              "line": 152,
+              "text": "      - name: Install WiX"
+            },
+            {
+              "line": 154,
+              "text": "        run: dotnet tool install --global wix --version 5.0.2"
+            },
+            {
+              "line": 158,
+              "text": "          CRAFT_FONTS_DIR: ${{ github.workspace }}/craft-fonts"
+            },
+            {
+              "line": 159,
+              "text": "          CRAFT_FONTS_REQUIRED: \"1\""
+            },
+            {
+              "line": 177,
+              "text": "    needs: version"
+            },
+            {
+              "line": 217,
+              "text": "          CRAFT_FONTS_DIR: ${{ github.workspace }}/craft-fonts"
+            },
+            {
+              "line": 218,
+              "text": "          CRAFT_FONTS_REQUIRED: \"1\""
+            },
+            {
+              "line": 241,
+              "text": "    needs: [version, linux]"
+            },
+            {
+              "line": 278,
+              "text": "    needs: version"
+            },
+            {
+              "line": 298,
+              "text": "          targets: riscv64gc-unknown-linux-gnu"
+            },
+            {
+              "line": 327,
+              "text": "          CRAFT_FONTS_DIR: ${{ github.workspace }}/craft-fonts"
+            },
+            {
+              "line": 328,
+              "text": "          CRAFT_FONTS_REQUIRED: \"1\""
+            },
+            {
+              "line": 329,
+              "text": "          CARGO_TARGET_RISCV64GC_UNKNOWN_LINUX_GNU_LINKER: riscv64-linux-gnu-gcc"
+            },
+            {
+              "line": 351,
+              "text": "    needs: version"
+            },
+            {
+              "line": 387,
+              "text": "            export CARGO_TARGET_DIR=/var/tmp/lightcraft-target CARGO_BUILD_JOBS=4"
+            },
+            {
+              "line": 390,
+              "text": "            export CRAFT_FONTS_DIR=\"$PWD/craft-fonts\" CRAFT_FONTS_REQUIRED=1"
+            },
+            {
+              "line": 402,
+              "text": "    needs: version"
+            },
+            {
+              "line": 418,
+              "text": "          targets: wasm32-unknown-unknown"
+            },
+            {
+              "line": 434,
+              "text": "          CRAFT_FONTS_DIR: ${{ github.workspace }}/craft-fonts"
+            },
+            {
+              "line": 435,
+              "text": "          CRAFT_FONTS_REQUIRED: \"1\""
+            },
+            {
+              "line": 445,
+              "text": "    needs: [version, macos, windows, linux, linux-riscv64, flatpak, freebsd, web]"
+            }
+          ]
+        },
+        {
+          "path": "packaging/macos/package.sh",
+          "url": "https://github.com/storytold/lightcraft/blob/16dbb90499d3c63a6582fcbba1b2550a6e2da032/packaging/macos/package.sh",
+          "sha256": "e9f1ffd116066e41f70ac4c4b84e097b0ec5a338af7787d7bfe3f6261482d31a",
+          "relevantLines": [
+            {
+              "line": 40,
+              "text": "SHORT_VERSION=\"${VERSION%%-*}\""
+            },
+            {
+              "line": 41,
+              "text": "WORK=\"$CARGO_TARGET_DIR/macos-package\""
+            },
+            {
+              "line": 61,
+              "text": "  (cd \"$ROOT\" && cargo build --release --locked -p lightcraft -p lightcraft-cli --features lightcraft/heif,lightcraft-cli/heif \"${args[@]}\")"
+            },
+            {
+              "line": 68,
+              "text": "  for t in \"${TARGETS[@]}\"; do inputs+=(\"$CARGO_TARGET_DIR/$t/release/$bin\"); done"
+            },
+            {
+              "line": 106,
+              "text": "sed -e \"s/@VERSION@/$VERSION/g\" -e \"s/@SHORT_VERSION@/$SHORT_VERSION/g\" \\"
+            },
+            {
+              "line": 111,
+              "text": "# Licences (and the craft-fonts font licences when built with CRAFT_FONTS_DIR) inside the bundle."
+            }
+          ]
+        },
+        {
+          "path": "packaging/windows/package.ps1",
+          "url": "https://github.com/storytold/lightcraft/blob/16dbb90499d3c63a6582fcbba1b2550a6e2da032/packaging/windows/package.ps1",
+          "sha256": "309121866fc1609ea308e77c8c06c0d45a173bdc5cf02cecd1e7243630d31895",
+          "relevantLines": [
+            {
+              "line": 7,
+              "text": "    lightcraft-<version>-windows-<arch>.msi            per-machine installer (WiX v5)"
+            },
+            {
+              "line": 10,
+              "text": "  The binaries link the C runtime statically (+crt-static), so neither the MSI nor the portable"
+            },
+            {
+              "line": 14,
+              "text": "  Needs: Rust (MSVC toolchain + the target), the Windows SDK (rc.exe, signtool.exe),"
+            },
+            {
+              "line": 15,
+              "text": "  and WiX v5: dotnet tool install --global wix --version 5.0.2"
+            },
+            {
+              "line": 16,
+              "text": "  The WiX UI and Util extensions (installer dialogs, \"Launch LightCraft\" on Finish) are added to"
+            },
+            {
+              "line": 17,
+              "text": "  the global WiX extension cache by this script (wix extension add -g ..., needs network once)."
+            },
+            {
+              "line": 75,
+              "text": "$TargetDir = if ($env:CARGO_TARGET_DIR) { $env:CARGO_TARGET_DIR } else { Join-Path $Root 'target' }"
+            },
+            {
+              "line": 86,
+              "text": "  $flagVar = 'CARGO_TARGET_' + ($Target.ToUpper() -replace '-', '_') + '_RUSTFLAGS'"
+            },
+            {
+              "line": 87,
+              "text": "  [Environment]::SetEnvironmentVariable($flagVar, '-C target-feature=+crt-static')"
+            },
+            {
+              "line": 90,
+              "text": "  Invoke-Native \"cargo build ($Target)\" { cargo build --release --locked -p lightcraft -p lightcraft-cli --features lightcraft/heif,lightcraft-cli/heif --target $Target }"
+            },
+            {
+              "line": 119,
+              "text": "# Extensions must match the WiX tool version (5.0.2, see release.yml). Re-adding is harmless."
+            },
+            {
+              "line": 120,
+              "text": "$WixVersion = '5.0.2'"
+            },
+            {
+              "line": 121,
+              "text": "$WixExtensions = 'WixToolset.UI.wixext', 'WixToolset.Util.wixext'"
+            },
+            {
+              "line": 122,
+              "text": "foreach ($ext in $WixExtensions) {"
+            },
+            {
+              "line": 123,
+              "text": "  Invoke-Native \"wix extension add $ext/$WixVersion\" { wix extension add -g \"$ext/$WixVersion\" }"
+            },
+            {
+              "line": 125,
+              "text": "$ExtArgs = foreach ($ext in $WixExtensions) { '-ext'; \"$ext/$WixVersion\" }"
+            },
+            {
+              "line": 127,
+              "text": "# Installer dialog bitmaps (WixUI sizes): a brand-blue side panel on the welcome/finish pages and"
+            },
+            {
+              "line": 135,
+              "text": "Invoke-Native 'wix build' {"
+            },
+            {
+              "line": 136,
+              "text": "  wix build (Join-Path $PSScriptRoot 'lightcraft.wxs') -arch $Arch -culture en-us @ExtArgs `"
+            },
+            {
+              "line": 141,
+              "text": "# wix writes its debug symbols (.wixpdb) next to the MSI; keep them out of the release assets."
+            },
+            {
+              "line": 142,
+              "text": "Remove-Item -Force -ErrorAction SilentlyContinue ([IO.Path]::ChangeExtension($Msi, '.wixpdb'))"
+            },
+            {
+              "line": 154,
+              "text": "# Builds made with CRAFT_FONTS_DIR (storytold/craft-fonts) embed its fonts: ship their OFL licences."
+            },
+            {
+              "line": 155,
+              "text": "if ($env:CRAFT_FONTS_DIR) {"
+            },
+            {
+              "line": 156,
+              "text": "  Get-ChildItem -Path (Join-Path $env:CRAFT_FONTS_DIR 'fonts\\*\\OFL.txt') -ErrorAction SilentlyContinue | ForEach-Object {"
+            }
+          ]
+        },
+        {
+          "path": "packaging/env.sh",
+          "url": "https://github.com/storytold/lightcraft/blob/16dbb90499d3c63a6582fcbba1b2550a6e2da032/packaging/env.sh",
+          "sha256": "fd2882aa6d03ce924a8501eed057ab27cabfad54a194052bbf88f585a93c1215",
+          "relevantLines": [
+            {
+              "line": 10,
+              "text": "#   CARGO_TARGET_DIR        cargo's target dir (default: $ROOT/target)"
+            },
+            {
+              "line": 40,
+              "text": "export CARGO_TARGET_DIR=\"${CARGO_TARGET_DIR:-$ROOT/target}\""
+            },
+            {
+              "line": 47,
+              "text": "# Copy licence and readme files that exist into a package directory (plus the craft-fonts licences"
+            },
+            {
+              "line": 48,
+              "text": "# when building with CRAFT_FONTS_DIR)."
+            },
+            {
+              "line": 54,
+              "text": "  copy_font_licences \"$dest\""
+            },
+            {
+              "line": 57,
+              "text": "# Builds made with CRAFT_FONTS_DIR (storytold/craft-fonts, an optional build input) embed its fonts;"
+            },
+            {
+              "line": 58,
+              "text": "# their OFL licences go with the package as OFL-<family-dir>.txt. Nothing to do without it."
+            },
+            {
+              "line": 59,
+              "text": "copy_font_licences() {"
+            },
+            {
+              "line": 61,
+              "text": "  [ -n \"${CRAFT_FONTS_DIR:-}\" ] || return 0"
+            },
+            {
+              "line": 62,
+              "text": "  for lic in \"$CRAFT_FONTS_DIR\"/fonts/*/OFL.txt; do"
+            }
+          ]
+        },
+        {
+          "path": "apps/lightcraft/Cargo.toml",
+          "url": "https://github.com/storytold/lightcraft/blob/16dbb90499d3c63a6582fcbba1b2550a6e2da032/apps/lightcraft/Cargo.toml",
+          "sha256": "5726da4c1c48c47e483a1fb3bac0c8d34c0228918c67f77ab1456498127d9249",
+          "relevantLines": [
+            {
+              "line": 17,
+              "text": "# it (HEVC patents); build with `--features heif` to include it."
+            }
+          ]
+        },
+        {
+          "path": "Cargo.toml",
+          "url": "https://github.com/storytold/lightcraft/blob/16dbb90499d3c63a6582fcbba1b2550a6e2da032/Cargo.toml",
+          "sha256": "90e722524ecf710a8e9aef808f0e1df3e92830e156588c90c300d63d203f2a3e",
+          "relevantLines": [
+            {
+              "line": 55,
+              "text": "dhat = \"0.3\" # opt-in heap profiling (lightcraft-cli --features dhat-heap); never in default builds"
+            },
+            {
+              "line": 75,
+              "text": "ravif = { version = \"0.13\", default-features = false, features = [\"threading\"] } # no \"asm\": it needs nasm (non-Rust)"
+            }
+          ]
+        }
+      ],
+      "requiredSidecars": [
+        "Original licenses/NOTICE/attribution",
+        "KIO provenance",
+        "Pinned font OFL licenses"
+      ],
+      "externalRuntimeStaging": "No additional codec/ORT DLL or dylib stage is specified by the pinned official native scripts reviewed.",
+      "critical": "Official native release HEIF feature must be enabled for BOTH GUI and CLI as recorded in cargoArgs. Plain default cargo build drops an upstream release capability. The scripts do not stage a libheif DLL or require vcpkg.",
+      "assembly": "Pinned ravif dependency disables default features/asm and enables threading; Cargo.toml explicitly says no asm because nasm is non-Rust."
+    },
+    {
+      "kioId": "pdf",
+      "kioName": "KIO PDF",
+      "repository": "storytold/pdfcraft",
+      "tag": "v0.8.0",
+      "releaseCommit": "9931329b9fae0b05373b4dc3ac7c58541f0891a4",
+      "fontPin": "3d9ab3a132ed0eff457e424226a435a901da30d3",
+      "features": {
+        "preserveDefaults": true,
+        "appDefaultFeatures": [],
+        "officialNativeAdditionalFeatures": [],
+        "optionalAppFeatures": []
+      },
+      "nativeBuild": {
+        "packages": [
+          "pdfcraft",
+          "pdfcraft-cli"
+        ],
+        "cargoArgs": [
+          "build",
+          "--release",
+          "--locked",
+          "-p",
+          "pdfcraft",
+          "-p",
+          "pdfcraft-cli"
+        ],
+        "macosPackagingScript": "packaging/macos/package.sh",
+        "macosPackagingArgs": [
+          "--arch",
+          "aarch64"
+        ],
+        "windowsPackagingScript": "packaging/windows/package.ps1",
+        "windowsPackagingArgs": [
+          "-Arch",
+          "x64"
+        ],
+        "webPackagingScript": "packaging/web/package.sh"
+      },
+      "pinnedGitDependencies": [
+        {
+          "crate": "craft-ui",
+          "repository": "https://github.com/storytold/craft-libs",
+          "revision": "5c874d51eeb3de70e735c8ce87a59a7dedd47675"
+        },
+        {
+          "crate": "craft-print",
+          "repository": "https://github.com/storytold/craft-libs",
+          "revision": "f03ec27ab2c405969428512178f746183cd55ca0"
+        }
+      ],
+      "offlineExtraStaging": [
+        {
+          "kind": "fonts",
+          "requiredForOfficialNativeParity": true,
+          "repo": "storytold/craft-fonts",
+          "commit": "3d9ab3a132ed0eff457e424226a435a901da30d3",
+          "buildEnvironment": {
+            "CRAFT_FONTS_DIR": "<absolute-path-to-pinned-craft-fonts>",
+            "CRAFT_FONTS_REQUIRED": "1"
+          },
+          "staging": "Embedded at compile time; also copy font OFL license files into the package using upstream packaging helpers."
+        },
+        {
+          "kind": "ocr-models",
+          "requiredForOfficialNativeParity": true,
+          "prepareCommand": [
+            "cargo",
+            "xtask",
+            "models",
+            "<staging-models-directory>"
+          ],
+          "macosDestination": "<App>.app/Contents/Resources/models",
+          "windowsDestination": "<directory-containing-exe>/models",
+          "requiredCompanions": [
+            "ATTRIBUTION.txt",
+            "*.LICENCE.txt"
+          ],
+          "notes": "Upstream package scripts fetch and stage all OCR models before code signing. Do not ship only the executable."
+        }
+      ],
+      "evidence": [
+        {
+          "path": ".github/workflows/release.yml",
+          "url": "https://github.com/storytold/pdfcraft/blob/9931329b9fae0b05373b4dc3ac7c58541f0891a4/.github/workflows/release.yml",
+          "sha256": "d0a186deb83028050c6c80108cc3420c235ba974078ad0cf5cd2f2847b815e2b",
+          "relevantLines": []
+        },
+        {
+          "path": "packaging/macos/package.sh",
+          "url": "https://github.com/storytold/pdfcraft/blob/9931329b9fae0b05373b4dc3ac7c58541f0891a4/packaging/macos/package.sh",
+          "sha256": "43120e135343ebab2aba67fd1df68b1e2f8987f7ff4db502aea0cd896a23a4c9",
+          "relevantLines": [
+            {
+              "line": 40,
+              "text": "SHORT_VERSION=\"${VERSION%%-*}\""
+            },
+            {
+              "line": 41,
+              "text": "WORK=\"$CARGO_TARGET_DIR/macos-package\""
+            },
+            {
+              "line": 61,
+              "text": "  (cd \"$ROOT\" && cargo build --release --locked -p pdfcraft -p pdfcraft-cli \"${args[@]}\")"
+            },
+            {
+              "line": 68,
+              "text": "  for t in \"${TARGETS[@]}\"; do inputs+=(\"$CARGO_TARGET_DIR/$t/release/$bin\"); done"
+            },
+            {
+              "line": 106,
+              "text": "copy_font_licences \"$APP/Contents/Resources\""
+            },
+            {
+              "line": 109,
+              "text": "stage_models \"$APP/Contents/Resources/models\""
+            },
+            {
+              "line": 110,
+              "text": "sed -e \"s/@VERSION@/$VERSION/g\" -e \"s/@SHORT_VERSION@/$SHORT_VERSION/g\" \\"
+            }
+          ]
+        },
+        {
+          "path": "packaging/windows/package.ps1",
+          "url": "https://github.com/storytold/pdfcraft/blob/9931329b9fae0b05373b4dc3ac7c58541f0891a4/packaging/windows/package.ps1",
+          "sha256": "039afd5ae61c29adae9a3130aa9ef15bd40678048c038f575ac04e5b3e36de6d",
+          "relevantLines": [
+            {
+              "line": 7,
+              "text": "    pdfcraft-<version>-windows-<arch>.msi            per-machine installer (WiX v5)"
+            },
+            {
+              "line": 10,
+              "text": "  The binaries link the C runtime statically (+crt-static), so neither the MSI nor the portable"
+            },
+            {
+              "line": 14,
+              "text": "  Needs: Rust (MSVC toolchain + the target), curl and the network (the OCR models), the Windows SDK (rc.exe, signtool.exe),"
+            },
+            {
+              "line": 15,
+              "text": "  and WiX v5: dotnet tool install --global wix --version 5.0.2"
+            },
+            {
+              "line": 50,
+              "text": "$TargetDir = if ($env:CARGO_TARGET_DIR) { $env:CARGO_TARGET_DIR } else { Join-Path $Root 'target' }"
+            },
+            {
+              "line": 61,
+              "text": "  $flagVar = 'CARGO_TARGET_' + ($Target.ToUpper() -replace '-', '_') + '_RUSTFLAGS'"
+            },
+            {
+              "line": 62,
+              "text": "  [Environment]::SetEnvironmentVariable($flagVar, '-C target-feature=+crt-static')"
+            },
+            {
+              "line": 65,
+              "text": "  Invoke-Native \"cargo build ($Target)\" { cargo build --release --locked -p pdfcraft -p pdfcraft-cli --target $Target }"
+            },
+            {
+              "line": 90,
+              "text": "# The document icon embeds Lucide artwork: carry its ISC notice and the project licences"
+            },
+            {
+              "line": 99,
+              "text": "# OCR models (#103): the app looks in models\\ beside pdfcraft.exe. `cargo xtask models` fetches every"
+            },
+            {
+              "line": 100,
+              "text": "# ATTRIBUTION.toml `kind = \"model\"` file (verified by SHA-256) with its licence and ATTRIBUTION.txt;"
+            },
+            {
+              "line": 105,
+              "text": "try { Invoke-Native 'cargo xtask models' { cargo xtask models $Models } } finally { Pop-Location }"
+            },
+            {
+              "line": 107,
+              "text": "if (-not (Test-Path (Join-Path $Models 'ATTRIBUTION.txt')) -or -not (Get-ChildItem (Join-Path $Models '*.LICENCE.txt'))) {"
+            },
+            {
+              "line": 108,
+              "text": "  throw \"no OCR models in $Models after cargo xtask models\""
+            },
+            {
+              "line": 113,
+              "text": "Invoke-Native 'wix build' {"
+            },
+            {
+              "line": 114,
+              "text": "  wix build (Join-Path $PSScriptRoot 'pdfcraft.wxs') -arch $Arch `"
+            },
+            {
+              "line": 122,
+              "text": "# wix writes its debug symbols (.wixpdb) next to the MSI; keep them out of the release assets."
+            },
+            {
+              "line": 123,
+              "text": "Remove-Item -Force -ErrorAction SilentlyContinue ([IO.Path]::ChangeExtension($Msi, '.wixpdb'))"
+            },
+            {
+              "line": 139,
+              "text": "# Builds made with craft-fonts (CRAFT_FONTS_DIR, set for every release) embed its fonts: ship their"
+            },
+            {
+              "line": 140,
+              "text": "# licences, fonts\\<family>\\OFL.txt -> OFL-<family>.txt."
+            },
+            {
+              "line": 141,
+              "text": "if ($env:CRAFT_FONTS_DIR) {"
+            },
+            {
+              "line": 142,
+              "text": "  Get-ChildItem -Path (Join-Path $env:CRAFT_FONTS_DIR 'fonts') -Directory -ErrorAction SilentlyContinue | ForEach-Object {"
+            }
+          ]
+        },
+        {
+          "path": "packaging/env.sh",
+          "url": "https://github.com/storytold/pdfcraft/blob/9931329b9fae0b05373b4dc3ac7c58541f0891a4/packaging/env.sh",
+          "sha256": "81cd66bfa05d1e9eb0b09481a3843f66a259a7122597a3a7d5dfdef2426f33f2",
+          "relevantLines": [
+            {
+              "line": 12,
+              "text": "#   CARGO_TARGET_DIR        cargo's target dir (default: $ROOT/target)"
+            },
+            {
+              "line": 54,
+              "text": "export CARGO_TARGET_DIR=\"${CARGO_TARGET_DIR:-$ROOT/target}\""
+            },
+            {
+              "line": 61,
+              "text": "# Copy licence and readme files that exist into a package directory."
+            },
+            {
+              "line": 67,
+              "text": "  copy_font_licences \"$dest\""
+            },
+            {
+              "line": 70,
+              "text": "# Builds made with the optional craft-fonts input (CRAFT_FONTS_DIR, set for every release) embed"
+            },
+            {
+              "line": 71,
+              "text": "# its fonts, so the package carries their licences: fonts/<family>/OFL.txt -> OFL-<family>.txt."
+            },
+            {
+              "line": 72,
+              "text": "copy_font_licences() {"
+            },
+            {
+              "line": 74,
+              "text": "  [ -n \"${CRAFT_FONTS_DIR:-}\" ] || return 0"
+            },
+            {
+              "line": 75,
+              "text": "  for f in \"$CRAFT_FONTS_DIR\"/fonts/*/OFL.txt; do"
+            },
+            {
+              "line": 82,
+              "text": "# Fetch the OCR models into a package directory (#103): `cargo xtask models DEST` downloads every"
+            },
+            {
+              "line": 83,
+              "text": "# ATTRIBUTION.toml `kind = \"model\"` file, verified by SHA-256, with its licence text and an"
+            },
+            {
+              "line": 84,
+              "text": "# ATTRIBUTION.txt crediting them. DEST must be where pdfcraft_ocr::Models::dirs_beside_exe looks"
+            },
+            {
+              "line": 87,
+              "text": "stage_models() {"
+            },
+            {
+              "line": 91,
+              "text": "  (cd \"$ROOT\" && cargo xtask models \"$dest\")"
+            },
+            {
+              "line": 93,
+              "text": "  if ! ls \"$dest\"/*.LICENCE.txt >/dev/null 2>&1 || [ ! -s \"$dest/ATTRIBUTION.txt\" ]; then"
+            },
+            {
+              "line": 94,
+              "text": "    echo \"error: no OCR models in $dest after cargo xtask models\" >&2"
+            }
+          ]
+        },
+        {
+          "path": "apps/pdfcraft/Cargo.toml",
+          "url": "https://github.com/storytold/pdfcraft/blob/9931329b9fae0b05373b4dc3ac7c58541f0891a4/apps/pdfcraft/Cargo.toml",
+          "sha256": "e016f7dd9361ae9f6ca0edd98190490a226fe8307921617b7df1d68617aed482",
+          "relevantLines": []
+        },
+        {
+          "path": "Cargo.toml",
+          "url": "https://github.com/storytold/pdfcraft/blob/9931329b9fae0b05373b4dc3ac7c58541f0891a4/Cargo.toml",
+          "sha256": "5704435bf957fb52e324730d6226d85fae91dcc1a9f37d25aa1e746b5c5e2336",
+          "relevantLines": []
+        }
+      ],
+      "requiredSidecars": [
+        "Original licenses/NOTICE/attribution",
+        "KIO provenance",
+        "Pinned font OFL licenses",
+        "models/text-detection.rten",
+        "models/text-recognition.rten",
+        "models/*.LICENCE.txt",
+        "models/ATTRIBUTION.txt"
+      ],
+      "externalRuntimeStaging": "No additional codec/ORT DLL or dylib stage is specified by the pinned official native scripts reviewed.",
+      "ocrModels": [
+        {
+          "file": "text-detection.rten",
+          "url": "https://ocrs-models.s3-accelerate.amazonaws.com/text-detection.rten",
+          "licence": "CC-BY-SA-4.0",
+          "licence_url": "https://creativecommons.org/licenses/by-sa/4.0/legalcode.txt",
+          "licence_sha256": "28a9529c7d0bb4dc51f4bf5c116a3d16ef247a052f7591466768ddf563fd1cf5",
+          "sha256": "f15cfb56bd02c4bf478a20343986504a1f01e1665c2b3a0ad66340f054b1b5ca"
+        },
+        {
+          "file": "text-recognition.rten",
+          "url": "https://ocrs-models.s3-accelerate.amazonaws.com/text-recognition.rten",
+          "licence": "CC-BY-SA-4.0",
+          "licence_url": "https://creativecommons.org/licenses/by-sa/4.0/legalcode.txt",
+          "licence_sha256": "28a9529c7d0bb4dc51f4bf5c116a3d16ef247a052f7591466768ddf563fd1cf5",
+          "sha256": "e484866d4cce403175bd8d00b128feb08ab42e208de30e42cd9889d8f1735a6e"
+        }
+      ],
+      "critical": "Run cargo xtask models DEST (requires curl + network/cache) and verify pinned model/license hashes. Stage whole directory in Mac Contents/Resources/models; on Windows stage models next to exe. Upstream packaging checks license and attribution companions and stages before signing. Shipping exe alone loses offline OCR. Model format is .rten, not an ONNX Runtime DLL requirement.",
+      "modelEvidence": {
+        "manifestUrl": "https://github.com/storytold/pdfcraft/blob/9931329b9fae0b05373b4dc3ac7c58541f0891a4/ATTRIBUTION.toml",
+        "manifestSha256": "79d7984b29199676206be7f5c076a858090d9bff2f0f539d94e6cce5e831b618",
+        "fetchImplementationUrl": "https://github.com/storytold/pdfcraft/blob/9931329b9fae0b05373b4dc3ac7c58541f0891a4/xtask/src/assets.rs",
+        "hashVerification": true
+      }
+    }
+  ]
+}

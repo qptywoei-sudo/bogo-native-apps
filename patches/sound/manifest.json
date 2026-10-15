@@ -1,0 +1,1919 @@
+{
+  "schema": "kio.native-branding-patch.v1",
+  "programId": "sound",
+  "applicationId": "com.kio.sound",
+  "displayName": "KIO Sound",
+  "status": "source-patch-ready; native build and GUI QA pending",
+  "upstream": {
+    "repository": "https://github.com/storytold/soundcraft",
+    "release": "v0.7.0",
+    "commit": "3a28a657692c1b98b28c276d8f61df9471074f0f",
+    "sourceArchive": "soundcraft-3a28a657692c1b98b28c276d8f61df9471074f0f.tar.gz",
+    "sourceArchiveSha256": "72a936c404b66a1210a74d3f81142910e868ea51150edd6bee10e6faba5d0325"
+  },
+  "patch": {
+    "file": "soundcraft-v0.7.0-kio-sound.patch",
+    "sha256": "3a29f33c98351c5af913fbd654c841fd410ccde4fe01824c5343a3a37ed1f5a9",
+    "bytes": 4979655
+  },
+  "counts": {
+    "upstreamFiles": 422,
+    "forkFiles": 417,
+    "changedPaths": 66,
+    "added": 17,
+    "removed": 22,
+    "modified": 27,
+    "protectedFilesByteIdentical": 251
+  },
+  "checks": {
+    "originalArchivePatchRoundtrip": true,
+    "protectedEngineDependenciesLicensesCreditsByteIdentical": true,
+    "everyCargoManifestAndLockByteIdentical": true,
+    "upstreamGapDocumentsByteIdentical": true,
+    "platformMetadataParses": true,
+    "packageShellSyntax": true,
+    "patchWhitespace": true,
+    "originalIconByteIdentical": true,
+    "allEmbeddedAssetPathsExist": true,
+    "upstreamTrademarkLogoFilesRemoved": true,
+    "nativeBuildRun": false,
+    "GUIValidationRun": false
+  },
+  "nonUiPlatformBrandingExceptions": [],
+  "features": {
+    "preserveDefaults": true,
+    "appDefaultFeatures": [],
+    "officialNativeAdditionalFeatures": [],
+    "optionalAppFeatures": [
+      "asio"
+    ]
+  },
+  "files": [
+    {
+      "path": "ATTRIBUTION.md",
+      "before": {
+        "sha256": "aaf3fa13f18d7bd84d6827b40a5a2added7548ffcef3ecde9aa322ccfaa5698b",
+        "bytes": 3266
+      },
+      "after": {
+        "sha256": "df0a6f3a293e39d0d940637463f88e07b6b9b9c4100a0ec56910bbd6edaf55b8",
+        "bytes": 8440
+      }
+    },
+    {
+      "path": "KIO-FORK.json",
+      "before": null,
+      "after": {
+        "sha256": "e873cf198ec4270882c81d3d3db43e283a6307281c07f756d6cf846621950690",
+        "bytes": 2627
+      }
+    },
+    {
+      "path": "KIO-FORK.md",
+      "before": null,
+      "after": {
+        "sha256": "9dcab94a3308b7532c8ebae45183bed9ed22dfd4099c82bd5cf7fd9244707ee4",
+        "bytes": 2813
+      }
+    },
+    {
+      "path": "README.md",
+      "before": {
+        "sha256": "d56abc5f95af8058fdaf344f7b7ac113eacbd889aae5778e0d14bda86acb09d7",
+        "bytes": 24817
+      },
+      "after": {
+        "sha256": "862de519492df686db21b8003755e26db8d1d96eb80872bb9614d27dc087aa02",
+        "bytes": 25068
+      }
+    },
+    {
+      "path": "apps/soundcraft-web/index.html",
+      "before": {
+        "sha256": "21f70bb914b1f1398d3afbb8f91ca4ca43427f20c7805368e493ae03847dfc72",
+        "bytes": 2057
+      },
+      "after": {
+        "sha256": "a2446324ff1ba3ca5a0d3391a8e4f3b6b94409da4647dfd1688adb1b532dfb2a",
+        "bytes": 2055
+      }
+    },
+    {
+      "path": "apps/soundcraft/build.rs",
+      "before": {
+        "sha256": "667d487bdd14cf27d48e36f5a67aa496ef7a5ab7f8562636e9827ef1fc282b6e",
+        "bytes": 1480
+      },
+      "after": {
+        "sha256": "f10457f958addf3f3383470e1bcc1a48e2b03a193ccbbbf039d522a199143615",
+        "bytes": 1460
+      }
+    },
+    {
+      "path": "apps/soundcraft/src/config.rs",
+      "before": {
+        "sha256": "65672601d854293e8913773480dfeb5b9d61dc114babdf9ff5ec9ce2c24dbe20",
+        "bytes": 12207
+      },
+      "after": {
+        "sha256": "a6c044692c20709103d794f46e513eb360230e41c34f58d94e25e86d1a4160f0",
+        "bytes": 12228
+      }
+    },
+    {
+      "path": "apps/soundcraft/src/logging.rs",
+      "before": {
+        "sha256": "59316bc37d3c6e212da435f9c2d22448c00c8941c8d9d64a496c073fc0917105",
+        "bytes": 35017
+      },
+      "after": {
+        "sha256": "a69347fd659873b923414a5e93a651aced39efbd78307aba9a063e2ccd075364",
+        "bytes": 35015
+      }
+    },
+    {
+      "path": "apps/soundcraft/src/main.rs",
+      "before": {
+        "sha256": "29f95081d68a63b7934ba3a5ed6d46bae406e7fcf77a80f2f8d0d890feb8e8a5",
+        "bytes": 14150
+      },
+      "after": {
+        "sha256": "af23e98ac70c1b892f65c8e3661ce042e6ee157a352745add02fb3a39b31a49b",
+        "bytes": 14115
+      }
+    },
+    {
+      "path": "apps/soundcraft/src/native_menu.rs",
+      "before": {
+        "sha256": "46c7e78449ee25d6b90a3c6b0d7274a78c08f4720a4db6164b56cb371663af0f",
+        "bytes": 6185
+      },
+      "after": {
+        "sha256": "89085bbfeffb04ce3bc820c32d2a47a67c5de894ea8f6b6953c09c8781e0cc24",
+        "bytes": 6181
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/128x128/apps/ai.storyteller.soundcraft.png",
+      "before": {
+        "sha256": "0e7f4f83d82f5539530f62f85ccf8717dcc00c6d25a3dba57e2a65111e3b248b",
+        "bytes": 7896
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/128x128/apps/com.kio.sound.png",
+      "before": null,
+      "after": {
+        "sha256": "8c605fc538493c6a367ddb42737e462ab63e55973ade67efd961263694b23919",
+        "bytes": 23449
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/16x16/apps/ai.storyteller.soundcraft.png",
+      "before": {
+        "sha256": "a258754c98384b567e842eb29cd25cdcbad8f3a74927d9866a5914dce46be42d",
+        "bytes": 767
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/16x16/apps/com.kio.sound.png",
+      "before": null,
+      "after": {
+        "sha256": "cd0a1bb72e0e46c6eea4000097407e997ec06f5fb7c818d351d4dd85f1383904",
+        "bytes": 791
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/24x24/apps/ai.storyteller.soundcraft.png",
+      "before": {
+        "sha256": "8fe7b5a90e6a10306b9b593f4a571262cc00590af8ae1614d35ffd5f42e52d29",
+        "bytes": 1308
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/24x24/apps/com.kio.sound.png",
+      "before": null,
+      "after": {
+        "sha256": "d9fb01c3615e9a034f188ca785eb51ea0119dcc0e2645895e1f86497c5b69fc0",
+        "bytes": 1334
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/256x256/apps/ai.storyteller.soundcraft.png",
+      "before": {
+        "sha256": "fd6fa6a938fb734990218e23523354762b601c3f06a9b93e77a5efbdae2b0fe6",
+        "bytes": 16627
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/256x256/apps/com.kio.sound.png",
+      "before": null,
+      "after": {
+        "sha256": "f02142e765498cf36237bdfc80b9f5784eb1c4a15842bc795f1e1e736a8239f8",
+        "bytes": 79269
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/32x32/apps/ai.storyteller.soundcraft.png",
+      "before": {
+        "sha256": "dba6824016d4decbaab0ea97dce999a9da22cc9302e0501effb9f92a846b7425",
+        "bytes": 1857
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/32x32/apps/com.kio.sound.png",
+      "before": null,
+      "after": {
+        "sha256": "5a94ce1a53cd36c7e4e5ec8e602e932323635fc94625c8001e296fb101e51f6a",
+        "bytes": 2164
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/48x48/apps/ai.storyteller.soundcraft.png",
+      "before": {
+        "sha256": "27d2ce5857f17d116ce7dd8bb8f0c0f6be8f2a7adbc6cfd4203078f6aa818e37",
+        "bytes": 3064
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/48x48/apps/com.kio.sound.png",
+      "before": null,
+      "after": {
+        "sha256": "cc50d449683f7813d56945de45805cf4183a20eecd3d6c40764cf07c46c07671",
+        "bytes": 4265
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/512x512/apps/ai.storyteller.soundcraft.png",
+      "before": {
+        "sha256": "4d408f65f7acfc2edf3847106a96c14814d38ac933f5911d3793540b1e1001db",
+        "bytes": 35290
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/512x512/apps/com.kio.sound.png",
+      "before": null,
+      "after": {
+        "sha256": "e64e652070b6a556b271abafa2bc4c7664af0d23a1f502985cbaad02486fa5fd",
+        "bytes": 204389
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/64x64/apps/ai.storyteller.soundcraft.png",
+      "before": {
+        "sha256": "b91bbf89680d702f8931d1a033465697ce814e2f62a9fdbadc4f4b76a1295dfe",
+        "bytes": 4252
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/64x64/apps/com.kio.sound.png",
+      "before": null,
+      "after": {
+        "sha256": "0080f7b9177a312538071dfe35236ad5b677df285a7d93e246307ccc620c4aef",
+        "bytes": 6911
+      }
+    },
+    {
+      "path": "assets/app-icon/hicolor/scalable/apps/ai.storyteller.soundcraft.svg",
+      "before": {
+        "sha256": "34dc19422bf33dc57239ecec01804bf6ea0851389317be6fe9b20d12176e3c12",
+        "bytes": 18898
+      },
+      "after": null
+    },
+    {
+      "path": "assets/app-icon/hicolor/scalable/apps/com.kio.sound.svg",
+      "before": null,
+      "after": {
+        "sha256": "b9fd51b0cc74ca248d8dde323fb4c9fd679fda8693ea1e4d8ee38da350460156",
+        "bytes": 494043
+      }
+    },
+    {
+      "path": "assets/app-icon/icon.svg",
+      "before": {
+        "sha256": "34dc19422bf33dc57239ecec01804bf6ea0851389317be6fe9b20d12176e3c12",
+        "bytes": 18898
+      },
+      "after": {
+        "sha256": "b9fd51b0cc74ca248d8dde323fb4c9fd679fda8693ea1e4d8ee38da350460156",
+        "bytes": 494043
+      }
+    },
+    {
+      "path": "assets/app-icon/kio-sound.png",
+      "before": null,
+      "after": {
+        "sha256": "9e416220449258f81a8c70590e1ee8d85bb706e34c6be90d6a0ad92526a03aa1",
+        "bytes": 370410
+      }
+    },
+    {
+      "path": "assets/app-icon/soundcraft-1024.png",
+      "before": {
+        "sha256": "3e772da3c651f4fe9ca19ad82478e40516a82c950ff06f5f6d01e42eeec5bd39",
+        "bytes": 82440
+      },
+      "after": {
+        "sha256": "9e416220449258f81a8c70590e1ee8d85bb706e34c6be90d6a0ad92526a03aa1",
+        "bytes": 370410
+      }
+    },
+    {
+      "path": "assets/app-icon/soundcraft-macos-512.png",
+      "before": {
+        "sha256": "0cbbc7cfac4d0f9aaf1411aa0cd0dacbdadc26415c7a787f8c18cf781061a04e",
+        "bytes": 30708
+      },
+      "after": {
+        "sha256": "e64e652070b6a556b271abafa2bc4c7664af0d23a1f502985cbaad02486fa5fd",
+        "bytes": 204389
+      }
+    },
+    {
+      "path": "assets/app-icon/soundcraft.icns",
+      "before": {
+        "sha256": "23168dca2efcdbd44f10b2e8a9cc8a19d4bef682dafa004ab9aa629805799762",
+        "bytes": 222257
+      },
+      "after": {
+        "sha256": "e87e29021f8edeade70ae607118a9bdd4385fa2de71177b7743c3985e8b78861",
+        "bytes": 1094463
+      }
+    },
+    {
+      "path": "assets/app-icon/soundcraft.ico",
+      "before": {
+        "sha256": "07eafbd18734a2a1c920749ceea2f54c004fd8149298804b6a9d14ee65226185",
+        "bytes": 39441
+      },
+      "after": {
+        "sha256": "13bdaec5302beab628d4e4269084825e87c6d32c398bc7ce5ab4f4c9e5a29daf",
+        "bytes": 118301
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/lib.rs",
+      "before": {
+        "sha256": "816994966b3620b97a8c5dc6980adb695dd9f2ea9208450ac34eb65517387c2a",
+        "bytes": 69205
+      },
+      "after": {
+        "sha256": "883d17e53664e5eb492774f07754e55cbeec154c398c8d7421cc0e83c1ea4c84",
+        "bytes": 69200
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/menus.rs",
+      "before": {
+        "sha256": "956bc36dea5988ed516e320784cc93fbf66913add0e4e8955a6d7bcd352c9c21",
+        "bytes": 33945
+      },
+      "after": {
+        "sha256": "4c325b255e93f98a6b2720bf48843a4fe27ceaad40a54666e8697bd186bf2f14",
+        "bytes": 33942
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/panels.rs",
+      "before": {
+        "sha256": "d6dcfdaa1996103d86982d7ec9452410436882c5c28b9fb91c8988b31d0dc360",
+        "bytes": 34949
+      },
+      "after": {
+        "sha256": "dd935ac0d3cf65e08c769c8ce0d2ce85a749ae3af7f1387d8c228cb1de88b568",
+        "bytes": 34978
+      }
+    },
+    {
+      "path": "docs/brand/artcraft-logo-white.png",
+      "before": {
+        "sha256": "8b86aeb06a12a90ba77a60e0d90329272310e244ee5c1f9b161b391280ca79d8",
+        "bytes": 32161
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-logo-white.svg",
+      "before": {
+        "sha256": "a3e03dc49f9ad4225b8517d5424309c8d1c864d3996d862190d9cc797d5af427",
+        "bytes": 5394
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-logo.png",
+      "before": {
+        "sha256": "08fc6d9d3717e8f13417bac6f9025b50e11d1e0b32e9e000883d2fe0c4a0c67b",
+        "bytes": 31302
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-logo.svg",
+      "before": {
+        "sha256": "3188971e1affdf4f6be4fa65f715376a7a305e6aa741ec78b0296c8f934eff08",
+        "bytes": 5394
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-mark-black.png",
+      "before": {
+        "sha256": "5954cc0306e1b9d7beb47097e2e842157113a39d9aba078b57304902687936a9",
+        "bytes": 26793
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-mark-black.svg",
+      "before": {
+        "sha256": "570adcb4f7ba8ca0647f97074476bab81d3272988f1cdee52efa21bf026036a4",
+        "bytes": 341
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-mark.png",
+      "before": {
+        "sha256": "9d372157a949c147318561e629b11561c28b7cbc14c84b516a3fe6e84d8fbbad",
+        "bytes": 24715
+      },
+      "after": null
+    },
+    {
+      "path": "docs/brand/artcraft-mark.svg",
+      "before": {
+        "sha256": "f87af81b6fa411da8820eed2bfdcc54c0ee9cd453b4e868c64f56c69db142d0e",
+        "bytes": 341
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/env.sh",
+      "before": {
+        "sha256": "bf1c366778ba838c9f96379bbf3448575d09c8b3b1d544e272c1028814f0c169",
+        "bytes": 2216
+      },
+      "after": {
+        "sha256": "d036fcbf8f13a4bed2c15fb119e0afc47cd2a7f85fa7f08f721f202c9ba2e4c8",
+        "bytes": 2274
+      }
+    },
+    {
+      "path": "packaging/freebsd/package.sh",
+      "before": {
+        "sha256": "e67aad267d97dbe10b16cd50396b14c35d9614e37112667cb55cbf2f76e7e102",
+        "bytes": 2853
+      },
+      "after": {
+        "sha256": "65802b107eb79c54540e6e1699f95cf606b0c2414b8594eb63aeb5e1efa6e766",
+        "bytes": 2839
+      }
+    },
+    {
+      "path": "packaging/icons.sh",
+      "before": {
+        "sha256": "5675ef630f3d98aa67b4e817be8879eca61d37a6a6e3f68d2098d116fe6edd2b",
+        "bytes": 2166
+      },
+      "after": {
+        "sha256": "c2f480e2c3a71e3c77f2381c6e6ff62d913879f9068b32ab219829c2eeaada9c",
+        "bytes": 2154
+      }
+    },
+    {
+      "path": "packaging/linux/ai.storyteller.soundcraft.desktop",
+      "before": {
+        "sha256": "f94f1b9c8f65c334727c0985f622e3182a255a5610393f8e48b6325cc30c2f6d",
+        "bytes": 562
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/linux/ai.storyteller.soundcraft.metainfo.xml.in",
+      "before": {
+        "sha256": "0d90b312c809f929107ef2a8437ab088e8289ed6d4d5e42cf497204235531078",
+        "bytes": 2567
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/linux/ai.storyteller.soundcraft.mime.xml",
+      "before": {
+        "sha256": "2d429becff8f01a911a70e4c64f0dc3ce39ab95bebe5d5ff27723b96586b2593",
+        "bytes": 568
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/linux/com.kio.sound.desktop",
+      "before": null,
+      "after": {
+        "sha256": "fe4d802114814d73cd69daa518a62b315a3e4a4b92801e187e5d3df62ea07dbe",
+        "bytes": 537
+      }
+    },
+    {
+      "path": "packaging/linux/com.kio.sound.metainfo.xml.in",
+      "before": null,
+      "after": {
+        "sha256": "12b4dc94ddc552ef1420b41257ae7cf0cbacccd93fe1998e0b2f64ce0332e014",
+        "bytes": 2504
+      }
+    },
+    {
+      "path": "packaging/linux/com.kio.sound.mime.xml",
+      "before": null,
+      "after": {
+        "sha256": "00a55fffde4910c4cde220c3fefb24fb9d2d5d3b8023bb6bc1f05b3c35549e27",
+        "bytes": 554
+      }
+    },
+    {
+      "path": "packaging/linux/flatpak-bundle.sh",
+      "before": {
+        "sha256": "eaaaf2c7903dfe0cd33c742b545640422ab4b7da8d4d8bb81261a27c1622dc17",
+        "bytes": 3098
+      },
+      "after": {
+        "sha256": "b750f5cda31b7e0e0d252458e30c926123408d974f22b6a80b1621ca36fd7174",
+        "bytes": 3072
+      }
+    },
+    {
+      "path": "packaging/linux/flatpak/ai.storyteller.soundcraft.bundle.yml",
+      "before": {
+        "sha256": "5ea2ee39f75bd71f675c4c4f3a40959013d05b770005ccb45791e8993c90f2af",
+        "bytes": 4340
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/linux/flatpak/ai.storyteller.soundcraft.yml",
+      "before": {
+        "sha256": "d5752a73dd40c95d14e9aa5920f73ab511a90a237ca8335e167a366684cc5b45",
+        "bytes": 4959
+      },
+      "after": null
+    },
+    {
+      "path": "packaging/linux/flatpak/com.kio.sound.bundle.yml",
+      "before": null,
+      "after": {
+        "sha256": "abf08b7dae1b635dc7c999e8500f7e2be8f406452534be57f690e691493d7df4",
+        "bytes": 4243
+      }
+    },
+    {
+      "path": "packaging/linux/flatpak/com.kio.sound.yml",
+      "before": null,
+      "after": {
+        "sha256": "84e2832a92456ecae3fdcd0ed3a338dd7342972c69668324fc1cabcaeeb4ad65",
+        "bytes": 4837
+      }
+    },
+    {
+      "path": "packaging/linux/nfpm.yaml",
+      "before": {
+        "sha256": "967a0c62a7683c6d6e13c1049a169b897951bbcd6c506af08dac417dd502f3dd",
+        "bytes": 2363
+      },
+      "after": {
+        "sha256": "185c95670b45315e38cc11fd2ba47abd1ef57fb51d391de1124a3d5d6f2afddd",
+        "bytes": 2345
+      }
+    },
+    {
+      "path": "packaging/linux/package.sh",
+      "before": {
+        "sha256": "98ee89d10b2308d09194a9d838f9c0c7d1c6841798771314a10dd3590dfda930",
+        "bytes": 7118
+      },
+      "after": {
+        "sha256": "1a62e2e08ff2c856235a07b82dc6ac1b298ce37956ee0be2437173f21b292fe9",
+        "bytes": 7102
+      }
+    },
+    {
+      "path": "packaging/macos/Info.plist.in",
+      "before": {
+        "sha256": "dbdd4525c433109927c12041aafc7fdc3e8841cc2857cec64b44ab5c513ae302",
+        "bytes": 4156
+      },
+      "after": {
+        "sha256": "d16c5da3b3d416bd4f3117a17af2d6f457a9c67f073f97aa2746a451ffd9fd3e",
+        "bytes": 4105
+      }
+    },
+    {
+      "path": "packaging/macos/package.sh",
+      "before": {
+        "sha256": "f9f7a0be33a9705115d8435dd0dc79b917594ee9d346d276ef32f37b70c152ee",
+        "bytes": 8990
+      },
+      "after": {
+        "sha256": "369e6d08668b4c4497ca99e71dd634f084581d6338e2c60b746d19a38566c9c2",
+        "bytes": 8836
+      }
+    },
+    {
+      "path": "packaging/windows/package.ps1",
+      "before": {
+        "sha256": "ac6b8152bf368493a7bbcc45adcaf43db6f206cb158a063ec31a6d06c688367d",
+        "bytes": 6663
+      },
+      "after": {
+        "sha256": "b19c26027c1a22e34812ec296d7ef07f8e445478ace7cb78b60c4209d720449e",
+        "bytes": 6661
+      }
+    },
+    {
+      "path": "packaging/windows/sign.ps1",
+      "before": {
+        "sha256": "eefd102e10d6d161ff048a98cb7b33c3513a3e6cca00add55b5c4bad27533867",
+        "bytes": 4802
+      },
+      "after": {
+        "sha256": "7fe15649d98e21e9a0363ff5703f43bf15ca6fb45fe51276b53ef5bcde9ae971",
+        "bytes": 4801
+      }
+    },
+    {
+      "path": "packaging/windows/soundcraft.wxs",
+      "before": {
+        "sha256": "67b034a163fa79f55bb0dd09b4d7f73a0215d786d6ece49ca21271cb42498786",
+        "bytes": 6381
+      },
+      "after": {
+        "sha256": "31f8292583f3cff18fff05daf1f30444e51009c7ee992c0bfcdd3d0f3415156f",
+        "bytes": 6329
+      }
+    }
+  ],
+  "protectedFiles": [
+    {
+      "path": "Cargo.toml",
+      "sha256": "22cfc5532a97e815ed139a81b8f5288716dcb702248b79f825e75630d38b4eee",
+      "bytes": 2178
+    },
+    {
+      "path": "LICENSE-APACHE",
+      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+      "bytes": 10174
+    },
+    {
+      "path": "Cargo.lock",
+      "sha256": "65a3e7a64c5e8b65ddf47c121f1c5cd02888dc2b8678b3ad8dcb4b42cd7d9009",
+      "bytes": 138097
+    },
+    {
+      "path": "NOTICE",
+      "sha256": "977949446409bf907b265d765f024d3194c09251c2a65a4ca418cf5cb2dc84c0",
+      "bytes": 832
+    },
+    {
+      "path": "LICENSE-MIT",
+      "sha256": "6aff3a3f0d8eb4c2d4fca151a00cdf26d8ff3020889402a453381a12dba3381e",
+      "bytes": 1102
+    },
+    {
+      "path": "crates/video/Cargo.toml",
+      "sha256": "2e411da8642b8fbd413de7dd0640227daf5333de6a7cb073a07a620c575c7e23",
+      "bytes": 739
+    },
+    {
+      "path": "crates/video/examples/test_movie.rs",
+      "sha256": "8aa2c8a788a5722b395422991578cebf8cdbb2bd9808c73c72dc4fcaa008a410",
+      "bytes": 590
+    },
+    {
+      "path": "crates/video/src/bitstream.rs",
+      "sha256": "57f4a20d8f21ed0d290755f9395b1d394777c59ceed46670f20c9cf8ee37d429",
+      "bytes": 12812
+    },
+    {
+      "path": "crates/video/src/convert.rs",
+      "sha256": "9752960e64abdfe447defb19552cce4f75ad46e820c1a8714c208b59ab29ad89",
+      "bytes": 6151
+    },
+    {
+      "path": "crates/video/src/lib.rs",
+      "sha256": "cc6d4d31d9d90f8edbf4075d43a325208673575ce4a784fcd2a0fe16db43185d",
+      "bytes": 2871
+    },
+    {
+      "path": "crates/video/src/synth.rs",
+      "sha256": "35207818aff01943d07bf094b7728874cad71a2774bca72d0f4c4f713bba2857",
+      "bytes": 7621
+    },
+    {
+      "path": "crates/video/src/tests.rs",
+      "sha256": "c3049d0d7d319812b537c41e813e74f3381f5c187179863b90b605f8e0a1a0c7",
+      "bytes": 8459
+    },
+    {
+      "path": "crates/video/src/movie.rs",
+      "sha256": "541ac79a2683d8f76ac7d9241e607726e618013f16b956502768faabba885bd1",
+      "bytes": 21371
+    },
+    {
+      "path": "crates/video/src/isobmff/error.rs",
+      "sha256": "52cefefb28a4a25ffd9fc3415b2fa33a10be9fd6c5d0f73381bccb307eb30be4",
+      "bytes": 1255
+    },
+    {
+      "path": "crates/video/src/isobmff/mux.rs",
+      "sha256": "60f192cd2c785184cfe31a15b185ac754ca26d3625dc8ef4b2ce7eface543e8b",
+      "bytes": 32985
+    },
+    {
+      "path": "crates/video/src/isobmff/source.rs",
+      "sha256": "8ab8dfcc22b31d92796ee73372f1bc5c2bc6b943be07e65b12ab055f3ad856b0",
+      "bytes": 3565
+    },
+    {
+      "path": "crates/video/src/isobmff/mod.rs",
+      "sha256": "4db0294e2474f91217e294c9608d0aaa8f112ed6ba20a82b0805f79eba01aa44",
+      "bytes": 1131
+    },
+    {
+      "path": "crates/video/src/isobmff/codec.rs",
+      "sha256": "b3478bad9709e74d5dd64f6fd36ea35ce9078dcd1b025961c28cc5f2567eccfa",
+      "bytes": 57458
+    },
+    {
+      "path": "crates/video/src/isobmff/bytes.rs",
+      "sha256": "eb380e1cdb79e689e595ec027f3016483db2e5d125e5b201315dc8faf8fabd77",
+      "bytes": 11395
+    },
+    {
+      "path": "crates/video/src/isobmff/demux.rs",
+      "sha256": "6d09e753dc721cd1522e72e63676269d1db8e61a1921e91f1bbc5d2e3bb09b68",
+      "bytes": 43858
+    },
+    {
+      "path": "crates/video/src/h264/dpb.rs",
+      "sha256": "f554016a06554b63316a58a19267cb2a323b3c4bb2688dc5a10db60c925578cb",
+      "bytes": 16803
+    },
+    {
+      "path": "crates/video/src/h264/cabac.rs",
+      "sha256": "087218729c998d6bc825c093ef09bd6461445684706eddea104dd79ad5acfdb4",
+      "bytes": 12379
+    },
+    {
+      "path": "crates/video/src/h264/error.rs",
+      "sha256": "7e148908f4a0efeb07b40bfa341b6c7bba7ff5b3cd255b9ec2233380488c4aaf",
+      "bytes": 1225
+    },
+    {
+      "path": "crates/video/src/h264/cabac_tables.rs",
+      "sha256": "9eb9f6ca837238be5f4340e49b32e451aa5b589623c7abd5138410acdf0df174",
+      "bytes": 45934
+    },
+    {
+      "path": "crates/video/src/h264/mbtypes.rs",
+      "sha256": "519a20cc2a429c9d268ebb87c194a4c6b28f2fc75dbfff249f49e2d3e3d9a33f",
+      "bytes": 7136
+    },
+    {
+      "path": "crates/video/src/h264/slice.rs",
+      "sha256": "450437c4d0fe790dd8869ccfd28e380ea35c5c26de2e2f9e42892c87bb9a8232",
+      "bytes": 19601
+    },
+    {
+      "path": "crates/video/src/h264/picture.rs",
+      "sha256": "9b77c344df289ba56c6ca19f31f539b56f844dee96a173ce627c7c6403e4d443",
+      "bytes": 12384
+    },
+    {
+      "path": "crates/video/src/h264/decoder.rs",
+      "sha256": "04d657562ebc7aebb8f17681f5bd25bc63522887acee97e6ebcb827c6958b8c7",
+      "bytes": 25105
+    },
+    {
+      "path": "crates/video/src/h264/params.rs",
+      "sha256": "654fb4c41f8730be80ee226f72e87d38480b8a0ded90fc793090a79a3f2768ca",
+      "bytes": 34227
+    },
+    {
+      "path": "crates/video/src/h264/cavlc_tables.rs",
+      "sha256": "d19043a937dd817664bb3e37445de6ec2feccf8ffecf8d481eb61a6716b529f3",
+      "bytes": 8332
+    },
+    {
+      "path": "crates/video/src/h264/mod.rs",
+      "sha256": "5ed5ddade1f5493f324c50963753849335db9e39b8492f9d97befb6c5a28a562",
+      "bytes": 2437
+    },
+    {
+      "path": "crates/video/src/h264/inter.rs",
+      "sha256": "238c4f31eb6c9431d8113d260264eee9806bd0a99f4e7d025ce11d51fc05912e",
+      "bytes": 20663
+    },
+    {
+      "path": "crates/video/src/h264/slicedec.rs",
+      "sha256": "513fcc353d435a53e39a9ccd00990e9abab666e8ba42626cb00b94a8acb342a4",
+      "bytes": 58107
+    },
+    {
+      "path": "crates/video/src/h264/transform.rs",
+      "sha256": "8f7cad928aeb2f24e9e292bac94ef4d5b9f44e4281913e04bd43f80f2711ee96",
+      "bytes": 10759
+    },
+    {
+      "path": "crates/video/src/h264/intra.rs",
+      "sha256": "181f99ca5d0f148d43ba61ff7e5d922132827500605b3da95d2b0c48c1c4b886",
+      "bytes": 16022
+    },
+    {
+      "path": "crates/video/src/h264/tables.rs",
+      "sha256": "3d38e8e93dc7d86f83580347a1764c670fc5510ea6a34d295b92b8b4116dd768",
+      "bytes": 6129
+    },
+    {
+      "path": "crates/video/src/h264/deblock.rs",
+      "sha256": "9c0df8e2e2a98eda1880fd35f330fe683f73290af649a2038783fecf81cedfdc",
+      "bytes": 22198
+    },
+    {
+      "path": "crates/video/src/h264/cavlc.rs",
+      "sha256": "31a6cf443c037066914a3ebdf819f74b6ae7cc91bf8c6b73e3f4966d413bc79c",
+      "bytes": 10633
+    },
+    {
+      "path": "crates/video/src/h264/cabac_mb.rs",
+      "sha256": "bc9f439fd435887498fd4c68e6bc0558c629c5d22d67a7e1605ea03e15b3b09a",
+      "bytes": 28164
+    },
+    {
+      "path": "crates/video/src/prores/encode.rs",
+      "sha256": "e75cbb6faae55ef3faaf8125ab4507a2ae8de6100c65aebcce816544f6bd3d04",
+      "bytes": 17382
+    },
+    {
+      "path": "crates/video/src/prores/dct.rs",
+      "sha256": "4c802a4d6aa8307830b24b48ae944676f86229ecb83354dd03c738a70eca3d42",
+      "bytes": 5236
+    },
+    {
+      "path": "crates/video/src/prores/header.rs",
+      "sha256": "7b94d0352eb126b86ed3d226d7b40d7d3653582aa2d2e73d6687fc0636312e73",
+      "bytes": 8836
+    },
+    {
+      "path": "crates/video/src/prores/bits.rs",
+      "sha256": "73da905f98be3979429cdd6df65a409e8ec92c8be841488189811a704006ef12",
+      "bytes": 8184
+    },
+    {
+      "path": "crates/video/src/prores/mod.rs",
+      "sha256": "8e9d86bdc6cb936e4fe7a28cfe1d1ba41f42f3ea020e9ffc34ca3f0fecd4fc70",
+      "bytes": 6570
+    },
+    {
+      "path": "crates/video/src/prores/decode.rs",
+      "sha256": "a2d78f14511f07e6147e67c8e39e5a2b44da45c32ad6183d3e04e5c5b82dcf08",
+      "bytes": 16871
+    },
+    {
+      "path": "crates/video/src/prores/tables.rs",
+      "sha256": "10b8fea4f743e65cea0b480473e82c456ed9397d691f879edb3d772eb59be37b",
+      "bytes": 5165
+    },
+    {
+      "path": "crates/au-host/Cargo.toml",
+      "sha256": "bd71e2007c77e34ce33f1a7f3e16231a30671ea899a0147623a770767baf88de",
+      "bytes": 912
+    },
+    {
+      "path": "crates/au-host/tests/system_units.rs",
+      "sha256": "fa1ff13c1157b7767430800a510670fadaf871081baf5789d2de09f2d0034f18",
+      "bytes": 7819
+    },
+    {
+      "path": "crates/au-host/src/registry.rs",
+      "sha256": "3be8dafa8dc07e45ae0763b20de757a501e24ac6be1fbe51406be10ec8f4066c",
+      "bytes": 11092
+    },
+    {
+      "path": "crates/au-host/src/lib.rs",
+      "sha256": "763177ff8eea7aa20bae300e5c99b6fde1ce28ae7600173f24447590d1b5b9fa",
+      "bytes": 14085
+    },
+    {
+      "path": "crates/au-host/src/ffi.rs",
+      "sha256": "a4e4d0c9356dc3ed9800f1df98a0aefa9f650029146c0a02855577bd31b20bd8",
+      "bytes": 40565
+    },
+    {
+      "path": "crates/au-host/src/plugin.rs",
+      "sha256": "458f081055635d2eab64f87dc4805af6cb2cd3ec115f72328816b7a2aac17c02",
+      "bytes": 9479
+    },
+    {
+      "path": "crates/midi/Cargo.toml",
+      "sha256": "4b79d75280c5c4e1753a4fc79d31ee0dcde9a8174f0a8c22f7b27eb0f101e0d6",
+      "bytes": 462
+    },
+    {
+      "path": "crates/midi/tests/smf.rs",
+      "sha256": "076523f2aad95ad032e60538700f811afab22fcd6263fc94bb6ddb888ea16b5e",
+      "bytes": 13235
+    },
+    {
+      "path": "crates/midi/tests/ops.rs",
+      "sha256": "4e9c5c59874ce72be311a2041cc6e91e95f2b9f481815a39d5cc26e05397ce52",
+      "bytes": 8680
+    },
+    {
+      "path": "crates/midi/src/sequence.rs",
+      "sha256": "e33a4002f45d4e18415910ec0b381f09bf7a7369d37eeb8e907a7f4f85a0398b",
+      "bytes": 4827
+    },
+    {
+      "path": "crates/midi/src/rng.rs",
+      "sha256": "d5952da5af6bdf0846483eaf54d5f2bdbf213d10c0202c6de203defa8d5c3661",
+      "bytes": 845
+    },
+    {
+      "path": "crates/midi/src/smf.rs",
+      "sha256": "1a84078b2b9033bf2b7cdb18aa600e72a57475dffcb72e372384ceeb59bba6ff",
+      "bytes": 21616
+    },
+    {
+      "path": "crates/midi/src/lib.rs",
+      "sha256": "ff7e839f94d84a8474e65822eb6502d771fbae083f29ee4fd04be6085e982afb",
+      "bytes": 1971
+    },
+    {
+      "path": "crates/midi/src/ops.rs",
+      "sha256": "a939193c66bd58a4338e35a609e09122ba75604d4d620677e5cd2c90b164624d",
+      "bytes": 10059
+    },
+    {
+      "path": "crates/midi/src/names.rs",
+      "sha256": "a1d6d46f0481a8b16fa12edad3cfe8e804451969503fd85e858ebc227a55830d",
+      "bytes": 5039
+    },
+    {
+      "path": "crates/vst3-host/Cargo.toml",
+      "sha256": "a5f8f8e5303748187a356872c31ddcb64c818e4c508cf28960a575505b934ba3",
+      "bytes": 2001
+    },
+    {
+      "path": "crates/vst3-host/tests/module_exit_live_instance.rs",
+      "sha256": "a48c64afdda8a2fe744a1cd2afba17e9c52175eda2bcab1ee3d99925e1d652cc",
+      "bytes": 730
+    },
+    {
+      "path": "crates/vst3-host/tests/module_exit.rs",
+      "sha256": "0877720f0bf1166837d54ecb12efdb5e63e9af99cff5ba68b7ada4a1064abad2",
+      "bytes": 715
+    },
+    {
+      "path": "crates/vst3-host/tests/fixture_e2e.rs",
+      "sha256": "3194c02eedd1732692b9a6f4bbf2530f59c47f6ddef68231e5d58f9da500d0c5",
+      "bytes": 13139
+    },
+    {
+      "path": "crates/vst3-host/tests/module_exit_worker_thread.rs",
+      "sha256": "72e9a5713f604e50a8b93cfde90f7467368f8f300257b92ccae3e6cb1ec2c163",
+      "bytes": 799
+    },
+    {
+      "path": "crates/vst3-host/tests/module_exit_shutdown.rs",
+      "sha256": "13fcbfe550052d13209a2c85bbe389a404685a8d13402278ab7b6ef4a724aa93",
+      "bytes": 2418
+    },
+    {
+      "path": "crates/vst3-host/tests/editor_main_thread.rs",
+      "sha256": "7ba19e3a595aa49d4a9f7b1e69fa4cc1011be90a8d001e56ba0a459859de20e2",
+      "bytes": 1518
+    },
+    {
+      "path": "crates/vst3-host/tests/fixture/Cargo.toml",
+      "sha256": "184d3657e6a04c532eb6ad83928ff4ac565e1df5b1db3f3bd8f4c4d867f570ba",
+      "bytes": 462
+    },
+    {
+      "path": "crates/vst3-host/tests/fixture/Cargo.lock",
+      "sha256": "584f7a13046fb02a0a0ce0a6a5ebad2a17cba757bd0de2b379e5ec5195355853",
+      "bytes": 612
+    },
+    {
+      "path": "crates/vst3-host/tests/fixture/src/lib.rs",
+      "sha256": "3bd745bf8e587d4335065bf085ac8ba80654d8494fcb46699a8f39ca333c002f",
+      "bytes": 31770
+    },
+    {
+      "path": "crates/vst3-host/tests/common/mod.rs",
+      "sha256": "d09d3005c7bc2c1e5fe481dafc5776ebd77c9d3bcdf0261712f2a3f6c71900c6",
+      "bytes": 1984
+    },
+    {
+      "path": "crates/vst3-host/src/registry.rs",
+      "sha256": "436970e4c7f69cff0de872a2c21707c6b1dba9cb3a78cf7ebf3d36f7992a339f",
+      "bytes": 9994
+    },
+    {
+      "path": "crates/vst3-host/src/lib.rs",
+      "sha256": "1895a8d2bdbbf164c7c70cffc355c7d609ddb28c41ef2ff0132e21420229e6db",
+      "bytes": 13112
+    },
+    {
+      "path": "crates/vst3-host/src/ffi.rs",
+      "sha256": "9611190b56faff606ec4d18e3fe2569b2b9ca6d9b7affac1cc3aa4dedb86f5f0",
+      "bytes": 97685
+    },
+    {
+      "path": "crates/vst3-host/src/scan.rs",
+      "sha256": "7ef9f0fcf8706b1dc596e941d6a4f0478e3d36e062e439b92c269e0eecbc8945",
+      "bytes": 13236
+    },
+    {
+      "path": "crates/vst3-host/src/plugin.rs",
+      "sha256": "fe15cc0c6c2be8489dbeb827c62a9895b2f380122bd9473de456392ac23890b3",
+      "bytes": 18986
+    },
+    {
+      "path": "crates/clap-host/Cargo.toml",
+      "sha256": "0d0237db949867dad471ac7786821beea80341d28c0517c458fb54c48588bed7",
+      "bytes": 1336
+    },
+    {
+      "path": "crates/clap-host/tests/fixture_e2e.rs",
+      "sha256": "cd43ae8f9ec25f555aff72eb88e6efb5b2ea6e6c0305a95170dbd764d48ebbdc",
+      "bytes": 7609
+    },
+    {
+      "path": "crates/clap-host/tests/editor_main_thread.rs",
+      "sha256": "80d080565ce1a4fab04c65e730616c65b655da4e00c12af9d2753886d3c886ea",
+      "bytes": 1759
+    },
+    {
+      "path": "crates/clap-host/tests/fixture/Cargo.toml",
+      "sha256": "cd51fbf01f352384d3298812a62218509be1a62675550b71daaeeb7a63fbecc4",
+      "bytes": 466
+    },
+    {
+      "path": "crates/clap-host/tests/fixture/Cargo.lock",
+      "sha256": "fbb49da804852b1a1bf36a3394fad45afc05f790c6acb3055d58ab14eade949c",
+      "bytes": 380
+    },
+    {
+      "path": "crates/clap-host/tests/fixture/src/lib.rs",
+      "sha256": "573f1b1b3602a37c14b2a28935a0ae6356b79d3b68c6a1407765d27b587ebd41",
+      "bytes": 19212
+    },
+    {
+      "path": "crates/clap-host/tests/common/mod.rs",
+      "sha256": "0f0084bece55dd0b577aeeccee7bdb6ef6f39d533e8e3c1aef16ec2952d410e9",
+      "bytes": 2010
+    },
+    {
+      "path": "crates/clap-host/src/registry.rs",
+      "sha256": "41134c7b65634441d07b9c73ba7e3eb51cc9786c19db81ccec3e148ec9dc64ff",
+      "bytes": 7576
+    },
+    {
+      "path": "crates/clap-host/src/lib.rs",
+      "sha256": "77c8702da6ed5a487f4485bce56a1e09fbccc9c97e673a589dd35d6b98f8435d",
+      "bytes": 8756
+    },
+    {
+      "path": "crates/clap-host/src/ffi.rs",
+      "sha256": "c528ee86f3a1f8967b2bd175911e1b60fe6a5cb8bebcc20564b529fa58f63205",
+      "bytes": 69472
+    },
+    {
+      "path": "crates/clap-host/src/scan.rs",
+      "sha256": "a57b5db1a1d46d97df77a7d8d95daf080aaee310c4ceef01b033ff6dca664b1b",
+      "bytes": 8982
+    },
+    {
+      "path": "crates/clap-host/src/plugin.rs",
+      "sha256": "67cb09c57fd309903a3de3684163b34304bbe37065ca0f4239badbfa73ba5662",
+      "bytes": 12653
+    },
+    {
+      "path": "crates/mix/Cargo.toml",
+      "sha256": "047e324c8e42199539466c7959a1a3e9e0a85c080bf50f9a219463fb8a3842d3",
+      "bytes": 706
+    },
+    {
+      "path": "crates/mix/tests/bus_aux_interval.rs",
+      "sha256": "8c6cda651a733db1ea331302a739042fcf8c1034699f4091a2afac4095beaf02",
+      "bytes": 4339
+    },
+    {
+      "path": "crates/mix/tests/master_insert_latency.rs",
+      "sha256": "9cf9df63b6bd07b1aa2dca3199be59ffa0bd51d1c1e6b24f191112d7591d51ed",
+      "bytes": 3083
+    },
+    {
+      "path": "crates/mix/examples/render_bench.rs",
+      "sha256": "18ac1b1fc747547ddefed66d08136b0ce98d48cf1aea40f86e16702ae0df3ebb",
+      "bytes": 2034
+    },
+    {
+      "path": "crates/mix/src/lib.rs",
+      "sha256": "ed520ba36387ec68cd96fda81fd24e6128a83f64b605460cddb6649b31472b40",
+      "bytes": 141493
+    },
+    {
+      "path": "crates/time/Cargo.toml",
+      "sha256": "57becc1aa898705ad7f143b7e9a25f9a82e32dc19e28979a81e04be3db61a3ef",
+      "bytes": 453
+    },
+    {
+      "path": "crates/time/tests/meter_grid_contract.rs",
+      "sha256": "f0a3dcaff6bb27f39ea6bd86e5071bccaf08906b90bf71b9da0f82f3d9857f87",
+      "bytes": 3002
+    },
+    {
+      "path": "crates/time/src/format.rs",
+      "sha256": "0e0c1e85a9558707d7ab8cd8d0ee9ecd13459183bb360da092f0c13a7aeceeba",
+      "bytes": 8029
+    },
+    {
+      "path": "crates/time/src/lib.rs",
+      "sha256": "909682e33a692977187845cf717179a13d6ef3ebb73b4127bb9cacf6781985aa",
+      "bytes": 4995
+    },
+    {
+      "path": "crates/time/src/timecode.rs",
+      "sha256": "7029315f0d9c96d0d4add432a1d26a67e2164dbcae22ab0407b4948298413421",
+      "bytes": 9477
+    },
+    {
+      "path": "crates/time/src/grid.rs",
+      "sha256": "e3510cf95b4c10f992f8a290d7f06c7705ca51a71890f37f98b8c56370fcc03a",
+      "bytes": 10718
+    },
+    {
+      "path": "crates/time/src/tempo.rs",
+      "sha256": "4a213cc5bf0162a0a7b6fef31a9bac167943531b38013b4d19dbc7707b67c49e",
+      "bytes": 15121
+    },
+    {
+      "path": "crates/ui-egui/src/credits.rs",
+      "sha256": "078215a3c24973580465cd5327553f9be3887857d06cdac108a1a9db4719f101",
+      "bytes": 13814
+    },
+    {
+      "path": "crates/playback/Cargo.toml",
+      "sha256": "76b313361d60279f18de913aba826af0fd8ce10663795bc97d73a2860c8ac697",
+      "bytes": 1003
+    },
+    {
+      "path": "crates/playback/src/lib.rs",
+      "sha256": "b65ad78dd5e41802ec907d7279197ed78ed6e550858099966a338f41a46d99c8",
+      "bytes": 55136
+    },
+    {
+      "path": "crates/playback/src/devices.rs",
+      "sha256": "5d79e4d38e00329231dcd42f89ab58007f7a8ad408ddd84496a4007b48136d70",
+      "bytes": 9725
+    },
+    {
+      "path": "crates/playback/src/record.rs",
+      "sha256": "db3a569b57013f4e4a6ccb7342a2aa84fef9ea336881c3e1b7629b1457ebda4e",
+      "bytes": 30786
+    },
+    {
+      "path": "crates/model/Cargo.toml",
+      "sha256": "8bcb072514a728b7d4eb256c8b7d15b86f593cff787989df333960c1aafd25e8",
+      "bytes": 545
+    },
+    {
+      "path": "crates/model/src/session.rs",
+      "sha256": "f576eb790bb887927941ec6bae50a4eddf04d5bd7d4065338e0aa8036f728945",
+      "bytes": 29264
+    },
+    {
+      "path": "crates/model/src/track.rs",
+      "sha256": "4c6c7d31d01fb678c17fd03e46dcc98adc031d499bf3bf1449f491ade1fb8e12",
+      "bytes": 12531
+    },
+    {
+      "path": "crates/model/src/automation.rs",
+      "sha256": "a528420f55457a27314b9e40aba1e111eaf1c2d90fab96d8edaea002e1006de9",
+      "bytes": 11630
+    },
+    {
+      "path": "crates/model/src/lib.rs",
+      "sha256": "849ccde2cdb7f64f582add5399a2cfd971a0cfe0bb2df2f9df1b26a3eecb363a",
+      "bytes": 1351
+    },
+    {
+      "path": "crates/model/src/b64.rs",
+      "sha256": "3fcb162d870bbd5492ba7a3adf1db80572fcbca0213ae46d9b89d9ebe72b5261",
+      "bytes": 3319
+    },
+    {
+      "path": "crates/model/src/source.rs",
+      "sha256": "46a6e54f40dffda74ac492665851108740df3c7e8d6a5b9b27bf7a903c635bc2",
+      "bytes": 3528
+    },
+    {
+      "path": "crates/model/src/ids.rs",
+      "sha256": "86bec814cddb78e5c10444cdc8e20841d528f0d77b9a731a6cd0f516d03c9b14",
+      "bytes": 640
+    },
+    {
+      "path": "crates/model/src/mixer.rs",
+      "sha256": "5b897d2d689c2b380a36a2e5beaff580e7ede455b219c52de63d04419656091f",
+      "bytes": 26361
+    },
+    {
+      "path": "crates/model/src/clip.rs",
+      "sha256": "ff20e86528911f7109b11154bed869053f479a25f8fdf659d3b3280cb048273e",
+      "bytes": 18781
+    },
+    {
+      "path": "crates/model/src/markers.rs",
+      "sha256": "86da88ea08f4291f63501c9e8efff07d2c614fc0fd9d604ae0e2f74f9d0c0104",
+      "bytes": 1611
+    },
+    {
+      "path": "crates/automation/Cargo.toml",
+      "sha256": "1047960b0ca1f2ffdc1f86e3c4baeeaec507adcee8cd1c135a48469e6b6936e8",
+      "bytes": 455
+    },
+    {
+      "path": "crates/automation/tests/automation_roots.rs",
+      "sha256": "03ea33b6aed20b9c49d477a95a384a96c92e66eac34585942e207722791adb49",
+      "bytes": 17995
+    },
+    {
+      "path": "crates/automation/tests/agent_tasks.rs",
+      "sha256": "0b0d4288bb9574815798cd8401c469b6e495686b2fb47c9ce9049a7a16207924",
+      "bytes": 8468
+    },
+    {
+      "path": "crates/automation/src/lib.rs",
+      "sha256": "529ca33a4e7ea3028b6f2c1f3c9bc2e316bb63eba2ec7bd3bd9d65221a3e7ee4",
+      "bytes": 6520
+    },
+    {
+      "path": "crates/automation/src/mcp.rs",
+      "sha256": "d042ac7e66d7e2b4b81832c5c230a60915b71207ad56e4e98cb3cee07cd81667",
+      "bytes": 13365
+    },
+    {
+      "path": "crates/audio-io/Cargo.toml",
+      "sha256": "a2d9de43ccd27a917d2d98cd27f033c19a0d532aad4f44ca4231cd23b2c0d32e",
+      "bytes": 559
+    },
+    {
+      "path": "crates/audio-io/tests/stream.rs",
+      "sha256": "e417275ca413baed63c383e8fabcfd1a7ccaebb7fac0287dada98c2c69278e15",
+      "bytes": 3070
+    },
+    {
+      "path": "crates/audio-io/tests/malformed.rs",
+      "sha256": "68fa2c02d515d6a18b934910b43b26c92e2eaa3a6f72bc6e6adef6cce4a3126a",
+      "bytes": 23335
+    },
+    {
+      "path": "crates/audio-io/tests/encode_format.rs",
+      "sha256": "cd4ba693017f1c2066ba6be66a423ebec745620ce03b436632bc26d6319425a3",
+      "bytes": 570
+    },
+    {
+      "path": "crates/audio-io/tests/roundtrip.rs",
+      "sha256": "acd43c9990640919ece329adf2f30a7b8b26ba7adc98ec08501ff7f4df57c0a2",
+      "bytes": 13923
+    },
+    {
+      "path": "crates/audio-io/src/lib.rs",
+      "sha256": "e1c26d6b14e8d15d84ad28b3827b59c5b6b01a18228d09f338b8bf3fbc31dfb1",
+      "bytes": 13817
+    },
+    {
+      "path": "crates/audio-io/src/pcm.rs",
+      "sha256": "c5ffe7f1637fd117d7866e5c5e84d566eb5c790cfdc81bd01b3fa1035c149616",
+      "bytes": 9011
+    },
+    {
+      "path": "crates/audio-io/src/flac.rs",
+      "sha256": "5dc4c76b5b5f6fd9f84f76aa40476422496f8d25da0b43fc00cfc7fd7cbfd581",
+      "bytes": 16883
+    },
+    {
+      "path": "crates/audio-io/src/caf.rs",
+      "sha256": "cb7d0c76eda96629a4b5e697af7bd34d0a60c9e2e482f1ca2585f75e56008720",
+      "bytes": 3828
+    },
+    {
+      "path": "crates/audio-io/src/peaks.rs",
+      "sha256": "5bb66391d343575b99a8044a4c0b3a45762110613cf8fc6d712ebb502ee0734a",
+      "bytes": 12419
+    },
+    {
+      "path": "crates/audio-io/src/symph.rs",
+      "sha256": "701d82bf8f372321b09586107acdb9146fc9ac5b82416b34a93240e3ce8fd57a",
+      "bytes": 10875
+    },
+    {
+      "path": "crates/audio-io/src/mp4.rs",
+      "sha256": "f7d8e5a54aa02cdd0e1e133b2719a6a9cdb1c0e982d52fe667d31c7b2f8ee9b0",
+      "bytes": 4590
+    },
+    {
+      "path": "crates/audio-io/src/aiff.rs",
+      "sha256": "7456997e3f748cccd2767ae00f0c32f6cbfa960a86df43770b3a30d1a1c36c9c",
+      "bytes": 11704
+    },
+    {
+      "path": "crates/audio-io/src/buffer.rs",
+      "sha256": "c200aeb85f6517eec8d21b13d08b67c4fc97ecd62b57349cfb4d9bca5a7d3208",
+      "bytes": 2512
+    },
+    {
+      "path": "crates/audio-io/src/wav.rs",
+      "sha256": "aecda47b3d234dbbae28886a38eb7edeebf73b84e4d02fe801b01f9922c567ff",
+      "bytes": 19005
+    },
+    {
+      "path": "crates/engine/Cargo.toml",
+      "sha256": "340bcc259d7155a7a77d3a7d8ebb39b710f765bdb802cf5e35b6cae330a2b1de",
+      "bytes": 842
+    },
+    {
+      "path": "crates/engine/catalog/menus.txt",
+      "sha256": "9067d9edfeef47dc657014d460404c0991defacdc26ec4007c5a7bad0e4edfb4",
+      "bytes": 16624
+    },
+    {
+      "path": "crates/engine/tests/trim_to_selection.rs",
+      "sha256": "f7bb8310a0bffceb1fbe9934b7b877f9b721e1266567eb837d51f0fb891ebb29",
+      "bytes": 1109
+    },
+    {
+      "path": "crates/engine/tests/long_renders.rs",
+      "sha256": "7a30f9266f084fae76adc8d14ed9c93f6f63d6c334645efdf8e4413a018cecae",
+      "bytes": 2899
+    },
+    {
+      "path": "crates/engine/tests/edit_modes.rs",
+      "sha256": "cf50184c3cd117aab8166812b8c2e26b1efe4e771bc9faa2c140c513b829e6e0",
+      "bytes": 19518
+    },
+    {
+      "path": "crates/engine/tests/recording.rs",
+      "sha256": "aab50c9900574f6fba7f68863486c5f572ed88e89cff189d1f1e67c0434015de",
+      "bytes": 815
+    },
+    {
+      "path": "crates/engine/tests/random_edits.rs",
+      "sha256": "0a1bd780b43fc332ca3ed17c9ca748ac49e1f9fb95974e519d48c7220c385027",
+      "bytes": 6117
+    },
+    {
+      "path": "crates/engine/tests/hostile_params.proptest-regressions",
+      "sha256": "2fa3d4d48c6c5486e0156d077200ddfd74bc185afee76683bca7c82bbc5bb2ba",
+      "bytes": 546
+    },
+    {
+      "path": "crates/engine/tests/random_edits.proptest-regressions",
+      "sha256": "fadda0501f408a95bbbc7023a7bd2899d7582683a7fac47676b3616e0c475a22",
+      "bytes": 423
+    },
+    {
+      "path": "crates/engine/tests/current_feet_frames_position.rs",
+      "sha256": "7f95c507edca04b14f14728800c6e80e9a78536ff9239fa97a7f34c19737be5e",
+      "bytes": 1419
+    },
+    {
+      "path": "crates/engine/tests/clap_e2e.rs",
+      "sha256": "cdb5c3b8529eb482ab15c22393f414908ddd696ab66bf05e88a32668432bf850",
+      "bytes": 6447
+    },
+    {
+      "path": "crates/engine/tests/hostile_sessions.rs",
+      "sha256": "fafb1c5c34f54abc43253163ddb60e0ee56b7ed79a746c4f50600c8a7735ab93",
+      "bytes": 4830
+    },
+    {
+      "path": "crates/engine/tests/hostile_params.rs",
+      "sha256": "db6c8c74358a1dc112cd71fffd5f87519c2d822951702966aeab859cb1456685",
+      "bytes": 2635
+    },
+    {
+      "path": "crates/engine/tests/hostile_sessions.proptest-regressions",
+      "sha256": "be4f758dbd1e7940fb904731e005691ebd2ce955a3873de8b277e39d5a19bbdd",
+      "bytes": 518
+    },
+    {
+      "path": "crates/engine/tests/session_transport.rs",
+      "sha256": "6dfbd23bcba6ae3682e471d5de45d65c58c92f8c4eb8366f0de0b794cfa5d2c7",
+      "bytes": 1383
+    },
+    {
+      "path": "crates/engine/tests/midi_offset.rs",
+      "sha256": "5122663c59cf392fc4e39b5c61de5eb3d115017a4b665ec6d0484f6991fd1678",
+      "bytes": 1513
+    },
+    {
+      "path": "crates/engine/tests/bounce.rs",
+      "sha256": "c83c667575464600eca804220d83b8471215f960100ad58551817af772255be7",
+      "bytes": 4280
+    },
+    {
+      "path": "crates/engine/tests/consolidate_selection.rs",
+      "sha256": "df266e8f033e74c720e485d84c22c4f6891124fc70d08eb75433e93a4ea86723",
+      "bytes": 5002
+    },
+    {
+      "path": "crates/engine/src/edit.rs",
+      "sha256": "2cbf27aca8f281222015d6317112e51cc14d2f2756f387be42e286f7341bd79d",
+      "bytes": 44610
+    },
+    {
+      "path": "crates/engine/src/autosave.rs",
+      "sha256": "8ecc619de4e8f2d5cfd5347255b749892900c20edfeb74826eca44d96b52f365",
+      "bytes": 27730
+    },
+    {
+      "path": "crates/engine/src/io.rs",
+      "sha256": "f67862acb61622ba391fa10fed44b8f2215af4022782a174ea20b9efc9a55d03",
+      "bytes": 91612
+    },
+    {
+      "path": "crates/engine/src/lib.rs",
+      "sha256": "623b6e9a0c6789199f5f56fe47b233999e442bb3865f32a00b2014c233cb214d",
+      "bytes": 19496
+    },
+    {
+      "path": "crates/engine/src/clip_group_file.rs",
+      "sha256": "bb3d1ebc0957c7a741ed6b6326be256d5f7b5381d3ce01ea0160f17680665445",
+      "bytes": 14119
+    },
+    {
+      "path": "crates/engine/src/catalog.rs",
+      "sha256": "60c49dcaceb2016b3cce0977181fb6b1b59f1b664e7a40b9db8eb089170562f6",
+      "bytes": 6230
+    },
+    {
+      "path": "crates/engine/src/score.rs",
+      "sha256": "8ad81596a535378b8be25a6c874a825ad25c9cbf1da7d4f715f99b7ce4595bb9",
+      "bytes": 24189
+    },
+    {
+      "path": "crates/engine/src/demo.rs",
+      "sha256": "d5f728f8adbde082b1e4538322223b035ffaca3f1fd52c3ea98743b796b0a56e",
+      "bytes": 13730
+    },
+    {
+      "path": "crates/engine/src/file_access.rs",
+      "sha256": "d1ff23fdf11b0abad6d5deab8995ba0dea5d516639c694b7f713e5eba72ba170",
+      "bytes": 23221
+    },
+    {
+      "path": "crates/engine/src/inspect.rs",
+      "sha256": "def1285909e82b5408f405b53a03fbede2aeb6fb8cd2b9d35352a67954ce7515",
+      "bytes": 7789
+    },
+    {
+      "path": "crates/engine/src/catalog_more.rs",
+      "sha256": "1ed724d282d02e5ecce1e9a9f18b5a8c1c1b9f8bf436d5aafc7972d854b31212",
+      "bytes": 3012
+    },
+    {
+      "path": "crates/engine/src/cmd/view_more.rs",
+      "sha256": "cf8a3c3f8a1fc8e4c9717074656e7097d65c73685867b7b4c1c1e83fdfd627e5",
+      "bytes": 16367
+    },
+    {
+      "path": "crates/engine/src/cmd/edit.rs",
+      "sha256": "369b5f7855408764dffd02013ff1d2e9827a34ec5b91bc697f006b80dbda1b62",
+      "bytes": 55082
+    },
+    {
+      "path": "crates/engine/src/cmd/health.rs",
+      "sha256": "5939395ff0916c270e1550aef978c17647321aff454489e441b0c7fcb9265888",
+      "bytes": 8523
+    },
+    {
+      "path": "crates/engine/src/cmd/edit_more.rs",
+      "sha256": "a0690a7af50a8ce08cca229c7e3ef746f6dc0039e87c696a2368de3e8bbeb3d4",
+      "bytes": 53857
+    },
+    {
+      "path": "crates/engine/src/cmd/track.rs",
+      "sha256": "da7205898586a2dc540fdb78dbd472d2be3ee5cac831bd3b109fcfc5d167f2e7",
+      "bytes": 44097
+    },
+    {
+      "path": "crates/engine/src/cmd/zoom_toggle.rs",
+      "sha256": "c3489bede5486d748805a6440e3f82c85f4729ef95d1ec708b7f7bc60953248a",
+      "bytes": 4320
+    },
+    {
+      "path": "crates/engine/src/cmd/track_more.rs",
+      "sha256": "deef2d55d6500557b98bb26bb03fab69879e6ae9df22729b7240e7ad770d6a7f",
+      "bytes": 29658
+    },
+    {
+      "path": "crates/engine/src/cmd/midi.rs",
+      "sha256": "926be74bfffcf8c3b183d750c35c56ef856d0f50241c3828fc87c567c9de9114",
+      "bytes": 7121
+    },
+    {
+      "path": "crates/engine/src/cmd/vst3.rs",
+      "sha256": "2b085faa6b18b44aef0981694802de3331083fde12feb39a898fb6a4b1193099",
+      "bytes": 1637
+    },
+    {
+      "path": "crates/engine/src/cmd/transport.rs",
+      "sha256": "b4ca5e18ccf0ee67ba4d2f9cccf07772c5f2e78984edfe573b8ad5a8837efb81",
+      "bytes": 3402
+    },
+    {
+      "path": "crates/engine/src/cmd/audiosuite.rs",
+      "sha256": "74617c6f6f53b0c51311fdedf970e94a6ee8089e9b75cb535a48334a7875ec3b",
+      "bytes": 12028
+    },
+    {
+      "path": "crates/engine/src/cmd/setup_more.rs",
+      "sha256": "58d3cae8ede8c4284a6866d83a4e6991e8a8395618e891c23a3f59b115ae988d",
+      "bytes": 30502
+    },
+    {
+      "path": "crates/engine/src/cmd/query.rs",
+      "sha256": "26fb51b19648e5e2f4f436da0dd8be59603c8078ec8c3997c10d636d1f07c031",
+      "bytes": 2529
+    },
+    {
+      "path": "crates/engine/src/cmd/options.rs",
+      "sha256": "3394d1a90f6f6ebffa0f85ce6c7b80ad81119ccc4957121e5e292073550654bd",
+      "bytes": 7260
+    },
+    {
+      "path": "crates/engine/src/cmd/plugin_state.rs",
+      "sha256": "27ffefaf2889412fb3264395a70ef5c5e8b79a3dcc31731bbfebb3b40a004312",
+      "bytes": 5166
+    },
+    {
+      "path": "crates/engine/src/cmd/clip_list.rs",
+      "sha256": "d602510c2922c2bc14ec46f73150ddb018647913a8b6df37e703774c3d4e9206",
+      "bytes": 6929
+    },
+    {
+      "path": "crates/engine/src/cmd/event.rs",
+      "sha256": "fbe6ba36abf85f762dc9b5bc5a5b7edebfed2db8f81a5345025969a04296ed7d",
+      "bytes": 20293
+    },
+    {
+      "path": "crates/engine/src/cmd/clap.rs",
+      "sha256": "2b37089846717160e4e061aff43b4961d8ceb5567ab3ba93ea4b5b4cac4960eb",
+      "bytes": 2516
+    },
+    {
+      "path": "crates/engine/src/cmd/video.rs",
+      "sha256": "ef567be961272907e2e55909019c150579e056148343200203e468ee7174afa2",
+      "bytes": 9713
+    },
+    {
+      "path": "crates/engine/src/cmd/surround.rs",
+      "sha256": "9f8f6942fa077255e3634c2c6a1766b29f3559f1c810731dc7518614eba9234e",
+      "bytes": 10934
+    },
+    {
+      "path": "crates/engine/src/cmd/mod.rs",
+      "sha256": "e911f063b115a117419e35394a85047e5b8b72800771a8ac3c37c979a7252a86",
+      "bytes": 12589
+    },
+    {
+      "path": "crates/engine/src/cmd/mix.rs",
+      "sha256": "e7ea88731593333d04a34d2cd8ecc7526892a1b2520d132e6880aea81e666799",
+      "bytes": 39704
+    },
+    {
+      "path": "crates/engine/src/cmd/sampler.rs",
+      "sha256": "38c10a100378a3901048a5590513281ad91aafb0b4ff2bc0db7bb3f401b756c7",
+      "bytes": 18632
+    },
+    {
+      "path": "crates/engine/src/cmd/clip.rs",
+      "sha256": "e5c93942ad6a48a9dc30e83a2983db18e99bebee8b688e832b2149e79b0bd326",
+      "bytes": 20904
+    },
+    {
+      "path": "crates/engine/src/cmd/instrument.rs",
+      "sha256": "9fe49293a716a2c2239ccb92fc742626272d0638f42511cf9787b744a867b232",
+      "bytes": 11635
+    },
+    {
+      "path": "crates/engine/src/cmd/tab.rs",
+      "sha256": "52b6ab16050000d3d0fe1e25952dc1b90fab1444ea0098555c3bbb75df0534bd",
+      "bytes": 12877
+    },
+    {
+      "path": "crates/engine/src/cmd/audio_midi.rs",
+      "sha256": "09e9d2a0a8b0836b38bbcb7af8f24e4cc0ed7567a0b0df486bbd17a7392296fa",
+      "bytes": 3748
+    },
+    {
+      "path": "crates/engine/src/cmd/clip_more.rs",
+      "sha256": "4948d15724f357bf58753634d7a46b5a22667810780abeb8a0d75ac4f661e35b",
+      "bytes": 20218
+    },
+    {
+      "path": "crates/engine/src/cmd/more_util.rs",
+      "sha256": "c8078297a127bc408286e13a1fffe40e939cf30fc6e639c5a8052964879a1f65",
+      "bytes": 8345
+    },
+    {
+      "path": "crates/engine/src/cmd/event_more.rs",
+      "sha256": "573c4011fcd6581ee641b9ee83d138eb66912cd84b0ecb73f39b049e2c30cc1f",
+      "bytes": 40388
+    },
+    {
+      "path": "crates/engine/src/cmd/view.rs",
+      "sha256": "c18d95d6d6743d2e0f9b355839e17ddf6a1fa261d93c319b6d940cc246821972",
+      "bytes": 13069
+    },
+    {
+      "path": "crates/engine/src/cmd/file.rs",
+      "sha256": "4d2cfbe3e5530b3089c986b432386861f63b63c4e63a7e1d473c760292f090db",
+      "bytes": 38786
+    },
+    {
+      "path": "crates/dsp/Cargo.toml",
+      "sha256": "8531d7e2f9ee12b33205e4283197f5e02557c778384247dce4c6b041f5e96e1e",
+      "bytes": 515
+    },
+    {
+      "path": "crates/dsp/tests/transients.rs",
+      "sha256": "fed82d7593ead6900ffc5b3d693be3a9b626b1ddfa9641da01a711b0f97377a3",
+      "bytes": 5493
+    },
+    {
+      "path": "crates/dsp/tests/plugins.rs",
+      "sha256": "1c65e1f0ff4416ddd5bb52833fe54ecf9d149e4b749f64d7f7bc31362294fe89",
+      "bytes": 19774
+    },
+    {
+      "path": "crates/dsp/tests/fuzz.rs",
+      "sha256": "3ef1d10cbb7bdff0672f1df9346793d1f7cd9a1caed296ff9823de5995f41ab6",
+      "bytes": 2202
+    },
+    {
+      "path": "crates/dsp/tests/offline_meters.rs",
+      "sha256": "228a785e71232158faa65c7d76ee8ef2ef20e64f594e62f7848cd4c6a84a621b",
+      "bytes": 11508
+    },
+    {
+      "path": "crates/dsp/examples/plugin_bench.rs",
+      "sha256": "5d7549156268fc664b99a4f72d7b583ea6856df44c02e60206254c340ab701e2",
+      "bytes": 957
+    },
+    {
+      "path": "crates/dsp/src/offline.rs",
+      "sha256": "7d067ce027ab2dfcabd8949f314d4f40118a7109439dbbcb2d8545d2b9e6a5c5",
+      "bytes": 26729
+    },
+    {
+      "path": "crates/dsp/src/util.rs",
+      "sha256": "27415d0865fc37056ed92245c4a6aa6a3b66162aea2bf990ae0be206c144a931",
+      "bytes": 8765
+    },
+    {
+      "path": "crates/dsp/src/pitch_detect.rs",
+      "sha256": "5312c8c7b7a84cfe7083c39585489a075e746c353637dec2e95f4b32b45f9b1d",
+      "bytes": 5718
+    },
+    {
+      "path": "crates/dsp/src/lib.rs",
+      "sha256": "01d155a64a5c65717be06ba801fbe7bff30cd376b7659f00ab76487e6b44e4e3",
+      "bytes": 14979
+    },
+    {
+      "path": "crates/dsp/src/meter.rs",
+      "sha256": "1c6880ed98e9fbee39a4ed6be6c7dec620c7efcca32f5fe9dd295a7324831fb6",
+      "bytes": 13248
+    },
+    {
+      "path": "crates/dsp/src/biquad.rs",
+      "sha256": "448eb02da3a5eb73f34a3c1a0e7c2dd0ed230b7831f326fe336a6fcb6897a786",
+      "bytes": 7961
+    },
+    {
+      "path": "crates/dsp/src/osc.rs",
+      "sha256": "272665ac4feb34009bf29188820e49f4c8c4fcfb0133bd5c2e7a03053c0ca9e7",
+      "bytes": 2655
+    },
+    {
+      "path": "crates/dsp/src/params.rs",
+      "sha256": "d2de5598e7180daeda8900c29386ec0d85a662add52702c137579f2a0378cb63",
+      "bytes": 3487
+    },
+    {
+      "path": "crates/dsp/src/pan.rs",
+      "sha256": "1d7b8cdd516b4747c0a5238bfbf017b6ea21ff427e18a5ba3d027f232c9daa6b",
+      "bytes": 15226
+    },
+    {
+      "path": "crates/dsp/src/spectrum.rs",
+      "sha256": "8018ed0fe3d00ea556fb609372ddebba469551d62f93ac108571136ff18b452e",
+      "bytes": 1924
+    },
+    {
+      "path": "crates/dsp/src/plugins/eq.rs",
+      "sha256": "4666c76f9319f5bd7f47918632c526c3e5e429d77e62c55ad34d9f725d77ffdb",
+      "bytes": 11112
+    },
+    {
+      "path": "crates/dsp/src/plugins/utility.rs",
+      "sha256": "0747ddadc554880baef1b0f47a9e506ad1c0f4531de5ede7e0d4533ac9358133",
+      "bytes": 14217
+    },
+    {
+      "path": "crates/dsp/src/plugins/synth.rs",
+      "sha256": "217e52cce52a3a58507ddb4614d1a1000fb8bd28da21408e9d8c544f81a07941",
+      "bytes": 16064
+    },
+    {
+      "path": "crates/dsp/src/plugins/mod.rs",
+      "sha256": "5d702ebf73c28e0e6dedab9b8b3ed26b378e3707e3ae8add5fa5cd016980d496",
+      "bytes": 2816
+    },
+    {
+      "path": "crates/dsp/src/plugins/dynamics.rs",
+      "sha256": "93266df298a42f36a0f7b64ca575f4642cf5f8eb0ce09d8452e7648f24077001",
+      "bytes": 19653
+    },
+    {
+      "path": "crates/dsp/src/plugins/drums.rs",
+      "sha256": "aa9fe610bd8a27d8e71d27eecb0c0f275614a134e9234b16d6fee3a971195898",
+      "bytes": 13952
+    },
+    {
+      "path": "crates/dsp/src/plugins/strip.rs",
+      "sha256": "11f98a6aabdab6a84700f8099f1db3c3389c0c46c04b8c0185521f1e36cec0ec",
+      "bytes": 6125
+    },
+    {
+      "path": "crates/dsp/src/plugins/pitch.rs",
+      "sha256": "2cbefe244142fa47d5ec011ba885efbc549efaf79e935eac1a2ccb9916bb5d21",
+      "bytes": 3725
+    },
+    {
+      "path": "crates/dsp/src/plugins/harmonic.rs",
+      "sha256": "59af80e4dc3387d248344976673876fd0466d962cf0e3280f0881715b5dee2c3",
+      "bytes": 9383
+    },
+    {
+      "path": "crates/dsp/src/plugins/sampler.rs",
+      "sha256": "97f21df349a77d046429cce8b3e128ea87389f0ab2dc408ae34d32d1207fccf9",
+      "bytes": 30172
+    },
+    {
+      "path": "crates/dsp/src/plugins/modulation.rs",
+      "sha256": "e8817cd0d006a0c0537fa317436eacaf7e8db44c9809d30137d688d69c4205ea",
+      "bytes": 15138
+    },
+    {
+      "path": "crates/dsp/src/plugins/reverb.rs",
+      "sha256": "91c227125b18245087466963fcc3bca701f39674764ac77e159ceac829038890",
+      "bytes": 11136
+    },
+    {
+      "path": "docs/plugin-parity.md",
+      "sha256": "afea87d410dc32e3c4e5a998e244df15b76101a48aa551e2744c8e0c873bc5c9",
+      "bytes": 5183
+    },
+    {
+      "path": "docs/architecture.md",
+      "sha256": "935dab2a26c2a71ce4bd908f70e8998e8c118233974ecf4f99474e6a67825ad1",
+      "bytes": 5199
+    },
+    {
+      "path": "docs/releasing.md",
+      "sha256": "644c30027d4b6b56ea736e5aab8e64ac1c54e5d7b4eb99adc019270eb4d999a5",
+      "bytes": 14382
+    },
+    {
+      "path": "docs/release-playbook.md",
+      "sha256": "d76275a21bbb794549146efcdfcbe612abe4f5e2931083bf2634effdd6302b7d",
+      "bytes": 461
+    },
+    {
+      "path": "docs/mcp.md",
+      "sha256": "8a36867ae60ca2e7b04ce849aa7d0e4fe42ee0eeff4af0f5dc085083ff8a7eb7",
+      "bytes": 7211
+    },
+    {
+      "path": "docs/target-app-parity.md",
+      "sha256": "249a3324b7736c19c94364fa9e562a3b834dde6b2b8bcc54edede73ccc8cd050",
+      "bytes": 22297
+    },
+    {
+      "path": "docs/ui-parity.md",
+      "sha256": "2d0f9a0cde81c4eed7adcb7a8e65e3c37e117a3c42402e5631a6d30f8a868559",
+      "bytes": 6723
+    },
+    {
+      "path": "docs/hardware-parity.md",
+      "sha256": "5d4f1a3c6f5453cba74396a474280299dd40763d4e461ca3bf3244e2503889fd",
+      "bytes": 5102
+    },
+    {
+      "path": "docs/parity-checklist.md",
+      "sha256": "8c2feaa882660bef9c3774fd8353143dfaae46e5d055786e9adc829fd37d5bce",
+      "bytes": 4898
+    },
+    {
+      "path": "docs/localization-parity.md",
+      "sha256": "2d878b88d5aa0faf27e2ba823891149eee6a8f9bbedb8045511ad628e0bac90a",
+      "bytes": 2710
+    },
+    {
+      "path": "docs/gaps.md",
+      "sha256": "f534e8ace2e7622732a1d61f932b65200210aba7e79a34c23f041256960f8d3a",
+      "bytes": 12431
+    },
+    {
+      "path": "docs/roadmap.md",
+      "sha256": "a59229ac533bd143b5f7b4e1f45615d3a2f404e63950eed164e361237d0920aa",
+      "bytes": 6148
+    },
+    {
+      "path": "docs/contributors.md",
+      "sha256": "b146da00ccdbecfe058b99c15580c8fc7d0c157d3764b3ca83df96b47aaf531f",
+      "bytes": 2736
+    },
+    {
+      "path": "docs/file-format-parity.md",
+      "sha256": "d4883617f55f2d3486fecc1c95295f3c4d9cf8ad798da8e152f57457cc7c14f1",
+      "bytes": 5066
+    },
+    {
+      "path": "docs/control-protocol.md",
+      "sha256": "b6dd3febc6dd61accf3e7f4b5390efb7d5d1561cd806f707a7cca8aff1250697",
+      "bytes": 7705
+    },
+    {
+      "path": "docs/images/mix.png",
+      "sha256": "0d8a944517fc218e87c43ea6539f7f794e3eacb2dcf0d1620e388ffaf35d5e05",
+      "bytes": 553112
+    },
+    {
+      "path": "docs/images/score.png",
+      "sha256": "6dd151fa4fed8161304cf781ecb435159e27b616ee3934bec5ec75a0ca608186",
+      "bytes": 493153
+    },
+    {
+      "path": "docs/images/video.png",
+      "sha256": "41a6eee0dce3cd37ff76436024759a0314d05d7c35f69f17f03aeaaef53ce092",
+      "bytes": 521444
+    },
+    {
+      "path": "docs/images/automation.png",
+      "sha256": "f96408189007293fb873cb11c70b043e4d4090de21dbfabf7bf3a4b8119ab2d3",
+      "bytes": 550121
+    },
+    {
+      "path": "docs/images/edit.png",
+      "sha256": "ceff6a04433e78920fe6a2aa2ef38cea4057a21c21c1b811d60c77ca8ad7b054",
+      "bytes": 572846
+    },
+    {
+      "path": "docs/images/surround.png",
+      "sha256": "d93fb8bd10bd111106ff3a774ae6a631c5927c04ef41b653769e13c8e5fcf1af",
+      "bytes": 457173
+    },
+    {
+      "path": "docs/images/midi.png",
+      "sha256": "9037db1eb73f8600366d84a1578771200367d0bcc79f4f83269923c6986d41f8",
+      "bytes": 563989
+    },
+    {
+      "path": "docs/brand/LICENSE-brand.txt",
+      "sha256": "dbd6e8555a7f6d393f89a47cd44773e1f1f415c22551a78449bd4b43bec49903",
+      "bytes": 2270
+    },
+    {
+      "path": "contributors/people.toml",
+      "sha256": "5602633d896b07866c448d0cd074027ab0fb5f22c3435349504bfb1518868e77",
+      "bytes": 1719
+    },
+    {
+      "path": "contributors/contributors.json",
+      "sha256": "f22e78a9a262c3ae4ee08067cecbfc8a33df706cf62535cbc4ae656d323eafad",
+      "bytes": 5298
+    }
+  ]
+}
