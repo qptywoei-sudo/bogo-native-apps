@@ -15,8 +15,8 @@
   },
   "patch": {
     "file": "craft-launcher-v0.4.1-kio-launcher.patch",
-    "sha256": "0aeb23a75fa2178cbe2ead80fb3a8b29fd9889a45d3fc0d9c367cc183c96cd21",
-    "bytes": 11728018
+    "sha256": "f06e4836ffe903274167a980ac332396fa2682141a65509d042b9ead06abafcb",
+    "bytes": 11731729
   },
   "counts": {
     "upstreamFiles": 198,
@@ -156,7 +156,8 @@
       "Mac bundle ID/upstream version/strict signature/optional KIO team",
       "Windows MSI KIO ProductName/Manufacturer/upstream numeric version",
       "managed KIO revisions bound to detected path and version",
-      "KIO single-instance loopback port/protocol namespace"
+      "KIO single-instance loopback port/protocol namespace",
+      "numeric-only manual installs treat exact positive integer KIO revisions as unknown revision zero; normal rc semantics retained"
     ],
     "studioOwnerTokensEmbedded": false,
     "installOrLaunchRequiresUserAction": true
@@ -716,8 +717,8 @@
         "bytes": 5443
       },
       "after": {
-        "sha256": "5add8280b8dff02be2ea2aabdad6fdcae4ebba9ad3b775900e81b8a495b872b0",
-        "bytes": 5438
+        "sha256": "7c85d45821e983dc2c8e1a5e36df4f138c58f782e964537b7488ab3179d5203d",
+        "bytes": 6348
       }
     },
     {
@@ -727,8 +728,8 @@
         "bytes": 7450
       },
       "after": {
-        "sha256": "92ee181099f18a17cc703b8d96c846d2f152b8991c881443b2a3cb3c06f81671",
-        "bytes": 7738
+        "sha256": "edaf0a0f93eded2e53854b69123c3326e34088daa751b9b69e66ba9bdfde7d03",
+        "bytes": 9074
       }
     },
     {
@@ -738,8 +739,8 @@
         "bytes": 69156
       },
       "after": {
-        "sha256": "29041aa498a5202619231fb27871f209e9879473bf86387697545ddb2d346b58",
-        "bytes": 71041
+        "sha256": "477953623e92e7f51b6072c9748a3c140f6458120f88c8d8228e3363b4ea24da",
+        "bytes": 71060
       }
     },
     {

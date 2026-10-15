@@ -1,9 +1,9 @@
 {
   "stage": "source-verified-native-cloud-required",
-  "patchSha256": "0aeb23a75fa2178cbe2ead80fb3a8b29fd9889a45d3fc0d9c367cc183c96cd21",
-  "patchBytes": 11728018,
-  "sourceZipSha256": "b77cb23bf9c1faa0691bf8de5b5ac0736be87e910fb0f61502d9280abcaafb50",
-  "sourceZipBytes": 19570421,
+  "patchSha256": "f06e4836ffe903274167a980ac332396fa2682141a65509d042b9ead06abafcb",
+  "patchBytes": 11731729,
+  "sourceZipSha256": "6d86ebdcf9d8e595d869bf4bda1f3ad5e8cf14e7a6ddb864ff475e40cac31889",
+  "sourceZipBytes": 19572094,
   "pythonTestsPassed": 38,
   "actualOfflinePrepareSourceArchiveVerified": true,
   "nativeBuildExecutedLocally": false,
@@ -11,5 +11,34 @@
     "artcraft-launcher-core",
     "artcraft-launcher-native",
     "artcraft-launcher-ui-egui"
-  ]
+  ],
+  "semverCorrection": {
+    "scope": [
+      "crates/core/src/version.rs",
+      "crates/core/src/status.rs"
+    ],
+    "numericOnlyManualInstall": "same upstream numeric version is unknown KIO revision zero",
+    "allowedRevision": "exact kio.<positive u64 integer>",
+    "originalRcBetaSemanticsRetained": true,
+    "rustRegressionTestsAdded": [
+      "version::tests::kio_packaging_revisions_update_unknown_numeric_manual_installs",
+      "status::tests::kio_first_install_manual_msi_and_managed_revision_statuses"
+    ],
+    "rustTestsExecutedLocally": false,
+    "cargoFmtRust195Passed": true
+  },
+  "nativeCompileCorrection": {
+    "failedCloudRun": 38778800473,
+    "macJob": 116573715529,
+    "windowsJob": 116573715318,
+    "observedCompilerError": "E0433 at backend.rs:505-506: detect module not imported",
+    "scope": [
+      "crates/native/src/backend.rs"
+    ],
+    "change": "add use crate::detect; only",
+    "originalDetectImplementationUnchanged": true,
+    "originalTestsRetained": true,
+    "directRustfmt195CheckPassed": true,
+    "rustBuildOrTestsExecutedLocally": false
+  }
 }

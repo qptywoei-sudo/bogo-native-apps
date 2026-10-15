@@ -145769,7 +145769,7 @@ index 1f2998da0a304a6a32e6655d795a87e0eb570a1d..5a9637e039ab76205c9fbd00947c7cbf
          assert_eq!(r.assets.len(), 1);
          assert_eq!(r.assets[0].sha256.as_deref(), Some(HASH));
 diff --git a/crates/core/src/status.rs b/crates/core/src/status.rs
-index 43459c3703c4be4e4d96954275cb0cba73efd088..c4a43305ce7099503570f5f3cd9a27d01f5fb28b 100644
+index 43459c3703c4be4e4d96954275cb0cba73efd088..629e58eec031f79a505dfd0b428915e4c6673e38 100644
 --- a/crates/core/src/status.rs
 +++ b/crates/core/src/status.rs
 @@ -30,7 +30,7 @@ pub enum InstallSource {
@@ -145781,8 +145781,27 @@ index 43459c3703c4be4e4d96954275cb0cba73efd088..c4a43305ce7099503570f5f3cd9a27d0
              Self::MacApp => "Applications folder",
              Self::Msi => "Windows Installer",
              Self::Deb => "Debian package",
+@@ -142,4 +142,18 @@ mod tests {
+         assert_eq!(status(Some(&inst("garbage")), found(true)), AppStatus::Installed);
+         assert!(AppStatus::UpdateAvailable.is_installed() && !AppStatus::Available.is_installed());
+     }
++    #[test]
++    fn kio_first_install_manual_msi_and_managed_revision_statuses() {
++        let latest = version::parse("0.7.0-kio.2").unwrap();
++        let found = || Latest::Found { version: Some(&latest), has_asset: true };
++        assert_eq!(status(None, found()), AppStatus::Available);
++        let mut manual = inst("0.7.0");
++        manual.source = InstallSource::Msi;
++        assert_eq!(status(Some(&manual), found()), AppStatus::UpdateAvailable);
++        assert_eq!(status(Some(&inst("0.7.0-kio.1")), found()), AppStatus::UpdateAvailable);
++        assert_eq!(status(Some(&inst("0.7.0-kio.2")), found()), AppStatus::UpToDate);
++        assert_eq!(status(Some(&inst("0.7.0-kio.3")), found()), AppStatus::UpToDate);
++        let preview = version::parse("0.7.0-rc.2").unwrap();
++        assert_eq!(status(Some(&manual), Latest::Found { version: Some(&preview), has_asset: true }), AppStatus::UpToDate);
++    }
+ }
 diff --git a/crates/core/src/version.rs b/crates/core/src/version.rs
-index 0beceef15a3c2396b4e5784ece23759ca2b04d2d..599af8ae4454c2432279e730d049a225dde17ee5 100644
+index 0beceef15a3c2396b4e5784ece23759ca2b04d2d..9785c19bccde6ee8ca3730c26e1c2b0ab9a2c0ff 100644
 --- a/crates/core/src/version.rs
 +++ b/crates/core/src/version.rs
 @@ -10,6 +10,7 @@ pub use semver::Version;
@@ -145810,7 +145829,27 @@ index 0beceef15a3c2396b4e5784ece23759ca2b04d2d..599af8ae4454c2432279e730d049a225
          // the first `X.Y.Z` run anywhere.
          _ => first_xyz(&t),
      }
-@@ -160,7 +162,7 @@ mod tests {
+@@ -114,13 +116,17 @@ pub fn is_newer(latest: &Version, installed: &Version) -> bool {
+ 
+ /// Platforms that only record `X.Y.Z` (the MSI ProductVersion, `CFBundleShortVersionString`)
+ /// drop a pre-release suffix. A numeric-only installed version therefore counts as current when it
+-/// matches a pre-release's numbers, rather than nagging forever.
++/// matches a pre-release's numbers, rather than nagging forever. KIO's positive integer
++/// packaging revisions are different: a numeric-only manual install has an unknown revision,
++/// treated as revision zero until a verified managed install records the complete KIO version.
+ pub fn is_update(latest: &Version, installed: &Version) -> bool {
+     if installed.pre.is_empty()
+         && !latest.pre.is_empty()
+         && (latest.major, latest.minor, latest.patch) == (installed.major, installed.minor, installed.patch)
+     {
+-        return false;
++        return latest.pre.as_str().strip_prefix("kio.").is_some_and(|revision| {
++            !revision.is_empty() && revision.bytes().all(|b| b.is_ascii_digit()) && revision.parse::<u64>().is_ok_and(|n| n > 0)
++        });
+     }
+     is_newer(latest, installed)
+ }
+@@ -160,7 +166,7 @@ mod tests {
          assert_eq!(p("0.4.0").as_deref(), Some("0.4.0"));
          assert_eq!(p("0.5").as_deref(), Some("0.5.0"));
          // A version inside text, as `--version` prints it.
@@ -145819,11 +145858,37 @@ index 0beceef15a3c2396b4e5784ece23759ca2b04d2d..599af8ae4454c2432279e730d049a225
          assert_eq!(p("junk"), None);
          assert_eq!(p("garbage"), None);
          // The bug this guards: 0.5.0-1 used to read as a pre-release, so an installed .deb of the
+@@ -180,4 +186,19 @@ mod tests {
+         assert!(!is_update(&v("0.3.0-rc.2"), &v("0.3.0")));
+         assert!(is_stable(&v("1.0.0")) && !is_stable(&v("1.0.0-beta.1")));
+     }
++    #[test]
++    fn kio_packaging_revisions_update_unknown_numeric_manual_installs() {
++        assert!(is_update(&v("0.7.0-kio.1"), &v("0.7.0")));
++        assert!(is_update(&v("0.7.0-kio.2"), &v("0.7.0")));
++        assert!(is_update(&v("0.7.0-kio.10"), &v("0.7.0-kio.2")));
++        assert!(!is_update(&v("0.7.0-kio.2"), &v("0.7.0-kio.2")));
++        assert!(!is_update(&v("0.7.0-kio.2"), &v("0.7.0-kio.10")));
++        assert!(is_update(&v("0.8.0-kio.1"), &v("0.7.0-kio.9")));
++        assert!(!is_update(&v("0.6.0-kio.9"), &v("0.7.0")));
++        assert!(!is_update(&v("0.7.0-kio.1"), &v("0.8.0")));
++        // Only exact positive integer KIO revisions bypass the original preview-version rule.
++        for preview in ["0.7.0-rc.1", "0.7.0-beta.2", "0.7.0-kio.0", "0.7.0-kio.alpha", "0.7.0-kio.1.rc.1", "0.7.0-kio.18446744073709551616"] {
++            assert!(!is_update(&v(preview), &v("0.7.0")), "{preview}");
++        }
++    }
+ }
 diff --git a/crates/native/src/backend.rs b/crates/native/src/backend.rs
-index 04d78f52e772112ccd8308fdce2c84a1b0026a64..52dcb3d44dbfacb85d34f0dcd4c9ffbdb279b40d 100644
+index 04d78f52e772112ccd8308fdce2c84a1b0026a64..e038fe00d113c5b24b11805bd5509c0f18dd64a2 100644
 --- a/crates/native/src/backend.rs
 +++ b/crates/native/src/backend.rs
-@@ -20,7 +20,7 @@ use crate::http::{self, Http, Stop};
+@@ -15,12 +15,13 @@ use artcraft_launcher_core::protocol::{
+ use artcraft_launcher_core::release::{Asset, Release};
+ use artcraft_launcher_core::{CraftApp, Installed, PackageKind, SUITE, version};
+ 
++use crate::detect;
+ use crate::feed_throttle::{self, FeedThrottle, Outcome};
+ use crate::http::{self, Http, Stop};
  use crate::install::{self, Job};
  use crate::manifest::Manifest;
  use crate::paths::Paths;
@@ -145832,7 +145897,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..52dcb3d44dbfacb85d34f0dcd4c9ffbd
  
  /// The longest the launcher's own update waits for other installs to end before it gives up
  /// (it can be cancelled sooner).
-@@ -63,7 +63,7 @@ struct Shared {
+@@ -63,7 +64,7 @@ struct Shared {
      /// A detection pass is running; another request waits for the next one.
      detecting: AtomicBool,
      last_check: Mutex<Option<i64>>,
@@ -145841,7 +145906,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..52dcb3d44dbfacb85d34f0dcd4c9ffbd
      launcher_release: Mutex<Option<Release>>,
      /// When GitHub was last asked about each app (Unix seconds), to keep the fallback rare.
      github_asked: Mutex<HashMap<String, i64>>,
-@@ -113,8 +113,7 @@ impl NativeBackend {
+@@ -113,8 +114,7 @@ impl NativeBackend {
                  None
              }
          };
@@ -145851,7 +145916,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..52dcb3d44dbfacb85d34f0dcd4c9ffbd
          let shared = Arc::new(Shared {
              events: Mutex::new(Vec::new()),
              waker,
-@@ -146,7 +145,7 @@ impl NativeBackend {
+@@ -146,7 +146,7 @@ impl NativeBackend {
      /// release feed's where they're still fresh, GitHub's otherwise.
      fn replay_cache(&self) {
          let pre = self.options().prereleases;
@@ -145860,7 +145925,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..52dcb3d44dbfacb85d34f0dcd4c9ffbd
          let now = crate::now();
          for app in &SUITE {
              let answer = match feed.as_ref().map(|f| f.answer(app, now)) {
-@@ -155,9 +154,7 @@ impl NativeBackend {
+@@ -155,9 +155,7 @@ impl NativeBackend {
                  _ => self.source.as_ref().and_then(|s| s.cached(&feed_repo(feed.as_ref(), app), pre)).map(|l| (l, Origin::GitHub)),
              };
              if let Some((latest, from)) = answer {
@@ -145871,7 +145936,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..52dcb3d44dbfacb85d34f0dcd4c9ffbd
                  self.shared.emit(Event::Latest { app: app.id.to_string(), latest, from });
              }
          }
-@@ -232,9 +229,6 @@ impl NativeBackend {
+@@ -232,9 +230,6 @@ impl NativeBackend {
              let (feed, fallback) = if let Some(base) = &mirror {
                  // A local mirror answers for everything: GitHub is never asked.
                  (local_feed(&http, base), Fallback { trust_feed: true, github_every: GITHUB_FALLBACK_EVERY })
@@ -145881,7 +145946,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..52dcb3d44dbfacb85d34f0dcd4c9ffbd
              } else {
                  feed_and_fallback(&http, &paths, &shared)
              };
-@@ -251,13 +245,14 @@ impl NativeBackend {
+@@ -251,13 +246,14 @@ impl NativeBackend {
                              let Some(app) = queue.lock().unwrap_or_else(PoisonError::into_inner).pop() else { break };
                              let (latest, from, used) = match &mirror {
                                  Some(_) => mirror_latest(app, feed.as_ref(), now),
@@ -145897,7 +145962,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..52dcb3d44dbfacb85d34f0dcd4c9ffbd
                                  if let Some(LatestRelease::Found(r)) = latest
                                      && let (Some(newest), Some(current)) = (r.version.as_ref(), crate::self_update::current_version())
                                      && version::is_newer(newest, &current)
-@@ -269,9 +264,7 @@ impl NativeBackend {
+@@ -269,9 +265,7 @@ impl NativeBackend {
                                  continue;
                              }
                              let Some(latest) = latest else { continue };
@@ -145908,7 +145973,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..52dcb3d44dbfacb85d34f0dcd4c9ffbd
                              if !matches!(latest, LatestRelease::Failed(_)) {
                                  shared.answered.lock().unwrap_or_else(PoisonError::into_inner).insert(app.id.to_string());
                              }
-@@ -326,7 +319,7 @@ impl NativeBackend {
+@@ -326,7 +320,7 @@ impl NativeBackend {
              restarting
          };
          if restarting {
@@ -145917,7 +145982,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..52dcb3d44dbfacb85d34f0dcd4c9ffbd
              self.shared.emit(Event::JobFinished { app: app.id.to_string(), result });
              return;
          }
-@@ -344,7 +337,9 @@ impl NativeBackend {
+@@ -344,7 +338,9 @@ impl NativeBackend {
                  match &existing {
                      Some(inst) => install::uninstall(app, inst, record.as_ref(), &paths, &stop, &mut phase).map(|()| {
                          let mut m = shared.manifest.lock().unwrap_or_else(PoisonError::into_inner);
@@ -145928,7 +145993,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..52dcb3d44dbfacb85d34f0dcd4c9ffbd
                              let _ = m.save(&paths.manifest());
                          }
                          format!("{} was removed", app.name)
-@@ -395,7 +390,7 @@ impl NativeBackend {
+@@ -395,7 +391,7 @@ impl NativeBackend {
          let (Some(install), Some(platform)) = (self.self_install.clone(), self.platform) else {
              self.shared.emit(Event::JobFinished {
                  app: id,
@@ -145937,7 +146002,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..52dcb3d44dbfacb85d34f0dcd4c9ffbd
              });
              return;
          };
-@@ -443,6 +438,21 @@ impl NativeBackend {
+@@ -443,6 +439,21 @@ impl NativeBackend {
      }
  }
  
@@ -145959,7 +146024,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..52dcb3d44dbfacb85d34f0dcd4c9ffbd
  #[allow(clippy::too_many_arguments)]
  fn run_install(
      app: &CraftApp,
-@@ -482,7 +492,7 @@ fn run_install(
+@@ -482,7 +493,7 @@ fn run_install(
      let new_record = install::install(app, &release, &asset, kind, existing, record, &mut job)?;
      {
          let mut m = shared.manifest.lock().unwrap_or_else(PoisonError::into_inner);
@@ -145968,7 +146033,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..52dcb3d44dbfacb85d34f0dcd4c9ffbd
              Some(r) => {
                  m.apps.insert(app.id.to_string(), r);
                  true
-@@ -490,6 +500,19 @@ fn run_install(
+@@ -490,6 +501,19 @@ fn run_install(
              // Installed the platform's own way: any old launcher record is stale.
              None => m.apps.remove(app.id).is_some(),
          };
@@ -145988,7 +146053,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..52dcb3d44dbfacb85d34f0dcd4c9ffbd
          if changed && let Err(e) = m.save(&paths.manifest()) {
              log::warn!("couldn't save the install record: {e}");
          }
-@@ -561,7 +584,7 @@ fn restart_blocked(mut busy: Vec<&str>) -> String {
+@@ -561,7 +585,7 @@ fn restart_blocked(mut busy: Vec<&str>) -> String {
          _ => (busy.join(", "), "were", "them"),
      };
      format!(
@@ -145997,7 +146062,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..52dcb3d44dbfacb85d34f0dcd4c9ffbd
           let {them} finish or cancel {them}, then press Update and restart again."
      )
  }
-@@ -745,14 +768,14 @@ fn fetch_feed(http: &Http, paths: &Paths, url: &str, throttle: &Mutex<FeedThrott
+@@ -745,14 +769,14 @@ fn fetch_feed(http: &Http, paths: &Paths, url: &str, throttle: &Mutex<FeedThrott
          asked = true;
          let outcome = match http.get_feed(url) {
              Ok(body) => match Feed::parse(&body) {
@@ -146014,7 +146079,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..52dcb3d44dbfacb85d34f0dcd4c9ffbd
                      log::warn!("the release feed answered with something unreadable (try {})", attempt + 1);
                      Outcome::Failed { retry_after: None }
                  }
-@@ -777,10 +800,11 @@ fn fetch_feed(http: &Http, paths: &Paths, url: &str, throttle: &Mutex<FeedThrott
+@@ -777,10 +801,11 @@ fn fetch_feed(http: &Http, paths: &Paths, url: &str, throttle: &Mutex<FeedThrott
  /// The feed's address. `ARTCRAFT_LAUNCHER_FEED_URL` points at a staging server or a local copy
  /// (only `https://`, or plain `http://` on localhost).
  fn feed_url() -> String {
@@ -146030,7 +146095,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..52dcb3d44dbfacb85d34f0dcd4c9ffbd
  }
  
  /// `http://<loopback host>:<port>` and an optional path: the host must be exactly 127.0.0.1,
-@@ -843,7 +867,7 @@ fn mirror_latest(app: &CraftApp, feed: Option<&Feed>, now: i64) -> (Option<Lates
+@@ -843,7 +868,7 @@ fn mirror_latest(app: &CraftApp, feed: Option<&Feed>, now: i64) -> (Option<Lates
  
  /// The last saved feed answer, if any.
  fn load_feed(paths: &Paths) -> Option<Feed> {
@@ -146039,7 +146104,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..52dcb3d44dbfacb85d34f0dcd4c9ffbd
  }
  
  /// The machine's real architecture: an x64 launcher on Windows on ARM should still pick ARM64
-@@ -1104,7 +1128,7 @@ mod tests {
+@@ -1104,7 +1129,7 @@ mod tests {
      fn feed() -> Feed {
          Feed::parse(
              r#"{"release_info": {"apps": {
@@ -146048,7 +146113,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..52dcb3d44dbfacb85d34f0dcd4c9ffbd
          }}}"#,
          )
          .unwrap()
-@@ -1179,13 +1203,13 @@ mod tests {
+@@ -1179,13 +1204,13 @@ mod tests {
          let word = CraftApp::by_id("wordcraft").unwrap();
          let feed = feed();
  
@@ -146064,7 +146129,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..52dcb3d44dbfacb85d34f0dcd4c9ffbd
          let (_, _, used) = latest_for(word, Some(&feed), LOADED, &github, &shared, false, false, NOW);
          assert_eq!(used, Some(Source::GitHubApi));
          assert_eq!(github.0.load(Ordering::SeqCst), 1);
-@@ -1210,9 +1234,21 @@ mod tests {
+@@ -1210,9 +1235,21 @@ mod tests {
          assert_eq!(used, Some(Source::GitHubApi));
      }
  
@@ -146087,7 +146152,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..52dcb3d44dbfacb85d34f0dcd4c9ffbd
      /// installs is there.
      fn release(version: &str) -> Release {
          let suffixes = ["-portable.zip", ".tar.gz", ".msi", ".dmg", ".AppImage", ".deb", ".rpm", ".flatpak"];
-@@ -1304,7 +1340,8 @@ mod tests {
+@@ -1304,7 +1341,8 @@ mod tests {
          let Some(platform) = native_platform() else { return };
          let dir = tempfile::tempdir().unwrap();
          let mut backend = backend(dir.path(), platform, Some(Arc::new(Newer)));
@@ -146097,7 +146162,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..52dcb3d44dbfacb85d34f0dcd4c9ffbd
          backend.http = Some(Http::new().unwrap());
          backend.shared.options.lock().unwrap().prereleases = true;
          keep_file(&backend);
-@@ -1365,9 +1402,9 @@ mod tests {
+@@ -1365,9 +1403,9 @@ mod tests {
          }
          let restarting = AtomicBool::new(false);
          let error = claim_restart(&jobs, &restarting, &Stop::default(), Duration::from_millis(300), &mut || {}).unwrap_err();
