@@ -43,17 +43,17 @@ jobs:
         with:
           persist-credentials: false
       - name: Verify orchestrator guards
-        run: "$KIO_PYTHON" -m unittest discover -s tests -v
+        run: $KIO_PYTHON -m unittest discover -s tests -v
       - name: Install the locked Rust toolchain
         run: rustup toolchain install 1.95.0 --profile minimal --target "$KIO_TARGET"
       - name: Fetch exact sources, fonts and apply the locked full-app patch
-        run: "$KIO_PYTHON" scripts/kio_native.py prepare --app word
+        run: $KIO_PYTHON scripts/kio_native.py prepare --app word
       - name: Build the complete native app and CLI, test original core, check DOCX and PDF
-        run: "$KIO_PYTHON" scripts/kio_native.py build --app word --platform ${{ matrix.platform }}
+        run: $KIO_PYTHON scripts/kio_native.py build --app word --platform ${{ matrix.platform }}
       - name: Package the full native application and license texts
-        run: "$KIO_PYTHON" scripts/kio_native.py package --app word --platform ${{ matrix.platform }}
+        run: $KIO_PYTHON scripts/kio_native.py package --app word --platform ${{ matrix.platform }}
       - name: Verify exact release allowlist and SHA-256
-        run: "$KIO_PYTHON" scripts/kio_native.py verify --directory dist/word-${{ matrix.platform }}
+        run: $KIO_PYTHON scripts/kio_native.py verify --directory dist/word-${{ matrix.platform }}
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: word-${{ matrix.platform }}
