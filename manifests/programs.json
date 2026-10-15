@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "description": "Full upstream applications. Only a reviewed lock with its own patch enables a build; this list is not a completion claim.",
+  "programs": [
+    {"id":"photo","name":"KIO Photo","repository":"storytold/photocraft","state":"unconfigured"},
+    {"id":"vector","name":"KIO Vector","repository":"storytold/vectorcraft","state":"unconfigured"},
+    {"id":"film","name":"KIO Film","repository":"storytold/filmcraft","state":"unconfigured"},
+    {"id":"light","name":"KIO Light","repository":"storytold/lightcraft","state":"unconfigured"},
+    {"id":"pdf","name":"KIO PDF","repository":"storytold/pdfcraft","state":"unconfigured"},
+    {"id":"effect","name":"KIO Effect","repository":"storytold/effectcraft","state":"unconfigured"},
+    {"id":"design","name":"KIO Design","repository":"storytold/designcraft","state":"unconfigured"},
+    {"id":"ui","name":"KIO UI","repository":"storytold/figcraft","state":"unconfigured"},
+    {"id":"word","name":"KIO Word","repository":"storytold/wordcraft","state":"pipeline-prepared","lock":"word.lock.json"},
+    {"id":"sound","name":"KIO Sound","repository":"storytold/soundcraft","state":"unconfigured"},
+    {"id":"deck","name":"KIO Deck","repository":"storytold/deckcraft","state":"unconfigured"},
+    {"id":"cad","name":"KIO CAD","repository":"storytold/cadcraft","state":"unconfigured"},
+    {"id":"grid","name":"KIO Grid","repository":"storytold/gridcraft","state":"unconfigured"}
+  ]
+}

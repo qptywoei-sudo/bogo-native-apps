@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "id": "word",
+  "name": "KIO Word",
+  "version": "0.7.0-kio.1",
+  "upstreamVersion": "0.7.0",
+  "rust": "1.95.0",
+  "sourceDateEpoch": 1791983245,
+  "source": {
+    "repository": "storytold/wordcraft",
+    "commit": "fc41918814f62645b6746ed68e71e8c2c2e85d6f",
+    "tag": "v0.7.0",
+    "url": "https://codeload.github.com/storytold/wordcraft/tar.gz/fc41918814f62645b6746ed68e71e8c2c2e85d6f",
+    "root": "wordcraft-fc41918814f62645b6746ed68e71e8c2c2e85d6f",
+    "sha256": "ea7a64508f9df85878481f41ad961f8396be0e6a4cf0f9842844a86dc7a48fb6",
+    "bytes": 9370348
+  },
+  "fonts": {
+    "repository": "storytold/craft-fonts",
+    "commit": "8dcdacd5153e64560d109541a47d806f26f048c0",
+    "url": "https://codeload.github.com/storytold/craft-fonts/tar.gz/8dcdacd5153e64560d109541a47d806f26f048c0",
+    "root": "craft-fonts-8dcdacd5153e64560d109541a47d806f26f048c0",
+    "sha256": "c0bfca8f4dd8c98825e598c0324c66d90609fe531b212a6c9a04f6852dc5387b",
+    "bytes": 28629163
+  },
+  "branding": {
+    "patch": "patches/word/wordcraft-v0.7.0-kio-word.patch",
+    "sha256": "f00037e3815c6e5b835d31dbbd326fe96663105778e4bfedc72b93e383ba9aac"
+  },
+  "cargoPackages": [
+    "wordcraft",
+    "wordcraft-cli"
+  ],
+  "testPackages": [
+    "wordcraft-engine",
+    "wordcraft-docx",
+    "wordcraft-formats"
+  ],
+  "binaries": {
+    "app": "wordcraft",
+    "cli": "wordcraft-cli"
+  },
+  "bundleId": "com.kio.word",
+  "icon": "assets/app-icon/wordcraft.icns",
+  "upstreamGaps": [
+    "https://github.com/storytold/wordcraft/blob/fc41918814f62645b6746ed68e71e8c2c2e85d6f/ROADMAP.md",
+    "https://github.com/storytold/wordcraft/blob/fc41918814f62645b6746ed68e71e8c2c2e85d6f/docs/gaps.md",
+    "https://github.com/storytold/wordcraft/blob/fc41918814f62645b6746ed68e71e8c2c2e85d6f/docs/target-app-parity.md"
+  ]
+}
