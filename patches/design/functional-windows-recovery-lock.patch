@@ -42,7 +42,7 @@ index e4ec20efd8fe1a65e03829c56e200389bee2f91a..4a8f9d07640d2ed12322d2abd1cfe408
      assert_eq!(std::fs::read(second).unwrap(), old_bytes);
      assert_eq!(std::fs::read(third).unwrap(), old_bytes);
 diff --git a/crates/engine/src/recovery.rs b/crates/engine/src/recovery.rs
-index 33b9a2a338d06b1363fe90051764920cce03879a..4920020b97a69e9e806d2574e5b5bba99d72fb1f 100644
+index 33b9a2a338d06b1363fe90051764920cce03879a..bc7a777d63cde0aaf5cd9a69022c4d6065c2eb38 100644
 --- a/crates/engine/src/recovery.rs
 +++ b/crates/engine/src/recovery.rs
 @@ -161,6 +161,17 @@ fn validate_lock(dir: &Path, lock: &std::fs::File) -> Result<()> {
@@ -95,7 +95,7 @@ index 33b9a2a338d06b1363fe90051764920cce03879a..4920020b97a69e9e806d2574e5b5bba9
      file.seek(std::io::SeekFrom::Start(0))?;
      let mut bytes = Vec::new();
      file.take(129).read_to_end(&mut bytes)?;
-@@ -934,6 +963,86 @@ mod tests {
+@@ -934,6 +963,88 @@ mod tests {
          }
      }
  
@@ -166,6 +166,8 @@ index 33b9a2a338d06b1363fe90051764920cce03879a..4920020b97a69e9e806d2574e5b5bba9
 +    fn lock_identity_rejects_a_replaced_run_folder_without_touching_its_documents() {
 +        let root = tempfile::tempdir().unwrap();
 +        let own = run_dir(root.path()).unwrap();
++        #[cfg(windows)]
++        std::fs::rename(own.join(LOCK), root.path().join("relocated-held-lock")).unwrap();
 +        std::fs::rename(&own, root.path().join("former-run")).unwrap();
 +        std::fs::create_dir(&own).unwrap();
 +        std::fs::write(own.join(LOCK), b"").unwrap();

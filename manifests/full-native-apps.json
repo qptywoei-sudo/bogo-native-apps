@@ -1003,9 +1003,9 @@
       "functionalFixes": [
         {
           "patch": "patches/design/functional-windows-recovery-lock.patch",
-          "sha256": "6e2753c639ab35ca89fa799e26dba0bc6bad183cc8d6d2f334c8952de381b7fe",
+          "sha256": "12da0c7791bcc53b8579022ce2c7272ee842dc2cd5a5e4412daea472954a83c5",
           "manifest": "patches/design/functional-windows-recovery-lock.json",
-          "manifestSha256": "f1f5655e1d8dba4b3afaa7492abfb5a63d68d216815a7928d2e16dc14ee5e39d"
+          "manifestSha256": "976568c77e4814eeda7b2eeabf37333f98c6a14b5c4fe4ca8a5c47f5647cd0eb"
         }
       ]
     },

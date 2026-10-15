@@ -1,0 +1,224 @@
+{
+  "schema": "kio.design-recovery-functional-review.v2",
+  "sourceArchive": {
+    "sha256": "5044162f9e7c2260156419b7e2c69c87801c5facc88e6b7aaa3552aca70c2acf",
+    "bytes": 7805542
+  },
+  "brandingPatch": {
+    "sha256": "7194f461cba04891621767cf4f26576508432600fcadf2455d37ff3534d65b5c",
+    "bytes": 8067433
+  },
+  "functionalPatch": {
+    "sha256": "12da0c7791bcc53b8579022ce2c7272ee842dc2cd5a5e4412daea472954a83c5",
+    "bytes": 8780
+  },
+  "manifest": {
+    "sha256": "976568c77e4814eeda7b2eeabf37333f98c6a14b5c4fe4ca8a5c47f5647cd0eb",
+    "bytes": 7448
+  },
+  "wholeSourceFiles": 441,
+  "onlyChangedPaths": [
+    "Cargo.lock",
+    "crates/engine/Cargo.toml",
+    "crates/engine/src/recovery.rs",
+    "crates/engine/src/cmd/book/safety_tests.rs"
+  ],
+  "allOtherFilesByteIdentical": true,
+  "cargoLock": {
+    "original": {
+      "sha256": "00042a1bfbbc6462085469d8fe5953bdd9ab89a0828cbc39fc48abc7fa17cdd3",
+      "bytes": 145870
+    },
+    "modified": {
+      "sha256": "375c8357571e7a3b1ab5a8fdee530c324005c8e015c3d2baf41b51a401b57193",
+      "bytes": 145884
+    },
+    "packageCountBefore": 568,
+    "packageCountAfter": 568,
+    "newPackages": [],
+    "removedPackages": [],
+    "changedPackageVersions": [],
+    "changedEdges": [
+      {
+        "from": "designcraft-engine 0.8.0",
+        "to": "same-file 1.0.6",
+        "target": "cfg(windows)"
+      }
+    ],
+    "existingLockedPackage": {
+      "name": "same-file",
+      "version": "1.0.6",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "93fc1dc3aaa9bfed95e02e6eadabb4baf7e3078b0bd1b4d7b6b0b68378900502",
+      "dependencies": [
+        "winapi-util"
+      ]
+    },
+    "allOtherPackageRecordsByteEquivalent": true
+  },
+  "originalRecoveryTests": 44,
+  "addedRecoveryTests": 6,
+  "originalIgnoresUnchanged": true,
+  "officialEvidence": [
+    "https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-lockfileex",
+    "https://raw.githubusercontent.com/rust-lang/rust/1.95.0/library/std/src/os/windows/fs.rs",
+    "https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fsa/87f86c9b-6c2a-4803-84b7-131a74a434fa",
+    "https://doc.rust-lang.org/std/os/windows/fs/trait.OpenOptionsExt.html#tymethod.share_mode"
+  ],
+  "nativeFullBuildRun": false,
+  "nativeFullCoreTestsRun": false,
+  "nativeTargetedProbe": {
+    "schema": "kio.design-targeted-production-core-probe.v1",
+    "platform": "macos-arm64",
+    "rustc": "rustc 1.95.0 (59807616e 2026-04-14)",
+    "productionSource": {
+      "sha256": "b18daa100d2170b560a1e8b2f0408c999e7ef05ac356268ee8bfc862e9f41b71"
+    },
+    "functionsCopiedByteForByte": [
+      "new_lock",
+      "validate_lock",
+      "same_lock_file",
+      "lock_marker",
+      "is_link_like (both cfg variants)"
+    ],
+    "originalAddedTestFunctionsCopiedByteForByte": [
+      "lock_identity_accepts_the_owner_and_its_clone_without_unlocking",
+      "lock_identity_rejects_a_different_file_with_the_same_marker",
+      "lock_identity_rejects_path_replacement_and_preserves_the_replacement",
+      "lock_identity_preserves_the_bounded_marker_check"
+    ],
+    "probeSourceSha256": "732ddb1fef52706d8c05a501fde6428ac16ba406841dac5e8bbc9b3be95cac77",
+    "result": "7 tests passed, 0 failed, 0 ignored",
+    "fullNativeOrEngineBuildRun": false,
+    "windowsNativeExecutionRun": false,
+    "pending": "Full exact original engine plus new high-level foreign-folder regression must run on both actual CI platforms; Windows identity branch is not executed by this Mac probe.",
+    "scope": "Historical pre-revision2 production-core probe; production prefix remains byte-identical. This did not execute the new Windows fixture."
+  },
+  "pythonTests": {
+    "command": "python3 -m unittest discover -s tests -v",
+    "passed": 235,
+    "failed": 0,
+    "designScopeTests": 8,
+    "newRevision2ScopeTests": 1,
+    "log": {
+      "sha256": "65dd2360bdfcf655372a685f72c06979aba8c7459362ff767b85bd92d546eb61",
+      "bytes": 27591
+    },
+    "nativeExecution": false
+  },
+  "limits": [
+    "Revision2 changes only the sixth test fixture on Windows; no local whole native build or Windows execution was performed.",
+    "Prior actual Windows native run passed the other five new lock-identity regressions, but failed the sixth fixture before the save/discard assertions; that historical success does not prove this revision.",
+    "New source fingerprint requires actual full original engine plus all six added regressions on both CI platforms before release; historical Mac and Windows evidence must remain distinct."
+  ],
+  "revision": 2,
+  "wholeOriginalAndFunctionalRoundtrip": {
+    "schema": "kio.design-fixture-v2-roundtrip.v1",
+    "status": "passed",
+    "immutableArchive": {
+      "sha256": "5044162f9e7c2260156419b7e2c69c87801c5facc88e6b7aaa3552aca70c2acf",
+      "bytes": 7805542
+    },
+    "branding": {
+      "patch": "patches/design/designcraft-v0.8.0-kio-design.patch",
+      "sha256": "7194f461cba04891621767cf4f26576508432600fcadf2455d37ff3534d65b5c",
+      "manifest": "patches/design/manifest.json",
+      "manifestSha256": "d1677370e277dff2044985eca3d792bcf2aac84bd1c2c7929956d9a7d8df32d7"
+    },
+    "functionalPatch": {
+      "sha256": "12da0c7791bcc53b8579022ce2c7272ee842dc2cd5a5e4412daea472954a83c5",
+      "bytes": 8780
+    },
+    "functionalManifest": {
+      "sha256": "976568c77e4814eeda7b2eeabf37333f98c6a14b5c4fe4ca8a5c47f5647cd0eb",
+      "bytes": 7448
+    },
+    "wholeAppFiles": 441,
+    "wholeFontFiles": 25,
+    "onlyChangedFromPriorNative": [
+      "crates/engine/src/recovery.rs"
+    ],
+    "allOther440AppFilesByteIdentical": true,
+    "wholeFreshOriginalBrandingFunctionalRoundtrip": true,
+    "functionalReverseForwardRoundtrip": true,
+    "productionPrefixBeforeTestModuleByteIdentical": true,
+    "productionPrefixSha256": "6e223ac1553bb6aeb120d7e564696143fc59afcb493950c36e5b36253ac9765c",
+    "existingTestNamesAndIgnoresUnchanged": true,
+    "recoveryTests": 50,
+    "sourceTreeSha256": "4f813634eb84b712330af00fa6a08fe5e8f347ca50eeedaf1382c5e3367c273e",
+    "previousSourceTreeSha256": "9d981683e2867bf7565a57da7a04b17a1522ed973943c1e8e1d9a6dbd1b7b684",
+    "fontsTreeSha256": "9282a006f65f4bd0be2473ef25bb64f90f9d0544958f949833de6347eb68ee53",
+    "cargoLockCurrent": {
+      "sha256": "375c8357571e7a3b1ab5a8fdee530c324005c8e015c3d2baf41b51a401b57193",
+      "bytes": 145884
+    },
+    "engineCargoCurrent": {
+      "sha256": "f28cae117ded7b17dac2542f9e047c2350b1fbc1d21354c0859649852ab00a58",
+      "bytes": 1698
+    },
+    "noNewNativeDependencyChanges": true,
+    "fullNativeBuildExecuted": false,
+    "windowsExecutionOfNewFixture": false
+  },
+  "fixturePortability": {
+    "revision": 2,
+    "scope": "Two lines in sixth new test only; all original/runtime/dependency/GUI source bytes unchanged from previous KIO fix.",
+    "historicalNativeRun": 38809250304,
+    "historicalHead": "c62d16318618d205d8380413dc21446d0f141c11",
+    "windowsJob": 116678457288,
+    "historicalWindowsResult": "416 passed;1 failed in fixture folder rename;1 original ignored subprocess helper",
+    "fiveOtherLockIdentityRegressions": "passed on actual Windows",
+    "newWindowsFixtureExecution": "pending full native CI",
+    "newMacWholeSourceExecution": "pending full native CI",
+    "officialEvidence": [
+      "https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fsa/87f86c9b-6c2a-4803-84b7-131a74a434fa",
+      "https://doc.rust-lang.org/std/os/windows/fs/trait.OpenOptionsExt.html#tymethod.share_mode"
+    ],
+    "priorRecoverySha256": "b18daa100d2170b560a1e8b2f0408c999e7ef05ac356268ee8bfc862e9f41b71",
+    "onlyAddedLines": [
+      "        #[cfg(windows)]",
+      "        std::fs::rename(own.join(LOCK), root.path().join(\"relocated-held-lock\")).unwrap();"
+    ]
+  },
+  "historicalNativeSnapshot": {
+    "run": 38809250304,
+    "head": "c62d16318618d205d8380413dc21446d0f141c11",
+    "sourceTreeSha256": "9d981683e2867bf7565a57da7a04b17a1522ed973943c1e8e1d9a6dbd1b7b684",
+    "windows": {
+      "job": 116678457288,
+      "guiAndCliBuild": "passed",
+      "engineTests": {
+        "passed": 416,
+        "failed": 1,
+        "originalIgnoredSubprocessHelper": 1
+      },
+      "failure": "sixth newly added regression fixture failed while renaming a directory containing the held lock; all five other new lock-identity regressions passed"
+    },
+    "macos": {
+      "nativeJob": 116678457321,
+      "nativeResult": "success",
+      "qaRun": 38814300881,
+      "qaJob": 116694993997,
+      "qaResult": "6 commands and 11 checks passed; 684 portable files verified"
+    },
+    "appliesToRevision2Source": false,
+    "preserveHistoricalEvidence": true
+  },
+  "revision2ChangeFromPriorNative": {
+    "files": [
+      "crates/engine/src/recovery.rs"
+    ],
+    "addedLines": [
+      "        #[cfg(windows)]",
+      "        std::fs::rename(own.join(LOCK), root.path().join(\"relocated-held-lock\")).unwrap();"
+    ],
+    "other440AppFilesUnchanged": true,
+    "all25FontFilesUnchanged": true,
+    "productionPrefixUnchanged": true,
+    "cargoLockUnchanged": true,
+    "engineCargoUnchanged": true,
+    "existingTestNamesAndIgnoresUnchanged": true,
+    "nativeBuildRun": false,
+    "windowsExecutionRun": false
+  }
+}

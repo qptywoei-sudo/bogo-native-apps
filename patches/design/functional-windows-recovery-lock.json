@@ -13,8 +13,8 @@
   },
   "patch": {
     "file": "functional-windows-recovery-lock.patch",
-    "sha256": "6e2753c639ab35ca89fa799e26dba0bc6bad183cc8d6d2f334c8952de381b7fe",
-    "bytes": 8663
+    "sha256": "12da0c7791bcc53b8579022ce2c7272ee842dc2cd5a5e4412daea472954a83c5",
+    "bytes": 8780
   },
   "files": [
     {
@@ -46,8 +46,8 @@
         "bytes": 69181
       },
       "after": {
-        "sha256": "b18daa100d2170b560a1e8b2f0408c999e7ef05ac356268ee8bfc862e9f41b71",
-        "bytes": 74207
+        "sha256": "bda21fe987140c7f9601bfe01cccd4965555a349f0cea00b5c6bb12f2d69d1e3",
+        "bytes": 74322
       }
     },
     {
@@ -68,6 +68,7 @@
     "Read the bounded marker through the owner handle on Windows. Unix marker/device/inode checks remain active and byte-equivalent.",
     "Reopen and compare the named Windows file after its link/type metadata check to detect replacement.",
     "Adapt the existing book partial-commit assertion to Rust Debug-escaped Windows paths; require the exact one-element completed prefix and retain all failure/unchanged-file/staging assertions.",
+    "Windows regression fixture only: move the still-held child lock outside the run folder before the unchanged universal folder rename. This permits actual foreign-folder save/discard protection assertions under Windows directory-rename semantics, without releasing the lock, changing runtime code, skipping a test or weakening an assertion.",
     "Apply after immutable original archive, branding patch and original protected-file verification. The original branding patch, all legal files and all unrelated source remain byte-identical."
   ],
   "dependencyLock": {
@@ -123,7 +124,7 @@
       "cargo test --release --locked --target aarch64-apple-darwin -p designcraft-engine"
     ],
     "pending": [
-      "Run full original engine tests and all six added tests in actual Windows CI; Mac whole-engine CI also remains required."
+      "Run new full engine/source snapshot on both actual CI platforms; the prior Windows run passed all five other lock-identity regressions, while the sixth fixture is now adapted to Windows directory-rename semantics."
     ],
     "targetedProductionCoreProbe": {
       "platform": "macos-arm64",
@@ -136,7 +137,28 @@
     "packagingAndPatchRegressions": {
       "suite": "python3 -m unittest discover -s tests -v",
       "result": "184 passed; 0 failed",
-      "newTests": 7
+      "newTests": 7,
+      "scope": "Historical original functional patch review before fixture portability revision2; new full Python suite evidence is separate."
+    },
+    "fixturePortability": {
+      "revision": 2,
+      "scope": "Two lines in sixth new test only; all original/runtime/dependency/GUI source bytes unchanged from previous KIO fix.",
+      "historicalNativeRun": 38809250304,
+      "historicalHead": "c62d16318618d205d8380413dc21446d0f141c11",
+      "windowsJob": 116678457288,
+      "historicalWindowsResult": "416 passed;1 failed in fixture folder rename;1 original ignored subprocess helper",
+      "fiveOtherLockIdentityRegressions": "passed on actual Windows",
+      "newWindowsFixtureExecution": "pending full native CI",
+      "newMacWholeSourceExecution": "pending full native CI",
+      "officialEvidence": [
+        "https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fsa/87f86c9b-6c2a-4803-84b7-131a74a434fa",
+        "https://doc.rust-lang.org/std/os/windows/fs/trait.OpenOptionsExt.html#tymethod.share_mode"
+      ],
+      "priorRecoverySha256": "b18daa100d2170b560a1e8b2f0408c999e7ef05ac356268ee8bfc862e9f41b71",
+      "onlyAddedLines": [
+        "        #[cfg(windows)]",
+        "        std::fs::rename(own.join(LOCK), root.path().join(\"relocated-held-lock\")).unwrap();"
+      ]
     }
   }
 }

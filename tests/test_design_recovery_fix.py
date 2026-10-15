@@ -113,6 +113,38 @@ class DesignRecoveryFix(unittest.TestCase):
         self.assertIn('b"foreign document"', added)
         self.assertIn('b"foreign metadata"', added)
 
+    def test_windows_fixture_moves_only_the_held_child_before_the_original_foreign_folder_checks(self):
+        added = '\n'.join(changed_lines(self.parts['crates/engine/src/recovery.rs'], '+'))
+        name = 'lock_identity_rejects_a_replaced_run_folder_without_touching_its_documents'
+        body = added[added.index('    fn ' + name + '() {'):]
+        body = body[:body.index('\n    }') + len('\n    }')]
+        setup = ('        #[cfg(windows)]\n'
+                 '        std::fs::rename(own.join(LOCK), root.path().join("relocated-held-lock")).unwrap();\n')
+        original = '''    fn lock_identity_rejects_a_replaced_run_folder_without_touching_its_documents() {
+        let root = tempfile::tempdir().unwrap();
+        let own = run_dir(root.path()).unwrap();
+        std::fs::rename(&own, root.path().join("former-run")).unwrap();
+        std::fs::create_dir(&own).unwrap();
+        std::fs::write(own.join(LOCK), b"").unwrap();
+        let session = dirty_session();
+        let (doc, meta) = files(&own, session.docs[0].uid);
+        std::fs::write(&doc, b"foreign document").unwrap();
+        std::fs::write(&meta, b"foreign metadata").unwrap();
+        assert!(save(&session, &own).is_err());
+        discard(&own, session.docs[0].uid);
+        assert_eq!(std::fs::read(&doc).unwrap(), b"foreign document");
+        assert_eq!(std::fs::read(&meta).unwrap(), b"foreign metadata");
+    }'''
+        self.assertEqual(body.count(setup), 1)
+        self.assertEqual(body.replace(setup, ''), original)
+        self.assertLess(body.index('relocated-held-lock'), body.index('former-run'))
+        self.assertNotRegex(body, r'\breturn\b|\.unlock\(|\bdrop\(')
+        self.assertNotIn('#[ignore', body)
+        revision = self.meta['tests']['fixturePortability']
+        self.assertEqual(revision['revision'], 2)
+        self.assertEqual(revision['onlyAddedLines'], setup.splitlines())
+        self.assertEqual(revision['newWindowsFixtureExecution'], 'pending full native CI')
+
     def test_book_partial_commit_assertions_compare_exact_debug_escaped_prefix(self):
         block = self.parts['crates/engine/src/cmd/book/safety_tests.rs']
         removed = changed_lines(block, '-')
