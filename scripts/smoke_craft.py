@@ -32,9 +32,21 @@ APPS = {
  'cad':('cadcraft','0.7.0','fc4e98315a8d771b5ab832f0ade0b5e7b106df7f','editable DXF geometry; exact coordinates/radius after reopen and SVG/PDF/PNG export'),
 }
 
+# Immutable Photo build input, also checked against its reviewed source lock.
+PHOTO_SOURCE_DATE_EPOCH = 1791987365
+
 def pinned_cli_version(app, output, expected_name, expected_version, source_commit):
- """Normalize only the exact pinned PDF footer; retain strict CLI identity checks."""
+ """Validate pinned Photo provenance/PDF footer; retain other CLI identity checks."""
  if not isinstance(output,str) or len(output)>4096 or app not in set(APPS)|{'word','grid','deck'}:return None
+ if app=='photo':
+  stem,version,commit,_=APPS['photo']
+  if (expected_name,expected_version,source_commit)!=(stem+'-cli',version,commit):return None
+  # Original photocraft-cli lib.rs::run() writes engine/build_info.rs::long_version().
+  # full_native.build_env pins both PHOTOCRAFT_BUILD_SHA and BUILD_DATE; accept
+  # only that complete original line, never an arbitrary hash/date or dev build.
+  date=time.strftime('%Y-%m-%d',time.gmtime(PHOTO_SOURCE_DATE_EPOCH))
+  line=expected_name+' '+expected_version+' ('+commit[:9]+', '+date+')'
+  return line if output.replace('\r\n','\n')==line+'\n' else None
  if app=='pdf':
   stem,version,commit,_=APPS['pdf']
   if (expected_name,expected_version,source_commit)!=(stem+'-cli',version,commit):return None

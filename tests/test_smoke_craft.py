@@ -72,7 +72,7 @@ class CraftSmokeChecks(unittest.TestCase):
         root = Path(__file__).resolve().parents[1]
         locks = json.loads((root / 'manifests/full-native-apps.json').read_text())['applications']
         for lock in locks:
-            if lock['id'] == 'pdf':
+            if lock['id'] in ('photo', 'pdf'):
                 continue
             app, name, version, commit = lock['id'], lock['versionOutputNames']['cli'], lock['upstreamVersion'], lock['source']['commit']
             raw = name + ' ' + version
