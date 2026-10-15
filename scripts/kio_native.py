@@ -337,16 +337,17 @@ def copy_license_tree(source, destination, public_validator=None):
 
 _UPSTREAM_NOTICE_CACHE = {}
 
-# Reviewed published archives contain a dual-license declaration but omit a
-# standalone license even at their exact VCS revision. These are not general
+# Reviewed published archives declare MIT (alone or as an option) but omit a
+# standalone license. These are exact published-source exceptions, not general
 # license-expression exceptions: every original file is authenticated below.
-# Archive SHA/bytes and canonical path->SHA maps came from the four published
-# .crate files (217,604 compressed bytes in total), not mutable repository HEADs.
+# Older crates without VCS metadata are authenticated by their published
+# archives only; no commit or immutable VCS URL is invented for them.
 _REVIEWED_DECLARED_LICENSES = {
     "cms-0.2.3": {
         "name": "cms", "version": "0.2.3", "repository": "https://github.com/RustCrypto/formats/tree/master/cms",
         "vcsRepository": "RustCrypto/formats", "commit": "5821a21553509dbd03eae593b0a1fad4e2083d4e", "pathInVcs": "cms",
         "license": "Apache-2.0 OR MIT", "authors": ["RustCrypto Developers"],
+        "vcsInfoPresent": True, "pathInVcsPresent": True, "declarationFiles": ["Cargo.toml", "Cargo.toml.orig", "README.md"],
         "archiveSha256": "7b77c319abfd5219629c45c34c89ba945ed3c5e49fcde9d16b6c3885f118a730", "archiveBytes": 179143,
         "filesManifestSha256": "3566b00b46b7b42cc0d6ed4424764f7d60db435144b2b68d2ae9671bb501caca", "fileCount": 62, "sourceBytes": 538193,
         "publicTestCertificates": {"tests/examples/example.pfx": {"bytes": 1516, "sha256": "94e84d9a00ed9545104823d95aab3741bb1544197f282e4031844f9ef40a05a6"}},
@@ -355,6 +356,7 @@ _REVIEWED_DECLARED_LICENSES = {
         "name": "fmt-derive", "version": "0.1.2", "repository": "https://github.com/danielschemmel/fmt-derive",
         "vcsRepository": "danielschemmel/fmt-derive", "commit": "3f1abe44dc5e36e467565d3bf636faba5193f2a1", "pathInVcs": "fmt-derive",
         "license": "MIT OR Apache-2.0", "authors": ["Daniel Schemmel <daniel@schemmel.net>"],
+        "vcsInfoPresent": True, "pathInVcsPresent": True, "declarationFiles": ["Cargo.toml", "Cargo.toml.orig", "README.md"],
         "archiveSha256": "1cb4a4b45c26455885f8b462db12978e51f60cc914337bccb9a36faf93410169", "archiveBytes": 5201,
         "filesManifestSha256": "b35a3d17158fbc7ab8c2419e88b3bd582d78371b871e6f8a9e09830742ee7439", "fileCount": 14, "sourceBytes": 20515,
         "publicTestCertificates": {},
@@ -363,6 +365,7 @@ _REVIEWED_DECLARED_LICENSES = {
         "name": "fmt-derive-proc", "version": "0.1.2", "repository": "https://github.com/danielschemmel/fmt-derive",
         "vcsRepository": "danielschemmel/fmt-derive", "commit": "3f1abe44dc5e36e467565d3bf636faba5193f2a1", "pathInVcs": "fmt-derive-proc",
         "license": "MIT OR Apache-2.0", "authors": ["Daniel Schemmel <daniel@schemmel.net>"],
+        "vcsInfoPresent": True, "pathInVcsPresent": True, "declarationFiles": ["Cargo.toml", "Cargo.toml.orig", "README.md"],
         "archiveSha256": "7704da0760734344ce8753f15b21e97c6be85dc5a8f2c3a963fbd042b3380d23", "archiveBytes": 4154,
         "filesManifestSha256": "d7018a1d32aeed2ada20bbf7111847a834df461d6d31eeb70785542163c89101", "fileCount": 12, "sourceBytes": 24276,
         "publicTestCertificates": {},
@@ -371,6 +374,7 @@ _REVIEWED_DECLARED_LICENSES = {
         "name": "rustls-cng", "version": "0.7.1", "repository": "https://github.com/rustls/rustls-cng",
         "vcsRepository": "rustls/rustls-cng", "commit": "b9126716029a105a08c1786993922103d9865bad", "pathInVcs": "",
         "license": "MIT/Apache-2.0", "authors": ["Dmitry Pankratov <dmitry@pankratov.net>"],
+        "vcsInfoPresent": True, "pathInVcsPresent": True, "declarationFiles": ["Cargo.toml", "Cargo.toml.orig", "README.md"],
         "archiveSha256": "3eeed9c3e96253f36d1cfdd593388ecca775b532b6ff0c649a3010f6af60fe70", "archiveBytes": 29106,
         "filesManifestSha256": "1cf3147636b5ca0f8d1e9bcf88cddb6527dc8fb6630cfe741b175c22ab9b85b9", "fileCount": 24, "sourceBytes": 87184,
         "publicTestCertificates": {
@@ -378,6 +382,33 @@ _REVIEWED_DECLARED_LICENSES = {
             "tests/assets/rustls-ec.p12": {"bytes": 2249, "sha256": "189ffc17f91de863c32623757201684dfae1ac08017d5ecd180d066c5eaacd2c"},
             "tests/assets/rustls-server.pfx": {"bytes": 2257, "sha256": "4e0d0154a09176d129a6c3cacb82024409b6fe4fe541b3c1af9bfb1e60ea54ff"},
         },
+    },
+    "block-0.1.6": {
+        "name": "block", "version": "0.1.6", "repository": "http://github.com/SSheldon/rust-block",
+        "vcsRepository": None, "commit": None, "pathInVcs": None,
+        "license": "MIT", "authors": ["Steven Sheldon"],
+        "vcsInfoPresent": False, "pathInVcsPresent": False, "declarationFiles": ["Cargo.toml", "README.md"],
+        "archiveSha256": "0d8c1fef690941d3e7788d328517591fecc684c084084702d6ff1641e993699a", "archiveBytes": 4077,
+        "filesManifestSha256": "438aeb0004ae316f4618bf6597c498043e4b6a0640dd1b57e6c2e9e72d0807d3", "fileCount": 4, "sourceBytes": 15196,
+        "publicTestCertificates": {},
+    },
+    "malloc_buf-0.0.6": {
+        "name": "malloc_buf", "version": "0.0.6", "repository": "https://github.com/SSheldon/malloc_buf",
+        "vcsRepository": None, "commit": None, "pathInVcs": None,
+        "license": "MIT", "authors": ["Steven Sheldon"],
+        "vcsInfoPresent": False, "pathInVcsPresent": False, "declarationFiles": ["Cargo.toml"],
+        "archiveSha256": "62bb907fe88d54d8d9ce32a3cceab4218ed2f6b7d35617cafe9adf84e43919cb", "archiveBytes": 1239,
+        "filesManifestSha256": "750a7cb75c76ac13a6448fec88535f22ca9b97432edc4f2e05e0a4b398b38130", "fileCount": 2, "sourceBytes": 2637,
+        "publicTestCertificates": {},
+    },
+    "simd_helpers-0.1.0": {
+        "name": "simd_helpers", "version": "0.1.0", "repository": "https://github.com/lu-zero/simd_helpers",
+        "vcsRepository": "lu-zero/simd_helpers", "commit": "ca1a2f84aa386d758e98f8a609d990263932fb85", "pathInVcs": None,
+        "license": "MIT", "authors": ["Luca Barbato <lu_zero@gentoo.org>"],
+        "vcsInfoPresent": True, "pathInVcsPresent": False, "declarationFiles": ["Cargo.toml", "Cargo.toml.orig", "README.md"],
+        "archiveSha256": "95890f873bec569a0362c235787f3aca6e1e887302ba4840839bcc6459c42da6", "archiveBytes": 1527,
+        "filesManifestSha256": "7b361c6f6baf32d9baf33d39ec80036472a375245075b7d279cfb47eff1155bf", "fileCount": 7, "sourceBytes": 2500,
+        "publicTestCertificates": {},
     },
 }
 
@@ -396,7 +427,7 @@ def _reviewed_json(path):
 
 
 def reviewed_declared_license(package, folder, destination):
-    """Retain four reviewed, byte-authenticated original crates and a labelled MIT body."""
+    """Retain seven reviewed, byte-authenticated original crates and a labelled MIT body."""
     label = package["name"] + "-" + package["version"]
     pin = _REVIEWED_DECLARED_LICENSES.get(label)
     require(pin is not None, "Crate has no reviewed omitted-license exception: " + label)
@@ -414,11 +445,20 @@ def reviewed_declared_license(package, folder, destination):
             "Invalid reviewed crate file checksum map: " + label)
     canonical = json.dumps(hashes, sort_keys=True, separators=(",", ":")).encode("utf-8")
     require(hashlib.sha256(canonical).hexdigest() == pin["filesManifestSha256"], "Reviewed crate published file manifest mismatch: " + label)
-    require(all(name in hashes for name in ("Cargo.toml", "Cargo.toml.orig", ".cargo_vcs_info.json", "README.md")),
+    declaration_files = pin["declarationFiles"]
+    require(declaration_files and "Cargo.toml" in declaration_files and len(declaration_files) == len(set(declaration_files)) and
+            all(name in hashes for name in declaration_files),
             "Reviewed declaration source files missing")
-    vcs = _reviewed_json(folder / ".cargo_vcs_info.json")
-    require(isinstance(vcs, dict) and isinstance(vcs.get("git"), dict) and vcs["git"].get("sha1") == pin["commit"] and vcs.get("path_in_vcs") == pin["pathInVcs"],
-            "Reviewed crate immutable VCS identity mismatch: " + label)
+    if pin["vcsInfoPresent"]:
+        require(".cargo_vcs_info.json" in hashes, "Reviewed crate published VCS metadata missing")
+        vcs = _reviewed_json(folder / ".cargo_vcs_info.json")
+        require(isinstance(vcs, dict) and isinstance(vcs.get("git"), dict) and vcs["git"].get("sha1") == pin["commit"] and
+                (("path_in_vcs" in vcs) == pin["pathInVcsPresent"]) and vcs.get("path_in_vcs") == pin["pathInVcs"],
+                "Reviewed crate immutable VCS identity mismatch: " + label)
+    else:
+        require(".cargo_vcs_info.json" not in hashes and not (folder / ".cargo_vcs_info.json").exists() and
+                pin["commit"] is None and pin["vcsRepository"] is None and pin["pathInVcs"] is None,
+                "Reviewed legacy crate must not invent VCS metadata: " + label)
     # Do not use regular_files() here: it intentionally skips .git/__pycache__,
     # whereas an exact published-crate copy must reject every extra path.
     actual = {}
@@ -469,14 +509,17 @@ def reviewed_declared_license(package, folder, destination):
     require(mit.count(marker) == 1, "Standard MIT source body is missing or ambiguous")
     body = mit[mit.index(marker):].strip() + "\n"
     require("THE SOFTWARE IS PROVIDED" in body and "KIO" not in body and "Copyright (c)" not in body, "Standard MIT body must not add KIO copyright")
-    explanation = ("KIO-supplied standard MIT license text; this is not an upstream license file.\n"
-                   "This exact published crate declares " + pin["license"] + "; KIO elects the MIT option for this redistributed copy.\n"
+    selection = ("This exact published crate declares MIT; this redistributed copy uses that declared license.\n" if pin["license"] == "MIT" else
+                 "This exact published crate declares " + pin["license"] + "; KIO elects the MIT option for this redistributed copy.\n")
+    explanation = ("KIO-supplied standard MIT license text; this is not an upstream license file.\n" + selection +
                    "The original authors, license declarations and complete published source bytes are preserved in original-crate/.\n"
                    "See REVIEWED-LICENSE-PROVENANCE.json for their exact authenticated origin.\n"
                    "The standard body below adds no copyright holder or copyright notice and does not replace original source notices.\n\n")
     standard = destination / "STANDARD-MIT-TEXT.txt"
     standard.write_text(explanation + body, encoding="utf-8")
     archive_url = "https://static.crates.io/crates/" + pin["name"] + "/" + label + ".crate"
+    immutable_vcs_url = ("https://github.com/" + pin["vcsRepository"] + "/tree/" + pin["commit"] +
+                         ("/" + pin["pathInVcs"] if pin["pathInVcs"] else "")) if pin["vcsInfoPresent"] else None
     provenance = {"schema": "kio.reviewed-declared-license.v1", "name": pin["name"], "version": pin["version"],
                   "repository": pin["repository"], "source": package["source"], "authors": pin["authors"],
                   "declaredLicense": pin["license"], "selectedLicense": "MIT", "commit": pin["commit"], "pathInVcs": pin["pathInVcs"],
@@ -487,17 +530,20 @@ def reviewed_declared_license(package, folder, destination):
                   "originalFiles": original, "sourceBytes": total, "excludedGeneratedFiles": [".cargo-ok"] if ".cargo-ok" in actual else [],
                   "originalDeclarationFiles": [{"path": "original-crate/" + name, "sha256": hashes[name],
                                                 "publishedArchiveMember": label + "/" + name, "publishedArchiveUrl": archive_url}
-                                               for name in ("Cargo.toml", "Cargo.toml.orig", "README.md")],
-                  "immutableVcsUrl": "https://github.com/" + pin["vcsRepository"] + "/tree/" + pin["commit"] +
-                                     ("/" + pin["pathInVcs"] if pin["pathInVcs"] else ""),
+                                               for name in declaration_files],
+                  "immutableVcsUrl": immutable_vcs_url,
+                  "publishedVcsMetadata": {"present": pin["vcsInfoPresent"], "pathInVcsKeyPresent": pin["pathInVcsPresent"],
+                                           "status": "published-immutable-commit" if pin["vcsInfoPresent"] else "absent-in-published-archive"},
+                  "sourceAuthority": "Exact checksum-authenticated published crate archive; VCS identity is supplementary only when published",
                   "reviewedPublicTestCertificates": pin["publicTestCertificates"],
-                  "omission": "No standalone upstream license file exists in this published crate or its reviewed immutable source location",
+                  "omission": ("No standalone upstream license file exists in this published crate or its reviewed immutable source location" if pin["vcsInfoPresent"] else
+                               "No standalone license file or immutable VCS metadata exists in this exact published crate; the reviewed source authority is its published archive"),
                   "standardMit": {"file": standard.name, "sha256": digest(standard), "bodySha256": hashlib.sha256(body.encode("utf-8")).hexdigest(),
                                   "providedBy": "KIO", "isUpstreamOriginal": False, "addsCopyrightNotice": False}}
     proof = destination / "REVIEWED-LICENSE-PROVENANCE.json"
     write_json(proof, provenance)
     return [{"file": path.name, "url": None, "sha256": digest(path), "originalCrateFiles": len(original),
-             "reason": "Exact reviewed published dual-license crate omits a standalone license; original source/declarations retained and MIT option explicitly selected"}
+             "reason": "Exact reviewed published crate omits a standalone license; complete source/declarations retained and the declared MIT license explicitly selected"}
             for path in (standard, proof)]
 
 
