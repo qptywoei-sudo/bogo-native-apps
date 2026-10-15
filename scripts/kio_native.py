@@ -541,6 +541,41 @@ def upstream_license_files(package, folder, cache):
     return records
 
 
+def dependency_source_files(package, folder):
+    """Retain one reviewed immutable winit license link without allowing arbitrary source links."""
+    expected_source = "git+https://github.com/skylartaylor/winit.git?rev=3d51077fd1a966f84df9ef287839dc84fd5b4ca7#3d51077fd1a966f84df9ef287839dc84fd5b4ca7"
+    if not (package.get("name") == "winit" and package.get("version") == "0.30.13" and package.get("source") == expected_source):
+        return regular_files(folder)
+    root = Path(folder).resolve()
+    link, target = root / "dpi/LICENSE", root / "LICENSE"
+    require(link.is_symlink() or link.is_file(), "Reviewed winit license link missing")
+    # Windows Git may materialize a symlink as its exact 10-byte target text.
+    require((link.is_symlink() and os.readlink(link) == "../LICENSE") or
+            (not link.is_symlink() and link.is_file() and link.stat().st_size == 10 and link.read_bytes() == b"../LICENSE"),
+            "Reviewed winit license link target changed")
+    require(target.is_file() and not target.is_symlink() and target.stat().st_size == 11323 and
+            digest(target) == "6dc0e068dcf3a5bc8e054205b85b7720e1d49265bbc64bf515d2cf79197df69a",
+            "Reviewed winit original license changed")
+    result = []
+    for base, dirs, files in os.walk(root, followlinks=False):
+        for name in list(dirs):
+            p = Path(base) / name
+            require(not p.is_symlink(), "Directory symlink refused")
+            if name in (".git", "__pycache__"):
+                dirs.remove(name)
+        for name in files:
+            p = Path(base) / name
+            relative = p.relative_to(root).as_posix()
+            safe_relative(relative)
+            if relative == "dpi/LICENSE":
+                # Copy the authenticated original license, preserving the link's logical path.
+                result.append((relative, target))
+            else:
+                require(p.is_file() and not p.is_symlink(), "Non-regular file refused: " + relative)
+                result.append((relative, p))
+    return sorted(result)
+
+
 def dependency_licenses(lock, source, env, target, destination):
     metadata = json.loads(run(["rustup", "run", lock["rust"], "cargo", "metadata", "--locked", "--format-version", "1", "--filter-platform", target], cwd=source, env=env, capture=True, timeout=600))
     allowed_roots = [source.resolve(), Path(env["CARGO_HOME"]).resolve()]
@@ -608,7 +643,7 @@ def dependency_licenses(lock, source, env, target, destination):
                     retrieved.append({"file": out.name, "url": None, "sha256": digest(out), "originalCrateFiles": len(files), "reason": "Original published crate declares MIT and has no standalone license file"})
                 else:
                     missing.append(label)
-        nested = [(relative, p) for relative, p in regular_files(folder) if "/" in relative and p.name.upper().startswith(("LICENSE", "COPYING", "NOTICE", "OFL", "UNLICENSE"))]
+        nested = [(relative, p) for relative, p in dependency_source_files(package, folder) if "/" in relative and Path(relative).name.upper().startswith(("LICENSE", "COPYING", "NOTICE", "OFL", "UNLICENSE"))]
         for relative, p in nested:
             require(p.stat().st_size <= 4 * 1024 * 1024, "Invalid nested license file")
             out = destination / label / "bundled-notices" / relative

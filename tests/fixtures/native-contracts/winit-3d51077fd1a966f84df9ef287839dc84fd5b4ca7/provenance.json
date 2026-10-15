@@ -1,0 +1,34 @@
+{
+  "schema": "kio.native-contract-fixture.v1",
+  "purpose": "Original unmodified license fixture for strict immutable winit license-link regression tests.",
+  "upstream": {
+    "repository": "https://github.com/skylartaylor/winit",
+    "commit": "3d51077fd1a966f84df9ef287839dc84fd5b4ca7",
+    "cargoName": "winit",
+    "cargoVersion": "0.30.13"
+  },
+  "files": [
+    {
+      "path": "LICENSE",
+      "upstreamPath": "LICENSE",
+      "gitBlob": "ad410e11302107da9aa47ce3d46bd5ad011c4c43",
+      "bytes": 11323,
+      "sha256": "6dc0e068dcf3a5bc8e054205b85b7720e1d49265bbc64bf515d2cf79197df69a",
+      "url": "https://raw.githubusercontent.com/skylartaylor/winit/3d51077fd1a966f84df9ef287839dc84fd5b4ca7/LICENSE"
+    }
+  ],
+  "originalLicenseLink": {
+    "path": "dpi/LICENSE",
+    "gitMode": "120000",
+    "gitBlob": "ea5b60640b01f74e295037aa8a6b7d4ea278a739",
+    "bytes": 10,
+    "target": "../LICENSE",
+    "url": "https://github.com/skylartaylor/winit/blob/3d51077fd1a966f84df9ef287839dc84fd5b4ca7/dpi/LICENSE"
+  },
+  "license": "Apache-2.0; original text and copyright retained unchanged.",
+  "notes": [
+    "The exact Git dependency is winit. Cargo.lock resolves dpi0.1.2 independently from crates.io, so the exception does not authorize a separate Git dpi package.",
+    "The fixture is a regular original text file. Tests create and clean their own synthetic link files inside tempfile directories only.",
+    "No executable, compiler output, credentials, personal files or downloaded model weights are included."
+  ]
+}

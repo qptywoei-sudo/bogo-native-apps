@@ -308,6 +308,19 @@ def audit_native_dependencies(binaries, kind):
     return result
 
 
+def check_cli_probe(lock, binary, source, env):
+    if lock['id'] == 'deck':
+        # Original Deck CLI has no --help branch; unknown arguments correctly exit1.
+        # Exercise the real headless registry and require complete essential commands instead.
+        value = json.loads(run([binary, 'commands'], cwd=source, env=env, capture=True, timeout=60))
+        require(isinstance(value, list) and value and all(isinstance(item, dict) and isinstance(item.get('id'), str) for item in value), 'Invalid original Deck command registry')
+        ids = [item['id'] for item in value]
+        require({'file.new', 'file.open', 'file.save', 'file.saveAs', 'file.export', 'document.inspect'} <= set(ids), 'Incomplete original Deck command registry')
+        return {'mode': 'original-command-registry', 'arguments': ['commands'], 'commands': len(ids), 'status': 'passed'}
+    run([binary, '--help'], cwd=source, env=env, capture=True, timeout=60)
+    return {'mode': 'original-help', 'arguments': ['--help'], 'status': 'passed'}
+
+
 def build(args, lock):
     assert_host(args.platform)
     work, source, fonts, inputs = prepared(lock)
@@ -334,12 +347,12 @@ def build(args, lock):
         run(cargo + ['test', '--release', '--locked', '--target', target, '-p', 'pdfcraft-ui-egui', '--lib', 'updates::kio_version_tests'], cwd=source, env=env)
     binaries = binary_paths(lock, target_dir / target / 'release', args.platform)
     versions = check_versions(lock, binaries, env)
-    run([binaries['cli'], '--help'], cwd=source, env=env, capture=True, timeout=60)
+    cli_probe = check_cli_probe(lock, binaries['cli'], source, env)
     prepared(lock)
     record = {'schema': 1, 'app': lock['id'], 'version': lock['version'], 'platform': args.platform, 'target': target, 'rustc': rustc,
               'inputs': inputs, 'cargoArgs': lock['cargoArgs'], 'features': lock['features'],
               'binaries': {key: {'sha256': digest(p), 'bytes': p.stat().st_size} for key, p in binaries.items()},
-              'checks': {'nativeArchitecture': 'passed', 'originalCoreTests': 'passed', 'testPackages': lock['testPackages'], 'kioLightEditorRegressionTests': 'passed' if lock['id'] == 'light' else 'not-applicable', 'kioPdfUpdateRegressionTests': 'passed' if lock['id'] == 'pdf' else 'not-applicable', 'binaryVersions': versions, 'cliHelp': 'passed', 'guiLaunch': 'not-performed-by-orchestrator'}}
+              'checks': {'nativeArchitecture': 'passed', 'originalCoreTests': 'passed', 'testPackages': lock['testPackages'], 'kioLightEditorRegressionTests': 'passed' if lock['id'] == 'light' else 'not-applicable', 'kioPdfUpdateRegressionTests': 'passed' if lock['id'] == 'pdf' else 'not-applicable', 'binaryVersions': versions, 'cliProbe': cli_probe, 'guiLaunch': 'not-performed-by-orchestrator'}}
     write_json(work / ('build-' + args.platform + '.json'), record)
 
 
@@ -559,6 +572,9 @@ def public_files(lock):
                   'tests/test_native_file_qa.py', 'tests/test_collect_ci_artifact.py', 'tests/test_smoke_word.py', 'tests/test_smoke_craft.py'})
     files.update({'scripts/audit_rust_branding.py', 'tests/test_rust_branding.py',
                   'tests/fixtures/rust-branding/provenance.json', 'tests/fixtures/rust-branding/ui-home-recents.rs'})
+    files.update({'tests/test_native_contract_regressions.py',
+                  'tests/fixtures/native-contracts/winit-3d51077fd1a966f84df9ef287839dc84fd5b4ca7/LICENSE',
+                  'tests/fixtures/native-contracts/winit-3d51077fd1a966f84df9ef287839dc84fd5b4ca7/provenance.json'})
     # Small original XML fixtures make the installer collision tests independent
     # of the source archive cache. Include the exact Launcher branding input too.
     files.update('tests/fixtures/windows-identity/' + app + '.wxs' for app in (*IDS, 'launcher'))
