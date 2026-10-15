@@ -9,6 +9,12 @@ on:
         options: [all, photo, vector, film, light, pdf, effect, design, ui, word, sound, deck, cad, grid]
         default: grid
         required: true
+      platform:
+        description: Native platform to build (keeps successful packages on the other platform)
+        type: choice
+        options: [all, macos-arm64, windows-x64]
+        default: all
+        required: true
       publish_draft:
         description: Create draft releases only after native and source jobs pass
         type: boolean
@@ -39,11 +45,21 @@ jobs:
         name: Validate immutable source locks and derive an allowlisted matrix
         env:
           KIO_SELECTED_APP: ${{ inputs.app }}
+          KIO_SELECTED_PLATFORM: ${{ inputs.platform }}
+          KIO_DRAFT_PUBLICATION: ${{ inputs.publish_draft }}
         run: |
           python3 - <<'PY'
           import json, os, subprocess
           native = subprocess.check_output(['python3', 'scripts/full_native.py', 'matrix', '--app', os.environ['KIO_SELECTED_APP']], text=True).strip()
           rows = json.loads(native)['include']
+          platform = os.environ['KIO_SELECTED_PLATFORM']
+          assert platform in ('all', 'macos-arm64', 'windows-x64'), 'Invalid native platform'
+          assert os.environ['KIO_DRAFT_PUBLICATION'] in ('true', 'false'), 'Invalid draft publication setting'
+          assert os.environ['KIO_DRAFT_PUBLICATION'] == 'false' or platform == 'all', 'Draft publication requires both native platforms'
+          if platform != 'all':
+              rows = [row for row in rows if row['platform'] == platform]
+          assert rows, 'Native platform selection must not be empty'
+          native = json.dumps({'include': rows}, separators=(',', ':'))
           source = {'app': list(dict.fromkeys(x['app'] for x in rows))}
           with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
               out.write('native=' + native + '\n')
