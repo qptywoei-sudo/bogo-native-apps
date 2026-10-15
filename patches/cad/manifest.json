@@ -13,8 +13,8 @@
   },
   "patch": {
     "file": "cadcraft-v0.7.0-kio-cad.patch",
-    "sha256": "592a551c831b67e0080c116c879553247daaa66b1ce09c62196b5b850425f9b1",
-    "bytes": 5291274
+    "sha256": "85097629b456cf1128023dda49e6a2bb66a000c81ba67ed36f11a90703e65c04",
+    "bytes": 5291298
   },
   "counts": {
     "upstreamFiles": 701,
@@ -37,7 +37,8 @@
     "allEmbeddedAssetPathsExist": true,
     "upstreamTrademarkLogoFilesRemoved": true,
     "nativeBuildRun": false,
-    "GUIValidationRun": false
+    "GUIValidationRun": false,
+    "kioPlotterReferencesUseOriginalPublicDocReexport": true
   },
   "nonUiPlatformBrandingExceptions": [],
   "features": {
@@ -111,8 +112,8 @@
       "path": "apps/cadcraft/src/kio_plotters.rs",
       "before": null,
       "after": {
-        "sha256": "4d72375a0c3020a7147e321de1be4376b66e1e0c1aceb13bf8c53e1061441b97",
-        "bytes": 2162
+        "sha256": "9f1466a0b41fbd52a4e8a62ec790a7d544df153d623b72423c01aee5afea6a4f",
+        "bytes": 2186
       }
     },
     {
@@ -3295,6 +3296,22 @@
       "path": "contributors/contributors.json",
       "sha256": "42b551b5225e7fdb6ee1ab0880d34cbe435b0f92cb065d31c2d3b7e5deef6ce1",
       "bytes": 1454
+    }
+  ],
+  "compileCorrections": [
+    {
+      "scope": [
+        "apps/cadcraft/src/kio_plotters.rs"
+      ],
+      "reason": "The unchanged GUI Cargo manifest directly depends on cadcraft-engine, not cadcraft-doc. The original engine publicly re-exports cadcraft_doc as doc; its plotter constants are reached through that existing public API.",
+      "replacedReferences": 3,
+      "beforeNamespace": "cadcraft_doc",
+      "afterNamespace": "cadcraft_engine::doc",
+      "priorBrandingPatchSha256": "592a551c831b67e0080c116c879553247daaa66b1ce09c62196b5b850425f9b1",
+      "helperBeforeSha256": "4d72375a0c3020a7147e321de1be4376b66e1e0c1aceb13bf8c53e1061441b97",
+      "helperAfterSha256": "9f1466a0b41fbd52a4e8a62ec790a7d544df153d623b72423c01aee5afea6a4f",
+      "originalEngineCargoAndApiChanged": false,
+      "nativeBuildRun": false
     }
   ]
 }

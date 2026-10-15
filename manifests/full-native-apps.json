@@ -1498,9 +1498,9 @@
       },
       "branding": {
         "patch": "patches/cad/cadcraft-v0.7.0-kio-cad.patch",
-        "sha256": "592a551c831b67e0080c116c879553247daaa66b1ce09c62196b5b850425f9b1",
+        "sha256": "85097629b456cf1128023dda49e6a2bb66a000c81ba67ed36f11a90703e65c04",
         "manifest": "patches/cad/manifest.json",
-        "manifestSha256": "141bbed39e0783e00b6bd06d7e1830ce57916d392457f4ad6fec4cfca689372b"
+        "manifestSha256": "003b7fdb24772784c5493eea16701bb2907a4cdecb8f0c9c2a04a94e7281346b"
       },
       "cargoPackages": [
         "cadcraft",

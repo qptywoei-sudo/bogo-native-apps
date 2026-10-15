@@ -1,0 +1,34 @@
+{
+  "schema": "kio.cad-plotter-public-api-fixture.v1",
+  "repository": "storytold/cadcraft",
+  "commit": "fc4e98315a8d771b5ab832f0ade0b5e7b106df7f",
+  "sourceArchiveSha256": "039ee54bfbf6c25f49a24770a5ba0ef4c2d3125c26fa88bafa06da4048b34d17",
+  "sourceArchiveBytes": 3979882,
+  "license": "MIT OR Apache-2.0; original upstream source bytes, no changes",
+  "files": [
+    {
+      "path": "apps/cadcraft/Cargo.toml",
+      "bytes": 2117,
+      "sha256": "8b0a16df9018e5ef63179a436b0cb174fe1ff33fb9e24025122796a00044901a",
+      "member": "cadcraft-fc4e98315a8d771b5ab832f0ade0b5e7b106df7f/apps/cadcraft/Cargo.toml"
+    },
+    {
+      "path": "crates/engine/src/lib.rs",
+      "bytes": 76405,
+      "sha256": "eb80ac69614a670c54d31ad7b6530e2a73e21905b1a6c73dad7bc03dda4366d1",
+      "member": "cadcraft-fc4e98315a8d771b5ab832f0ade0b5e7b106df7f/crates/engine/src/lib.rs"
+    },
+    {
+      "path": "crates/doc/src/lib.rs",
+      "bytes": 14936,
+      "sha256": "22ff923587acbb43d84393b72cc9edf5241d3bc245ac013e07c573fb6c26c4d4",
+      "member": "cadcraft-fc4e98315a8d771b5ab832f0ade0b5e7b106df7f/crates/doc/src/lib.rs"
+    },
+    {
+      "path": "crates/doc/src/plotter.rs",
+      "bytes": 10362,
+      "sha256": "68dce11b6abada5fa240489bd58bca2520db2785750da0a93e81b7911cbd13c6",
+      "member": "cadcraft-fc4e98315a8d771b5ab832f0ade0b5e7b106df7f/crates/doc/src/plotter.rs"
+    }
+  ]
+}

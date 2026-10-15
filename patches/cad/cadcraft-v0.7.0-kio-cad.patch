@@ -207,7 +207,7 @@ index 1349ebe..73712c6 100644
          .set("InternalName", "cadcraft");
 diff --git a/apps/cadcraft/src/kio_plotters.rs b/apps/cadcraft/src/kio_plotters.rs
 new file mode 100644
-index 0000000..4e8ebce
+index 0000000..55e10da
 --- /dev/null
 +++ b/apps/cadcraft/src/kio_plotters.rs
 @@ -0,0 +1,47 @@
@@ -221,7 +221,7 @@ index 0000000..4e8ebce
 +    }
 +    /// A plain file name of ours (no separators, no parent references).
 +    fn file(n: &str) -> std::result::Result<std::path::PathBuf, String> {
-+        let ok = n.ends_with(cadcraft_doc::PLOTTER_FILE_EXT) && !n.starts_with('.') && !n.contains(['/', '\\', ':']);
++        let ok = n.ends_with(cadcraft_engine::doc::PLOTTER_FILE_EXT) && !n.starts_with('.') && !n.contains(['/', '\\', ':']);
 +        if !ok {
 +            return Err(format!("`{n}` is not a plotter configuration file name"));
 +        }
@@ -236,14 +236,14 @@ index 0000000..4e8ebce
 +            };
 +            Ok(rd
 +                .filter_map(|e| e.ok()?.file_name().into_string().ok())
-+                .filter(|n| n.ends_with(cadcraft_doc::PLOTTER_FILE_EXT))
++                .filter(|n| n.ends_with(cadcraft_engine::doc::PLOTTER_FILE_EXT))
 +                .take(MAX_DEVICES)
 +                .collect())
 +        },
 +        read: |n| {
 +            let p = file(n)?;
 +            let len = std::fs::metadata(&p).map_err(|e| format!("{n}: {e}"))?.len();
-+            if len > cadcraft_doc::MAX_PLOTTER_FILE as u64 {
++            if len > cadcraft_engine::doc::MAX_PLOTTER_FILE as u64 {
 +                return Err(format!("{n}: the plotter configuration file is too large"));
 +            }
 +            std::fs::read_to_string(&p).map_err(|e| format!("{n}: {e}"))

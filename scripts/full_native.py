@@ -575,6 +575,11 @@ def public_files(lock):
     files.update({'tests/test_native_contract_regressions.py',
                   'tests/fixtures/native-contracts/winit-3d51077fd1a966f84df9ef287839dc84fd5b4ca7/LICENSE',
                   'tests/fixtures/native-contracts/winit-3d51077fd1a966f84df9ef287839dc84fd5b4ca7/provenance.json'})
+    files.update({'tests/test_cad_plotter_api.py', 'tests/fixtures/cad-plotter-api/provenance.json',
+                  'tests/fixtures/cad-plotter-api/apps/cadcraft/Cargo.toml',
+                  'tests/fixtures/cad-plotter-api/crates/engine/src/lib.rs',
+                  'tests/fixtures/cad-plotter-api/crates/doc/src/lib.rs',
+                  'tests/fixtures/cad-plotter-api/crates/doc/src/plotter.rs'})
     # Small original XML fixtures make the installer collision tests independent
     # of the source archive cache. Include the exact Launcher branding input too.
     files.update('tests/fixtures/windows-identity/' + app + '.wxs' for app in (*IDS, 'launcher'))
