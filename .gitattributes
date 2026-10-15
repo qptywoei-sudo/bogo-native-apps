@@ -1,0 +1,2 @@
+# Immutable source/patch hashes must survive Windows checkouts byte-for-byte.
+* -text
