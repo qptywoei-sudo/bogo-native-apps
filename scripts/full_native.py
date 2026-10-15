@@ -17,6 +17,7 @@ from xml.sax.saxutils import quoteattr
 from pathlib import Path
 
 import kio_native as common
+import audit_windows_identity
 
 ROOT = Path(__file__).resolve().parents[1]
 IDS = ('photo', 'vector', 'film', 'light', 'pdf', 'effect', 'design', 'ui', 'word', 'sound', 'deck', 'cad', 'grid')
@@ -140,6 +141,26 @@ def paths(lock):
     return work, work / 'source', work / 'craft-fonts'
 
 
+def light_format_contract(source):
+    """Every literal tr_format call must exist in all pinned Light catalogs."""
+    catalogs = [json.loads(p.read_text(encoding='utf-8')) for p in source.rglob('*-formats.json')]
+    require(len(catalogs) == 9, 'Expected nine original Light format catalogs')
+    keys = set(catalogs[0])
+    require(all(set(catalog) == keys for catalog in catalogs), 'Light format catalog key sets diverged')
+    calls = []
+    for path in source.rglob('*.rs'):
+        text = path.read_text(encoding='utf-8')
+        # Preserve normal/raw string contents while removing Rust comments.
+        tokens = re.compile(r'r(#+)?".*?"\1|"(?:\\.|[^"\\])*"|//[^\n]*|/\*.*?\*/', re.S)
+        text = tokens.sub(lambda m: '' if m[0].startswith(('//', '/*')) else m[0], text)
+        for match in re.finditer(r'\btr_format\s*!\s*[({\[]\s*("(?:\\.|[^"\\])*")', text, re.S):
+            key = json.loads(match[1].replace('\n', '\\n').replace('\r', '\\r'))
+            require(key in keys, 'Light literal format has no catalog key: ' + str(path.relative_to(source)) + ': ' + key)
+            calls.append(key)
+    require(calls, 'No original Light format calls were inspected')
+    return {'catalogs': len(catalogs), 'keys': len(keys), 'literalCalls': len(calls)}
+
+
 def prepare(args, lock):
     work, source, fonts = paths(lock)
     if work.exists():
@@ -169,11 +190,17 @@ def prepare(args, lock):
             require((declared is None and item['path'] not in actual) or (declared is not None and actual.get(item['path']) == declared['sha256']), 'Patch roundtrip hash mismatch')
     for r, sha in meta.get('protectedFileHashes', {}).items():
         require(after.get(r) == sha, 'Original protected engine bytes changed: ' + r)
+    if lock['id'] == 'light':
+        light_format_contract(source)
+    # Compare actual WiX XML to the hash-locked upstream before permitting any
+    # native build/source package. KIO must coexist with the original app.
+    windows_identity = audit_windows_identity.audit(lock, source, archive_cache=args.archive_cache)
     # Functional corrections are separate, hash-locked, narrow patches, applied only
     # after the original branding-only source and protected engine check succeeded.
     apply_functional_fixes(lock, source)
     record = {'schema': 1, 'app': lock['id'], 'catalogSha256': digest(CATALOG), 'lock': lock,
-              'sourceTreeSha256': source_fingerprint(lock, source), 'fontsTreeSha256': common.tree_fingerprint(fonts) if fonts.exists() else None}
+              'sourceTreeSha256': source_fingerprint(lock, source), 'fontsTreeSha256': common.tree_fingerprint(fonts) if fonts.exists() else None,
+              'windowsInstallerIdentity': windows_identity}
     write_json(work / 'prepared.json', record)
     print('Prepared complete native ' + lock['name'] + ' source, original engine and dependencies retained.')
 
@@ -191,6 +218,7 @@ def build_env(lock, fonts, target_dir, target):
     env = os.environ.copy()
     prefix = lock['binaries']['app'].upper()
     env.update({'CARGO_TARGET_DIR': str(target_dir), 'CARGO_HOME': os.environ.get('KIO_CARGO_HOME', str(ROOT / '.cache/cargo')),
+                'KIO_RELEASE_VERSION': lock['version'],
                 'SOURCE_DATE_EPOCH': str(lock['sourceDateEpoch']), prefix + '_BUILD_SHA': lock['source']['commit'],
                 prefix + '_VERSION': lock['version'], prefix + '_BUILD_DATE': time.strftime('%Y-%m-%d', time.gmtime(lock['sourceDateEpoch']))})
     if lock['fonts'] is not None:
@@ -288,6 +316,15 @@ def build(args, lock):
     for package in lock['testPackages']:
         command += ['-p', package]
     run(command, cwd=source, env=env)
+    if lock['id'] == 'light':
+        # Keep the original engine suites and exercise KIO Photo discovery in
+        # the native host too, without launching a graphical window.
+        run(cargo + ['test', '--release', '--locked', '--target', target, '-p', 'lightcraft', '--bin', 'lightcraft', 'editors::tests'], cwd=source, env=env)
+    if lock['id'] == 'pdf':
+        # The KIO updater belongs to the native shell and UI, outside the original
+        # engine test package. Keep those tests and run both new boundaries too.
+        run(cargo + ['test', '--release', '--locked', '--target', target, '-p', 'pdfcraft', '--bin', 'pdfcraft', 'updates::tests'], cwd=source, env=env)
+        run(cargo + ['test', '--release', '--locked', '--target', target, '-p', 'pdfcraft-ui-egui', '--lib', 'updates::kio_version_tests'], cwd=source, env=env)
     binaries = binary_paths(lock, target_dir / target / 'release', args.platform)
     versions = check_versions(lock, binaries, env)
     run([binaries['cli'], '--help'], cwd=source, env=env, capture=True, timeout=60)
@@ -295,7 +332,7 @@ def build(args, lock):
     record = {'schema': 1, 'app': lock['id'], 'version': lock['version'], 'platform': args.platform, 'target': target, 'rustc': rustc,
               'inputs': inputs, 'cargoArgs': lock['cargoArgs'], 'features': lock['features'],
               'binaries': {key: {'sha256': digest(p), 'bytes': p.stat().st_size} for key, p in binaries.items()},
-              'checks': {'nativeArchitecture': 'passed', 'originalCoreTests': 'passed', 'testPackages': lock['testPackages'], 'binaryVersions': versions, 'cliHelp': 'passed', 'guiLaunch': 'not-performed-by-orchestrator'}}
+              'checks': {'nativeArchitecture': 'passed', 'originalCoreTests': 'passed', 'testPackages': lock['testPackages'], 'kioLightEditorRegressionTests': 'passed' if lock['id'] == 'light' else 'not-applicable', 'kioPdfUpdateRegressionTests': 'passed' if lock['id'] == 'pdf' else 'not-applicable', 'binaryVersions': versions, 'cliHelp': 'passed', 'guiLaunch': 'not-performed-by-orchestrator'}}
     write_json(work / ('build-' + args.platform + '.json'), record)
 
 
@@ -509,7 +546,11 @@ def verify(folder, lock, kind):
 
 
 def public_files(lock):
-    files = set(common.PUBLIC_FILES) | {'scripts/full_native.py', 'tests/test_full_native.py', 'manifests/full-native-apps.json', 'manifests/archive-inputs.json', '.github/workflows/full-native-apps.yml'}
+    files = set(common.PUBLIC_FILES) | {'scripts/full_native.py', 'scripts/audit_windows_identity.py', 'tests/test_full_native.py', 'tests/test_windows_identity.py', 'manifests/full-native-apps.json', 'manifests/archive-inputs.json', '.github/workflows/full-native-apps.yml'}
+    # Small original XML fixtures make the installer collision tests independent
+    # of the source archive cache. Include the exact Launcher branding input too.
+    files.update('tests/fixtures/windows-identity/' + app + '.wxs' for app in (*IDS, 'launcher'))
+    files.update({'tests/fixtures/windows-identity/provenance.json', 'manifests/launcher.lock.json', 'patches/launcher/manifest.json', 'patches/launcher/craft-launcher-v0.4.1-kio-launcher.patch'})
     for app in IDS:
         other = load_lock(app)
         files.update([other['branding']['patch'], other['branding']['manifest']])

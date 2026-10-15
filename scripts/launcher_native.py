@@ -53,7 +53,7 @@ def paths(lock):
 
 def public_files(lock):
     files = ['README.md', 'LICENSE', '.gitignore', '.gitattributes', 'scripts/kio_native.py', 'scripts/full_native.py', 'scripts/launcher_native.py',
-             'tests/test_launcher_native.py', 'manifests/launcher.lock.json', 'patches/launcher/manifest.json', lock['branding']['patch'], '.github/workflows/full-native-launcher.yml']
+             'tests/test_launcher_native.py', 'scripts/audit_windows_identity.py', 'manifests/launcher.lock.json', 'patches/launcher/manifest.json', lock['branding']['patch'], '.github/workflows/full-native-launcher.yml']
     for relative in files:
         p = ROOT / common.check_public_path(relative)
         require(p.is_file() and not p.is_symlink(), 'Missing reviewed Launcher source input')
@@ -76,6 +76,8 @@ def prepare(args, lock):
     with helpers():
         full.prepare(args, lock)
     _, source, _, _ = prepared(lock)
+    import audit_windows_identity
+    audit_windows_identity.audit(lock, source, archive_cache=args.archive_cache)
     require((source / 'crates/core/src/kio_registry.rs').is_file(), 'Reviewed native registry missing')
     require(not any(x.is_file() and x.name != 'LICENSE-brand.txt' for x in (source / 'docs/brand').rglob('*')), 'Upstream trademark artwork remains')
     meta = json.loads((ROOT / lock['branding']['manifest']).read_text(encoding='utf-8'))

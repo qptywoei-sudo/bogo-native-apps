@@ -342,38 +342,271 @@ index 9d15f5b26afb8f2b89bd7e55d39af027a061248c..06f95be350c60ed26385456b4c18a8a3
  
  /// Accept launches on a background thread for as long as the process runs.
 diff --git a/apps/pdfcraft/src/updates.rs b/apps/pdfcraft/src/updates.rs
-index 686c8cee84cf65ff591913806aa336b90e27c666..279ad42c828eb77d495ca15dd378093190d57526 100644
+index 686c8cee84cf65ff591913806aa336b90e27c666..8429e548c758edbeddb0df7be27bed624bc86461 100644
 --- a/apps/pdfcraft/src/updates.rs
 +++ b/apps/pdfcraft/src/updates.rs
-@@ -4,7 +4,7 @@ use std::time::Duration;
+@@ -1,39 +1,30 @@
+-//! Asks GitHub for the latest PdfCraft release (Help ▸ Check for updates, issue #28).
++//! User-requested KIO PDF release checks. Never query a shared GitHub latest release.
+ 
+ use std::time::Duration;
  
  use pdfcraft_ui_egui::updates::{RELEASES_PAGE, Release};
  
 -const LATEST: &str = "https://api.github.com/repos/storytold/pdfcraft/releases/latest";
-+const LATEST: &str = "https://api.github.com/repos/storytold/com.kio.pdf/releases/latest";
++const MANIFEST: &str = "https://kio-library.vercel.app/downloads/native-apps-manifest.json";
++const REPOSITORY: &str = "qptywoei777-rgb/kio-native-apps";
  
- /// The latest release. The answer is untrusted: its size is capped, and only a page under
- /// [`RELEASES_PAGE`] is ever offered for download (anything else falls back to that list).
-@@ -17,7 +17,7 @@ pub fn latest_release() -> Result<Release, String> {
+-/// The latest release. The answer is untrusted: its size is capped, and only a page under
+-/// [`RELEASES_PAGE`] is ever offered for download (anything else falls back to that list).
++/// Check only the published KIO PDF entry. Nothing is downloaded or installed.
+ pub fn latest_release() -> Result<Release, String> {
+-    let agent = ureq::Agent::config_builder()
+-        .timeout_global(Some(Duration::from_secs(10)))
+-        .tls_config(ureq::tls::TlsConfig::builder().root_certs(os_roots()?).build())
+-        .build()
+-        .new_agent();
++    let agent =
++        ureq::Agent::config_builder().timeout_global(Some(Duration::from_secs(10))).tls_config(ureq::tls::TlsConfig::builder().root_certs(os_roots()?).build()).build().new_agent();
      let mut response = agent
-         .get(LATEST)
-         .header("Accept", "application/vnd.github+json")
+-        .get(LATEST)
+-        .header("Accept", "application/vnd.github+json")
 -        .header("User-Agent", concat!("PdfCraft/", env!("CARGO_PKG_VERSION")))
-+        .header("User-Agent", concat!("KIO PDF/", env!("CARGO_PKG_VERSION")))
-         // Read error statuses ourselves: a 403 from GitHub usually means its anonymous
-         // rate limit ran out, and the retry time rides along in a response header.
+-        // Read error statuses ourselves: a 403 from GitHub usually means its anonymous
+-        // rate limit ran out, and the retry time rides along in a response header.
++        .get(MANIFEST)
++        .header("Accept", "application/json")
++        .header("User-Agent", concat!("KIO-PDF/", env!("CARGO_PKG_VERSION")))
          .config()
-@@ -87,8 +87,8 @@ mod tests {
-     #[test]
-     fn answers_are_read_and_only_our_release_pages_are_offered() {
-         let r = parse(r#"{"tag_name":"v0.2.0","html_url":"https://github.com/storytold/pdfcraft/releases/tag/v0.2.0"}"#).unwrap();
+         .http_status_as_error(false)
+         .build()
+         .call()
+-        .map_err(|e| format!("couldn't reach GitHub ({e})"))?;
++        .map_err(|e| format!("couldn't reach the KIO PDF release service ({e})"))?;
+     let status = response.status().as_u16();
+-    if status == 403 {
+-        let reset = response.headers().get("x-ratelimit-reset").and_then(|v| v.to_str().ok());
+-        return Err(rate_limited(reset, now_unix()));
++    if !(200..300).contains(&status) {
++        return Err(format!("couldn't reach the KIO PDF release service (http status: {status})"));
+     }
+-    if !(200..300).contains(&status) {
+-        return Err(format!("couldn't reach GitHub (http status: {status})"));
+-    }
+-    let body = response.body_mut().with_config().limit(1 << 20).read_to_string().map_err(|e| format!("unreadable answer ({e})"))?;
++    let body = response.body_mut().with_config().limit(1 << 20).read_to_string().map_err(|e| format!("unreadable KIO release manifest ({e})"))?;
+     parse(&body)
+ }
+ 
+@@ -47,81 +38,151 @@
+     Ok(ureq::tls::RootCerts::new_with_certs(&certs))
+ }
+ 
+-/// The current Unix time in seconds (0 when the clock gives nothing usable).
+-fn now_unix() -> u64 {
+-    std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0)
++fn parse(body: &str) -> Result<Release, String> {
++    let platform = match std::env::consts::OS {
++        "macos" => "macos",
++        "windows" => "windows",
++        other => other,
++    };
++    parse_for_platform(body, platform, std::env::consts::ARCH)
+ }
+ 
+-/// What to tell the user when GitHub answers 403: its anonymous quota (60 checks an hour,
+-/// shared by everyone behind the same address) ran out. `reset` is the `x-ratelimit-reset`
+-/// header, the Unix time the quota refills; `now` is the current Unix time. Anything
+-/// surprising (no header, not a number, already past) falls back to asking for patience.
+-fn rate_limited(reset: Option<&str>, now: u64) -> String {
+-    const FALLBACK: &str = "GitHub is limiting update checks for now (shared hourly quota); try again later";
+-    let wait = reset.and_then(|r| r.trim().parse::<u64>().ok()).and_then(|reset| reset.checked_sub(now)).filter(|&wait| wait > 0);
+-    match wait {
+-        Some(wait) => {
+-            let minutes = wait.div_ceil(60).max(1);
+-            let plural = if minutes == 1 { "" } else { "s" };
+-            format!("GitHub is limiting update checks for now (shared hourly quota); try again in about {minutes} minute{plural}")
++fn parse_for_platform(body: &str, platform: &str, arch: &str) -> Result<Release, String> {
++    let invalid = || "invalid KIO PDF release manifest".to_string();
++    let manifest: serde_json::Value = serde_json::from_str(body).map_err(|e| format!("unreadable KIO release manifest ({e})"))?;
++    if manifest["schemaVersion"].as_u64() != Some(1) {
++        return Err(invalid());
++    }
++    let programs = manifest["programs"].as_array().filter(|p| p.len() <= 64).ok_or_else(invalid)?;
++    let mut entries = programs.iter().filter(|p| p["id"].as_str() == Some("pdf"));
++    let entry = entries.next().ok_or_else(|| format!("KIO PDF has not been published yet; check {RELEASES_PAGE}"))?;
++    if entries.next().is_some()
++        || entry["repository"].as_str() != Some(REPOSITORY)
++        || entry["bundleId"].as_str() != Some("com.kio.pdf")
++        || entry["name"].as_str() != Some("KIO PDF")
++    {
++        return Err(invalid());
++    }
++    let version = entry["version"].as_str().filter(|v| valid_kio_version(v)).ok_or_else(invalid)?;
++    let tag = format!("pdf-v{version}");
++    if entry["releaseTag"].as_str() != Some(tag.as_str()) || entry["upstreamVersion"].as_str() != version.split_once("-kio.").map(|(core, _)| core) {
++        return Err(invalid());
++    }
++    let artifacts = entry["artifacts"].as_array().filter(|a| a.len() <= 32).ok_or_else(invalid)?;
++    let matching: Vec<_> = artifacts.iter().filter(|a| a["platform"].as_str() == Some(platform) && a["arch"].as_str() == Some(arch)).collect();
++    if matching.is_empty() {
++        return Err(format!("KIO PDF {version} has no published download for {platform}/{arch}; check {RELEASES_PAGE}"));
++    }
++    for artifact in matching {
++        let suffix = match (platform, arch, artifact["kind"].as_str()) {
++            ("macos", "aarch64", Some("dmg")) => "macos-arm64.dmg",
++            ("macos", "aarch64", Some("zip")) => "macos-arm64.zip",
++            ("windows", "x86_64", Some("msi")) => "windows-x64.msi",
++            ("windows", "x86_64", Some("zip")) => "windows-x64.zip",
++            _ => return Err(format!("KIO PDF has no supported published package for {platform}/{arch}")),
++        };
++        let expected = format!("https://github.com/{REPOSITORY}/releases/download/{tag}/KIO-PDF-{version}-{suffix}");
++        let hash = artifact["sha256"].as_str().filter(|s| s.len() == 64 && s.bytes().all(|c| c.is_ascii_digit() || (b'a'..=b'f').contains(&c)));
++        if artifact["url"].as_str() != Some(expected.as_str()) || hash.is_none() || !artifact["bytes"].as_u64().is_some_and(|n| n > 0 && n <= 2 * 1024 * 1024 * 1024) {
++            return Err(invalid());
+         }
+-        None => FALLBACK.into(),
+     }
++    // Never open an untrusted manifest URL or another application's release.
++    Ok(Release { version: version.to_string(), url: format!("https://github.com/{REPOSITORY}/releases/tag/{tag}") })
+ }
+ 
+-fn parse(body: &str) -> Result<Release, String> {
+-    let v: serde_json::Value = serde_json::from_str(body).map_err(|e| format!("unreadable answer ({e})"))?;
+-    let version = v["tag_name"].as_str().filter(|t| !t.is_empty() && t.len() <= 64).ok_or("no release found")?.to_string();
+-    let url = v["html_url"]
+-        .as_str()
+-        .filter(|u| u.strip_prefix(RELEASES_PAGE).is_some_and(|rest| rest.starts_with('/') && !rest.contains(['?', '#', '\\'])))
+-        .unwrap_or(RELEASES_PAGE)
+-        .to_string();
+-    Ok(Release { version, url })
++fn valid_kio_version(value: &str) -> bool {
++    if value.len() > 64 {
++        return false;
++    }
++    let Some((core, revision)) = value.split_once("-kio.") else { return false };
++    let number = |s: &str| !s.is_empty() && s.bytes().all(|c| c.is_ascii_digit()) && s.parse::<u64>().is_ok();
++    let components: Vec<_> = core.split('.').collect();
++    components.len() == 3 && components.into_iter().all(number) && number(revision) && revision.parse::<u64>().is_ok_and(|n| n > 0)
+ }
+ 
+ #[cfg(test)]
+ mod tests {
+     use super::*;
++    use serde_json::json;
+ 
+-    #[test]
+-    fn answers_are_read_and_only_our_release_pages_are_offered() {
+-        let r = parse(r#"{"tag_name":"v0.2.0","html_url":"https://github.com/storytold/pdfcraft/releases/tag/v0.2.0"}"#).unwrap();
 -        assert_eq!(r, Release { version: "v0.2.0".into(), url: "https://github.com/storytold/pdfcraft/releases/tag/v0.2.0".into() });
 -        for elsewhere in ["https://example.com/pdfcraft.exe", "https://github.com/storytold/pdfcraft/releases.evil/x", "javascript:alert(1)"] {
-+        assert_eq!(r, Release { version: "v0.2.0".into(), url: "https://github.com/storytold/com.kio.pdf/releases/tag/v0.2.0".into() });
-+        for elsewhere in ["https://example.com/pdfcraft.exe", "https://github.com/storytold/com.kio.pdf/releases.evil/x", "javascript:alert(1)"] {
-             let r = parse(&format!(r#"{{"tag_name":"v9.9.9","html_url":"{elsewhere}"}}"#)).unwrap();
-             assert_eq!(r.url, RELEASES_PAGE, "{elsewhere}");
-         }
+-            let r = parse(&format!(r#"{{"tag_name":"v9.9.9","html_url":"{elsewhere}"}}"#)).unwrap();
+-            assert_eq!(r.url, RELEASES_PAGE, "{elsewhere}");
+-        }
+-        assert!(parse(r#"{"message":"Not Found"}"#).is_err());
+-        assert!(parse("<html>").is_err());
++    fn entry() -> serde_json::Value {
++        json!({"id":"pdf","name":"KIO PDF","version":"0.8.0-kio.2","upstreamVersion":"0.8.0","releaseTag":"pdf-v0.8.0-kio.2","repository":REPOSITORY,"bundleId":"com.kio.pdf","artifacts":[{"platform":"macos","arch":"aarch64","kind":"dmg","url":format!("https://github.com/{REPOSITORY}/releases/download/pdf-v0.8.0-kio.2/KIO-PDF-0.8.0-kio.2-macos-arm64.dmg"),"sha256":"a".repeat(64),"bytes":123456}]})
++    }
++
++    fn read(entry: serde_json::Value) -> Result<Release, String> {
++        parse_for_platform(&json!({"schemaVersion":1,"programs":[entry]}).to_string(), "macos", "aarch64")
+     }
+ 
+     #[test]
+-    fn rate_limit_messages_name_the_wait() {
+-        let limited = "GitHub is limiting update checks for now (shared hourly quota); try again in about 20 minutes";
+-        assert_eq!(rate_limited(Some("1800001200"), 1800000000), limited);
+-        // Rounds up: 61 seconds out reads as 2 minutes.
+-        assert_eq!(
+-            rate_limited(Some("1800000061"), 1800000000),
+-            "GitHub is limiting update checks for now (shared hourly quota); try again in about 2 minutes"
+-        );
+-        assert_eq!(
+-            rate_limited(Some("1800000060"), 1800000000),
+-            "GitHub is limiting update checks for now (shared hourly quota); try again in about 1 minute"
+-        );
+-        // No header, not a number, or already past: ask for patience instead of a time.
+-        let later = "GitHub is limiting update checks for now (shared hourly quota); try again later";
+-        for bad in [None, Some(""), Some("soon"), Some("1799999999"), Some("1800000000")] {
+-            assert_eq!(rate_limited(bad, 1800000000), later);
+-        }
++    fn offers_only_the_exact_published_kio_pdf_release_page() {
++        let result = read(entry()).unwrap();
++        assert_eq!(result.version, "0.8.0-kio.2");
++        assert_eq!(result.url, format!("https://github.com/{REPOSITORY}/releases/tag/pdf-v0.8.0-kio.2"));
++        assert!(RELEASES_PAGE.ends_with("/?program=pdf"));
+     }
+ 
+-    /// Live: asks GitHub over TLS with the OS's roots (`cargo test -p pdfcraft -- --ignored`).
+     #[test]
+-    #[ignore = "needs network access"]
+-    fn github_answers_with_the_latest_release() {
++    fn rejects_other_apps_repositories_tags_versions_and_artifacts() {
++        for (field, value) in [
++            ("id", "word"),
++            ("name", "PDF"),
++            ("repository", "storytold/pdfcraft"),
++            ("bundleId", "com.kio.word"),
++            ("releaseTag", "word-v0.8.0-kio.2"),
++            ("version", "v0.8.0"),
++            ("version", "0.8.0-kio.0"),
++            ("version", "0.8.0-kio.2/other"),
++            ("upstreamVersion", "0.9.0"),
++        ] {
++            let mut bad = entry();
++            bad[field] = json!(value);
++            assert!(read(bad).is_err(), "{field}: {value}");
++        }
++        for value in [
++            "https://github.com/storytold/pdfcraft/releases/latest",
++            "https://github.com/qptywoei777-rgb/kio-native-apps/releases/latest",
++            "https://attacker.invalid/pdf.dmg",
++            "javascript:alert(1)",
++        ] {
++            let mut bad = entry();
++            bad["artifacts"][0]["url"] = json!(value);
++            assert!(read(bad).is_err(), "{value}");
++        }
++        let mut bad = entry();
++        bad["artifacts"][0]["sha256"] = json!("not-a-hash");
++        assert!(read(bad).is_err());
++        let mut bad = entry();
++        bad["artifacts"][0]["bytes"] = json!(0);
++        assert!(read(bad).is_err());
++    }
++
++    #[test]
++    fn unavailable_or_duplicate_pdf_and_unsupported_os_are_honest_errors() {
++        assert!(parse_for_platform(r#"{"schemaVersion":1,"programs":[]}"#, "macos", "aarch64").unwrap_err().contains("not been published"));
++        assert!(parse_for_platform(&json!({"schemaVersion":1,"programs":[entry(),entry()]}).to_string(), "macos", "aarch64").is_err());
++        assert!(parse_for_platform(&json!({"schemaVersion":1,"programs":[entry()]}).to_string(), "windows", "x86_64").unwrap_err().contains("no published download"));
++        assert!(parse_for_platform(r#"{"schemaVersion":2,"programs":[]}"#, "macos", "aarch64").is_err());
++        assert!(parse_for_platform("<html>", "macos", "aarch64").is_err());
++    }
++
++    #[test]
++    fn windows_package_must_match_its_own_architecture_and_exact_tag() {
++        let mut windows = entry();
++        windows["artifacts"][0]["platform"] = json!("windows");
++        windows["artifacts"][0]["arch"] = json!("x86_64");
++        windows["artifacts"][0]["kind"] = json!("msi");
++        windows["artifacts"][0]["url"] = json!(format!("https://github.com/{REPOSITORY}/releases/download/pdf-v0.8.0-kio.2/KIO-PDF-0.8.0-kio.2-windows-x64.msi"));
++        let body = json!({"schemaVersion":1,"programs":[windows]}).to_string();
++        assert!(parse_for_platform(&body, "windows", "x86_64").is_ok());
++        assert!(parse_for_platform(&body, "windows", "aarch64").is_err());
++    }
++
++    /// Live, opt-in TLS check; a PDF package must actually be published first.
++    #[test]
++    #[ignore = "needs network access and a published KIO PDF package"]
++    fn kio_manifest_answers_with_this_platforms_pdf_release() {
+         let r = latest_release().unwrap();
+-        assert!(pdfcraft_ui_egui::updates::is_newer(&r.version, "0.0.0"), "{r:?}");
+-        assert!(r.url.starts_with(RELEASES_PAGE), "{r:?}");
++        assert!(r.url.starts_with(&format!("https://github.com/{REPOSITORY}/releases/tag/pdf-v")));
+     }
+ }
 diff --git a/apps/pdfcraft/tests/winit_x11_dpi.rs b/apps/pdfcraft/tests/winit_x11_dpi.rs
 index fed0cf3e426c83988f6449bb945c131446347862..238bbb0eb239ce5fb09d49732548149fd22fac0b 100644
 --- a/apps/pdfcraft/tests/winit_x11_dpi.rs
@@ -72814,28 +73047,92 @@ index 14aa45160ea52dae3a16b1a3ff325f6a414eb858..fa3cda80a2bc0981d18fdd6385276218
                  .small()
                  .color(t.text_muted),
 diff --git a/crates/ui-egui/src/updates.rs b/crates/ui-egui/src/updates.rs
-index 4e7957e15e75e61bc34f9d5d0efd2eafe156dfcb..f7e6bd1fb3105c9ff2b46021c8001e2f67e01f52 100644
+index 4e7957e15e75e61bc34f9d5d0efd2eafe156dfcb..971de8c30a26f0666d98e1f248abf23ff560da81 100644
 --- a/crates/ui-egui/src/updates.rs
 +++ b/crates/ui-egui/src/updates.rs
-@@ -12,7 +12,7 @@ use egui::{Align, Layout};
+@@ -11,15 +11,21 @@
+ 
  use crate::{PdfCraftApp, theme, widgets};
  
- /// Where every PdfCraft release is listed.
+-/// Where every PdfCraft release is listed.
 -pub const RELEASES_PAGE: &str = "https://github.com/storytold/pdfcraft/releases";
-+pub const RELEASES_PAGE: &str = "https://github.com/storytold/com.kio.pdf/releases";
++/// Fixed KIO PDF download details, including truthful availability per platform.
++pub const RELEASES_PAGE: &str = "https://kio-library.vercel.app/?program=pdf";
++
++/// KIO release identity is separate from the unchanged upstream CLI version contract.
++pub const CURRENT_VERSION: &str = match option_env!("PDFCRAFT_VERSION") {
++    Some(version) => version,
++    None => env!("CARGO_PKG_VERSION"),
++};
  
  /// The latest published release.
  #[derive(Clone, Debug, PartialEq, Eq)]
-@@ -136,7 +136,7 @@ pub(crate) fn dialog(app: &mut PdfCraftApp, ctx: &egui::Context) {
+ pub struct Release {
+     /// Its version tag, such as `v0.2.0`.
+     pub version: String,
+-    /// Its page on [`RELEASES_PAGE`], where the downloads are.
++    /// The exact KIO PDF release-tag page, validated by the native host.
+     pub url: String,
+ }
+ 
+@@ -27,21 +33,30 @@
+ pub type UpdateSource = Arc<dyn Fn() -> Result<Release, String> + Send + Sync>;
+ 
+ /// Whether release `latest` (a tag such as `v0.2.0`) is newer than version `current` (`0.1.1`).
+-/// Pre-release and build suffixes are ignored; a version that doesn't parse is never newer.
++/// KIO revision numbers participate in ordering. Other legacy suffixes retain the
++/// original behavior; a version that does not parse is never newer.
+ pub fn is_newer(latest: &str, current: &str) -> bool {
+     matches!((parse(latest), parse(current)), (Some(l), Some(c)) if l > c)
+ }
+ 
+-fn parse(v: &str) -> Option<(u64, u64, u64)> {
++fn parse(v: &str) -> Option<(u64, u64, u64, u64)> {
+     let v = v.trim().trim_start_matches(['v', 'V']);
+-    let core = v.split(['-', '+']).next()?;
++    let (core, revision) = match v.split_once("-kio.") {
++        Some((core, revision)) => {
++            if revision.is_empty() || !revision.bytes().all(|c| c.is_ascii_digit()) {
++                return None;
++            }
++            (core, revision.parse::<u64>().ok()?)
++        }
++        None => (v.split(['-', '+']).next()?, 0),
++    };
+     let mut parts = core.split('.');
+     let mut next = |required: bool| match parts.next() {
+         Some(p) => p.parse::<u64>().ok(),
+         None if required => None,
+         None => Some(0),
+     };
+-    let version = (next(true)?, next(false)?, next(false)?);
++    let version = (next(true)?, next(false)?, next(false)?, revision);
+     parts.next().is_none().then_some(version)
+ }
+ 
+@@ -113,7 +128,7 @@
+         return;
+     }
+     let t = theme::Tokens::get(ctx);
+-    let current = env!("CARGO_PKG_VERSION");
++    let current = CURRENT_VERSION;
+     let mut close = false;
+     let mut download: Option<String> = None;
+     let modal = crate::widgets::show_modal(ctx, "updates", |ui| {
+@@ -136,36 +151,25 @@
              }
              Check::Done(Ok(r)) if is_newer(&r.version, current) => {
                  let version = r.version.trim_start_matches(['v', 'V']);
 -                ui.label(egui::RichText::new(crate::i18n::fmt(tl!("PdfCraft {v} is available."), &[("v", version)])).strong());
 +                ui.label(egui::RichText::new(crate::i18n::fmt(tl!("KIO PDF {v} is available."), &[("v", version)])).strong());
                  ui.label(
-                     egui::RichText::new(crate::i18n::fmt(
-                         tl!("You have version {c}. Download the new version from its release page."),
-@@ -147,7 +147,7 @@ pub(crate) fn dialog(app: &mut PdfCraftApp, ctx: &egui::Context) {
+-                    egui::RichText::new(crate::i18n::fmt(
+-                        tl!("You have version {c}. Download the new version from its release page."),
+-                        &[("c", current)],
+-                    ))
+-                    .color(t.text_muted),
++                    egui::RichText::new(crate::i18n::fmt(tl!("You have version {c}. Download the new version from its release page."), &[("c", current)])).color(t.text_muted),
+                 );
                  download = Some(r.url.clone());
              }
              Check::Done(Ok(_)) => {
@@ -72844,6 +73141,57 @@ index 4e7957e15e75e61bc34f9d5d0efd2eafe156dfcb..f7e6bd1fb3105c9ff2b46021c8001e2f
              }
              Check::Done(Err(e)) => {
                  ui.label(crate::i18n::fmt(tl!("Couldn't check for updates: {e}"), &[("e", &e.to_string())]));
+                 ui.label(
+-                    egui::RichText::new(crate::i18n::fmt(
+-                        tl!("You have version {c}. All releases are listed at {page}."),
+-                        &[("c", current), ("page", RELEASES_PAGE)],
+-                    ))
+-                    .color(t.text_muted),
++                    egui::RichText::new(crate::i18n::fmt(tl!("You have version {c}. All releases are listed at {page}."), &[("c", current), ("page", RELEASES_PAGE)]))
++                        .color(t.text_muted),
+                 );
+             }
+         }
+         ui.add_space(10.0);
+-        ui.label(
+-            egui::RichText::new(tl!("Asks GitHub for the latest release. Nothing is downloaded or installed automatically."))
+-                .color(t.text_muted)
+-                .small(),
+-        );
++        ui.label(egui::RichText::new(tl!("Checks the KIO PDF release manifest. Nothing is downloaded or installed automatically.")).color(t.text_muted).small());
+         ui.add_space(12.0);
+         ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+             if let Some(url) = download.take() {
+@@ -189,3 +193,29 @@
+         }
+     }
+ }
++
++#[cfg(test)]
++mod kio_version_tests {
++    use super::*;
++
++    #[test]
++    fn kio_revisions_and_legacy_numeric_versions_keep_their_order() {
++        assert!(is_newer("0.8.0-kio.2", "0.8.0-kio.1"));
++        assert!(!is_newer("0.8.0-kio.1", "0.8.0-kio.1"));
++        assert!(!is_newer("0.8.0-kio.1", "0.8.0-kio.2"));
++        assert!(!is_newer("0.8.0", "0.8.0-kio.1"));
++        assert!(is_newer("0.9.0-kio.1", "0.8.0-kio.99"));
++        assert!(is_newer("v0.1.10", "0.1.9"));
++        assert!(is_newer("1", "0.9.9"));
++        assert!(!is_newer("v0.1.1-beta.2", "0.1.1"));
++        assert!(!is_newer("0.8.0-kio.other", "0.8.0-kio.1"));
++        assert!(!is_newer("0.8.0-kio.18446744073709551616", "0.8.0-kio.1"));
++    }
++
++    #[test]
++    fn kio_revision_does_not_replace_the_upstream_cargo_version() {
++        let expected = option_env!("PDFCRAFT_VERSION").unwrap_or(env!("CARGO_PKG_VERSION"));
++        assert_eq!(CURRENT_VERSION, expected);
++        assert!(parse(CURRENT_VERSION).is_some());
++    }
++}
 diff --git a/crates/ui-egui/src/web_print.rs b/crates/ui-egui/src/web_print.rs
 index 6af878dafa18b607fc5bb1a6377899371df36362..208ff5a1557d07598f3d2b5c9fd475c89a0e5548 100644
 --- a/crates/ui-egui/src/web_print.rs
@@ -73042,19 +73390,19 @@ index b08036b11d60b43f7d208cef5a4746875b5799cc..b238c2a0c91256fa87d3e8fabd52c907
      assert_eq!(h.state().last_opened_url.as_deref(), Some(links::DISCORD));
  }
 diff --git a/crates/ui-egui/tests/ui_group/updates.rs b/crates/ui-egui/tests/ui_group/updates.rs
-index c06bd8b2c37d8ee8ae7c1b19b64e6dae8453e37c..cb338882f7e9588c0703418c822833a9c4763f27 100644
+index c06bd8b2c37d8ee8ae7c1b19b64e6dae8453e37c..becaeeb258840dda348bbc21f1c4af11e3dabe15 100644
 --- a/crates/ui-egui/tests/ui_group/updates.rs
 +++ b/crates/ui-egui/tests/ui_group/updates.rs
-@@ -9,7 +9,7 @@ use pdfcraft_ui_egui::updates::{Release, UpdateSource, is_newer};
+@@ -9,7 +9,7 @@
  
  fn source(answer: Result<&str, &str>) -> UpdateSource {
      let answer = answer.map(str::to_string).map_err(str::to_string);
 -    Arc::new(move || answer.clone().map(|v| Release { url: format!("https://github.com/storytold/pdfcraft/releases/tag/{v}"), version: v }))
-+    Arc::new(move || answer.clone().map(|v| Release { url: format!("https://github.com/storytold/com.kio.pdf/releases/tag/{v}"), version: v }))
++    Arc::new(move || answer.clone().map(|v| Release { url: format!("https://github.com/qptywoei777-rgb/kio-native-apps/releases/tag/pdf-{v}"), version: v }))
  }
  
  fn harness(answer: Result<&str, &str>) -> Harness<'static, PdfCraftApp> {
-@@ -51,7 +51,7 @@ fn a_newer_release_is_offered_for_download() {
+@@ -51,7 +51,7 @@
      let mut h = harness(Ok("v99.0.0"));
      h.state_mut().execute("help.check_updates");
      settle(&mut h);
@@ -73063,16 +73411,25 @@ index c06bd8b2c37d8ee8ae7c1b19b64e6dae8453e37c..cb338882f7e9588c0703418c822833a9
      h.get_by_label("Download");
      h.get_by_label("Later").click();
      h.run_steps(3);
-@@ -85,7 +85,7 @@ fn nothing_is_asked_until_the_user_checks() {
+@@ -60,7 +60,7 @@
+ 
+ #[test]
+ fn an_up_to_date_or_failed_check_says_so() {
+-    let mut h = harness(Ok(concat!("v", env!("CARGO_PKG_VERSION"))));
++    let mut h = harness(Ok(pdfcraft_ui_egui::updates::CURRENT_VERSION));
+     h.state_mut().execute("help.check_updates");
+     settle(&mut h);
+     h.get_by_label_contains("is up to date");
+@@ -85,7 +85,7 @@
          let counted = counted.clone();
          app.update_source = Some(Arc::new(move || {
              counted.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
 -            Ok(Release { version: "v99.0.0".into(), url: "https://github.com/storytold/pdfcraft/releases/tag/v99.0.0".into() })
-+            Ok(Release { version: "v99.0.0".into(), url: "https://github.com/storytold/com.kio.pdf/releases/tag/v99.0.0".into() })
++            Ok(Release { version: "v99.0.0".into(), url: "https://github.com/qptywoei777-rgb/kio-native-apps/releases/tag/pdf-v99.0.0".into() })
          }));
          app
      });
-@@ -95,5 +95,5 @@ fn nothing_is_asked_until_the_user_checks() {
+@@ -95,5 +95,5 @@
      h.state_mut().execute("help.check_updates");
      settle(&mut h);
      assert_eq!(calls.load(std::sync::atomic::Ordering::SeqCst), 1);
@@ -75597,10 +75954,17 @@ index 524280b971aa83e264c7b145b199aa8f3d742e1a..3d49eb1e13692d305d5137ee9693b704
  if (-not $SkipBuild) {
    # Static CRT: no VC++ redistributable needed. Scoped to the target so host build scripts and
 diff --git a/packaging/windows/pdfcraft.wxs b/packaging/windows/pdfcraft.wxs
-index 3f291721ab9ba3472252f14de87c96b081f139b5..1b3a6c55a78cd6013cab87465edc561fb8065a1d 100644
+index 3f291721ab9ba3472252f14de87c96b081f139b5..4ede3a2e012689906b06921e885580c721b62a36 100644
 --- a/packaging/windows/pdfcraft.wxs
 +++ b/packaging/windows/pdfcraft.wxs
-@@ -12,14 +12,14 @@
+@@ -6,20 +6,20 @@
+ 
+   Per-machine install into Program Files, a Start Menu shortcut, a desktop shortcut (on by default,
+   optional, and an update keeps it only if it is still there), an App Paths entry, PdfCraft registered as a PDF handler (offered under "Open with"
+-  and in Default apps, never forced as the default), and "Edit with PdfCraft" on PDF files'
++  and in Default apps, never forced as the default), and "Edit with KIO PDF" on PDF files'
+   right-click menu (on by default, optional). Files opened with PdfCraft arrive on its command
+   line.
  -->
  <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
    <Package
@@ -75619,7 +75983,18 @@ index 3f291721ab9ba3472252f14de87c96b081f139b5..1b3a6c55a78cd6013cab87465edc561f
      <!-- HKLM registrations must never point into a per-user installation (#305). Allow removal
           of an existing installation even if an older MSI let it install per-user. -->
      <Launch Condition="ALLUSERS = 1 OR (Installed AND REMOVE = &quot;ALL&quot;)"
-@@ -46,7 +46,7 @@
+@@ -34,8 +34,8 @@
+          Add/Remove Programs show a blank icon (#57). -->
+     <Icon Id="PdfcraftIcon.ico" SourceFile="$(var.IconPath)" />
+     <Property Id="ARPPRODUCTICON" Value="PdfcraftIcon.ico" />
+-    <Property Id="ARPURLINFOABOUT" Value="https://getartcraft.com/apps/pdfcraft" />
+-    <Property Id="ARPURLUPDATEINFO" Value="https://getartcraft.com/apps/pdfcraft" />
++    <Property Id="ARPURLINFOABOUT" Value="https://kio-library.vercel.app/?program=pdf" />
++    <Property Id="ARPURLUPDATEINFO" Value="https://kio-library.vercel.app/?program=pdf" />
+     <Property Id="ARPHELPLINK" Value="https://discord.gg/artcraft" />
+     <!-- Desktop shortcut (#143): on by default for a first install, a checkbox in the full-UI
+          welcome dialog, and INSTALLDESKTOPSHORTCUT=0 on the msiexec command line for unattended
+@@ -46,18 +46,18 @@
      <Property Id="INSTALLDESKTOPSHORTCUT" Secure="yes" />
      <Property Id="EXISTINGDESKTOPSHORTCUT">
        <DirectorySearch Id="DesktopSearch" Path="[DesktopFolder]" Depth="0">
@@ -75628,7 +76003,11 @@ index 3f291721ab9ba3472252f14de87c96b081f139b5..1b3a6c55a78cd6013cab87465edc561f
        </DirectorySearch>
      </Property>
      <SetProperty Id="INSTALLDESKTOPSHORTCUT" Value="1" After="AppSearch" Sequence="first"
-@@ -57,7 +57,7 @@
+         Condition="NOT INSTALLDESKTOPSHORTCUT AND (NOT WIX_UPGRADE_DETECTED OR EXISTINGDESKTOPSHORTCUT)" />
+-    <!-- "Edit with PdfCraft" on the right-click menu of PDF files in File Explorer (#682): on by
++    <!-- "Edit with KIO PDF" on the right-click menu of PDF files in File Explorer (#682): on by
+          default, the same way, and INSTALLPDFCONTEXTMENU=0 for unattended installs without it. -->
+     <Property Id="INSTALLPDFCONTEXTMENU" Value="1" Secure="yes" />
      <UIRef Id="PdfcraftInstallerUI" />
  
      <StandardDirectory Id="ProgramFiles6432Folder">
@@ -75637,34 +76016,118 @@ index 3f291721ab9ba3472252f14de87c96b081f139b5..1b3a6c55a78cd6013cab87465edc561f
          <Directory Id="ModelsFolder" Name="models" />
        </Directory>
      </StandardDirectory>
-@@ -72,7 +72,7 @@
+@@ -72,10 +72,10 @@
  
    <Fragment>
      <ComponentGroup Id="PdfcraftFiles" Directory="INSTALLFOLDER">
 -      <Component Id="PdfcraftApp" Guid="E724C1C6-091F-4E21-A685-80D089FDBE21">
+-        <File Id="PdfcraftExe" Source="$(var.BinDir)\pdfcraft.exe" KeyPath="yes" />
 +      <Component Id="PdfcraftApp" Guid="7EAD28BA-4D90-5DE8-9624-057C45A15F58">
-         <File Id="PdfcraftExe" Source="$(var.BinDir)\pdfcraft.exe" KeyPath="yes" />
++        <File Id="PdfcraftExe" Name="KIO PDF.exe" Source="$(var.BinDir)\pdfcraft.exe" KeyPath="yes" />
  
-         <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\pdfcraft.exe" Value="[#PdfcraftExe]" Type="string" />
-@@ -88,7 +88,7 @@
+-        <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\pdfcraft.exe" Value="[#PdfcraftExe]" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\KIO PDF.exe" Value="[#PdfcraftExe]" Type="string" />
+ 
+         <!-- PDF files (#107): PdfCraft is offered under "Open with" and in Settings ▸ Default
+              apps, through Windows' Default Programs registration (a ProgID, OpenWithProgids,
+@@ -83,53 +83,53 @@
+              .pdf's own default value is left alone, and the user chooses. Without this, the only
+              PdfCraft entry to pick was the advertised Start Menu shortcut, which Windows can't
+              run as a file handler ("This app can't run on your PC"). -->
+-        <RegistryValue Root="HKLM" Key="Software\Classes\PdfCraft.Document" Value="PDF Document" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\KIO.PDF.Document" Value="PDF Document" Type="string" />
+         <!-- A negative index selects the stable icon resource ID, rather than its position.
               Resource 1 is the app's lion; resource 2 is the PDF document (build.rs). -->
-         <RegistryValue Root="HKLM" Key="Software\Classes\PdfCraft.Document\DefaultIcon" Value="&quot;[#PdfcraftExe]&quot;,-2" Type="string" />
-         <RegistryValue Root="HKLM" Key="Software\Classes\PdfCraft.Document\shell\open\command" Value="&quot;[#PdfcraftExe]&quot; &quot;%1&quot;" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\PdfCraft.Document\DefaultIcon" Value="&quot;[#PdfcraftExe]&quot;,-2" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\PdfCraft.Document\shell\open\command" Value="&quot;[#PdfcraftExe]&quot; &quot;%1&quot;" Type="string" />
 -        <RegistryValue Root="HKLM" Key="Software\Classes\.pdf\OpenWithProgids" Name="PdfCraft.Document" Value="" Type="string" />
-+        <RegistryValue Root="HKLM" Key="Software\Classes\.pdf\OpenWithProgids" Name="KIO PDF.Document" Value="" Type="string" />
-         <RegistryValue Root="HKLM" Key="Software\Classes\Applications\pdfcraft.exe" Name="FriendlyAppName" Value="PdfCraft" Type="string" />
-         <RegistryValue Root="HKLM" Key="Software\Classes\Applications\pdfcraft.exe\DefaultIcon" Value="&quot;[#PdfcraftExe]&quot;,-2" Type="string" />
-         <RegistryValue Root="HKLM" Key="Software\Classes\Applications\pdfcraft.exe\SupportedTypes" Name=".pdf" Value="" Type="string" />
-@@ -97,7 +97,7 @@
-         <RegistryValue Root="HKLM" Key="Software\PdfCraft\Capabilities" Name="ApplicationDescription" Value="Open-source PDF workbench" Type="string" />
-         <RegistryValue Root="HKLM" Key="Software\PdfCraft\Capabilities" Name="ApplicationIcon" Value="[#PdfcraftExe],0" Type="string" />
-         <RegistryValue Root="HKLM" Key="Software\PdfCraft\Capabilities\FileAssociations" Name=".pdf" Value="PdfCraft.Document" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\pdfcraft.exe" Name="FriendlyAppName" Value="PdfCraft" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\pdfcraft.exe\DefaultIcon" Value="&quot;[#PdfcraftExe]&quot;,-2" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\pdfcraft.exe\SupportedTypes" Name=".pdf" Value="" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\pdfcraft.exe\shell\open\command" Value="&quot;[#PdfcraftExe]&quot; &quot;%1&quot;" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\PdfCraft\Capabilities" Name="ApplicationName" Value="PdfCraft" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\PdfCraft\Capabilities" Name="ApplicationDescription" Value="Open-source PDF workbench" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\PdfCraft\Capabilities" Name="ApplicationIcon" Value="[#PdfcraftExe],0" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\PdfCraft\Capabilities\FileAssociations" Name=".pdf" Value="PdfCraft.Document" Type="string" />
 -        <RegistryValue Root="HKLM" Key="Software\RegisteredApplications" Name="PdfCraft" Value="Software\PdfCraft\Capabilities" Type="string" />
-+        <RegistryValue Root="HKLM" Key="Software\RegisteredApplications" Name="KIO PDF" Value="Software\PdfCraft\Capabilities" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\KIO.PDF.Document\DefaultIcon" Value="&quot;[#PdfcraftExe]&quot;,-2" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\KIO.PDF.Document\shell\open\command" Value="&quot;[#PdfcraftExe]&quot; &quot;%1&quot;" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\.pdf\OpenWithProgids" Name="KIO.PDF.Document" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\KIO PDF.exe" Name="FriendlyAppName" Value="KIO PDF" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\KIO PDF.exe\DefaultIcon" Value="&quot;[#PdfcraftExe]&quot;,-2" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\KIO PDF.exe\SupportedTypes" Name=".pdf" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\KIO PDF.exe\shell\open\command" Value="&quot;[#PdfcraftExe]&quot; &quot;%1&quot;" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\KIO\PDF\Capabilities" Name="ApplicationName" Value="KIO PDF" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\KIO\PDF\Capabilities" Name="ApplicationDescription" Value="Open-source PDF workbench" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\KIO\PDF\Capabilities" Name="ApplicationIcon" Value="[#PdfcraftExe],0" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\KIO\PDF\Capabilities\FileAssociations" Name=".pdf" Value="KIO.PDF.Document" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\RegisteredApplications" Name="KIO PDF" Value="Software\KIO\PDF\Capabilities" Type="string" />
  
          <!-- Image context menu (#190): convert without changing image file defaults. -->
-         <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.png\shell\PdfCraft.CreatePdf" Value="Create PDF with PdfCraft…" Type="string" />
-@@ -137,15 +137,15 @@
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.png\shell\PdfCraft.CreatePdf" Value="Create PDF with PdfCraft…" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.png\shell\PdfCraft.CreatePdf" Name="MultiSelectModel" Value="Single" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.png\shell\PdfCraft.CreatePdf\command" Value="&quot;[#PdfcraftExe]&quot; --create-images &quot;%1&quot;" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpg\shell\PdfCraft.CreatePdf" Value="Create PDF with PdfCraft…" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpg\shell\PdfCraft.CreatePdf" Name="MultiSelectModel" Value="Single" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpg\shell\PdfCraft.CreatePdf\command" Value="&quot;[#PdfcraftExe]&quot; --create-images &quot;%1&quot;" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpeg\shell\PdfCraft.CreatePdf" Value="Create PDF with PdfCraft…" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpeg\shell\PdfCraft.CreatePdf" Name="MultiSelectModel" Value="Single" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpeg\shell\PdfCraft.CreatePdf\command" Value="&quot;[#PdfcraftExe]&quot; --create-images &quot;%1&quot;" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.tif\shell\PdfCraft.CreatePdf" Value="Create PDF with PdfCraft…" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.tif\shell\PdfCraft.CreatePdf" Name="MultiSelectModel" Value="Single" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.tif\shell\PdfCraft.CreatePdf\command" Value="&quot;[#PdfcraftExe]&quot; --create-images &quot;%1&quot;" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.tiff\shell\PdfCraft.CreatePdf" Value="Create PDF with PdfCraft…" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.tiff\shell\PdfCraft.CreatePdf" Name="MultiSelectModel" Value="Single" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.tiff\shell\PdfCraft.CreatePdf\command" Value="&quot;[#PdfcraftExe]&quot; --create-images &quot;%1&quot;" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.gif\shell\PdfCraft.CreatePdf" Value="Create PDF with PdfCraft…" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.gif\shell\PdfCraft.CreatePdf" Name="MultiSelectModel" Value="Single" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.gif\shell\PdfCraft.CreatePdf\command" Value="&quot;[#PdfcraftExe]&quot; --create-images &quot;%1&quot;" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.bmp\shell\PdfCraft.CreatePdf" Value="Create PDF with PdfCraft…" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.bmp\shell\PdfCraft.CreatePdf" Name="MultiSelectModel" Value="Single" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.bmp\shell\PdfCraft.CreatePdf\command" Value="&quot;[#PdfcraftExe]&quot; --create-images &quot;%1&quot;" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jp2\shell\PdfCraft.CreatePdf" Value="Create PDF with PdfCraft…" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jp2\shell\PdfCraft.CreatePdf" Name="MultiSelectModel" Value="Single" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jp2\shell\PdfCraft.CreatePdf\command" Value="&quot;[#PdfcraftExe]&quot; --create-images &quot;%1&quot;" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.j2k\shell\PdfCraft.CreatePdf" Value="Create PDF with PdfCraft…" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.j2k\shell\PdfCraft.CreatePdf" Name="MultiSelectModel" Value="Single" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.j2k\shell\PdfCraft.CreatePdf\command" Value="&quot;[#PdfcraftExe]&quot; --create-images &quot;%1&quot;" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpx\shell\PdfCraft.CreatePdf" Value="Create PDF with PdfCraft…" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpx\shell\PdfCraft.CreatePdf" Name="MultiSelectModel" Value="Single" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpx\shell\PdfCraft.CreatePdf\command" Value="&quot;[#PdfcraftExe]&quot; --create-images &quot;%1&quot;" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.png\shell\KIO.PDF.CreatePdf" Value="Create PDF with KIO PDF…" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.png\shell\KIO.PDF.CreatePdf" Name="MultiSelectModel" Value="Single" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.png\shell\KIO.PDF.CreatePdf\command" Value="&quot;[#PdfcraftExe]&quot; --create-images &quot;%1&quot;" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpg\shell\KIO.PDF.CreatePdf" Value="Create PDF with KIO PDF…" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpg\shell\KIO.PDF.CreatePdf" Name="MultiSelectModel" Value="Single" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpg\shell\KIO.PDF.CreatePdf\command" Value="&quot;[#PdfcraftExe]&quot; --create-images &quot;%1&quot;" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpeg\shell\KIO.PDF.CreatePdf" Value="Create PDF with KIO PDF…" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpeg\shell\KIO.PDF.CreatePdf" Name="MultiSelectModel" Value="Single" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpeg\shell\KIO.PDF.CreatePdf\command" Value="&quot;[#PdfcraftExe]&quot; --create-images &quot;%1&quot;" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.tif\shell\KIO.PDF.CreatePdf" Value="Create PDF with KIO PDF…" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.tif\shell\KIO.PDF.CreatePdf" Name="MultiSelectModel" Value="Single" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.tif\shell\KIO.PDF.CreatePdf\command" Value="&quot;[#PdfcraftExe]&quot; --create-images &quot;%1&quot;" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.tiff\shell\KIO.PDF.CreatePdf" Value="Create PDF with KIO PDF…" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.tiff\shell\KIO.PDF.CreatePdf" Name="MultiSelectModel" Value="Single" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.tiff\shell\KIO.PDF.CreatePdf\command" Value="&quot;[#PdfcraftExe]&quot; --create-images &quot;%1&quot;" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.gif\shell\KIO.PDF.CreatePdf" Value="Create PDF with KIO PDF…" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.gif\shell\KIO.PDF.CreatePdf" Name="MultiSelectModel" Value="Single" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.gif\shell\KIO.PDF.CreatePdf\command" Value="&quot;[#PdfcraftExe]&quot; --create-images &quot;%1&quot;" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.bmp\shell\KIO.PDF.CreatePdf" Value="Create PDF with KIO PDF…" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.bmp\shell\KIO.PDF.CreatePdf" Name="MultiSelectModel" Value="Single" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.bmp\shell\KIO.PDF.CreatePdf\command" Value="&quot;[#PdfcraftExe]&quot; --create-images &quot;%1&quot;" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jp2\shell\KIO.PDF.CreatePdf" Value="Create PDF with KIO PDF…" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jp2\shell\KIO.PDF.CreatePdf" Name="MultiSelectModel" Value="Single" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jp2\shell\KIO.PDF.CreatePdf\command" Value="&quot;[#PdfcraftExe]&quot; --create-images &quot;%1&quot;" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.j2k\shell\KIO.PDF.CreatePdf" Value="Create PDF with KIO PDF…" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.j2k\shell\KIO.PDF.CreatePdf" Name="MultiSelectModel" Value="Single" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.j2k\shell\KIO.PDF.CreatePdf\command" Value="&quot;[#PdfcraftExe]&quot; --create-images &quot;%1&quot;" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpx\shell\KIO.PDF.CreatePdf" Value="Create PDF with KIO PDF…" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpx\shell\KIO.PDF.CreatePdf" Name="MultiSelectModel" Value="Single" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.jpx\shell\KIO.PDF.CreatePdf\command" Value="&quot;[#PdfcraftExe]&quot; --create-images &quot;%1&quot;" Type="string" />
+       </Component>
+ 
+       <!-- Shortcuts (#143) are plain links to pdfcraft.exe, not advertised MSI shortcuts: advertised
+@@ -137,32 +137,32 @@
             use as a file handler (#107), and 0.2.1's advertised one went missing from the Start menu
             (#143). Each has its own component with an HKLM key path, so Windows Installer removes it
             on uninstall; in this per-machine package both folders are the all-users ones. -->
@@ -75673,7 +76136,8 @@ index 3f291721ab9ba3472252f14de87c96b081f139b5..1b3a6c55a78cd6013cab87465edc561f
 +      <Component Id="PdfcraftStartMenuShortcut" Directory="ProgramMenuFolder" Guid="8664B5C5-8E9A-5120-A3CC-748528DB05DC">
 +        <Shortcut Id="StartMenuShortcut" Name="KIO PDF" Description="KIO PDF PDF workbench"
              Target="[#PdfcraftExe]" WorkingDirectory="INSTALLFOLDER" Icon="PdfcraftIcon.ico" IconIndex="0" />
-         <RegistryValue Root="HKLM" Key="Software\PdfCraft\Shortcuts" Name="StartMenu" Type="integer" Value="1" KeyPath="yes" />
+-        <RegistryValue Root="HKLM" Key="Software\PdfCraft\Shortcuts" Name="StartMenu" Type="integer" Value="1" KeyPath="yes" />
++        <RegistryValue Root="HKLM" Key="Software\KIO\PDF\Shortcuts" Name="StartMenu" Type="integer" Value="1" KeyPath="yes" />
        </Component>
  
 -      <Component Id="PdfcraftDesktopShortcut" Directory="DesktopFolder" Guid="F6948627-32AB-4D78-8865-0FDF417CE442"
@@ -75682,17 +76146,32 @@ index 3f291721ab9ba3472252f14de87c96b081f139b5..1b3a6c55a78cd6013cab87465edc561f
 -        <Shortcut Id="DesktopShortcut" Name="PdfCraft" Description="PdfCraft PDF workbench"
 +        <Shortcut Id="DesktopShortcut" Name="KIO PDF" Description="KIO PDF PDF workbench"
              Target="[#PdfcraftExe]" WorkingDirectory="INSTALLFOLDER" Icon="PdfcraftIcon.ico" IconIndex="0" />
-         <RegistryValue Root="HKLM" Key="Software\PdfCraft\Shortcuts" Name="Desktop" Type="integer" Value="1" KeyPath="yes" />
+-        <RegistryValue Root="HKLM" Key="Software\PdfCraft\Shortcuts" Name="Desktop" Type="integer" Value="1" KeyPath="yes" />
++        <RegistryValue Root="HKLM" Key="Software\KIO\PDF\Shortcuts" Name="Desktop" Type="integer" Value="1" KeyPath="yes" />
        </Component>
-@@ -157,7 +157,7 @@
+ 
+-      <!-- PDF context menu (#682): "Edit with PdfCraft" opens the file in PdfCraft whichever app is
++      <!-- PDF context menu (#682): "Edit with KIO PDF" opens the file in PdfCraft whichever app is
+            the default for .pdf, which it leaves alone (SystemFileAssociations, like the image
+            menu). Several PDFs selected (up to 15, Windows' limit for this kind of entry) start one
+            launch each, and the single-instance hand-off opens them as tabs of one window. On
             Windows 11 the entry is under "Show more options": the first-level menu only takes
             packaged apps' (IExplorerCommand) entries. Its own component with an HKLM key path, so
             INSTALLPDFCONTEXTMENU=0 leaves it out and uninstall removes it. -->
 -      <Component Id="PdfcraftPdfContextMenu" Guid="439F084F-657D-4AC2-A4CC-F099C518D71F"
 +      <Component Id="PdfcraftPdfContextMenu" Guid="ADDEB32C-B9EC-53B8-A48D-A904D7F1BFCA"
            Condition="INSTALLPDFCONTEXTMENU = 1">
-         <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.pdf\shell\PdfCraft.Edit" Value="Edit with PdfCraft" Type="string" KeyPath="yes" />
-         <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.pdf\shell\PdfCraft.Edit" Name="Icon" Value="&quot;[#PdfcraftExe]&quot;,0" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.pdf\shell\PdfCraft.Edit" Value="Edit with PdfCraft" Type="string" KeyPath="yes" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.pdf\shell\PdfCraft.Edit" Name="Icon" Value="&quot;[#PdfcraftExe]&quot;,0" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.pdf\shell\PdfCraft.Edit" Name="MultiSelectModel" Value="Document" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.pdf\shell\PdfCraft.Edit\command" Value="&quot;[#PdfcraftExe]&quot; &quot;%1&quot;" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.pdf\shell\KIO.PDF.Edit" Value="Edit with KIO PDF" Type="string" KeyPath="yes" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.pdf\shell\KIO.PDF.Edit" Name="Icon" Value="&quot;[#PdfcraftExe]&quot;,0" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.pdf\shell\KIO.PDF.Edit" Name="MultiSelectModel" Value="Document" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\SystemFileAssociations\.pdf\shell\KIO.PDF.Edit\command" Value="&quot;[#PdfcraftExe]&quot; &quot;%1&quot;" Type="string" />
+       </Component>
+ 
+       <Component Id="PdfcraftCli">
 diff --git a/packaging/windows/security-audit.ps1 b/packaging/windows/security-audit.ps1
 index 8bda7a8077cda129b8500eff23dc41e25314c1d1..41395e2c127fed65ae102bf60afb500f20bfc1fd 100644
 --- a/packaging/windows/security-audit.ps1

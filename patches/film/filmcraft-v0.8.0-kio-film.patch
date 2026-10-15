@@ -77778,17 +77778,10 @@ index cb4a2344a4dc5d45bcf0dbda51312243bdfc4d38..0c050b73949bcc8571cf6638f618eff8
              .resizable(false)
              .pivot(egui::Align2::CENTER_CENTER)
 diff --git a/crates/ui-egui/src/links.rs b/crates/ui-egui/src/links.rs
-index 37df98da1e4c23ae8a6b68f46f903a032832b3e3..d42d4e2f4304b04e9c68c76e9d0835d1d9a05f4a 100644
+index 37df98da1e4c23ae8a6b68f46f903a032832b3e3..1f9be410cdc53d6bc2e7b76ebe580e68d0231efd 100644
 --- a/crates/ui-egui/src/links.rs
 +++ b/crates/ui-egui/src/links.rs
-@@ -15,14 +15,14 @@ pub const APP_PAGE: &str = "https://getartcraft.com/apps/filmcraft";
- /// FilmCraft's source repository.
- pub const GITHUB: &str = "https://github.com/storytold/filmcraft";
- /// New issue on FilmCraft's repository.
--pub const ISSUES: &str = "https://github.com/storytold/filmcraft/issues";
-+pub const ISSUES: &str = "https://github.com/storytold/com.kio.film/issues";
- 
- /// (command id, label, url) for every link, in menu order.
+@@ -21,8 +21,8 @@
  pub const ALL: [(&str, &str, &str); 5] = [
      ("help.discord", "Join the ArtCraft Discord…", DISCORD),
      ("help.website", "ArtCraft Website", WEBSITE),
@@ -77799,7 +77792,7 @@ index 37df98da1e4c23ae8a6b68f46f903a032832b3e3..d42d4e2f4304b04e9c68c76e9d0835d1
      ("help.reportIssue", "Report an Issue…", ISSUES),
  ];
  
-@@ -49,7 +49,7 @@ pub fn menu_hint(command: &str) -> Option<String> {
+@@ -49,7 +49,7 @@
          match command {
              "help.revealLogFiles" => tl!("Saves this session's log and shows it in your file manager."),
              "help.systemCompatibilityReport" => tl!("Shows a report on this computer."),
@@ -77931,10 +77924,10 @@ index 0aafa2eec412f1a9960aabb22f458e10608b4c3b..924622c2b466093f42bac7e7adcee4ba
                  ui.colored_label(Color32::from_rgb(0xff, 0x80, 0x80), &d.error);
              }
 diff --git a/crates/ui-egui/src/panels/keyboard.rs b/crates/ui-egui/src/panels/keyboard.rs
-index bdf7441965a8b377277ba3be16ab89e0147a631b..11326de1b36a53dcedd83ff449b17c16f0b4fdef 100644
+index bdf7441965a8b377277ba3be16ab89e0147a631b..dae62c7526551de0f4f988bbd7381f1fd49d447c 100644
 --- a/crates/ui-egui/src/panels/keyboard.rs
 +++ b/crates/ui-egui/src/panels/keyboard.rs
-@@ -128,12 +128,12 @@ pub const COMMANDS: &[UiCommand] = &[
+@@ -128,8 +128,8 @@
      uic!("textPanel.rippleDelete", "Ripple Delete", [], None),
      uic!("textPanel.showProgramTranscript", "Show Program Transcript", [], None),
      uic!("graphics.beginTextEditing", "Begin Text Editing for a Graphic Layer", [], Some("Cmd+Alt+'")),
@@ -77945,11 +77938,6 @@ index bdf7441965a8b377277ba3be16ab89e0147a631b..11326de1b36a53dcedd83ff449b17c16
  ];
  
  /// FilmCraft's documentation (Help ▸ FilmCraft Help…, F1).
--pub const HELP_URL: &str = "https://github.com/storytold/filmcraft/tree/main/docs";
-+pub const HELP_URL: &str = "https://github.com/storytold/com.kio.film/tree/main/docs";
- 
- const HEIGHT_STEP: f32 = 12.0;
- const MIN_TRACK_H: f32 = 24.0;
 diff --git a/crates/ui-egui/src/panels/menu_dialogs.rs b/crates/ui-egui/src/panels/menu_dialogs.rs
 index 99151da72a520060a9bdfa72cbf3f1a788264e1d..b1e28eb24b46a72448be32711aca16c1dbc233d2 100644
 --- a/crates/ui-egui/src/panels/menu_dialogs.rs
@@ -80708,7 +80696,7 @@ index 85902b91bc7868bb95458c5a6ed2b1b7d36b618d..c239d14a8d30c887eed0d4af1afaeb88
  rm -f "$WORK/raw.dmg"
  sign "$DMG"
 diff --git a/packaging/windows/filmcraft.wxs b/packaging/windows/filmcraft.wxs
-index 91eb71de6779d27b622a563c25563c94798c4758..b86787a63e860d7aeb29e369afe072d63e467750 100644
+index 91eb71de6779d27b622a563c25563c94798c4758..881dc01cb2660c076ac2aac76389e7d9e347c76e 100644
 --- a/packaging/windows/filmcraft.wxs
 +++ b/packaging/windows/filmcraft.wxs
 @@ -8,14 +8,14 @@
@@ -80730,7 +80718,14 @@ index 91eb71de6779d27b622a563c25563c94798c4758..b86787a63e860d7aeb29e369afe072d6
      <!-- Same-version upgrades let successive pre-releases of one X.Y.Z replace each other
           (MSI versions are numeric, so 1.2.3-rc.1 and 1.2.3-rc.2 are both 1.2.3). -->
      <MajorUpgrade AllowSameVersionUpgrades="yes"
-@@ -29,7 +29,7 @@
+@@ -24,12 +24,12 @@
+ 
+     <Icon Id="FilmcraftIcon.ico" SourceFile="$(var.IconPath)" />
+     <Property Id="ARPPRODUCTICON" Value="FilmcraftIcon.ico" />
+-    <Property Id="ARPURLINFOABOUT" Value="https://getartcraft.com/apps/filmcraft" />
+-    <Property Id="ARPURLUPDATEINFO" Value="https://getartcraft.com/apps/filmcraft" />
++    <Property Id="ARPURLINFOABOUT" Value="https://kio-library.vercel.app/?program=film" />
++    <Property Id="ARPURLUPDATEINFO" Value="https://kio-library.vercel.app/?program=film" />
      <Property Id="ARPHELPLINK" Value="https://discord.gg/artcraft" />
  
      <StandardDirectory Id="ProgramFiles6432Folder">
@@ -80739,20 +80734,26 @@ index 91eb71de6779d27b622a563c25563c94798c4758..b86787a63e860d7aeb29e369afe072d6
      </StandardDirectory>
      <StandardDirectory Id="ProgramMenuFolder" />
  
-@@ -40,10 +40,10 @@
+@@ -40,14 +40,14 @@
  
    <Fragment>
      <ComponentGroup Id="FilmcraftFiles" Directory="INSTALLFOLDER">
 -      <Component Id="FilmcraftApp" Guid="15933017-925B-4963-8992-52000EB26AAA">
-+      <Component Id="FilmcraftApp" Guid="62DDFA92-F3EB-5729-9B36-828852DBD590">
-         <File Id="FilmcraftExe" Source="$(var.BinDir)\filmcraft.exe" KeyPath="yes">
+-        <File Id="FilmcraftExe" Source="$(var.BinDir)\filmcraft.exe" KeyPath="yes">
 -          <Shortcut Id="StartMenuShortcut" Directory="ProgramMenuFolder" Name="FilmCraft"
 -              Description="FilmCraft video editor" WorkingDirectory="INSTALLFOLDER" Advertise="yes"
++      <Component Id="FilmcraftApp" Guid="62DDFA92-F3EB-5729-9B36-828852DBD590">
++        <File Id="FilmcraftExe" Name="KIO Film.exe" Source="$(var.BinDir)\filmcraft.exe" KeyPath="yes">
 +          <Shortcut Id="StartMenuShortcut" Directory="ProgramMenuFolder" Name="KIO Film"
 +              Description="KIO Film video editor" WorkingDirectory="INSTALLFOLDER" Advertise="yes"
                Icon="FilmcraftIcon.ico" IconIndex="0" />
          </File>
  
+-        <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\filmcraft.exe" Value="[#FilmcraftExe]" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\KIO Film.exe" Value="[#FilmcraftExe]" Type="string" />
+       </Component>
+ 
+       <Component Id="FilmcraftCli">
 diff --git a/packaging/windows/package.ps1 b/packaging/windows/package.ps1
 index faa4b863844a7cb773c9340fbfd43f45e6f76a16..f2f5816ef962ec1ccc079623389bcf2e4709af9c 100644
 --- a/packaging/windows/package.ps1

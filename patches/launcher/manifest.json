@@ -15,8 +15,8 @@
   },
   "patch": {
     "file": "craft-launcher-v0.4.1-kio-launcher.patch",
-    "sha256": "f06e4836ffe903274167a980ac332396fa2682141a65509d042b9ead06abafcb",
-    "bytes": 11731729
+    "sha256": "bc35ee4b0f6bb68bb0c7c6094a6fa4ecf2f0093ac8dbc0d1398ef5afd24201b1",
+    "bytes": 11756677
   },
   "counts": {
     "upstreamFiles": 198,
@@ -35,7 +35,8 @@
     "shellSyntax": true,
     "cargoFmtRust195": true,
     "nativeBuildRunByBrandingAgent": false,
-    "testsAddedNotExecutedLocally": true
+    "testsAddedNotExecutedLocally": true,
+    "windowsOriginalCoexistenceXmlAudit": true
   },
   "protectedFiles": [
     {
@@ -761,8 +762,8 @@
         "bytes": 27678
       },
       "after": {
-        "sha256": "f8a5e5fc38e21c92e92dee787da492acaafe0881365984ff11119dc5c15ad2b7",
-        "bytes": 30044
+        "sha256": "8b86353909d37d39b2457f0a62d7eb83ff71634c77f19ace4b0ffc4e6ca92dfd",
+        "bytes": 32826
       }
     },
     {
@@ -1168,8 +1169,8 @@
         "bytes": 65709
       },
       "after": {
-        "sha256": "2da6039b7b137c741e5662f8e23faf93e8c1e1fefe303918d8a2bfbf0f793e0c",
-        "bytes": 65647
+        "sha256": "790eee5a172874083b7209fd9f3d6c7167b6907d46173e4dfbfb7a2a1a42d31a",
+        "bytes": 65718
       }
     },
     {
@@ -1433,8 +1434,8 @@
         "bytes": 12796
       },
       "after": {
-        "sha256": "761e47b65e88b84050cd0c4ccdf710ad87d57fe92016dbcd5d6ab0ad7a1ab616",
-        "bytes": 12506
+        "sha256": "9b377e98890d8094fea0dd5d1e12eb512a7d43216d310eb575ee08e1e7d64255",
+        "bytes": 12586
       }
     },
     {
@@ -1481,5 +1482,29 @@
         "bytes": 32422
       }
     }
-  ]
+  ],
+  "windowsIdentityAudit": {
+    "app": "launcher",
+    "wxs": "packaging/windows/artcraft-launcher.wxs",
+    "sha256": "9b377e98890d8094fea0dd5d1e12eb512a7d43216d310eb575ee08e1e7d64255",
+    "name": "KIO Launcher",
+    "upgradeCode": "70E9A62B-2013-520F-AE8C-CE135D781114",
+    "gui": "KIO Launcher.exe",
+    "fixedComponentGuids": [
+      "42a4702f-9f44-5955-bfe1-bc5aa9841a4a",
+      "5d7ad73b-d9d1-54e8-b5d5-131f62abe288",
+      "a2209449-3f5d-5fe3-9315-ffd8c45ac70d"
+    ],
+    "registryValues": 5,
+    "registrySearches": 2,
+    "progIds": [],
+    "supportedTypesRetained": [],
+    "checks": {
+      "upstreamRegistryAndComponentIsolation": true,
+      "upstreamDefaultAppUnchanged": true,
+      "kioAppPathsAndGuiMatch": true,
+      "kioInstallDirectory": true,
+      "noNativeExecution": true
+    }
+  }
 }

@@ -14,8 +14,8 @@
   },
   "patch": {
     "file": "filmcraft-v0.8.0-kio-film.patch",
-    "sha256": "5ebb0bb092fedbbb03f6b56ca268ff4b3f140c6b5273f68a75251e51847a11c8",
-    "bytes": 9165356
+    "sha256": "b06cb7ac440d6d69a1eda2359bf7031eb0dae7927aec830041fc28e1a6f7255b",
+    "bytes": 9165545
   },
   "counts": {
     "upstreamFiles": 1364,
@@ -824,8 +824,8 @@
         "bytes": 11341
       },
       "after": {
-        "sha256": "a45e815ad4f39c3065107703278d99629197d4e16b6fec1f61868a9a9f5ec246",
-        "bytes": 11341
+        "sha256": "fe5e5a16683ac9129e77386fe49b29cc5e3e9cec95195eb1c0a6e669b023488b",
+        "bytes": 11338
       }
     },
     {
@@ -890,8 +890,8 @@
         "bytes": 28989
       },
       "after": {
-        "sha256": "ca362c15fa2a75b786649e32d5cce19136528d27877c11897671ab86f7e8d9b8",
-        "bytes": 28990
+        "sha256": "218b384ed9842ea009e5fb0dbed68d2f3f5e979abdfdfc006d7e601d01b2a0c3",
+        "bytes": 28987
       }
     },
     {
@@ -1241,8 +1241,8 @@
         "bytes": 2632
       },
       "after": {
-        "sha256": "f6a4346a6fa2548c44461258f7697df60d7b139acfda0648d9025149e66259a8",
-        "bytes": 2591
+        "sha256": "1981b11aeb7802d2317407e2eb48c1db9aeed5ff629c052e7f923cd113cb595c",
+        "bytes": 2622
       }
     },
     {
@@ -2249,5 +2249,31 @@
     "docs/brand/artcraft-logo.svg.attribution",
     "docs/brand/artcraft-logo.svg",
     "docs/brand/artcraft-mark.png"
-  ]
+  ],
+  "linkAndUpdateCorrection": {
+    "supersededPatchSha256": "5ebb0bb092fedbbb03f6b56ca268ff4b3f140c6b5273f68a75251e51847a11c8",
+    "upstreamDocumentationUrlsRestored": [
+      {
+        "file": "crates/ui-egui/src/links.rs",
+        "before": "https://github.com/storytold/com.kio.film/issues",
+        "after": "https://github.com/storytold/filmcraft/issues"
+      },
+      {
+        "file": "crates/ui-egui/src/panels/keyboard.rs",
+        "before": "https://github.com/storytold/com.kio.film/tree/main/docs",
+        "after": "https://github.com/storytold/filmcraft/tree/main/docs"
+      }
+    ],
+    "lightFormatLabelMatchedToNineExistingCatalogs": false,
+    "engineAndCargoFeaturesUnchanged": true
+  },
+  "windowsInstallerIsolation": {
+    "supersededPatchSha256": "acf85216c079f71e49162a36e483b85498fc42e33c6411c320e656ca84bc232d",
+    "registryNamespace": "Software\\KIO\\Film",
+    "appPathsExecutable": "KIO Film.exe",
+    "installedGuiExecutable": "KIO Film.exe",
+    "originalCargoBinaryAndCliNamesRetained": true,
+    "originalUserDefaultFileAssociationsPreserved": true,
+    "kioPhotoHostInteropUpdated": false
+  }
 }

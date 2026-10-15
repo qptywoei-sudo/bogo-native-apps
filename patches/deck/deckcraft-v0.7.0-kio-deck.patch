@@ -1,5 +1,5 @@
 diff --git a/ATTRIBUTION.md b/ATTRIBUTION.md
-index 9ca8e5e..9cc09ad 100644
+index 9ca8e5e8db23ec7fd3f933f35154bb117e064198..9cc09ad882ca0c5238596a7ed354858526a6d231 100644
 --- a/ATTRIBUTION.md
 +++ b/ATTRIBUTION.md
 @@ -56,3 +56,24 @@ families excluded by `crates/fonts/build.rs`:
@@ -29,10 +29,10 @@ index 9ca8e5e..9cc09ad 100644
 +| `assets/app-icon/kio-deck.png` | KIO | Existing KIO `public/kio-program-icons/deck.png`, SHA-256 `97c262ea17a07c10e9ea2531f1fd9fdaf2da319f2ec91929187e2e1062c16481` | KIO supplied branding asset; retained for KIO distribution | Original PNG or a native format/size conversion; no upstream trademark artwork |
 diff --git a/KIO-FORK.json b/KIO-FORK.json
 new file mode 100644
-index 0000000..7f1f407
+index 0000000000000000000000000000000000000000..52f4b3588d23e29ade5c01be4530b78938a0b35b
 --- /dev/null
 +++ b/KIO-FORK.json
-@@ -0,0 +1,45 @@
+@@ -0,0 +1,47 @@
 +{
 +  "schema": "kio.full-native-fork.v1",
 +  "programId": "deck",
@@ -69,21 +69,23 @@ index 0000000..7f1f407
 +    "application/bundle IDs and isolated profile",
 +    "KIO supplied icon in native formats",
 +    "remove ArtCraft trademark logo files",
-+    "independent fork provenance"
++    "independent fork provenance",
++    "Windows file associations use KIO-only OpenWith ProgIds without taking shared format defaults"
 +  ],
 +  "notClaimed": [
 +    "Microsoft Office parity",
 +    "real-world Office file fidelity",
 +    "upstream known gaps resolved",
 +    "successful build or GUI QA at source patch stage"
-+  ]
++  ],
++  "kioVersion": "0.7.0-kio.2"
 +}
 diff --git a/KIO-FORK.md b/KIO-FORK.md
 new file mode 100644
-index 0000000..1a2d47e
+index 0000000000000000000000000000000000000000..eae45f9b4c0d522bc0ba0c17a3c0ac5c732e8070
 --- /dev/null
 +++ b/KIO-FORK.md
-@@ -0,0 +1,19 @@
+@@ -0,0 +1,21 @@
 +# KIO Deck full native fork
 +
 +Independent KIO branding fork of the complete Rust-native [DeckCraft v0.7.0](https://github.com/storytold/deckcraft/releases/tag/v0.7.0), immutable commit `d78e657e4cb1e490ceb5445785c052d9cf5ad963`. Based on DeckCraft by the ArtCraft team. This is the entire native workspace, including all original engine, format, rendering, CLI, MCP and web modules. It is not the former simplified KIO web editor.
@@ -103,8 +105,10 @@ index 0000000..1a2d47e
 +## Verification state
 +
 +This source patch is statically checked and reapplied to an independent extraction of the original archive. Protected engine, dependency, license and credit files are compared by SHA-256. The branding agent did not build, install or run an app. Native launch, About/icons, open/save, printing/export and recovery require the parent build/QA stage before release.
++
++KIO release 0.7.0-kio.2: preserve the full upstream 0.7.0 workspace; isolate the Windows .deckcraft OpenWith handler from upstream/default associations. CLI and MSI numeric versions remain the upstream 0.7.0; the KIO About line and bundle metadata carry the full KIO revision.
 diff --git a/README.md b/README.md
-index f25aef2..396a65d 100644
+index f25aef2ded38c6811db05ee2a9974eb6cf3505e3..396a65df13b1facdf3cb2ce1185b8da5e18639dc 100644
 --- a/README.md
 +++ b/README.md
 @@ -1,13 +1,6 @@
@@ -133,7 +137,7 @@ index f25aef2..396a65d 100644
 +  <sub>Upstream made by the <a href="https://getartcraft.com/">ArtCraft</a> team and community.</sub>
  </p>
 diff --git a/apps/deckcraft/build.rs b/apps/deckcraft/build.rs
-index 5bb30d5..8ca5596 100644
+index 5bb30d583d2f401895f08ac2e1a8179c3db6cd79..8347156c7185be46bd91a8029ced51838776d7b2 100644
 --- a/apps/deckcraft/build.rs
 +++ b/apps/deckcraft/build.rs
 @@ -14,9 +14,9 @@ fn main() {
@@ -144,13 +148,13 @@ index 5bb30d5..8ca5596 100644
 -        .set("FileDescription", "DeckCraft presentations")
 -        .set("CompanyName", "Learning Machines LLC")
 +        .set("ProductName", "KIO Deck")
-+        .set("FileDescription", "KIO Deck presentations")
++        .set("FileDescription", &format!("KIO Deck presentations ({})", option_env!("KIO_RELEASE_VERSION").unwrap_or("0.7.0-kio.2")))
 +        .set("CompanyName", "KIO")
          .set("LegalCopyright", "Copyright (c) the DeckCraft authors. MIT OR Apache-2.0.")
          .set("OriginalFilename", "deckcraft.exe")
          .set("InternalName", "deckcraft");
 diff --git a/apps/deckcraft/src/logging.rs b/apps/deckcraft/src/logging.rs
-index a0ca504..c135a27 100644
+index a0ca50484caa1539083a4bec92dc575a59211775..c135a277ad8c9014c6a67d0d07bd7cd98c74e6b4 100644
 --- a/apps/deckcraft/src/logging.rs
 +++ b/apps/deckcraft/src/logging.rs
 @@ -496,7 +496,7 @@ mod tests {
@@ -172,7 +176,7 @@ index a0ca504..c135a27 100644
          assert!(logger.enabled(&log::Metadata::builder().level(log::Level::Info).target("deckcraft_engine::recovery").build()));
          assert!(!logger.enabled(&log::Metadata::builder().level(log::Level::Info).target("naga").build()));
 diff --git a/apps/deckcraft/src/main.rs b/apps/deckcraft/src/main.rs
-index 7b5e48b..1d0f1f7 100644
+index 7b5e48bbe10827f3a0b393acc710c117ecfbada4..1d0f1f7f3fafd1359ddc41cd7f7f2621adb9c8ff 100644
 --- a/apps/deckcraft/src/main.rs
 +++ b/apps/deckcraft/src/main.rs
 @@ -41,14 +41,14 @@ impl eframe::App for App {
@@ -35640,7 +35644,7 @@ H+~_|5_;mM#
 
 diff --git a/assets/app-icon/deckcraft.svg b/assets/app-icon/deckcraft.svg
 new file mode 100644
-index 0000000..039921e
+index 0000000000000000000000000000000000000000..039921e925184e7f62486aed68f1ca5ae08ac13e
 --- /dev/null
 +++ b/assets/app-icon/deckcraft.svg
 @@ -0,0 +1 @@
@@ -42642,14 +42646,14 @@ HcmV?d00001
 
 diff --git a/assets/app-icon/hicolor/scalable/apps/ai.storyteller.deckcraft.svg b/assets/app-icon/hicolor/scalable/apps/ai.storyteller.deckcraft.svg
 deleted file mode 100644
-index 5cd0a42..0000000
+index 5cd0a426378d0a09532e6255c51468a404949159..0000000000000000000000000000000000000000
 --- a/assets/app-icon/hicolor/scalable/apps/ai.storyteller.deckcraft.svg
 +++ /dev/null
 @@ -1 +0,0 @@
 -<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect x="16" y="16" width="480" height="480" rx="111.84" fill="#f26b1d"/><rect x="246" y="330" width="20" height="110" fill="#0b0b0c"/><rect x="176" y="430" width="160" height="18" fill="#0b0b0c"/><rect x="86" y="96" width="340" height="244" rx="14.64" fill="#efe9dc" stroke="#0b0b0c" stroke-width="12"/><rect x="126" y="136" width="170" height="20" fill="#0b0b0c"/><rect x="136" y="236" width="46" height="70" fill="#f26b1d"/><rect x="202" y="196" width="46" height="110" fill="#0b0b0c"/><rect x="268" y="166" width="46" height="140" fill="#f26b1d"/><circle cx="364" cy="178" r="28" fill="#0b0b0c"/></svg>
 diff --git a/assets/app-icon/hicolor/scalable/apps/com.kio.deck.svg b/assets/app-icon/hicolor/scalable/apps/com.kio.deck.svg
 new file mode 100644
-index 0000000..039921e
+index 0000000000000000000000000000000000000000..039921e925184e7f62486aed68f1ca5ae08ac13e
 --- /dev/null
 +++ b/assets/app-icon/hicolor/scalable/apps/com.kio.deck.svg
 @@ -0,0 +1 @@
@@ -49458,7 +49462,7 @@ literal 0
 HcmV?d00001
 
 diff --git a/crates/ui-egui/src/backstage.rs b/crates/ui-egui/src/backstage.rs
-index f1d0fde..b5ed063 100644
+index f1d0fde3ef2cdff1fcbc796f065888dc6f4a438d..b5ed06306963b7e3b74710655c7c52c3300f29db 100644
 --- a/crates/ui-egui/src/backstage.rs
 +++ b/crates/ui-egui/src/backstage.rs
 @@ -208,7 +208,7 @@ impl Backstage {
@@ -49530,7 +49534,7 @@ index f1d0fde..b5ed063 100644
                  true,
              ) {
 diff --git a/crates/ui-egui/src/backstage_tests.rs b/crates/ui-egui/src/backstage_tests.rs
-index 115d782..729236a 100644
+index 115d782f5e6f6b11ca8d40f023875fbdb447717e..729236a0e64315e281cff357dbb07cf84d881ddc 100644
 --- a/crates/ui-egui/src/backstage_tests.rs
 +++ b/crates/ui-egui/src/backstage_tests.rs
 @@ -166,7 +166,7 @@ fn every_page_renders() {
@@ -49543,7 +49547,7 @@ index 115d782..729236a 100644
      for (p, marker) in checks {
          h.state_mut().run("app.backstage", json!({"page": p.id()})).unwrap();
 diff --git a/crates/ui-egui/src/dialogs.rs b/crates/ui-egui/src/dialogs.rs
-index d1934be..f71a84a 100644
+index d1934be9661adc75a45d25b5194c23cf907ac498..760bc0efbf0ad37bbc528c4957350d6e372c0667 100644
 --- a/crates/ui-egui/src/dialogs.rs
 +++ b/crates/ui-egui/src/dialogs.rs
 @@ -1,7 +1,7 @@
@@ -49594,6 +49598,15 @@ index d1934be..f71a84a 100644
          ui.hyperlink_to("Source on GitHub", deckcraft_engine::links::GITHUB);
          ui.add_space(6.0);
          ui.label(egui::RichText::new("MIT OR Apache-2.0 · © 2026 ArtCraft Team and the DeckCraft contributors").size(11.0).color(t.text_faint));
+@@ -803,7 +803,7 @@ pub fn about(_app: &mut SlideApp, ui: &mut Ui) {
+ /// from `[workspace.package] version` (the single source of truth, `cargo xtask version`); the
+ /// release workflow sets `DECKCRAFT_BUILD_SHA` / `DECKCRAFT_BUILD_DATE` at build time.
+ pub fn version_line() -> String {
+-    let mut s = format!("Version {}", env!("CARGO_PKG_VERSION"));
++    let mut s = format!("Version {}", option_env!("KIO_RELEASE_VERSION").unwrap_or("0.7.0-kio.2"));
+     let sha = option_env!("DECKCRAFT_BUILD_SHA").map(|s| s.get(..9).unwrap_or(s)).filter(|s| !s.is_empty());
+     let date = option_env!("DECKCRAFT_BUILD_DATE").filter(|s| !s.is_empty());
+     match (sha, date) {
 @@ -816,16 +816,15 @@ pub fn version_line() -> String {
  
  /// DeckCraft's mark, drawn in code: a slide card with a play triangle in our orange.
@@ -49623,7 +49636,7 @@ index d1934be..f71a84a 100644
 +    }
  }
 diff --git a/crates/ui-egui/src/lib.rs b/crates/ui-egui/src/lib.rs
-index ec97e6e..7df2def 100644
+index ec97e6e6753a4cfdd8787ebca387431210cad91f..7df2def7cd19f7ce5850e59a9586c0db5d3cbbd8 100644
 --- a/crates/ui-egui/src/lib.rs
 +++ b/crates/ui-egui/src/lib.rs
 @@ -158,7 +158,7 @@ pub const UI_COMMANDS: &[(&str, &str, Option<&str>, &str)] = &[
@@ -49654,7 +49667,7 @@ index ec97e6e..7df2def 100644
          };
          let p = if cmd == "slide.fromOutline" { json!({"text": String::from_utf8_lossy(bytes)}) } else { json!({"name": name, "data": data}) };
 diff --git a/crates/ui-egui/src/menus.rs b/crates/ui-egui/src/menus.rs
-index 25398b4..c2e5129 100644
+index 25398b45abd9e6558e07cdfcbd83a752082cfd31..c2e512982fbfbcaddffcf1fa09fc53fb50584f70 100644
 --- a/crates/ui-egui/src/menus.rs
 +++ b/crates/ui-egui/src/menus.rs
 @@ -262,6 +262,6 @@ pub fn menu_tree() -> Vec<(&'static str, Vec<(&'static str, &'static str)>)> {
@@ -49666,7 +49679,7 @@ index 25398b4..c2e5129 100644
      ]
  }
 diff --git a/crates/ui-egui/src/ribbon.rs b/crates/ui-egui/src/ribbon.rs
-index 428eff0..8a17e8a 100644
+index 428eff0bfa0db2a597f249edeebd06d3cb46a771..8a17e8aec427a6f49ed9d0261e9658446a9e2a24 100644
 --- a/crates/ui-egui/src/ribbon.rs
 +++ b/crates/ui-egui/src/ribbon.rs
 @@ -63,7 +63,7 @@ pub fn title_bar(app: &mut SlideApp, ui: &mut Ui) {
@@ -49679,7 +49692,7 @@ index 428eff0..8a17e8a 100644
          // Right side.
          let mut right = ui.new_child(
 diff --git a/crates/ui-egui/src/show.rs b/crates/ui-egui/src/show.rs
-index 17ec527..aeb3299 100644
+index 17ec527e8c34c332edac8c50e8ea216266645f59..aeb3299ed14a04a2e7a324d459798c9d006c3443 100644
 --- a/crates/ui-egui/src/show.rs
 +++ b/crates/ui-egui/src/show.rs
 @@ -792,7 +792,7 @@ fn presenter_window(ctx: &egui::Context, show: &mut Show, doc: &Presentation, no
@@ -50279,7 +50292,7 @@ tf56#M-sj)H5EK5_7m~~V-~M~UhsPu0=Yf5}`_KzsRMS3}sX}=8{{T<KFP{Ja
 
 diff --git a/docs/brand/artcraft-logo-white.svg b/docs/brand/artcraft-logo-white.svg
 deleted file mode 100644
-index 4af80f7..0000000
+index 4af80f757045619475435b3ec52dbf5ed6d15cf7..0000000000000000000000000000000000000000
 --- a/docs/brand/artcraft-logo-white.svg
 +++ /dev/null
 @@ -1,7 +0,0 @@
@@ -50866,7 +50879,7 @@ ew&(x%&)c}D8%*^he-v=&6Y45j7qZXe1OE?JG~1&9
 
 diff --git a/docs/brand/artcraft-logo.svg b/docs/brand/artcraft-logo.svg
 deleted file mode 100644
-index d63f3ea..0000000
+index d63f3eae1b78ec78c2d3c95ce697d2330446cf73..0000000000000000000000000000000000000000
 --- a/docs/brand/artcraft-logo.svg
 +++ /dev/null
 @@ -1,7 +0,0 @@
@@ -51315,7 +51328,7 @@ e&&}|E4FfI_y3)`krUrPI@WZsQ-d?nobN+v7Axq-`
 
 diff --git a/docs/brand/artcraft-mark-black.svg b/docs/brand/artcraft-mark-black.svg
 deleted file mode 100644
-index 6394353..0000000
+index 6394353783591b1bd88b4376cbd890ffe16b2077..0000000000000000000000000000000000000000
 --- a/docs/brand/artcraft-mark-black.svg
 +++ /dev/null
 @@ -1,4 +0,0 @@
@@ -51725,7 +51738,7 @@ Cm;%NC
 
 diff --git a/docs/brand/artcraft-mark.svg b/docs/brand/artcraft-mark.svg
 deleted file mode 100644
-index 72e191f..0000000
+index 72e191f8ab8a4e142c2ee860bc21ee3e074723fc..0000000000000000000000000000000000000000
 --- a/docs/brand/artcraft-mark.svg
 +++ /dev/null
 @@ -1,4 +0,0 @@
@@ -51734,7 +51747,7 @@ index 72e191f..0000000
 -  <path fill="#4e7bfb" d="M104.28,49.49L81.55,0h-31.23l-3.17,4.76L14.75,53.63,0,75.85l21.55,21.55,63.79-36.94,16.99,37.04,14.01-21.74-12.06-26.27ZM32.89,65.66l32.42-48.87,10.91,23.77-43.32,25.09Z"/>
 -</svg>
 diff --git a/packaging/freebsd/package.sh b/packaging/freebsd/package.sh
-index a8c0549..0612cc2 100755
+index a8c05497713e9995cbae320ec4d8fde2f06a937d..0612cc24698099a5c2cf2a853a7fda0d16d5a13f 100755
 --- a/packaging/freebsd/package.sh
 +++ b/packaging/freebsd/package.sh
 @@ -1,5 +1,5 @@
@@ -51754,7 +51767,7 @@ index a8c0549..0612cc2 100755
  if [ "${1:-}" != "--skip-build" ]; then
    (cd "$ROOT" && cargo build --release --locked -p deckcraft -p deckcraft-cli)
 diff --git a/packaging/icons.sh b/packaging/icons.sh
-index 79b5ede..1c6b714 100755
+index 79b5edeb54e9cf6f95a0b1ec720b172223a0d64a..1c6b7145e98d40523be361bbefc4d96df80538c8 100755
 --- a/packaging/icons.sh
 +++ b/packaging/icons.sh
 @@ -4,7 +4,7 @@
@@ -51777,7 +51790,7 @@ index 79b5ede..1c6b714 100755
  TMP="$(mktemp -d)"
 diff --git a/packaging/linux/ai.storyteller.deckcraft.desktop b/packaging/linux/ai.storyteller.deckcraft.desktop
 deleted file mode 100644
-index 4f6471e..0000000
+index 4f6471ea810f233be1737d4b38eac370a0452ae5..0000000000000000000000000000000000000000
 --- a/packaging/linux/ai.storyteller.deckcraft.desktop
 +++ /dev/null
 @@ -1,14 +0,0 @@
@@ -51797,7 +51810,7 @@ index 4f6471e..0000000
 -Keywords=presentation;slides;slide show;deck;pptx;keynote;powerpoint;
 diff --git a/packaging/linux/ai.storyteller.deckcraft.metainfo.xml.in b/packaging/linux/ai.storyteller.deckcraft.metainfo.xml.in
 deleted file mode 100644
-index 4e6f0ae..0000000
+index 4e6f0ae5f1b988654c11d4707dbddeeb57e611b2..0000000000000000000000000000000000000000
 --- a/packaging/linux/ai.storyteller.deckcraft.metainfo.xml.in
 +++ /dev/null
 @@ -1,59 +0,0 @@
@@ -51862,7 +51875,7 @@ index 4e6f0ae..0000000
 -</component>
 diff --git a/packaging/linux/ai.storyteller.deckcraft.mime.xml b/packaging/linux/ai.storyteller.deckcraft.mime.xml
 deleted file mode 100644
-index 64e2c01..0000000
+index 64e2c01d60ed5ae06b54872e5158b2b590baa51c..0000000000000000000000000000000000000000
 --- a/packaging/linux/ai.storyteller.deckcraft.mime.xml
 +++ /dev/null
 @@ -1,9 +0,0 @@
@@ -51877,7 +51890,7 @@ index 64e2c01..0000000
 -</mime-info>
 diff --git a/packaging/linux/com.kio.deck.desktop b/packaging/linux/com.kio.deck.desktop
 new file mode 100644
-index 0000000..52ac2d3
+index 0000000000000000000000000000000000000000..52ac2d3b2591aae6a5453e00ebb9466f36eec6f2
 --- /dev/null
 +++ b/packaging/linux/com.kio.deck.desktop
 @@ -0,0 +1,14 @@
@@ -51897,7 +51910,7 @@ index 0000000..52ac2d3
 +Keywords=presentation;slides;slide show;deck;pptx;keynote;powerpoint;
 diff --git a/packaging/linux/com.kio.deck.metainfo.xml.in b/packaging/linux/com.kio.deck.metainfo.xml.in
 new file mode 100644
-index 0000000..9d86530
+index 0000000000000000000000000000000000000000..9d86530f6cbacfd891002bc9b4651ab77be64a55
 --- /dev/null
 +++ b/packaging/linux/com.kio.deck.metainfo.xml.in
 @@ -0,0 +1,59 @@
@@ -51962,7 +51975,7 @@ index 0000000..9d86530
 +</component>
 diff --git a/packaging/linux/com.kio.deck.mime.xml b/packaging/linux/com.kio.deck.mime.xml
 new file mode 100644
-index 0000000..384872f
+index 0000000000000000000000000000000000000000..384872f54577c7b7faf72e549dc50f0220550c7c
 --- /dev/null
 +++ b/packaging/linux/com.kio.deck.mime.xml
 @@ -0,0 +1,9 @@
@@ -51976,7 +51989,7 @@ index 0000000..384872f
 +  </mime-type>
 +</mime-info>
 diff --git a/packaging/linux/flatpak-bundle.sh b/packaging/linux/flatpak-bundle.sh
-index 3097755..bc8cac0 100755
+index 3097755cf0af5af807172749cbf93adb4d08a773..bc8cac07415973eb7eddeef18bdae894c73acf4b 100755
 --- a/packaging/linux/flatpak-bundle.sh
 +++ b/packaging/linux/flatpak-bundle.sh
 @@ -1,5 +1,5 @@
@@ -52012,7 +52025,7 @@ index 3097755..bc8cac0 100755
  rm -rf "$WORK"
 diff --git a/packaging/linux/flatpak/ai.storyteller.deckcraft.bundle.yml b/packaging/linux/flatpak/ai.storyteller.deckcraft.bundle.yml
 deleted file mode 100644
-index 6245147..0000000
+index 6245147cf2fd0c9c0530648e1691abe53fb56604..0000000000000000000000000000000000000000
 --- a/packaging/linux/flatpak/ai.storyteller.deckcraft.bundle.yml
 +++ /dev/null
 @@ -1,51 +0,0 @@
@@ -52069,7 +52082,7 @@ index 6245147..0000000
 -        path: stage
 diff --git a/packaging/linux/flatpak/ai.storyteller.deckcraft.yml b/packaging/linux/flatpak/ai.storyteller.deckcraft.yml
 deleted file mode 100644
-index 85abe9a..0000000
+index 85abe9a72125257768d544358b0d509aba331d7d..0000000000000000000000000000000000000000
 --- a/packaging/linux/flatpak/ai.storyteller.deckcraft.yml
 +++ /dev/null
 @@ -1,67 +0,0 @@
@@ -52142,7 +52155,7 @@ index 85abe9a..0000000
 -      - cargo-sources.json
 diff --git a/packaging/linux/flatpak/com.kio.deck.bundle.yml b/packaging/linux/flatpak/com.kio.deck.bundle.yml
 new file mode 100644
-index 0000000..7bed5c1
+index 0000000000000000000000000000000000000000..7bed5c12c581e8d44b7d768d97138ab6707341fd
 --- /dev/null
 +++ b/packaging/linux/flatpak/com.kio.deck.bundle.yml
 @@ -0,0 +1,51 @@
@@ -52199,7 +52212,7 @@ index 0000000..7bed5c1
 +        path: stage
 diff --git a/packaging/linux/flatpak/com.kio.deck.yml b/packaging/linux/flatpak/com.kio.deck.yml
 new file mode 100644
-index 0000000..aeaaa76
+index 0000000000000000000000000000000000000000..aeaaa76b0df50691d82670a7fbf6f9ccb84a9ebb
 --- /dev/null
 +++ b/packaging/linux/flatpak/com.kio.deck.yml
 @@ -0,0 +1,67 @@
@@ -52271,7 +52284,7 @@ index 0000000..aeaaa76
 +          - .flatpak-builder
 +      - cargo-sources.json
 diff --git a/packaging/linux/nfpm.yaml b/packaging/linux/nfpm.yaml
-index 0d41fc7..0f6dfad 100644
+index 0d41fc7ec5f29fea3685db9a2cb8f988568913f1..0f6dfad04206f87d20d9246bf09b201a4df6cffa 100644
 --- a/packaging/linux/nfpm.yaml
 +++ b/packaging/linux/nfpm.yaml
 @@ -13,7 +13,7 @@ release: 1
@@ -52284,7 +52297,7 @@ index 0d41fc7..0f6dfad 100644
  license: MIT OR Apache-2.0
  description: |-
 diff --git a/packaging/linux/package.sh b/packaging/linux/package.sh
-index eb0b7d0..2f25e8c 100755
+index eb0b7d0a08cea3107803fc763b4d557e28f9dcfc..2f25e8cb42f47c74ec89ad46e2b3a1f1340ea5d7 100755
 --- a/packaging/linux/package.sh
 +++ b/packaging/linux/package.sh
 @@ -1,5 +1,5 @@
@@ -52326,7 +52339,7 @@ index eb0b7d0..2f25e8c 100755
    mv "$APPDIR/usr/share/doc" "$WORK/doc-unused"
    ln -s usr/bin/deckcraft "$APPDIR/AppRun"
 diff --git a/packaging/macos/Info.plist.in b/packaging/macos/Info.plist.in
-index 22afe13..3b48e40 100644
+index 22afe13ea5e6269c7324de196ac177aaa634bff6..3b48e40ffdb488f73c8fa6d912d7bcd1a1c1d918 100644
 --- a/packaging/macos/Info.plist.in
 +++ b/packaging/macos/Info.plist.in
 @@ -7,13 +7,13 @@
@@ -52393,7 +52406,7 @@ index 22afe13..3b48e40 100644
        <dict>
          <key>public.filename-extension</key>
 diff --git a/packaging/macos/package.sh b/packaging/macos/package.sh
-index 4eed67a..7d8658e 100755
+index 4eed67ab6d957e5ef1feafcc4a092b2278f28ec7..7d8658e10556501ebf066215af1de9a84a70feb8 100755
 --- a/packaging/macos/package.sh
 +++ b/packaging/macos/package.sh
 @@ -1,7 +1,7 @@
@@ -52481,10 +52494,10 @@ index 4eed67a..7d8658e 100755
  rm -f "$WORK/raw.dmg"
  sign "$DMG"
 diff --git a/packaging/windows/deckcraft.wxs b/packaging/windows/deckcraft.wxs
-index 43d256f..113fb96 100644
+index 43d256fe8047a932fe1322c730e68c927585d4c1..a885442a07af75d442a5a4f10df7583648f78134 100644
 --- a/packaging/windows/deckcraft.wxs
 +++ b/packaging/windows/deckcraft.wxs
-@@ -1,29 +1,29 @@
+@@ -1,75 +1,73 @@
  <?xml version="1.0" encoding="utf-8"?>
  <!--
 -  DeckCraft MSI (WiX Toolset v5: `dotnet tool install -g wix`). Built by package.ps1:
@@ -52522,7 +52535,11 @@ index 43d256f..113fb96 100644
      <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
  
      <Icon Id="DeckcraftIcon.ico" SourceFile="$(var.IconPath)" />
-@@ -33,43 +33,43 @@
+     <Property Id="ARPPRODUCTICON" Value="DeckcraftIcon.ico" />
+-    <Property Id="ARPURLINFOABOUT" Value="https://getartcraft.com/apps/deckcraft" />
+-    <Property Id="ARPURLUPDATEINFO" Value="https://getartcraft.com/apps/deckcraft" />
++    <Property Id="ARPURLINFOABOUT" Value="https://kio-library.vercel.app/?program=deck" />
++    <Property Id="ARPURLUPDATEINFO" Value="https://kio-library.vercel.app/?program=deck" />
      <Property Id="ARPHELPLINK" Value="https://discord.gg/artcraft" />
  
      <StandardDirectory Id="ProgramFiles6432Folder">
@@ -52552,12 +52569,14 @@ index 43d256f..113fb96 100644
  
 -        <!-- .deckcraft: DeckCraft's own format. -->
 -        <ProgId Id="DeckCraft.Presentation" Description="DeckCraft Presentation" Icon="DeckcraftExe" IconIndex="0">
-+        <!-- .deckcraft: KIO Deck's own format. -->
-+        <ProgId Id="KIO.Deck.Presentation" Description="KIO Deck Presentation" Icon="DeckcraftExe" IconIndex="0">
-           <Extension Id="deckcraft" ContentType="application/x-deckcraft">
-             <Verb Id="open" Command="Open" TargetFile="DeckcraftExe" Argument="&quot;%1&quot;" />
-           </Extension>
-         </ProgId>
+-          <Extension Id="deckcraft" ContentType="application/x-deckcraft">
+-            <Verb Id="open" Command="Open" TargetFile="DeckcraftExe" Argument="&quot;%1&quot;" />
+-          </Extension>
+-        </ProgId>
++        <!-- Shared .deckcraft format: offer KIO without replacing an upstream/user default. -->
++        <ProgId Id="KIO.Deck.Presentation" Description="KIO Deck Presentation" Icon="DeckcraftExe" IconIndex="0" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\KIO.Deck.Presentation\shell\open\command" Value="&quot;[#DeckcraftExe]&quot; &quot;%1&quot;" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\.deckcraft\OpenWithProgids" Name="KIO.Deck.Presentation" Value="" Type="string" />
  
          <!-- "Open with" for PowerPoint formats, without becoming the default. -->
 -        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\deckcraft.exe" Name="FriendlyAppName" Value="DeckCraft" Type="string" />
@@ -52585,7 +52604,7 @@ index 43d256f..113fb96 100644
  
        <Component Id="DeckcraftCli">
 diff --git a/packaging/windows/package.ps1 b/packaging/windows/package.ps1
-index f15f00e..3970ff3 100644
+index f15f00e858eabf0f0e9fb27ee1790f52866c4d1e..3970ff3be4b66a01ddafcbb3d4272b7a3b1c37d9 100644
 --- a/packaging/windows/package.ps1
 +++ b/packaging/windows/package.ps1
 @@ -1,6 +1,6 @@
@@ -52606,7 +52625,7 @@ index f15f00e..3970ff3 100644
  if (-not $SkipBuild) {
    # Static CRT: no VC++ redistributable needed. Scoped to the target so host build scripts and
 diff --git a/packaging/windows/sign.ps1 b/packaging/windows/sign.ps1
-index b1275fe..f0cb50f 100644
+index b1275fee574c274d38363e531807a3abc8fcb552..f0cb50fd1e0461bf835be57effbd870c0a3fd233 100644
 --- a/packaging/windows/sign.ps1
 +++ b/packaging/windows/sign.ps1
 @@ -55,7 +55,7 @@ if (-not $haveCert -and -not $haveAzure) {

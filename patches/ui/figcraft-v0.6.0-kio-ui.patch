@@ -1,5 +1,5 @@
 diff --git a/ATTRIBUTION.md b/ATTRIBUTION.md
-index 1f72aeb..d79956d 100644
+index 1f72aeb7cb4b578ccb729a0b5229d857802845b6..d79956d93e53ad66169d04d644e69ef7458c0ef2 100644
 --- a/ATTRIBUTION.md
 +++ b/ATTRIBUTION.md
 @@ -30,3 +30,31 @@ Release builds embed fonts from the optional craft-fonts build input
@@ -36,7 +36,7 @@ index 1f72aeb..d79956d 100644
 +| `assets/app-icon/kio-ui.png` | KIO | Supplied KIO `public/kio-program-icons/ui.png`, SHA-256 `8cb2d2d4f4dfde2cf4666067bcedc7b864cc3a19d5f53d7854864fe9776a391b` | KIO supplied branding asset for KIO distribution | Original PNG or platform format/size conversion; upstream attribution above is preserved as history |
 diff --git a/KIO-FORK.json b/KIO-FORK.json
 new file mode 100644
-index 0000000..1c8faf1
+index 0000000000000000000000000000000000000000..1c8faf10110e8a7a54a932a80aca0dab6c100be7
 --- /dev/null
 +++ b/KIO-FORK.json
 @@ -0,0 +1,76 @@
@@ -118,7 +118,7 @@ index 0000000..1c8faf1
 +}
 diff --git a/KIO-FORK.md b/KIO-FORK.md
 new file mode 100644
-index 0000000..d2e1908
+index 0000000000000000000000000000000000000000..d2e1908b514d4a6f3d6206b026b23582f2d78819
 --- /dev/null
 +++ b/KIO-FORK.md
 @@ -0,0 +1,19 @@
@@ -142,7 +142,7 @@ index 0000000..d2e1908
 +
 +Static checks compare protected engine/dependency/license/credit files byte for byte, validate platform metadata and icon formats, and reapply the patch to a separate fresh original source extraction with complete resulting file-hash comparison. This branding agent did not build, install or run the resulting app. Native launch, open/save, printing/export, plug-ins, recovery and profile isolation still require build and GUI QA before release.
 diff --git a/README.md b/README.md
-index 9b67078..fc9025e 100644
+index 9b67078bea5a497ef88f8dcdf3d022b174b07166..fc9025e3cc73195c400249540d328d4e1360eaa1 100644
 --- a/README.md
 +++ b/README.md
 @@ -1,3 +1,9 @@
@@ -165,7 +165,7 @@ index 9b67078..fc9025e 100644
  
  <sub>Figma is a trademark of Figma, Inc. FigCraft is an independent, open-source project and is not affiliated with, sponsored by or endorsed by Figma, Inc.; the name is used only to describe the workflows FigCraft is compatible with.</sub>
 diff --git a/apps/figcraft-web/index.html b/apps/figcraft-web/index.html
-index 1a9969d..243f502 100644
+index 1a9969d5cf0dfdcc54212a42989e36e10e19a29a..243f502336b5b2c71985cefa56cecb91dd6e739e 100644
 --- a/apps/figcraft-web/index.html
 +++ b/apps/figcraft-web/index.html
 @@ -3,7 +3,7 @@
@@ -186,7 +186,7 @@ index 1a9969d..243f502 100644
  </body>
  </html>
 diff --git a/apps/figcraft/build.rs b/apps/figcraft/build.rs
-index 64f9783..987c778 100644
+index 64f978350100cf4307c1c9d94ae76f330a8cdad2..987c77870b8579a25ce90588ae99ea4f155be366 100644
 --- a/apps/figcraft/build.rs
 +++ b/apps/figcraft/build.rs
 @@ -9,9 +9,9 @@ fn main() {
@@ -203,7 +203,7 @@ index 64f9783..987c778 100644
              println!("cargo::warning=winresource: {e}");
          }
 diff --git a/apps/figcraft/src/control_server.rs b/apps/figcraft/src/control_server.rs
-index 5cfe129..b20eb1f 100644
+index 5cfe12924d9523faa40b6b254ddc2bde6e476904..b20eb1fd1ea8c4b0a366cf29d9f458aa201ad410 100644
 --- a/apps/figcraft/src/control_server.rs
 +++ b/apps/figcraft/src/control_server.rs
 @@ -31,11 +31,11 @@ pub fn start(port: u16, queue: Queue, ctx: CtxSlot) {
@@ -221,7 +221,7 @@ index 5cfe129..b20eb1f 100644
          let mut workers = Vec::new();
          for stream in listener.incoming().flatten() {
 diff --git a/apps/figcraft/src/main.rs b/apps/figcraft/src/main.rs
-index 0332f7d..783af00 100644
+index 0332f7d83a054288f60c6972dcefd1194b7e5975..783af009887c442ff0405f07e7522d8e8b19a5a7 100644
 --- a/apps/figcraft/src/main.rs
 +++ b/apps/figcraft/src/main.rs
 @@ -99,7 +99,7 @@ fn main() -> eframe::Result {
@@ -251,7 +251,7 @@ index 0332f7d..783af00 100644
 +    eframe::run_native("KIO UI", options, Box::new(move |_cc| Ok(Box::new(App { queue, ctx_slot, title: String::new(), recovery }))))
  }
 diff --git a/apps/figcraft/src/services.rs b/apps/figcraft/src/services.rs
-index f4aeb63..8b13cbd 100644
+index f4aeb63d76e7736f45dd3be2dffc73fd4242e832..8b13cbd444527c6a2615a4037ed930084e28c293 100644
 --- a/apps/figcraft/src/services.rs
 +++ b/apps/figcraft/src/services.rs
 @@ -28,7 +28,7 @@ pub fn config_dir() -> Option<PathBuf> {
@@ -28693,7 +28693,7 @@ literal 0
 HcmV?d00001
 
 diff --git a/assets/app-icon/figcraft-small.svg b/assets/app-icon/figcraft-small.svg
-index 5df77c8..6d26fdd 100644
+index 5df77c8ed72bf54e33e475824bf84b8627451069..6d26fdd1fe3112db196de7e200d8765e97cfe943 100644
 --- a/assets/app-icon/figcraft-small.svg
 +++ b/assets/app-icon/figcraft-small.svg
 @@ -1 +1 @@
@@ -54495,7 +54495,7 @@ zMM;Z}g;2=Lk)s;dv#|(6Gd0tDCK7W>!V>)&z4r6A6t=w8qD70Tty+a8yXy|WBl`af
 WrSES7Dop_Z0000<MNUMnLSTaTN?OYR
 
 diff --git a/assets/app-icon/figcraft.svg b/assets/app-icon/figcraft.svg
-index de38c93..6d26fdd 100644
+index de38c9324e79931dd12d80842c7528f22f1ba6b2..6d26fdd1fe3112db196de7e200d8765e97cfe943 100644
 --- a/assets/app-icon/figcraft.svg
 +++ b/assets/app-icon/figcraft.svg
 @@ -1 +1 @@
@@ -66390,7 +66390,7 @@ HcmV?d00001
 
 diff --git a/assets/app-icon/hicolor/scalable/apps/ai.storyteller.figcraft.svg b/assets/app-icon/hicolor/scalable/apps/ai.storyteller.figcraft.svg
 deleted file mode 100644
-index 5df77c8..0000000
+index 5df77c8ed72bf54e33e475824bf84b8627451069..0000000000000000000000000000000000000000
 --- a/assets/app-icon/hicolor/scalable/apps/ai.storyteller.figcraft.svg
 +++ /dev/null
 @@ -1 +0,0 @@
@@ -66398,7 +66398,7 @@ index 5df77c8..0000000
 \ No newline at end of file
 diff --git a/assets/app-icon/hicolor/scalable/apps/com.kio.ui.svg b/assets/app-icon/hicolor/scalable/apps/com.kio.ui.svg
 new file mode 100644
-index 0000000..6d26fdd
+index 0000000000000000000000000000000000000000..6d26fdd1fe3112db196de7e200d8765e97cfe943
 --- /dev/null
 +++ b/assets/app-icon/hicolor/scalable/apps/com.kio.ui.svg
 @@ -0,0 +1 @@
@@ -73657,7 +73657,7 @@ literal 0
 HcmV?d00001
 
 diff --git a/crates/ui-egui/src/dev_compare.rs b/crates/ui-egui/src/dev_compare.rs
-index 2e21eb5..7d572a0 100644
+index 2e21eb54a098be4f2baf16a666bed7d0f82c6f0e..7d572a0a03480cc53389c0d44c9f37378498cd03 100644
 --- a/crates/ui-egui/src/dev_compare.rs
 +++ b/crates/ui-egui/src/dev_compare.rs
 @@ -165,7 +165,7 @@ pub fn show(app: &mut FigApp, ctx: &egui::Context) {
@@ -73670,7 +73670,7 @@ index 2e21eb5..7d572a0 100644
                      } else {
                          tr("Nothing changed since this was marked ready for dev.")
 diff --git a/crates/ui-egui/src/dialogs.rs b/crates/ui-egui/src/dialogs.rs
-index 221ee63..9eb9cc2 100644
+index 221ee63619260bc0f1ba2b4333fb93da233d530b..9eb9cc2e70e4325097bedec806c46c86849ae522 100644
 --- a/crates/ui-egui/src/dialogs.rs
 +++ b/crates/ui-egui/src/dialogs.rs
 @@ -82,17 +82,17 @@ fn about_body(ui: &mut egui::Ui, t: &Tokens) {
@@ -73723,7 +73723,7 @@ index 221ee63..9eb9cc2 100644
                  }
              });
 diff --git a/crates/ui-egui/src/home.rs b/crates/ui-egui/src/home.rs
-index 9b57cb0..eab0c6e 100644
+index 9b57cb0a15ae25527d9d7e71c92a88ad887d3224..eab0c6ee933a42216d5323a26aff823615fed051 100644
 --- a/crates/ui-egui/src/home.rs
 +++ b/crates/ui-egui/src/home.rs
 @@ -144,7 +144,7 @@ pub fn show(app: &mut FigApp, ui: &mut Ui) {
@@ -73736,7 +73736,7 @@ index 9b57cb0..eab0c6e 100644
      for (section, icon, label) in Section::ALL {
          let r = Rect::from_min_size(pos2(left.min.x + 8.0, y), vec2(SIDEBAR - 16.0, 32.0));
 diff --git a/crates/ui-egui/src/home_recents.rs b/crates/ui-egui/src/home_recents.rs
-index dbc5850..6e112b5 100644
+index dbc58506717bf5a77357601025eb6fe8e9ea9ceb..6e112b5665a1a6d6b0100597f87a1f806a18084e 100644
 --- a/crates/ui-egui/src/home_recents.rs
 +++ b/crates/ui-egui/src/home_recents.rs
 @@ -706,7 +706,7 @@ fn arrows(ui: &Ui, recents: &mut Recents, files: &[Shown], across: usize, down:
@@ -73749,7 +73749,7 @@ index dbc5850..6e112b5 100644
              icons::paint(ui.painter(), r.shrink(3.0), Icon::Logo, Color32::WHITE);
          }
 diff --git a/crates/ui-egui/src/icons.rs b/crates/ui-egui/src/icons.rs
-index 726f62f..1b06dc3 100644
+index 726f62f44391b996ac33032debc971d93144200b..1b06dc3af18dc484cca88677eb5aa40adf8f576a 100644
 --- a/crates/ui-egui/src/icons.rs
 +++ b/crates/ui-egui/src/icons.rs
 @@ -1021,16 +1021,18 @@ fn draw(p: &P, icon: Icon) {
@@ -73782,7 +73782,7 @@ index 726f62f..1b06dc3 100644
      }
  }
 diff --git a/crates/ui-egui/src/live.rs b/crates/ui-egui/src/live.rs
-index 46687a6..8d16d9a 100644
+index 46687a685d3eb68d12609e302d1aa2685aab614d..8d16d9a0b0579789712b0e317983b3398d86f734 100644
 --- a/crates/ui-egui/src/live.rs
 +++ b/crates/ui-egui/src/live.rs
 @@ -29,7 +29,7 @@ use crate::widgets;
@@ -73813,7 +73813,7 @@ index 46687a6..8d16d9a 100644
          );
          widgets::label(ui, tr("Server address"), t.text_secondary);
 diff --git a/crates/ui-egui/src/live_join_tests.rs b/crates/ui-egui/src/live_join_tests.rs
-index d745216..2b04fda 100644
+index d7452163841280ae3c534a21fa46b95324d68eef..2b04fda6a2c896c2af248377c4283a65d03427e4 100644
 --- a/crates/ui-egui/src/live_join_tests.rs
 +++ b/crates/ui-egui/src/live_join_tests.rs
 @@ -101,6 +101,6 @@ fn the_browser_joins_but_does_not_host() {
@@ -73825,7 +73825,7 @@ index d745216..2b04fda 100644
      ));
  }
 diff --git a/crates/ui-egui/src/plugins_ui.rs b/crates/ui-egui/src/plugins_ui.rs
-index 0d4da40..e7017c2 100644
+index 0d4da40c56dc5aae0c19c9901ccecff479c02a14..e7017c231454954dceab17dac098f947bd804cac 100644
 --- a/crates/ui-egui/src/plugins_ui.rs
 +++ b/crates/ui-egui/src/plugins_ui.rs
 @@ -452,7 +452,7 @@ fn confirm_window(app: &mut FigApp, ctx: &Context, t: &Tokens) {
@@ -73838,7 +73838,7 @@ index 0d4da40..e7017c2 100644
          );
          ui.add_space(4.0);
 diff --git a/crates/ui-egui/src/toolbar.rs b/crates/ui-egui/src/toolbar.rs
-index 1e6e38a..8c804f6 100644
+index 1e6e38aa120567b79d67da8f73cbaebeb1fe378a..8c804f6b1c82cdbd789a8fcb1d8ec27293895a43 100644
 --- a/crates/ui-egui/src/toolbar.rs
 +++ b/crates/ui-egui/src/toolbar.rs
 @@ -194,7 +194,7 @@ pub fn show(app: &mut FigApp, ui: &mut Ui) {
@@ -73851,7 +73851,7 @@ index 1e6e38a..8c804f6 100644
              if crate::right::menu_item(ui, l, crate::shortcuts::shortcut(c).unwrap_or("")) {
                  app.run(c, json!({}));
 diff --git a/crates/ui-egui/src/windows.rs b/crates/ui-egui/src/windows.rs
-index 82da755..c8cdf39 100644
+index 82da7555c5e53df03e35cb96ff2d0bf061686f98..c8cdf394c9cea44ca6f97c9f2848c098dae95f96 100644
 --- a/crates/ui-egui/src/windows.rs
 +++ b/crates/ui-egui/src/windows.rs
 @@ -112,8 +112,8 @@ pub fn take_input(app: &mut FigApp, viewport_id: ViewportId) -> Vec<egui::Event>
@@ -74453,7 +74453,7 @@ tf56#M-sj)H5EK5_7m~~V-~M~UhsPu0=Yf5}`_KzsRMS3}sX}=8{{T<KFP{Ja
 
 diff --git a/docs/brand/artcraft-logo-white.svg b/docs/brand/artcraft-logo-white.svg
 deleted file mode 100644
-index 4af80f7..0000000
+index 4af80f757045619475435b3ec52dbf5ed6d15cf7..0000000000000000000000000000000000000000
 --- a/docs/brand/artcraft-logo-white.svg
 +++ /dev/null
 @@ -1,7 +0,0 @@
@@ -75040,7 +75040,7 @@ ew&(x%&)c}D8%*^he-v=&6Y45j7qZXe1OE?JG~1&9
 
 diff --git a/docs/brand/artcraft-logo.svg b/docs/brand/artcraft-logo.svg
 deleted file mode 100644
-index d63f3ea..0000000
+index d63f3eae1b78ec78c2d3c95ce697d2330446cf73..0000000000000000000000000000000000000000
 --- a/docs/brand/artcraft-logo.svg
 +++ /dev/null
 @@ -1,7 +0,0 @@
@@ -75489,7 +75489,7 @@ e&&}|E4FfI_y3)`krUrPI@WZsQ-d?nobN+v7Axq-`
 
 diff --git a/docs/brand/artcraft-mark-black.svg b/docs/brand/artcraft-mark-black.svg
 deleted file mode 100644
-index 6394353..0000000
+index 6394353783591b1bd88b4376cbd890ffe16b2077..0000000000000000000000000000000000000000
 --- a/docs/brand/artcraft-mark-black.svg
 +++ /dev/null
 @@ -1,4 +0,0 @@
@@ -75899,7 +75899,7 @@ Cm;%NC
 
 diff --git a/docs/brand/artcraft-mark.svg b/docs/brand/artcraft-mark.svg
 deleted file mode 100644
-index 72e191f..0000000
+index 72e191f8ab8a4e142c2ee860bc21ee3e074723fc..0000000000000000000000000000000000000000
 --- a/docs/brand/artcraft-mark.svg
 +++ /dev/null
 @@ -1,4 +0,0 @@
@@ -75908,7 +75908,7 @@ index 72e191f..0000000
 -  <path fill="#4e7bfb" d="M104.28,49.49L81.55,0h-31.23l-3.17,4.76L14.75,53.63,0,75.85l21.55,21.55,63.79-36.94,16.99,37.04,14.01-21.74-12.06-26.27ZM32.89,65.66l32.42-48.87,10.91,23.77-43.32,25.09Z"/>
 -</svg>
 diff --git a/packaging/env.sh b/packaging/env.sh
-index b68406a..bb7b312 100644
+index b68406a013cd8a3d157ad394008a585f36ce8273..bb7b31216a18b33e2f2ab04d298933bc23f1d892 100644
 --- a/packaging/env.sh
 +++ b/packaging/env.sh
 @@ -80,7 +80,7 @@ warn() {
@@ -75921,7 +75921,7 @@ index b68406a..bb7b312 100644
    done
    copy_font_licences "$dest"
 diff --git a/packaging/freebsd/package.sh b/packaging/freebsd/package.sh
-index 6931676..63b7d2d 100755
+index 6931676565fc80a1bae03995ddd9c3d107f83909..63b7d2d1caf41d9480e50b9fc3d13ab1e729d354 100755
 --- a/packaging/freebsd/package.sh
 +++ b/packaging/freebsd/package.sh
 @@ -1,5 +1,5 @@
@@ -75951,7 +75951,7 @@ index 6931676..63b7d2d 100755
  export CARGO_BUILD_JOBS="${CARGO_BUILD_JOBS:-4}"
 diff --git a/packaging/linux/ai.storyteller.figcraft.desktop b/packaging/linux/ai.storyteller.figcraft.desktop
 deleted file mode 100644
-index 767dd6e..0000000
+index 767dd6e541d6aa666c60bc5e7d53ecfb0dd0a84c..0000000000000000000000000000000000000000
 --- a/packaging/linux/ai.storyteller.figcraft.desktop
 +++ /dev/null
 @@ -1,14 +0,0 @@
@@ -75971,7 +75971,7 @@ index 767dd6e..0000000
 -MimeType=application/x-figcraft;image/svg+xml;image/png;image/jpeg;x-scheme-handler/figcraft;
 diff --git a/packaging/linux/ai.storyteller.figcraft.metainfo.xml.in b/packaging/linux/ai.storyteller.figcraft.metainfo.xml.in
 deleted file mode 100644
-index 2dc341a..0000000
+index 2dc341a7ed6b805b8975b224e9c99c3f64931b6a..0000000000000000000000000000000000000000
 --- a/packaging/linux/ai.storyteller.figcraft.metainfo.xml.in
 +++ /dev/null
 @@ -1,66 +0,0 @@
@@ -76043,7 +76043,7 @@ index 2dc341a..0000000
 -</component>
 diff --git a/packaging/linux/ai.storyteller.figcraft.mime.xml b/packaging/linux/ai.storyteller.figcraft.mime.xml
 deleted file mode 100644
-index 7c18c9a..0000000
+index 7c18c9a816722a17144a340aeaf4da27fe220185..0000000000000000000000000000000000000000
 --- a/packaging/linux/ai.storyteller.figcraft.mime.xml
 +++ /dev/null
 @@ -1,11 +0,0 @@
@@ -76059,7 +76059,7 @@ index 7c18c9a..0000000
 -  </mime-type>
 -</mime-info>
 diff --git a/packaging/linux/apprun-test.sh b/packaging/linux/apprun-test.sh
-index c6d98da..395bc37 100755
+index c6d98da0d38c1924a7af623a21d31daea1e7d9c8..395bc371ff88c9f54197f5358c510e76d32d94ff 100755
 --- a/packaging/linux/apprun-test.sh
 +++ b/packaging/linux/apprun-test.sh
 @@ -8,13 +8,13 @@ set -euo pipefail
@@ -76080,7 +76080,7 @@ index c6d98da..395bc37 100755
  install -Dm644 "$HERE/$APP_ID.desktop" "$APPDIR/usr/share/applications/$APP_ID.desktop"
 diff --git a/packaging/linux/com.kio.ui.desktop b/packaging/linux/com.kio.ui.desktop
 new file mode 100644
-index 0000000..009a421
+index 0000000000000000000000000000000000000000..009a42123d9ae12e5a668c6122cace1185dded03
 --- /dev/null
 +++ b/packaging/linux/com.kio.ui.desktop
 @@ -0,0 +1,14 @@
@@ -76100,7 +76100,7 @@ index 0000000..009a421
 +MimeType=application/x-figcraft;image/svg+xml;image/png;image/jpeg;x-scheme-handler/figcraft;
 diff --git a/packaging/linux/com.kio.ui.metainfo.xml.in b/packaging/linux/com.kio.ui.metainfo.xml.in
 new file mode 100644
-index 0000000..90c7a60
+index 0000000000000000000000000000000000000000..90c7a60bc6cff6460e07963c69faf36fc3228b05
 --- /dev/null
 +++ b/packaging/linux/com.kio.ui.metainfo.xml.in
 @@ -0,0 +1,66 @@
@@ -76172,7 +76172,7 @@ index 0000000..90c7a60
 +</component>
 diff --git a/packaging/linux/com.kio.ui.mime.xml b/packaging/linux/com.kio.ui.mime.xml
 new file mode 100644
-index 0000000..7c401fe
+index 0000000000000000000000000000000000000000..7c401fe51052a9bea742081e44df3bc3ee7d5fc0
 --- /dev/null
 +++ b/packaging/linux/com.kio.ui.mime.xml
 @@ -0,0 +1,11 @@
@@ -76188,7 +76188,7 @@ index 0000000..7c401fe
 +  </mime-type>
 +</mime-info>
 diff --git a/packaging/linux/flatpak-bundle.sh b/packaging/linux/flatpak-bundle.sh
-index 127c3af..4ce2399 100755
+index 127c3af9646be3a881304e2743fee96f55ee65d9..4ce2399829b4e9832d44f342a55f8c9c66191599 100755
 --- a/packaging/linux/flatpak-bundle.sh
 +++ b/packaging/linux/flatpak-bundle.sh
 @@ -1,5 +1,5 @@
@@ -76224,7 +76224,7 @@ index 127c3af..4ce2399 100755
  rm -rf "$WORK"
 diff --git a/packaging/linux/flatpak/ai.storyteller.figcraft.bundle.yml b/packaging/linux/flatpak/ai.storyteller.figcraft.bundle.yml
 deleted file mode 100644
-index 4b0bd0f..0000000
+index 4b0bd0fe60a1611967fb92902418bc3e8aaa3b5e..0000000000000000000000000000000000000000
 --- a/packaging/linux/flatpak/ai.storyteller.figcraft.bundle.yml
 +++ /dev/null
 @@ -1,51 +0,0 @@
@@ -76281,7 +76281,7 @@ index 4b0bd0f..0000000
 -        path: stage
 diff --git a/packaging/linux/flatpak/ai.storyteller.figcraft.yml b/packaging/linux/flatpak/ai.storyteller.figcraft.yml
 deleted file mode 100644
-index 03cb5fb..0000000
+index 03cb5fbad3972ad51c1c9fdd938c18e57c5f454b..0000000000000000000000000000000000000000
 --- a/packaging/linux/flatpak/ai.storyteller.figcraft.yml
 +++ /dev/null
 @@ -1,73 +0,0 @@
@@ -76360,7 +76360,7 @@ index 03cb5fb..0000000
 -      - cargo-sources.json
 diff --git a/packaging/linux/flatpak/com.kio.ui.bundle.yml b/packaging/linux/flatpak/com.kio.ui.bundle.yml
 new file mode 100644
-index 0000000..1775944
+index 0000000000000000000000000000000000000000..1775944a39f96f6e4f1d78379f5ce55db15954c2
 --- /dev/null
 +++ b/packaging/linux/flatpak/com.kio.ui.bundle.yml
 @@ -0,0 +1,51 @@
@@ -76417,7 +76417,7 @@ index 0000000..1775944
 +        path: stage
 diff --git a/packaging/linux/flatpak/com.kio.ui.yml b/packaging/linux/flatpak/com.kio.ui.yml
 new file mode 100644
-index 0000000..a4f3661
+index 0000000000000000000000000000000000000000..a4f366174d9dd1146eca348b5f5a006984b82338
 --- /dev/null
 +++ b/packaging/linux/flatpak/com.kio.ui.yml
 @@ -0,0 +1,73 @@
@@ -76495,7 +76495,7 @@ index 0000000..a4f3661
 +          - .flatpak-builder
 +      - cargo-sources.json
 diff --git a/packaging/linux/nfpm.yaml b/packaging/linux/nfpm.yaml
-index 69667a2..9938d4c 100644
+index 69667a2b5a0a75a8e7d5774b4f0ce4ec088991e9..9938d4ca8ce8680250a82a855eb2e1492babb55f 100644
 --- a/packaging/linux/nfpm.yaml
 +++ b/packaging/linux/nfpm.yaml
 @@ -14,7 +14,7 @@ release: 1
@@ -76508,7 +76508,7 @@ index 69667a2..9938d4c 100644
  license: MIT OR Apache-2.0
  description: |-
 diff --git a/packaging/linux/package.sh b/packaging/linux/package.sh
-index 20da2f7..32248df 100755
+index 20da2f7648dfdda6af7212526475f6e3d5c8a558..32248dfeea4b2a417e9ac7e1c1f23d9710b65d83 100755
 --- a/packaging/linux/package.sh
 +++ b/packaging/linux/package.sh
 @@ -1,5 +1,5 @@
@@ -76550,7 +76550,7 @@ index 20da2f7..32248df 100755
    mv "$APPDIR/usr/share/doc" "$WORK/doc-unused"
    # AppRun is a script, not a symlink: it installs the .desktop entry and icons into
 diff --git a/packaging/macos/Info.plist.in b/packaging/macos/Info.plist.in
-index bbcec20..b875157 100644
+index bbcec20f83c8ecfe92a814df2252e3f7ec42cc35..b8751574772e89f10b9d4e64f1fc5e0219bf5790 100644
 --- a/packaging/macos/Info.plist.in
 +++ b/packaging/macos/Info.plist.in
 @@ -7,13 +7,13 @@
@@ -76648,7 +76648,7 @@ index bbcec20..b875157 100644
      <!-- Offered under "Open With", never forced as the default. -->
      <dict>
 diff --git a/packaging/macos/package.sh b/packaging/macos/package.sh
-index 87abe94..88514b7 100755
+index 87abe94c702460eded439739f7e474f650a0b708..88514b71e1aba82ce0bca0a022d7d9bca929bd88 100755
 --- a/packaging/macos/package.sh
 +++ b/packaging/macos/package.sh
 @@ -1,7 +1,7 @@
@@ -76750,7 +76750,7 @@ index 87abe94..88514b7 100755
    rm -f "$CLI_ZIP"
    ditto -c -k --keepParent "$CLI_DIR" "$CLI_ZIP"
 diff --git a/packaging/server/install.sh b/packaging/server/install.sh
-index 11c489a..4540d6c 100755
+index 11c489a329ae14acb105d9b50b76b8db6922b4ae..4540d6c3dc0083d8f62e7d5ef1d52aac7f44228c 100755
 --- a/packaging/server/install.sh
 +++ b/packaging/server/install.sh
 @@ -394,7 +394,7 @@ cat <<EOF
@@ -76763,7 +76763,7 @@ index 11c489a..4540d6c 100755
    Check:     curl https://$HOST/healthz      (once DNS points here and Caddy has its certificate)
    Logs:      journalctl -u $SERVICE -f
 diff --git a/packaging/windows/check-icons.ps1 b/packaging/windows/check-icons.ps1
-index fcc6d2f..0edd263 100644
+index fcc6d2fce9a76c6e1579c782dbb61432a99b1f83..0edd263febbc2cee5d49d5b8dab2360ced2e5676 100644
 --- a/packaging/windows/check-icons.ps1
 +++ b/packaging/windows/check-icons.ps1
 @@ -1,6 +1,6 @@
@@ -76775,7 +76775,7 @@ index fcc6d2f..0edd263 100644
  .DESCRIPTION
    ICE50 requires advertised shortcut icon identifiers to have the target file's extension.
 diff --git a/packaging/windows/figcraft.wxs b/packaging/windows/figcraft.wxs
-index a0e40b2..b7ae9cc 100644
+index a0e40b24133b1e0d7080a0bd66bc84866f293859..fd835f487875c72707519bf7ce29e54db1399e31 100644
 --- a/packaging/windows/figcraft.wxs
 +++ b/packaging/windows/figcraft.wxs
 @@ -1,6 +1,6 @@
@@ -76786,7 +76786,7 @@ index a0e40b2..b7ae9cc 100644
    `wix extension add -g WixToolset.UI.wixext/5.0.2 WixToolset.Util.wixext/5.0.2`). Built by package.ps1:
  
      wix build figcraft.wxs -arch x64 -ext WixToolset.UI.wixext -ext WixToolset.Util.wixext
-@@ -8,29 +8,29 @@
+@@ -8,50 +8,50 @@
        -d BinDir=... -d IconPath=... -d BannerBmp=... -d DialogBmp=... -d HasCli=1 -o out.msi
  
    Per-machine install with a setup wizard that names the version: Welcome, install folder
@@ -76825,7 +76825,13 @@ index a0e40b2..b7ae9cc 100644
      <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
  
      <!-- MSI caches this icon using its Id as the filename. Advertised shortcuts to an
-@@ -42,16 +42,16 @@
+          .exe need an .exe icon identifier (ICE50), even when the source is an ICO. -->
+     <Icon Id="FigcraftIcon.exe" SourceFile="$(var.IconPath)" />
+     <Property Id="ARPPRODUCTICON" Value="FigcraftIcon.exe" />
+-    <Property Id="ARPURLINFOABOUT" Value="https://getartcraft.com/apps/figcraft" />
+-    <Property Id="ARPURLUPDATEINFO" Value="https://getartcraft.com/apps/figcraft" />
++    <Property Id="ARPURLINFOABOUT" Value="https://kio-library.vercel.app/?program=ui" />
++    <Property Id="ARPURLUPDATEINFO" Value="https://kio-library.vercel.app/?program=ui" />
      <Property Id="ARPHELPLINK" Value="https://discord.gg/artcraft" />
  
      <StandardDirectory Id="ProgramFiles6432Folder">
@@ -76856,7 +76862,7 @@ index a0e40b2..b7ae9cc 100644
      <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
      <Property Id="WixShellExecTarget" Value="[#FigcraftExe]" />
      <!-- Runs in the wizard's own (unelevated) process, so the app starts as the user, not as admin. -->
-@@ -83,15 +83,15 @@
+@@ -83,37 +83,35 @@
  
    <Fragment>
      <ComponentGroup Id="FigcraftFiles" Directory="INSTALLFOLDER">
@@ -76873,13 +76879,27 @@ index a0e40b2..b7ae9cc 100644
  
 -        <!-- .figcraft: FigCraft's own format; FigCraft is its default app. -->
 -        <ProgId Id="Figcraft.Document" Description="FigCraft Document" Icon="FigcraftExe" IconIndex="0">
-+        <!-- .figcraft: KIO UI's own format; KIO UI is its default app. -->
-+        <ProgId Id="Figcraft.Document" Description="KIO UI Document" Icon="FigcraftExe" IconIndex="0">
-           <Extension Id="figcraft" ContentType="application/x-figcraft">
-             <Verb Id="open" Command="Open" TargetFile="FigcraftExe" Argument="&quot;%1&quot;" />
-           </Extension>
-@@ -105,15 +105,15 @@
-         <RegistryValue Root="HKLM" Key="Software\Classes\.jpeg\OpenWithProgids" Name="Figcraft.Image" Value="" Type="string" />
+-          <Extension Id="figcraft" ContentType="application/x-figcraft">
+-            <Verb Id="open" Command="Open" TargetFile="FigcraftExe" Argument="&quot;%1&quot;" />
+-          </Extension>
+-        </ProgId>
++        <!-- Keep the shared format available without replacing an upstream/user default. -->
++        <ProgId Id="KIO.UI.Document" Description="KIO UI Document" Icon="FigcraftExe" IconIndex="0" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\KIO.UI.Document\shell\open\command" Value="&quot;[#FigcraftExe]&quot; &quot;%1&quot;" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\.figcraft\OpenWithProgids" Name="KIO.UI.Document" Value="" Type="string" />
+         <!-- SVG and images: offered under "Open with", never forced as the default. -->
+-        <ProgId Id="Figcraft.Image" Description="Image" Icon="FigcraftExe" IconIndex="0" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\Figcraft.Image\shell\open\command" Value="&quot;[#FigcraftExe]&quot; &quot;%1&quot;" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\.svg\OpenWithProgids" Name="Figcraft.Image" Value="" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\.png\OpenWithProgids" Name="Figcraft.Image" Value="" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\.jpg\OpenWithProgids" Name="Figcraft.Image" Value="" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\.jpeg\OpenWithProgids" Name="Figcraft.Image" Value="" Type="string" />
++        <ProgId Id="KIO.UI.Image" Description="Image" Icon="FigcraftExe" IconIndex="0" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\KIO.UI.Image\shell\open\command" Value="&quot;[#FigcraftExe]&quot; &quot;%1&quot;" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\.svg\OpenWithProgids" Name="KIO.UI.Image" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\.png\OpenWithProgids" Name="KIO.UI.Image" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\.jpg\OpenWithProgids" Name="KIO.UI.Image" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\.jpeg\OpenWithProgids" Name="KIO.UI.Image" Value="" Type="string" />
  
          <!-- "Open with" app list and the Run dialog (Win+R "figcraft"). -->
 -        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\figcraft.exe" Name="FriendlyAppName" Value="FigCraft" Type="string" />
@@ -76904,7 +76924,7 @@ index a0e40b2..b7ae9cc 100644
  
  <?if $(var.HasCli) = 1 ?>
 diff --git a/packaging/windows/package.ps1 b/packaging/windows/package.ps1
-index eaa46ba..85c3c97 100644
+index eaa46ba00906c8f7aa44d8b5ef91a99259798729..85c3c97fca861c3b67980b56309f6a57abb66db3 100644
 --- a/packaging/windows/package.ps1
 +++ b/packaging/windows/package.ps1
 @@ -1,6 +1,6 @@
@@ -76952,7 +76972,7 @@ index eaa46ba..85c3c97 100644
  Remove-Item -Force $Zip -ErrorAction SilentlyContinue
  Compress-Archive -Path $Portable -DestinationPath $Zip
 diff --git a/packaging/windows/sign.ps1 b/packaging/windows/sign.ps1
-index 3d94747..18978d2 100644
+index 3d94747a58fdd81944ffbafb9bdd028593136212..18978d2296dcb809b4f28fbb274cd396974954b7 100644
 --- a/packaging/windows/sign.ps1
 +++ b/packaging/windows/sign.ps1
 @@ -15,7 +15,7 @@

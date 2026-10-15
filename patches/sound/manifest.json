@@ -13,8 +13,8 @@
   },
   "patch": {
     "file": "soundcraft-v0.7.0-kio-sound.patch",
-    "sha256": "3a29f33c98351c5af913fbd654c841fd410ccde4fe01824c5343a3a37ed1f5a9",
-    "bytes": 4979655
+    "sha256": "343ba9410d2fc1037f769227b519702e38ae2221d16d377950cb31b392b896ea",
+    "bytes": 4983075
   },
   "counts": {
     "upstreamFiles": 422,
@@ -37,7 +37,8 @@
     "allEmbeddedAssetPathsExist": true,
     "upstreamTrademarkLogoFilesRemoved": true,
     "nativeBuildRun": false,
-    "GUIValidationRun": false
+    "GUIValidationRun": false,
+    "windowsOriginalCoexistenceXmlAudit": true
   },
   "nonUiPlatformBrandingExceptions": [],
   "features": {
@@ -654,8 +655,8 @@
         "bytes": 6381
       },
       "after": {
-        "sha256": "31f8292583f3cff18fff05daf1f30444e51009c7ee992c0bfcdd3d0f3415156f",
-        "bytes": 6329
+        "sha256": "df3206be64f7d23a0bdd2607a3dcc553b00bab43cb22b8beeeefadf0bd5545ab",
+        "bytes": 6425
       }
     }
   ],
@@ -1915,5 +1916,41 @@
       "sha256": "f22e78a9a262c3ae4ee08067cecbfc8a33df706cf62535cbc4ae656d323eafad",
       "bytes": 5298
     }
-  ]
+  ],
+  "windowsIdentityAudit": {
+    "app": "sound",
+    "wxs": "packaging/windows/soundcraft.wxs",
+    "sha256": "df3206be64f7d23a0bdd2607a3dcc553b00bab43cb22b8beeeefadf0bd5545ab",
+    "name": "KIO Sound",
+    "upgradeCode": "BA32AC1E-6DBB-5AAB-9CB5-4F2908FA62FA",
+    "gui": "KIO Sound.exe",
+    "fixedComponentGuids": [
+      "3cbc907e-7965-591b-a8e5-cccf43a70418",
+      "f8919df0-b09b-558d-a0f3-06ce890cd9c4"
+    ],
+    "registryValues": 22,
+    "registrySearches": 0,
+    "progIds": [
+      "kio.sound.audio",
+      "kio.sound.midi",
+      "kio.sound.session"
+    ],
+    "supportedTypesRetained": [
+      ".aif",
+      ".aiff",
+      ".flac",
+      ".mid",
+      ".midi",
+      ".mp3",
+      ".scraft",
+      ".wav"
+    ],
+    "checks": {
+      "upstreamRegistryAndComponentIsolation": true,
+      "upstreamDefaultAppUnchanged": true,
+      "kioAppPathsAndGuiMatch": true,
+      "kioInstallDirectory": true,
+      "noNativeExecution": true
+    }
+  }
 }

@@ -146211,7 +146211,7 @@ index 0a519f57af769d0f251090ab9032b79e2d0b9246..3f37b1f77e5f4f6b1f07bf2b1110bffd
          assert!(!is_ours(theirs));
          assert_eq!(exec_program("[Desktop Entry]\nExec=photocraft %F\n").as_deref(), Some("photocraft"));
 diff --git a/crates/native/src/detect.rs b/crates/native/src/detect.rs
-index bb10123bb25cb7b6e478b90281abe1bb45ca2971..ac12a7b01a0d4165339731f82660f31fc269a105 100644
+index bb10123bb25cb7b6e478b90281abe1bb45ca2971..535d0bac9b2505a5ebce33788419862e45fab8cd 100644
 --- a/crates/native/src/detect.rs
 +++ b/crates/native/src/detect.rs
 @@ -36,6 +36,30 @@ impl Snapshot {
@@ -146245,7 +146245,7 @@ index bb10123bb25cb7b6e478b90281abe1bb45ca2971..ac12a7b01a0d4165339731f82660f31f
      let _ = snapshot;
      if let Some(found) = from_manifest(app, manifest) {
          return Some(found);
-@@ -90,7 +114,7 @@ pub(crate) fn appimage_version(name: &str, stems: &[&str]) -> Option<Option<Stri
+@@ -90,27 +114,62 @@ pub(crate) fn appimage_version(name: &str, stems: &[&str]) -> Option<Option<Stri
  
  /// Who our Windows Installer packages name as their publisher.
  #[cfg_attr(not(windows), allow(dead_code))]
@@ -146254,7 +146254,60 @@ index bb10123bb25cb7b6e478b90281abe1bb45ca2971..ac12a7b01a0d4165339731f82660f31f
  
  /// Whether an uninstall entry's `DisplayName` and `Publisher` are `app`'s, under any name its
  /// installers have registered.
-@@ -110,7 +134,7 @@ fn exe_candidates(app: &CraftApp, location: Option<&Path>, program_files: &[Path
+ #[cfg_attr(not(windows), allow(dead_code))]
+ fn is_installer_entry(app: &CraftApp, display_name: &str, publisher: &str) -> bool {
+-    publisher == PUBLISHER && app.names().any(|n| n == display_name)
++    publisher == PUBLISHER && app.names().filter(|n| n.starts_with("KIO ")).any(|n| n == display_name)
+ }
+ 
+-/// Where a Windows install of `app` may keep its exe, in the order to try: the entry's
+-/// `InstallLocation`, then `<App>` under each Program Files root for each name the app has had,
+-/// and in each folder `<stem>.exe` for each stem, current first. Doesn't touch the disk.
++/// Candidate executables only inside this KIO MSI's install location or KIO-named
++/// Program Files folders. The KIO GUI name comes first; original Cargo file names remain
++/// valid inside those confirmed KIO locations for older full native packages.
+ #[cfg_attr(not(windows), allow(dead_code))]
+ fn exe_candidates(app: &CraftApp, location: Option<&Path>, program_files: &[PathBuf]) -> Vec<PathBuf> {
+-    let in_program_files = program_files.iter().flat_map(|root| app.names().map(move |n| root.join(n)));
++    let in_program_files = program_files.iter().flat_map(|root| app.names().filter(|n| n.starts_with("KIO ")).map(move |n| root.join(n)));
+     let dirs = location.map(Path::to_path_buf).into_iter().chain(in_program_files);
+-    dirs.flat_map(|d| app.stems().map(move |s| d.join(format!("{s}.exe")))).collect()
++    let mut out = Vec::new();
++    for dir in dirs {
++        for name in std::iter::once(format!("{}.exe", app.name)).chain(app.stems().map(|s| format!("{s}.exe"))) {
++            let path = dir.join(name);
++            if !out.contains(&path) {
++                out.push(path);
++            }
++        }
++    }
++    out
++}
++
++/// App Paths is only a hint, never proof that an upstream binary belongs to KIO.
++/// Match it to this KIO MSI's permitted candidates before touching or launching a file.
++#[cfg_attr(not(windows), allow(dead_code))]
++fn select_windows_exe(
++    app: &CraftApp,
++    location: Option<&Path>,
++    program_files: &[PathBuf],
++    app_paths: &[PathBuf],
++    is_file: impl Fn(&Path) -> bool,
++) -> Option<PathBuf> {
++    let candidates = exe_candidates(app, location, program_files);
++    let same_path = |a: &Path, b: &Path| a.to_string_lossy().replace('/', "\\").eq_ignore_ascii_case(&b.to_string_lossy().replace('/', "\\"));
++    // Prefer a KIO-named GUI even if an older registration still points to its Cargo name.
++    for candidate in &candidates {
++        if candidate.file_name().is_some_and(|n| n.to_string_lossy().eq_ignore_ascii_case(&format!("{}.exe", app.name))) && is_file(candidate) {
++            return Some(candidate.clone());
++        }
++    }
++    for candidate in &candidates {
++        if app_paths.iter().any(|p| same_path(candidate, p)) && is_file(candidate) {
++            return Some(candidate.clone());
++        }
++    }
++    candidates.into_iter().find(|p| is_file(p))
  }
  
  /// Version from `<app> --version` output. Binaries print the machine id (`photocraft 0.7.0`),
@@ -146263,7 +146316,7 @@ index bb10123bb25cb7b6e478b90281abe1bb45ca2971..ac12a7b01a0d4165339731f82660f31f
  #[cfg_attr(not(any(target_os = "linux", target_os = "freebsd")), allow(dead_code))]
  fn parse_cli_version(line: &str, app: &CraftApp) -> Option<version::Version> {
      let line = line.trim();
-@@ -166,9 +190,11 @@ pub mod macos {
+@@ -166,9 +225,11 @@ pub mod macos {
          }
          // `<App>Version` carries the full version including a pre-release suffix;
          // CFBundleShortVersionString only has the numbers.
@@ -146278,7 +146331,44 @@ index bb10123bb25cb7b6e478b90281abe1bb45ca2971..ac12a7b01a0d4165339731f82660f31f
          Some(Installed { version: text.and_then(version::parse), source: InstallSource::MacApp, location: path.display().to_string(), package: None })
      }
  }
-@@ -441,7 +467,7 @@ mod linux_tests {
+@@ -218,19 +279,15 @@ pub mod windows {
+         out
+     }
+ 
+-    /// The app's exe: from `App Paths`, the install folder, or Program Files.
++    /// Resolve only KIO App Paths and executables owned by a matching KIO MSI.
+     fn exe_path(app: &CraftApp, location: Option<PathBuf>) -> Option<PathBuf> {
+-        for stem in app.stems() {
+-            let app_paths = format!(r"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\{stem}.exe");
+-            for flags in [KEY_WOW64_64KEY, KEY_WOW64_32KEY] {
+-                if let Ok(key) = RegKey::predef(HKEY_LOCAL_MACHINE).open_subkey_with_flags(&app_paths, KEY_READ | flags)
+-                    && let Ok(path) = key.get_value::<String, _>("")
+-                {
+-                    let p = PathBuf::from(path.trim_matches('"'));
+-                    if p.exists() {
+-                        return Some(p);
+-                    }
+-                }
++        let app_path_key = format!(r"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\{}.exe", app.name);
++        let mut app_paths = Vec::new();
++        for (hive, flags) in [(HKEY_LOCAL_MACHINE, KEY_WOW64_64KEY), (HKEY_LOCAL_MACHINE, KEY_WOW64_32KEY), (HKEY_CURRENT_USER, 0)] {
++            if let Ok(key) = RegKey::predef(hive).open_subkey_with_flags(&app_path_key, KEY_READ | flags)
++                && let Ok(path) = key.get_value::<String, _>("")
++            {
++                app_paths.push(PathBuf::from(path.trim_matches('"')));
+             }
+         }
+         let mut roots = Vec::new();
+@@ -239,7 +296,7 @@ pub mod windows {
+                 roots.push(PathBuf::from(pf));
+             }
+         }
+-        exe_candidates(app, location.as_deref(), &roots).into_iter().find(|p| p.exists())
++        select_windows_exe(app, location.as_deref(), &roots, &app_paths, |p| p.is_file())
+     }
+ 
+     pub fn detect(app: &CraftApp) -> Option<Installed> {
+@@ -441,7 +498,7 @@ mod linux_tests {
              })
          };
          assert!(ours("photocraft"));
@@ -146287,7 +146377,7 @@ index bb10123bb25cb7b6e478b90281abe1bb45ca2971..ac12a7b01a0d4165339731f82660f31f
          assert!(!ours("unrelated-package"));
      }
  
-@@ -475,7 +501,7 @@ mod linux_tests {
+@@ -475,7 +532,7 @@ mod linux_tests {
              std::fs::set_permissions(&bin, std::fs::Permissions::from_mode(0o755)).unwrap();
              bin
          };
@@ -146296,7 +146386,7 @@ index bb10123bb25cb7b6e478b90281abe1bb45ca2971..ac12a7b01a0d4165339731f82660f31f
          assert_eq!(linux::binary_version(&sound, CraftApp::by_id("soundcraft").unwrap()).unwrap().to_string(), "0.5.0");
          let pdf = write("pdfcraft", "#!/bin/sh\necho 'printcraft 0.2.1'\n");
          assert_eq!(linux::binary_version(&pdf, CraftApp::by_id("pdfcraft").unwrap()).unwrap().to_string(), "0.2.1");
-@@ -497,7 +523,8 @@ mod tests {
+@@ -497,7 +554,8 @@ mod tests {
          assert_eq!(v("pdfcraft-0.3.0-rc.1-linux-x86_64.AppImage"), Some(Some("0.3.0-rc.1".into())));
          // Gear Lever's rename, and a plain rename by hand.
          assert_eq!(v("pdfcraft.appimage"), Some(None));
@@ -146306,7 +146396,7 @@ index bb10123bb25cb7b6e478b90281abe1bb45ca2971..ac12a7b01a0d4165339731f82660f31f
          for other in [
              "pdfcraft-0.3.0-linux-x86_64.AppImage.zsync",
              "pdfcraft-0.3.0-linux-x86_64.deb",
-@@ -519,9 +546,9 @@ mod tests {
+@@ -519,9 +577,9 @@ mod tests {
          let sound = CraftApp::by_id("soundcraft").unwrap();
          let pdf = CraftApp::by_id("pdfcraft").unwrap();
          assert_eq!(parse_cli_version("photocraft 0.7.0 (dev build)", photo).unwrap().to_string(), "0.7.0");
@@ -146318,7 +146408,7 @@ index bb10123bb25cb7b6e478b90281abe1bb45ca2971..ac12a7b01a0d4165339731f82660f31f
          assert!(strip_cli_prefix("photocraft-cli 1.0.0", "photocraft").is_none());
      }
  
-@@ -551,7 +578,27 @@ mod tests {
+@@ -551,62 +609,110 @@ mod tests {
          );
      }
  
@@ -146347,12 +146437,15 @@ index bb10123bb25cb7b6e478b90281abe1bb45ca2971..ac12a7b01a0d4165339731f82660f31f
  
      fn roots() -> Vec<PathBuf> {
          vec![PathBuf::from(r"C:\Program Files"), PathBuf::from(r"C:\Program Files (x86)")]
-@@ -560,20 +607,20 @@ mod tests {
+     }
+ 
      #[test]
-     fn pdfcraft_matches_its_former_printcraft_installer_name() {
+-    fn pdfcraft_matches_its_former_printcraft_installer_name() {
++    fn original_printcraft_installer_is_not_a_kio_install() {
          let pdf = CraftApp::by_id("pdfcraft").unwrap();
 -        assert!(is_installer_entry(pdf, "PrintCraft", LEARNING_MACHINES), "a PrintCraft entry from {LEARNING_MACHINES} should be PdfCraft's");
-+        assert!(is_installer_entry(pdf, "PrintCraft", LEARNING_MACHINES), "a PrintCraft entry from {LEARNING_MACHINES} should be KIO PDF's");
++        assert!(!is_installer_entry(pdf, "PrintCraft", LEARNING_MACHINES));
++        assert!(!is_installer_entry(pdf, "PrintCraft", "Learning Machines LLC"));
      }
  
      #[test]
@@ -146364,22 +146457,95 @@ index bb10123bb25cb7b6e478b90281abe1bb45ca2971..ac12a7b01a0d4165339731f82660f31f
  
      #[test]
      fn printcraft_entries_match_nothing_else() {
-         let pdf = CraftApp::by_id("pdfcraft").unwrap();
-         assert!(!is_installer_entry(pdf, "PrintCraft", "Some Other Publisher"));
+-        let pdf = CraftApp::by_id("pdfcraft").unwrap();
+-        assert!(!is_installer_entry(pdf, "PrintCraft", "Some Other Publisher"));
 -        assert!(!is_installer_entry(pdf, "PhotoCraft", LEARNING_MACHINES));
-+        assert!(!is_installer_entry(pdf, "KIO Photo", LEARNING_MACHINES));
-         for a in SUITE.iter().filter(|a| a.id != "pdfcraft") {
-             assert!(!is_installer_entry(a, "PrintCraft", LEARNING_MACHINES), "PrintCraft matched {}", a.name);
+-        for a in SUITE.iter().filter(|a| a.id != "pdfcraft") {
+-            assert!(!is_installer_entry(a, "PrintCraft", LEARNING_MACHINES), "PrintCraft matched {}", a.name);
++        for app in &SUITE {
++            assert!(!is_installer_entry(app, "PrintCraft", "Some Other Publisher"));
++            assert!(!is_installer_entry(app, "PrintCraft", LEARNING_MACHINES));
          }
-@@ -586,7 +633,7 @@ mod tests {
+     }
+ 
+     #[test]
+-    fn pdfcraft_exe_is_sought_under_every_name_it_has_shipped_as() {
++    fn pdfcraft_exe_stems_are_only_sought_in_kio_owned_locations() {
+         let pdf = CraftApp::by_id("pdfcraft").unwrap();
+-        let location = PathBuf::from(r"D:\Apps\PrintCraft");
++        let location = PathBuf::from(r"D:\Apps With Spaces\KIO PDF");
          let roots = roots();
-         let mut want = vec![location.join("pdfcraft.exe"), location.join("printcraft.exe")];
-         for root in &roots {
+-        let mut want = vec![location.join("pdfcraft.exe"), location.join("printcraft.exe")];
+-        for root in &roots {
 -            for dir in ["PdfCraft", "PrintCraft"] {
-+            for dir in ["KIO PDF", "PrintCraft"] {
-                 want.push(root.join(dir).join("pdfcraft.exe"));
-                 want.push(root.join(dir).join("printcraft.exe"));
+-                want.push(root.join(dir).join("pdfcraft.exe"));
+-                want.push(root.join(dir).join("printcraft.exe"));
++        let mut want = Vec::new();
++        for dir in std::iter::once(location.clone()).chain(roots.iter().map(|r| r.join("KIO PDF"))) {
++            for name in ["KIO PDF.exe", "pdfcraft.exe", "printcraft.exe"] {
++                want.push(dir.join(name));
              }
+         }
+         assert_eq!(exe_candidates(pdf, Some(&location), &roots), want);
++        assert!(exe_candidates(pdf, None, &roots).iter().all(|p| !p.to_string_lossy().contains("PrintCraft")));
++    }
++
++    #[test]
++    fn apps_without_former_names_match_and_find_their_kio_gui_or_original_cargo_name() {
++        let roots = roots();
++        let location = PathBuf::from(r"D:\Apps\Somewhere With Spaces");
++        for app in SUITE.iter().filter(|a| a.former_ids.is_empty() && a.former_names.is_empty()) {
++            assert!(is_installer_entry(app, app.name, LEARNING_MACHINES), "{}", app.name);
++            assert!(!is_installer_entry(app, app.name, "Learning Machines LLC"), "{}", app.name);
++            assert!(!is_installer_entry(app, &app.name.to_lowercase(), LEARNING_MACHINES), "{}", app.name);
++            let mut want = Vec::new();
++            for dir in std::iter::once(location.clone()).chain(roots.iter().map(|r| r.join(app.name))) {
++                want.push(dir.join(format!("{}.exe", app.name)));
++                want.push(dir.join(format!("{}.exe", app.id)));
++            }
++            assert_eq!(exe_candidates(app, Some(&location), &roots), want);
++        }
++    }
++
++    #[test]
++    fn coinstalled_original_app_paths_cannot_override_kio_gui() {
++        let app = CraftApp::by_id("wordcraft").unwrap();
++        let roots = roots();
++        let kio = roots[0].join("KIO Word").join("KIO Word.exe");
++        let original = roots[0].join("WordCraft").join("wordcraft.exe");
++        let found = select_windows_exe(app, None, &roots, std::slice::from_ref(&original), |p| p == kio || p == original);
++        assert_eq!(found, Some(kio));
++        assert!(select_windows_exe(app, None, &roots, std::slice::from_ref(&original), |p| p == original).is_none());
+     }
+ 
+     #[test]
+-    fn apps_without_former_names_match_and_find_their_exe_as_before() {
++    fn renamed_gui_custom_spaces_and_kio_app_paths_keep_original_cargo_fallback_scoped() {
+         let roots = roots();
+-        let location = PathBuf::from(r"D:\Apps\Somewhere");
+-        for a in SUITE.iter().filter(|a| a.former_ids.is_empty() && a.former_names.is_empty()) {
+-            assert!(is_installer_entry(a, a.name, LEARNING_MACHINES), "{}", a.name);
+-            assert!(!is_installer_entry(a, a.name, "Some Other Publisher"), "{}", a.name);
+-            assert!(!is_installer_entry(a, &a.name.to_lowercase(), LEARNING_MACHINES), "{}", a.name);
+-            let exe = format!("{}.exe", a.id);
+-            let in_program_files: Vec<PathBuf> = roots.iter().map(|r| r.join(a.name).join(&exe)).collect();
+-            assert_eq!(exe_candidates(a, None, &roots), in_program_files);
+-            let with_location: Vec<PathBuf> = std::iter::once(location.join(&exe)).chain(in_program_files).collect();
+-            assert_eq!(exe_candidates(a, Some(&location), &roots), with_location);
++        let custom = PathBuf::from(r"D:\My Apps\My KIO App");
++        for app in &SUITE {
++            let named = custom.join(format!("{}.exe", app.name));
++            let old = custom.join(format!("{}.exe", app.id));
++            let original = roots[0].join(app.id).join(format!("{}.exe", app.id));
++            assert_eq!(
++                select_windows_exe(app, Some(&custom), &roots, std::slice::from_ref(&old), |p| p == named || p == old || p == original),
++                Some(named)
++            );
++            assert_eq!(select_windows_exe(app, Some(&custom), &roots, std::slice::from_ref(&old), |p| p == old || p == original), Some(old));
++            assert!(select_windows_exe(app, None, &roots, std::slice::from_ref(&original), |p| p == original).is_none());
+         }
+     }
+ }
 diff --git a/crates/native/src/http.rs b/crates/native/src/http.rs
 index 8a304489e59b32b6ed07c22b099c30368a542c23..4a104612974162056ac87c7d88f97283cbaebdf3 100644
 --- a/crates/native/src/http.rs
@@ -148692,7 +148858,7 @@ index 8f85180eda3f41000487dee9264d07f4afa1d0bb..d6d0a1fd72ef6bce416b76bdda739351
      let mut table = harness(ViewMode::Table);
      table.run_steps(8);
 diff --git a/crates/ui-egui/tests/ui.rs b/crates/ui-egui/tests/ui.rs
-index a89a4aa158a22d6d70f5bb96fed167185ac56688..36556caa3fec44ac50ed2d67333df707a5dfa1dc 100644
+index a89a4aa158a22d6d70f5bb96fed167185ac56688..74f0c98ba2597eb42acdeb8d53499cd64a9f899e 100644
 --- a/crates/ui-egui/tests/ui.rs
 +++ b/crates/ui-egui/tests/ui.rs
 @@ -389,8 +389,8 @@ fn a_kept_update_names_its_version_and_an_up_to_date_app_is_not_downloaded_again
@@ -148819,6 +148985,34 @@ index a89a4aa158a22d6d70f5bb96fed167185ac56688..36556caa3fec44ac50ed2d67333df707
      assert!(h.query_all_by_label_contains("Website").count() >= 2);
  }
  
+@@ -674,13 +674,13 @@ fn links_open_the_right_pages() {
+     let (mut h, _) = harness(ViewMode::Grid, egui::Theme::Dark, true);
+     h.run_steps(6);
+     assert_eq!(click_opens(&mut h, "Discord").as_deref(), Some("https://discord.gg/artcraft"));
+-    // The footer's ArtCraft links and each card's own pages.
++    // The footer opens KIO's source/homepage, and cards open the selected program page.
+     let github = all_opened(&mut h, "GitHub");
+-    assert!(github.contains(&"https://github.com/storytold".to_string()), "{github:?}");
+-    assert!(github.contains(&"https://github.com/storytold/photocraft".to_string()), "{github:?}");
++    assert!(github.len() >= 2, "the footer and app card both retain source links: {github:?}");
++    assert!(github.iter().all(|url| url == "https://github.com/qptywoei777-rgb/kio-native-apps"), "{github:?}");
+     let sites = all_opened(&mut h, "Website");
+-    assert!(sites.contains(&"https://getartcraft.com".to_string()), "{sites:?}");
+-    assert!(sites.contains(&"https://getartcraft.com/apps/photocraft".to_string()), "{sites:?}");
++    assert!(sites.contains(&"https://kio-library.vercel.app".to_string()), "{sites:?}");
++    assert!(sites.contains(&"https://kio-library.vercel.app/?program=photo".to_string()), "{sites:?}");
+     // Social icons in the footer.
+     assert_eq!(click_opens(&mut h, "X").as_deref(), Some("https://x.com/get_artcraft"));
+     assert_eq!(click_opens(&mut h, "YouTube").as_deref(), Some("https://www.youtube.com/@OfficialArtcraftStudios"));
+@@ -690,7 +690,7 @@ fn links_open_the_right_pages() {
+     // The … menu.
+     h.get_all_by_label("…").next().unwrap().click();
+     h.run_steps(3);
+-    assert_eq!(click_opens(&mut h, "All releases").as_deref(), Some("https://github.com/storytold/photocraft/releases"));
++    assert_eq!(click_opens(&mut h, "All releases").as_deref(), Some("https://github.com/qptywoei777-rgb/kio-native-apps/releases"));
+ }
+ 
+ #[test]
 @@ -780,7 +780,7 @@ fn the_launcher_updates_itself_and_quits_to_restart() {
          None,
      );
@@ -151163,6 +151357,88 @@ index b004d0dd397e530d543062e5b18c12689f44a00e..ec5ed3707893c703d1e4e6ac8c8db855
  TMP="$(mktemp -d)"
  trap 'rm -rf "$TMP"' EXIT
  
+diff --git a/packaging/linux/ai.storyteller.artcraft-launcher.desktop b/packaging/linux/ai.storyteller.artcraft-launcher.desktop
+deleted file mode 100644
+index 88e13a21dd416f347e5df3d9d02314b84b5da01a..0000000000000000000000000000000000000000
+--- a/packaging/linux/ai.storyteller.artcraft-launcher.desktop
++++ /dev/null
+@@ -1,13 +0,0 @@
+-[Desktop Entry]
+-Type=Application
+-Name=ArtCraft Launcher
+-GenericName=App Launcher
+-Comment=Install, update and launch the Craft App Suite
+-Exec=artcraft-launcher
+-TryExec=artcraft-launcher
+-Icon=ai.storyteller.artcraft-launcher
+-Terminal=false
+-StartupNotify=true
+-StartupWMClass=artcraft-launcher
+-Categories=Utility;PackageManager;
+-Keywords=artcraft;craft;launcher;installer;updater;photocraft;filmcraft;apps;
+diff --git a/packaging/linux/ai.storyteller.artcraft-launcher.metainfo.xml.in b/packaging/linux/ai.storyteller.artcraft-launcher.metainfo.xml.in
+deleted file mode 100644
+index 7a885ff4f3e0fe5e69d63b3626bf41b4f6fd3ea1..0000000000000000000000000000000000000000
+--- a/packaging/linux/ai.storyteller.artcraft-launcher.metainfo.xml.in
++++ /dev/null
+@@ -1,57 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!-- AppStream metadata (software centres, Flathub). Template: package.sh and the Flatpak
+-     manifest substitute @VERSION@ and @DATE@ from Cargo.toml and the build date. -->
+-<component type="desktop-application">
+-  <id>ai.storyteller.artcraft-launcher</id>
+-  <metadata_license>CC0-1.0</metadata_license>
+-  <project_license>MIT OR Apache-2.0</project_license>
+-  <name>ArtCraft Launcher</name>
+-  <summary>Install, update and launch the Craft App Suite</summary>
+-  <developer id="ai.storyteller">
+-    <name>Learning Machines LLC</name>
+-  </developer>
+-  <description>
+-    <p>
+-      ArtCraft Launcher lists every app in the Craft App Suite (PhotoCraft, LightCraft, FilmCraft,
+-      DesignCraft, VectorCraft, PdfCraft, EffectCraft, WordCraft, DeckCraft, GridCraft, CADCraft,
+-      SoundCraft and FigCraft), installs the right build for your computer, and keeps them up to date.
+-    </p>
+-    <ul>
+-      <li>One place to find, install and open every Craft app</li>
+-      <li>Checks GitHub releases for updates and installs them for you</li>
+-      <li>Lives in the system tray and tells you when updates are ready</li>
+-    </ul>
+-  </description>
+-  <launchable type="desktop-id">ai.storyteller.artcraft-launcher.desktop</launchable>
+-  <icon type="stock">ai.storyteller.artcraft-launcher</icon>
+-  <!-- Only url types known to appstream 0.15 (Ubuntu 22.04, where CI validates): no vcs-browser. -->
+-  <url type="homepage">https://getartcraft.com/apps</url>
+-  <url type="bugtracker">https://github.com/storytold/craft-launcher/issues</url>
+-  <url type="help">https://github.com/storytold/craft-launcher</url>
+-  <url type="contact">https://discord.gg/artcraft</url>
+-  <categories>
+-    <category>Utility</category>
+-    <category>PackageManager</category>
+-  </categories>
+-  <keywords>
+-    <keyword>launcher</keyword>
+-    <keyword>installer</keyword>
+-    <keyword>updater</keyword>
+-    <keyword>artcraft</keyword>
+-  </keywords>
+-  <branding>
+-    <color type="primary" scheme_preference="light">#d9dce3</color>
+-    <color type="primary" scheme_preference="dark">#26282e</color>
+-  </branding>
+-  <supports>
+-    <control>keyboard</control>
+-    <control>pointing</control>
+-  </supports>
+-  <provides>
+-    <binary>artcraft-launcher</binary>
+-  </provides>
+-  <content_rating type="oars-1.1"/>
+-  <releases>
+-    <release version="@VERSION@" date="@DATE@"/>
+-  </releases>
+-</component>
 diff --git a/packaging/linux/apprun-test.sh b/packaging/linux/apprun-test.sh
 index 23007d1bc2d786611311fa5358d5a08253de2edf..337c687cb7cd6b8b0828ecacd4dc0aeec9106060 100755
 --- a/packaging/linux/apprun-test.sh
@@ -151176,73 +151452,88 @@ index 23007d1bc2d786611311fa5358d5a08253de2edf..337c687cb7cd6b8b0828ecacd4dc0aee
  
  TMP="$(mktemp -d)"
  trap 'rm -rf "$TMP"' EXIT
-diff --git a/packaging/linux/ai.storyteller.artcraft-launcher.desktop b/packaging/linux/com.kio.launcher.desktop
-similarity index 71%
-rename from packaging/linux/ai.storyteller.artcraft-launcher.desktop
-rename to packaging/linux/com.kio.launcher.desktop
-index 88e13a21dd416f347e5df3d9d02314b84b5da01a..959f16ad96cda51ccad50827cccdfc27ee6ad2d6 100644
---- a/packaging/linux/ai.storyteller.artcraft-launcher.desktop
+diff --git a/packaging/linux/com.kio.launcher.desktop b/packaging/linux/com.kio.launcher.desktop
+new file mode 100644
+index 0000000000000000000000000000000000000000..959f16ad96cda51ccad50827cccdfc27ee6ad2d6
+--- /dev/null
 +++ b/packaging/linux/com.kio.launcher.desktop
-@@ -1,11 +1,11 @@
- [Desktop Entry]
- Type=Application
--Name=ArtCraft Launcher
+@@ -0,0 +1,13 @@
++[Desktop Entry]
++Type=Application
 +Name=KIO Launcher
- GenericName=App Launcher
--Comment=Install, update and launch the Craft App Suite
++GenericName=App Launcher
 +Comment=Install, update and launch the KIO App Suite
- Exec=artcraft-launcher
- TryExec=artcraft-launcher
--Icon=ai.storyteller.artcraft-launcher
++Exec=artcraft-launcher
++TryExec=artcraft-launcher
 +Icon=com.kio.launcher
- Terminal=false
- StartupNotify=true
- StartupWMClass=artcraft-launcher
-diff --git a/packaging/linux/ai.storyteller.artcraft-launcher.metainfo.xml.in b/packaging/linux/com.kio.launcher.metainfo.xml.in
-similarity index 73%
-rename from packaging/linux/ai.storyteller.artcraft-launcher.metainfo.xml.in
-rename to packaging/linux/com.kio.launcher.metainfo.xml.in
-index 7a885ff4f3e0fe5e69d63b3626bf41b4f6fd3ea1..d938dbfc37508f907a7436d1a2306da0a1fad215 100644
---- a/packaging/linux/ai.storyteller.artcraft-launcher.metainfo.xml.in
++Terminal=false
++StartupNotify=true
++StartupWMClass=artcraft-launcher
++Categories=Utility;PackageManager;
++Keywords=artcraft;craft;launcher;installer;updater;photocraft;filmcraft;apps;
+diff --git a/packaging/linux/com.kio.launcher.metainfo.xml.in b/packaging/linux/com.kio.launcher.metainfo.xml.in
+new file mode 100644
+index 0000000000000000000000000000000000000000..d938dbfc37508f907a7436d1a2306da0a1fad215
+--- /dev/null
 +++ b/packaging/linux/com.kio.launcher.metainfo.xml.in
-@@ -2,19 +2,19 @@
- <!-- AppStream metadata (software centres, Flathub). Template: package.sh and the Flatpak
-      manifest substitute @VERSION@ and @DATE@ from Cargo.toml and the build date. -->
- <component type="desktop-application">
--  <id>ai.storyteller.artcraft-launcher</id>
+@@ -0,0 +1,57 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<!-- AppStream metadata (software centres, Flathub). Template: package.sh and the Flatpak
++     manifest substitute @VERSION@ and @DATE@ from Cargo.toml and the build date. -->
++<component type="desktop-application">
 +  <id>com.kio.launcher</id>
-   <metadata_license>CC0-1.0</metadata_license>
-   <project_license>MIT OR Apache-2.0</project_license>
--  <name>ArtCraft Launcher</name>
--  <summary>Install, update and launch the Craft App Suite</summary>
++  <metadata_license>CC0-1.0</metadata_license>
++  <project_license>MIT OR Apache-2.0</project_license>
 +  <name>KIO Launcher</name>
 +  <summary>Install, update and launch the KIO App Suite</summary>
-   <developer id="ai.storyteller">
--    <name>Learning Machines LLC</name>
++  <developer id="ai.storyteller">
 +    <name>KIO</name>
-   </developer>
-   <description>
-     <p>
--      ArtCraft Launcher lists every app in the Craft App Suite (PhotoCraft, LightCraft, FilmCraft,
--      DesignCraft, VectorCraft, PdfCraft, EffectCraft, WordCraft, DeckCraft, GridCraft, CADCraft,
--      SoundCraft and FigCraft), installs the right build for your computer, and keeps them up to date.
++  </developer>
++  <description>
++    <p>
 +      KIO Launcher lists every app in the KIO App Suite (KIO Photo, KIO Light, KIO Film,
 +      KIO Design, KIO Vector, KIO PDF, KIO Effect, KIO Word, KIO Deck, KIO Grid, KIO Cad,
 +      KIO Sound and KIO UI), installs the right build for your computer, and keeps them up to date.
-     </p>
-     <ul>
-       <li>One place to find, install and open every Craft app</li>
-@@ -22,8 +22,8 @@
-       <li>Lives in the system tray and tells you when updates are ready</li>
-     </ul>
-   </description>
--  <launchable type="desktop-id">ai.storyteller.artcraft-launcher.desktop</launchable>
--  <icon type="stock">ai.storyteller.artcraft-launcher</icon>
++    </p>
++    <ul>
++      <li>One place to find, install and open every Craft app</li>
++      <li>Checks GitHub releases for updates and installs them for you</li>
++      <li>Lives in the system tray and tells you when updates are ready</li>
++    </ul>
++  </description>
 +  <launchable type="desktop-id">com.kio.launcher.desktop</launchable>
 +  <icon type="stock">com.kio.launcher</icon>
-   <!-- Only url types known to appstream 0.15 (Ubuntu 22.04, where CI validates): no vcs-browser. -->
-   <url type="homepage">https://getartcraft.com/apps</url>
-   <url type="bugtracker">https://github.com/storytold/craft-launcher/issues</url>
++  <!-- Only url types known to appstream 0.15 (Ubuntu 22.04, where CI validates): no vcs-browser. -->
++  <url type="homepage">https://getartcraft.com/apps</url>
++  <url type="bugtracker">https://github.com/storytold/craft-launcher/issues</url>
++  <url type="help">https://github.com/storytold/craft-launcher</url>
++  <url type="contact">https://discord.gg/artcraft</url>
++  <categories>
++    <category>Utility</category>
++    <category>PackageManager</category>
++  </categories>
++  <keywords>
++    <keyword>launcher</keyword>
++    <keyword>installer</keyword>
++    <keyword>updater</keyword>
++    <keyword>artcraft</keyword>
++  </keywords>
++  <branding>
++    <color type="primary" scheme_preference="light">#d9dce3</color>
++    <color type="primary" scheme_preference="dark">#26282e</color>
++  </branding>
++  <supports>
++    <control>keyboard</control>
++    <control>pointing</control>
++  </supports>
++  <provides>
++    <binary>artcraft-launcher</binary>
++  </provides>
++  <content_rating type="oars-1.1"/>
++  <releases>
++    <release version="@VERSION@" date="@DATE@"/>
++  </releases>
++</component>
 diff --git a/packaging/linux/flatpak-bundle.sh b/packaging/linux/flatpak-bundle.sh
 index e6d36525485134f404a2e623b39087f191665566..dec60e5f8246c7091f5b92e06efbd80b37a865bb 100755
 --- a/packaging/linux/flatpak-bundle.sh
@@ -151278,127 +151569,310 @@ index e6d36525485134f404a2e623b39087f191665566..dec60e5f8246c7091f5b92e06efbd80b
  
  WORK="$CARGO_TARGET_DIR/flatpak-bundle"
  rm -rf "$WORK"
-diff --git a/packaging/linux/flatpak/ai.storyteller.artcraft-launcher.bundle.yml b/packaging/linux/flatpak/com.kio.launcher.bundle.yml
-similarity index 83%
-rename from packaging/linux/flatpak/ai.storyteller.artcraft-launcher.bundle.yml
-rename to packaging/linux/flatpak/com.kio.launcher.bundle.yml
-index 836cd11b4ffd61388d44aeee5dc8b4c09ed80f0f..25ed9503406b1075d05d37a5557090551551df1b 100644
+diff --git a/packaging/linux/flatpak/ai.storyteller.artcraft-launcher.bundle.yml b/packaging/linux/flatpak/ai.storyteller.artcraft-launcher.bundle.yml
+deleted file mode 100644
+index 836cd11b4ffd61388d44aeee5dc8b4c09ed80f0f..0000000000000000000000000000000000000000
 --- a/packaging/linux/flatpak/ai.storyteller.artcraft-launcher.bundle.yml
-+++ b/packaging/linux/flatpak/com.kio.launcher.bundle.yml
-@@ -9,9 +9,9 @@
- # Wayland, xkbcommon and Vulkan at runtime; the freedesktop runtime has all of them, and the
- # GPU driver comes from its org.freedesktop.Platform.GL extension.
- #
++++ /dev/null
+@@ -1,61 +0,0 @@
+-# Flatpak manifest for the single-file bundle attached to every GitHub release
+-# (artcraft-launcher-<version>-linux-<arch>.flatpak). Build it with packaging/linux/flatpak-bundle.sh.
+-#
+-# It repackages the release's own Linux tarball (artcraft-launcher-<version>-linux-<arch>.tar.gz,
+-# built on Ubuntu 22.04 by package.sh) instead of compiling Rust inside flatpak-builder: no
+-# network and no vendored crate sources during the build, a few seconds instead of many minutes,
+-# and byte-for-byte the same binary as the AppImage/deb/rpm. The script unpacks the tarball
+-# into `stage/` next to a copy of this file. The binary needs glibc >= 2.35 and loads X11,
+-# Wayland, xkbcommon and Vulkan at runtime; the freedesktop runtime has all of them, and the
+-# GPU driver comes from its org.freedesktop.Platform.GL extension.
+-#
 -# ai.storyteller.artcraft-launcher.yml (same directory) is the from-source manifest for Flathub.
-+# com.kio.launcher.yml (same directory) is the from-source manifest for Flathub.
- # Keep runtime-version and finish-args identical in both (packaging-lint checks this).
+-# Keep runtime-version and finish-args identical in both (packaging-lint checks this).
 -id: ai.storyteller.artcraft-launcher
-+id: com.kio.launcher
- runtime: org.freedesktop.Platform
- runtime-version: '26.08'
- sdk: org.freedesktop.Sdk
-@@ -24,10 +24,10 @@ finish-args:
-   - --share=ipc
-   # GPU access for egui's wgpu renderer (Vulkan, or GL as a fallback).
-   - --device=dri
+-runtime: org.freedesktop.Platform
+-runtime-version: '26.08'
+-sdk: org.freedesktop.Sdk
+-command: artcraft-launcher
+-finish-args:
+-  # Display: Wayland first; X11 only when no Wayland compositor is running.
+-  - --socket=wayland
+-  - --socket=fallback-x11
+-  # X11 shared memory (MIT-SHM). Without it the X11 fallback is slow or fails.
+-  - --share=ipc
+-  # GPU access for egui's wgpu renderer (Vulkan, or GL as a fallback).
+-  - --device=dri
 -  # SoundCraft's audio, for the case where it runs inside this sandbox rather than on the host
-+  # KIO Sound's audio, for the case where it runs inside this sandbox rather than on the host
-   # (the launcher falls back to its release tarball when the host has no usable Flatpak): its
-   # ALSA goes through the runtime's PulseAudio plugin to this socket, which PipeWire's pulse
+-  # (the launcher falls back to its release tarball when the host has no usable Flatpak): its
+-  # ALSA goes through the runtime's PulseAudio plugin to this socket, which PipeWire's pulse
 -  # server provides on modern desktops. Note this socket also covers the microphone (SoundCraft
-+  # server provides on modern desktops. Note this socket also covers the microphone (KIO Sound
-   # records, so it needs it); it grants recording, not raw hardware access.
-   - --socket=pulseaudio
-   # The launcher reads the Craft apps' GitHub releases and downloads them.
-@@ -38,7 +38,7 @@ finish-args:
-   # Apps normally install as Flatpaks and run on the host: `flatpak-spawn --host` (below) starts
-   # them, and the home directory is granted so files opened by path work. When the host has no
-   # usable Flatpak the launcher falls back to the release tarball, which it unpacks into its own
+-  # records, so it needs it); it grants recording, not raw hardware access.
+-  - --socket=pulseaudio
+-  # The launcher reads the Craft apps' GitHub releases and downloads them.
+-  - --share=network
+-  # Tray icon (StatusNotifierItem) and desktop notifications, both over the session bus.
+-  - --talk-name=org.kde.StatusNotifierWatcher
+-  - --talk-name=org.freedesktop.Notifications
+-  # Apps normally install as Flatpaks and run on the host: `flatpak-spawn --host` (below) starts
+-  # them, and the home directory is granted so files opened by path work. When the host has no
+-  # usable Flatpak the launcher falls back to the release tarball, which it unpacks into its own
 -  # folder (~/.var/app/ai.storyteller.artcraft-launcher/data/artcraft-launcher/apps/<app>) and
-+  # folder (~/.var/app/com.kio.launcher/data/artcraft-launcher/apps/<app>) and
-   # runs in the same sandbox with HOME pointed at a home/ folder beside it, so each app's
-   # settings stay in the sandbox too.
-   # LIMITATION: installing software on the host still needs `flatpak-spawn --host`. Distro
-@@ -52,9 +52,9 @@ modules:
-     buildsystem: simple
-     build-commands:
-       - install -Dm755 bin/artcraft-launcher /app/bin/artcraft-launcher
+-  # runs in the same sandbox with HOME pointed at a home/ folder beside it, so each app's
+-  # settings stay in the sandbox too.
+-  # LIMITATION: installing software on the host still needs `flatpak-spawn --host`. Distro
+-  # packages (.deb/.rpm) or anything needing root still have to be installed by the user.
+-  # org.freedesktop.Flatpak is a sandbox escape that Flathub reviews case by case; the AppImage,
+-  # .deb and .rpm builds are the recommended way to run the launcher on Linux.
+-  - --talk-name=org.freedesktop.Flatpak
+-  - --filesystem=home
+-modules:
+-  - name: artcraft-launcher
+-    buildsystem: simple
+-    build-commands:
+-      - install -Dm755 bin/artcraft-launcher /app/bin/artcraft-launcher
 -      - install -Dm644 share/applications/ai.storyteller.artcraft-launcher.desktop /app/share/applications/ai.storyteller.artcraft-launcher.desktop
-+      - install -Dm644 share/applications/com.kio.launcher.desktop /app/share/applications/com.kio.launcher.desktop
-       # Already has the release's version and date substituted by package.sh.
+-      # Already has the release's version and date substituted by package.sh.
 -      - install -Dm644 share/metainfo/ai.storyteller.artcraft-launcher.metainfo.xml /app/share/metainfo/ai.storyteller.artcraft-launcher.metainfo.xml
-+      - install -Dm644 share/metainfo/com.kio.launcher.metainfo.xml /app/share/metainfo/com.kio.launcher.metainfo.xml
-       - mkdir -p /app/share/icons /app/share/doc && cp -R share/icons/hicolor /app/share/icons/ && cp -R share/doc/artcraft-launcher /app/share/doc/
-     sources:
-       - type: dir
-diff --git a/packaging/linux/flatpak/ai.storyteller.artcraft-launcher.yml b/packaging/linux/flatpak/com.kio.launcher.yml
-similarity index 80%
-rename from packaging/linux/flatpak/ai.storyteller.artcraft-launcher.yml
-rename to packaging/linux/flatpak/com.kio.launcher.yml
-index f3166436d000da8da0ff380562731fd310bb3bbb..f78ec03391cc5e6d9ff5e0351ffeb71cd2642ed5 100644
+-      - mkdir -p /app/share/icons /app/share/doc && cp -R share/icons/hicolor /app/share/icons/ && cp -R share/doc/artcraft-launcher /app/share/doc/
+-    sources:
+-      - type: dir
+-        path: stage
+diff --git a/packaging/linux/flatpak/ai.storyteller.artcraft-launcher.yml b/packaging/linux/flatpak/ai.storyteller.artcraft-launcher.yml
+deleted file mode 100644
+index f3166436d000da8da0ff380562731fd310bb3bbb..0000000000000000000000000000000000000000
 --- a/packaging/linux/flatpak/ai.storyteller.artcraft-launcher.yml
-+++ b/packaging/linux/flatpak/com.kio.launcher.yml
-@@ -1,17 +1,17 @@
++++ /dev/null
+@@ -1,79 +0,0 @@
 -# Flatpak manifest for ArtCraft Launcher, ready for a Flathub submission.
-+# Flatpak manifest for KIO Launcher, ready for a Flathub submission.
- #
- # Flatpak builds run offline, so the crate sources must be vendored first. From the repo root:
- #
- #   curl -fsSLO https://raw.githubusercontent.com/flatpak/flatpak-builder-tools/master/cargo/flatpak-cargo-generator.py
- #   python3 flatpak-cargo-generator.py Cargo.lock -o packaging/linux/flatpak/cargo-sources.json
+-#
+-# Flatpak builds run offline, so the crate sources must be vendored first. From the repo root:
+-#
+-#   curl -fsSLO https://raw.githubusercontent.com/flatpak/flatpak-builder-tools/master/cargo/flatpak-cargo-generator.py
+-#   python3 flatpak-cargo-generator.py Cargo.lock -o packaging/linux/flatpak/cargo-sources.json
 -#   flatpak-builder --user --install --force-clean build-flatpak packaging/linux/flatpak/ai.storyteller.artcraft-launcher.yml
 -#   flatpak run ai.storyteller.artcraft-launcher
+-#
+-# For Flathub, replace the `dir` source with a `git` source pinned to a release tag and commit.
+-# The single-file .flatpak attached to each release comes from
+-# ai.storyteller.artcraft-launcher.bundle.yml, which repackages the prebuilt release binary.
+-# Keep runtime-version and finish-args identical.
+-id: ai.storyteller.artcraft-launcher
+-runtime: org.freedesktop.Platform
+-runtime-version: '26.08'
+-sdk: org.freedesktop.Sdk
+-sdk-extensions:
+-  - org.freedesktop.Sdk.Extension.rust-stable
+-command: artcraft-launcher
+-finish-args:
+-  # Display: Wayland first; X11 only when no Wayland compositor is running.
+-  - --socket=wayland
+-  - --socket=fallback-x11
+-  # X11 shared memory (MIT-SHM). Without it the X11 fallback is slow or fails.
+-  - --share=ipc
+-  # GPU access for egui's wgpu renderer (Vulkan, or GL as a fallback).
+-  - --device=dri
+-  # SoundCraft's audio, for the case where it runs inside this sandbox rather than on the host
+-  # (the launcher falls back to its release tarball when the host has no usable Flatpak): its
+-  # ALSA goes through the runtime's PulseAudio plugin to this socket, which PipeWire's pulse
+-  # server provides on modern desktops. Note this socket also covers the microphone (SoundCraft
+-  # records, so it needs it); it grants recording, not raw hardware access.
+-  - --socket=pulseaudio
+-  # The launcher reads the Craft apps' GitHub releases and downloads them.
+-  - --share=network
+-  # Tray icon (StatusNotifierItem) and desktop notifications, both over the session bus.
+-  - --talk-name=org.kde.StatusNotifierWatcher
+-  - --talk-name=org.freedesktop.Notifications
+-  # Apps normally install as Flatpaks and run on the host: `flatpak-spawn --host` (below) starts
+-  # them, and the home directory is granted so files opened by path work. When the host has no
+-  # usable Flatpak the launcher falls back to the release tarball, which it unpacks into its own
+-  # folder (~/.var/app/ai.storyteller.artcraft-launcher/data/artcraft-launcher/apps/<app>) and
+-  # runs in the same sandbox with HOME pointed at a home/ folder beside it, so each app's
+-  # settings stay in the sandbox too.
+-  # LIMITATION: installing software on the host still needs `flatpak-spawn --host`. Distro
+-  # packages (.deb/.rpm) or anything needing root still have to be installed by the user.
+-  # org.freedesktop.Flatpak is a sandbox escape that Flathub reviews case by case; the AppImage,
+-  # .deb and .rpm builds are the recommended way to run the launcher on Linux.
+-  - --talk-name=org.freedesktop.Flatpak
+-  - --filesystem=home
+-build-options:
+-  append-path: /usr/lib/sdk/rust-stable/bin
+-modules:
+-  - name: artcraft-launcher
+-    buildsystem: simple
+-    build-options:
+-      env:
+-        CARGO_HOME: /run/build/artcraft-launcher/cargo
+-        CARGO_NET_OFFLINE: 'true'
+-    build-commands:
+-      - cargo --offline build --release --locked -p artcraft-launcher
+-      - install -Dm755 target/release/artcraft-launcher /app/bin/artcraft-launcher
+-      - install -Dm644 packaging/linux/ai.storyteller.artcraft-launcher.desktop /app/share/applications/ai.storyteller.artcraft-launcher.desktop
+-      - mkdir -p /app/share/icons && cp -R assets/app-icon/hicolor /app/share/icons/
+-      - >-
+-        version=$(awk '/^\[/{p=($0=="[workspace.package]");next} p&&$1=="version"{gsub(/[" ]/,"",$3);print $3;exit}' Cargo.toml);
+-        install -d /app/share/metainfo;
+-        sed -e "s/@VERSION@/$version/" -e "s/@DATE@/$(date -u +%Y-%m-%d)/"
+-        packaging/linux/ai.storyteller.artcraft-launcher.metainfo.xml.in > /app/share/metainfo/ai.storyteller.artcraft-launcher.metainfo.xml
+-    sources:
+-      - type: dir
+-        path: ../../..
+-        skip:
+-          - target
+-          - dist
+-          - build-flatpak
+-          - .flatpak-builder
+-      - cargo-sources.json
+diff --git a/packaging/linux/flatpak/com.kio.launcher.bundle.yml b/packaging/linux/flatpak/com.kio.launcher.bundle.yml
+new file mode 100644
+index 0000000000000000000000000000000000000000..25ed9503406b1075d05d37a5557090551551df1b
+--- /dev/null
++++ b/packaging/linux/flatpak/com.kio.launcher.bundle.yml
+@@ -0,0 +1,61 @@
++# Flatpak manifest for the single-file bundle attached to every GitHub release
++# (artcraft-launcher-<version>-linux-<arch>.flatpak). Build it with packaging/linux/flatpak-bundle.sh.
++#
++# It repackages the release's own Linux tarball (artcraft-launcher-<version>-linux-<arch>.tar.gz,
++# built on Ubuntu 22.04 by package.sh) instead of compiling Rust inside flatpak-builder: no
++# network and no vendored crate sources during the build, a few seconds instead of many minutes,
++# and byte-for-byte the same binary as the AppImage/deb/rpm. The script unpacks the tarball
++# into `stage/` next to a copy of this file. The binary needs glibc >= 2.35 and loads X11,
++# Wayland, xkbcommon and Vulkan at runtime; the freedesktop runtime has all of them, and the
++# GPU driver comes from its org.freedesktop.Platform.GL extension.
++#
++# com.kio.launcher.yml (same directory) is the from-source manifest for Flathub.
++# Keep runtime-version and finish-args identical in both (packaging-lint checks this).
++id: com.kio.launcher
++runtime: org.freedesktop.Platform
++runtime-version: '26.08'
++sdk: org.freedesktop.Sdk
++command: artcraft-launcher
++finish-args:
++  # Display: Wayland first; X11 only when no Wayland compositor is running.
++  - --socket=wayland
++  - --socket=fallback-x11
++  # X11 shared memory (MIT-SHM). Without it the X11 fallback is slow or fails.
++  - --share=ipc
++  # GPU access for egui's wgpu renderer (Vulkan, or GL as a fallback).
++  - --device=dri
++  # KIO Sound's audio, for the case where it runs inside this sandbox rather than on the host
++  # (the launcher falls back to its release tarball when the host has no usable Flatpak): its
++  # ALSA goes through the runtime's PulseAudio plugin to this socket, which PipeWire's pulse
++  # server provides on modern desktops. Note this socket also covers the microphone (KIO Sound
++  # records, so it needs it); it grants recording, not raw hardware access.
++  - --socket=pulseaudio
++  # The launcher reads the Craft apps' GitHub releases and downloads them.
++  - --share=network
++  # Tray icon (StatusNotifierItem) and desktop notifications, both over the session bus.
++  - --talk-name=org.kde.StatusNotifierWatcher
++  - --talk-name=org.freedesktop.Notifications
++  # Apps normally install as Flatpaks and run on the host: `flatpak-spawn --host` (below) starts
++  # them, and the home directory is granted so files opened by path work. When the host has no
++  # usable Flatpak the launcher falls back to the release tarball, which it unpacks into its own
++  # folder (~/.var/app/com.kio.launcher/data/artcraft-launcher/apps/<app>) and
++  # runs in the same sandbox with HOME pointed at a home/ folder beside it, so each app's
++  # settings stay in the sandbox too.
++  # LIMITATION: installing software on the host still needs `flatpak-spawn --host`. Distro
++  # packages (.deb/.rpm) or anything needing root still have to be installed by the user.
++  # org.freedesktop.Flatpak is a sandbox escape that Flathub reviews case by case; the AppImage,
++  # .deb and .rpm builds are the recommended way to run the launcher on Linux.
++  - --talk-name=org.freedesktop.Flatpak
++  - --filesystem=home
++modules:
++  - name: artcraft-launcher
++    buildsystem: simple
++    build-commands:
++      - install -Dm755 bin/artcraft-launcher /app/bin/artcraft-launcher
++      - install -Dm644 share/applications/com.kio.launcher.desktop /app/share/applications/com.kio.launcher.desktop
++      # Already has the release's version and date substituted by package.sh.
++      - install -Dm644 share/metainfo/com.kio.launcher.metainfo.xml /app/share/metainfo/com.kio.launcher.metainfo.xml
++      - mkdir -p /app/share/icons /app/share/doc && cp -R share/icons/hicolor /app/share/icons/ && cp -R share/doc/artcraft-launcher /app/share/doc/
++    sources:
++      - type: dir
++        path: stage
+diff --git a/packaging/linux/flatpak/com.kio.launcher.yml b/packaging/linux/flatpak/com.kio.launcher.yml
+new file mode 100644
+index 0000000000000000000000000000000000000000..f78ec03391cc5e6d9ff5e0351ffeb71cd2642ed5
+--- /dev/null
++++ b/packaging/linux/flatpak/com.kio.launcher.yml
+@@ -0,0 +1,79 @@
++# Flatpak manifest for KIO Launcher, ready for a Flathub submission.
++#
++# Flatpak builds run offline, so the crate sources must be vendored first. From the repo root:
++#
++#   curl -fsSLO https://raw.githubusercontent.com/flatpak/flatpak-builder-tools/master/cargo/flatpak-cargo-generator.py
++#   python3 flatpak-cargo-generator.py Cargo.lock -o packaging/linux/flatpak/cargo-sources.json
 +#   flatpak-builder --user --install --force-clean build-flatpak packaging/linux/flatpak/com.kio.launcher.yml
 +#   flatpak run com.kio.launcher
- #
- # For Flathub, replace the `dir` source with a `git` source pinned to a release tag and commit.
- # The single-file .flatpak attached to each release comes from
--# ai.storyteller.artcraft-launcher.bundle.yml, which repackages the prebuilt release binary.
++#
++# For Flathub, replace the `dir` source with a `git` source pinned to a release tag and commit.
++# The single-file .flatpak attached to each release comes from
 +# com.kio.launcher.bundle.yml, which repackages the prebuilt release binary.
- # Keep runtime-version and finish-args identical.
--id: ai.storyteller.artcraft-launcher
++# Keep runtime-version and finish-args identical.
 +id: com.kio.launcher
- runtime: org.freedesktop.Platform
- runtime-version: '26.08'
- sdk: org.freedesktop.Sdk
-@@ -26,10 +26,10 @@ finish-args:
-   - --share=ipc
-   # GPU access for egui's wgpu renderer (Vulkan, or GL as a fallback).
-   - --device=dri
--  # SoundCraft's audio, for the case where it runs inside this sandbox rather than on the host
++runtime: org.freedesktop.Platform
++runtime-version: '26.08'
++sdk: org.freedesktop.Sdk
++sdk-extensions:
++  - org.freedesktop.Sdk.Extension.rust-stable
++command: artcraft-launcher
++finish-args:
++  # Display: Wayland first; X11 only when no Wayland compositor is running.
++  - --socket=wayland
++  - --socket=fallback-x11
++  # X11 shared memory (MIT-SHM). Without it the X11 fallback is slow or fails.
++  - --share=ipc
++  # GPU access for egui's wgpu renderer (Vulkan, or GL as a fallback).
++  - --device=dri
 +  # KIO Sound's audio, for the case where it runs inside this sandbox rather than on the host
-   # (the launcher falls back to its release tarball when the host has no usable Flatpak): its
-   # ALSA goes through the runtime's PulseAudio plugin to this socket, which PipeWire's pulse
--  # server provides on modern desktops. Note this socket also covers the microphone (SoundCraft
++  # (the launcher falls back to its release tarball when the host has no usable Flatpak): its
++  # ALSA goes through the runtime's PulseAudio plugin to this socket, which PipeWire's pulse
 +  # server provides on modern desktops. Note this socket also covers the microphone (KIO Sound
-   # records, so it needs it); it grants recording, not raw hardware access.
-   - --socket=pulseaudio
-   # The launcher reads the Craft apps' GitHub releases and downloads them.
-@@ -40,7 +40,7 @@ finish-args:
-   # Apps normally install as Flatpaks and run on the host: `flatpak-spawn --host` (below) starts
-   # them, and the home directory is granted so files opened by path work. When the host has no
-   # usable Flatpak the launcher falls back to the release tarball, which it unpacks into its own
--  # folder (~/.var/app/ai.storyteller.artcraft-launcher/data/artcraft-launcher/apps/<app>) and
++  # records, so it needs it); it grants recording, not raw hardware access.
++  - --socket=pulseaudio
++  # The launcher reads the Craft apps' GitHub releases and downloads them.
++  - --share=network
++  # Tray icon (StatusNotifierItem) and desktop notifications, both over the session bus.
++  - --talk-name=org.kde.StatusNotifierWatcher
++  - --talk-name=org.freedesktop.Notifications
++  # Apps normally install as Flatpaks and run on the host: `flatpak-spawn --host` (below) starts
++  # them, and the home directory is granted so files opened by path work. When the host has no
++  # usable Flatpak the launcher falls back to the release tarball, which it unpacks into its own
 +  # folder (~/.var/app/com.kio.launcher/data/artcraft-launcher/apps/<app>) and
-   # runs in the same sandbox with HOME pointed at a home/ folder beside it, so each app's
-   # settings stay in the sandbox too.
-   # LIMITATION: installing software on the host still needs `flatpak-spawn --host`. Distro
-@@ -61,13 +61,13 @@ modules:
-     build-commands:
-       - cargo --offline build --release --locked -p artcraft-launcher
-       - install -Dm755 target/release/artcraft-launcher /app/bin/artcraft-launcher
--      - install -Dm644 packaging/linux/ai.storyteller.artcraft-launcher.desktop /app/share/applications/ai.storyteller.artcraft-launcher.desktop
++  # runs in the same sandbox with HOME pointed at a home/ folder beside it, so each app's
++  # settings stay in the sandbox too.
++  # LIMITATION: installing software on the host still needs `flatpak-spawn --host`. Distro
++  # packages (.deb/.rpm) or anything needing root still have to be installed by the user.
++  # org.freedesktop.Flatpak is a sandbox escape that Flathub reviews case by case; the AppImage,
++  # .deb and .rpm builds are the recommended way to run the launcher on Linux.
++  - --talk-name=org.freedesktop.Flatpak
++  - --filesystem=home
++build-options:
++  append-path: /usr/lib/sdk/rust-stable/bin
++modules:
++  - name: artcraft-launcher
++    buildsystem: simple
++    build-options:
++      env:
++        CARGO_HOME: /run/build/artcraft-launcher/cargo
++        CARGO_NET_OFFLINE: 'true'
++    build-commands:
++      - cargo --offline build --release --locked -p artcraft-launcher
++      - install -Dm755 target/release/artcraft-launcher /app/bin/artcraft-launcher
 +      - install -Dm644 packaging/linux/com.kio.launcher.desktop /app/share/applications/com.kio.launcher.desktop
-       - mkdir -p /app/share/icons && cp -R assets/app-icon/hicolor /app/share/icons/
-       - >-
-         version=$(awk '/^\[/{p=($0=="[workspace.package]");next} p&&$1=="version"{gsub(/[" ]/,"",$3);print $3;exit}' Cargo.toml);
-         install -d /app/share/metainfo;
-         sed -e "s/@VERSION@/$version/" -e "s/@DATE@/$(date -u +%Y-%m-%d)/"
--        packaging/linux/ai.storyteller.artcraft-launcher.metainfo.xml.in > /app/share/metainfo/ai.storyteller.artcraft-launcher.metainfo.xml
++      - mkdir -p /app/share/icons && cp -R assets/app-icon/hicolor /app/share/icons/
++      - >-
++        version=$(awk '/^\[/{p=($0=="[workspace.package]");next} p&&$1=="version"{gsub(/[" ]/,"",$3);print $3;exit}' Cargo.toml);
++        install -d /app/share/metainfo;
++        sed -e "s/@VERSION@/$version/" -e "s/@DATE@/$(date -u +%Y-%m-%d)/"
 +        packaging/linux/com.kio.launcher.metainfo.xml.in > /app/share/metainfo/com.kio.launcher.metainfo.xml
-     sources:
-       - type: dir
-         path: ../../..
++    sources:
++      - type: dir
++        path: ../../..
++        skip:
++          - target
++          - dist
++          - build-flatpak
++          - .flatpak-builder
++      - cargo-sources.json
 diff --git a/packaging/linux/package.sh b/packaging/linux/package.sh
 index d3241b0304122656ca666e194c8300af23421966..17203b0804a6812ee54d3b14b4630c8a2c8f1dca 100755
 --- a/packaging/linux/package.sh
@@ -151553,7 +152027,7 @@ index 23e2866299bcf6ded007f0d35a9b904fd115b870..96f0c34767f65a2e4bec299ee2a6788c
    <String Id="VerifyReadyDlgInstallTitle" Value="{\WixUI_Font_Title}Ready to install [ProductName] [ArtCraftLauncherVersion]" />
    <!-- Also shown after a repair or removal from the same wizard, so it doesn't say "installed". -->
 diff --git a/packaging/windows/artcraft-launcher.wxs b/packaging/windows/artcraft-launcher.wxs
-index fecba724bf21fac0f131d02ac2e866f0781be4d7..8d1046ec5f40eb21852c397b903dda17082a1529 100644
+index fecba724bf21fac0f131d02ac2e866f0781be4d7..60ad31e2a4f07b7f1c05d3e14b4bdb08a38b5db3 100644
 --- a/packaging/windows/artcraft-launcher.wxs
 +++ b/packaging/windows/artcraft-launcher.wxs
 @@ -1,6 +1,6 @@
@@ -151582,7 +152056,7 @@ index fecba724bf21fac0f131d02ac2e866f0781be4d7..8d1046ec5f40eb21852c397b903dda17
    Apache-2.0; nothing to accept). The install folder and the desktop-shortcut choice are recorded
    under HKCU and reused by later versions, so an update (the launcher's own self-update runs this
    with /passive, which skips the wizard) lands in the same folder and keeps the user's choice; the
-@@ -27,18 +27,18 @@
+@@ -27,30 +27,30 @@
  <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
       xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
    <Package
@@ -151606,7 +152080,13 @@ index fecba724bf21fac0f131d02ac2e866f0781be4d7..8d1046ec5f40eb21852c397b903dda17
      <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
  
      <!-- MSI caches this icon using its Id as the filename; keep the .exe extension (ICE50). -->
-@@ -50,7 +50,7 @@
+     <Icon Id="ArtCraftLauncherIcon.exe" SourceFile="$(var.IconPath)" />
+     <Property Id="ARPPRODUCTICON" Value="ArtCraftLauncherIcon.exe" />
+-    <Property Id="ARPURLINFOABOUT" Value="https://getartcraft.com/apps" />
+-    <Property Id="ARPURLUPDATEINFO" Value="https://github.com/storytold/craft-launcher/releases" />
++    <Property Id="ARPURLINFOABOUT" Value="https://kio-library.vercel.app/?program=launcher" />
++    <Property Id="ARPURLUPDATEINFO" Value="https://kio-library.vercel.app/?program=launcher" />
+     <Property Id="ARPHELPLINK" Value="https://discord.gg/artcraft" />
  
      <StandardDirectory Id="LocalAppDataFolder">
        <Directory Id="LocalProgramsFolder" Name="Programs">
@@ -151658,15 +152138,18 @@ index fecba724bf21fac0f131d02ac2e866f0781be4d7..8d1046ec5f40eb21852c397b903dda17
    <Fragment>
      <ComponentGroup Id="ArtCraftLauncherFiles">
 -      <Component Id="ArtCraftLauncherApp" Directory="INSTALLFOLDER" Guid="55DCC431-EBEF-4C11-BABB-6D78CE0ECF4E">
+-        <File Id="ArtCraftLauncherExe" Source="$(var.BinDir)\artcraft-launcher.exe" KeyPath="no" />
 +      <Component Id="ArtCraftLauncherApp" Directory="INSTALLFOLDER" Guid="5D7AD73B-D9D1-54E8-B5D5-131F62ABE288">
-         <File Id="ArtCraftLauncherExe" Source="$(var.BinDir)\artcraft-launcher.exe" KeyPath="no" />
++        <File Id="ArtCraftLauncherExe" Source="$(var.BinDir)\artcraft-launcher.exe" Name="KIO Launcher.exe" KeyPath="no" />
          <!-- Read back by the next version's installer and by the launcher (self_update.rs). -->
 -        <RegistryValue Root="HKCU" Key="Software\Learning Machines LLC\ArtCraft Launcher" Name="InstallDir" Value="[INSTALLFOLDER]" Type="string" KeyPath="yes" />
 -        <RegistryValue Root="HKCU" Key="Software\Learning Machines LLC\ArtCraft Launcher" Name="DesktopShortcutChoice" Value="[DESKTOPSHORTCUTCHOICE]" Type="string" />
+-        <!-- Win+R "artcraft-launcher". -->
+-        <RegistryValue Root="HKCU" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\artcraft-launcher.exe" Value="[#ArtCraftLauncherExe]" Type="string" />
 +        <RegistryValue Root="HKCU" Key="Software\KIO\KIO Launcher" Name="InstallDir" Value="[INSTALLFOLDER]" Type="string" KeyPath="yes" />
 +        <RegistryValue Root="HKCU" Key="Software\KIO\KIO Launcher" Name="DesktopShortcutChoice" Value="[DESKTOPSHORTCUTCHOICE]" Type="string" />
-         <!-- Win+R "artcraft-launcher". -->
-         <RegistryValue Root="HKCU" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\artcraft-launcher.exe" Value="[#ArtCraftLauncherExe]" Type="string" />
++        <!-- KIO-only Run dialog registration; upstream installation is independent. -->
++        <RegistryValue Root="HKCU" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\KIO Launcher.exe" Value="[#ArtCraftLauncherExe]" Type="string" />
          <RemoveFolder Id="RemoveInstallFolder" Directory="INSTALLFOLDER" On="uninstall" />
          <RemoveFolder Id="RemoveLocalProgramsFolder" Directory="LocalProgramsFolder" On="uninstall" />
        </Component>

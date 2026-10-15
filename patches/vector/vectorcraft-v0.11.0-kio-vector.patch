@@ -138,19 +138,10 @@ index 71e104fcc71f721b8eb3a413581ea242c4ac4e2d..0d29ae9df456843a5c720bb8107ac7a0
          .set("OriginalFilename", "vectorcraft.exe")
          .set("InternalName", "vectorcraft");
 diff --git a/apps/vectorcraft/src/gpu.rs b/apps/vectorcraft/src/gpu.rs
-index 6819476daada5cb136d1be6c226f7d3c076bdbb9..837837791ab08fcc4557daab42279fbfad87c679 100644
+index 6819476daada5cb136d1be6c226f7d3c076bdbb9..3f216582faa23e7c14a2d2c7605c0b8e511d198d 100644
 --- a/apps/vectorcraft/src/gpu.rs
 +++ b/apps/vectorcraft/src/gpu.rs
-@@ -55,7 +55,7 @@ const NAME_ENV: &str = "WGPU_ADAPTER_NAME";
- 
- /// Where to read how to choose another adapter, for the error that ends the app.
- const HELP: &str =
--    "to choose a graphics adapter, see https://github.com/storytold/vectorcraft/blob/main/docs/development.md#desktop-graphics-processor";
-+    "to choose a graphics adapter, see https://github.com/storytold/com.kio.vector/blob/main/docs/development.md#desktop-graphics-processor";
- 
- /// Frames the UI ran before the failure, below which it was still starting up. The failure in
- /// #502 came on the first or second frame; later, the adapter has proved itself, and a lost
-@@ -1063,8 +1063,8 @@ mod tests {
+@@ -1063,8 +1063,8 @@
              assert!(in_graphics_stack(file), "{file}");
          }
          for file in [
@@ -86016,7 +86007,7 @@ index 2cd610f57fa0404d32614ac18fab4c32decd23fd..6ee69bc925514c3b32dec19c48bb529f
  New-Item -ItemType Directory -Force -Path $tmp | Out-Null
  
 diff --git a/packaging/windows/vectorcraft.wxs b/packaging/windows/vectorcraft.wxs
-index 45076390b28c2efeb74c9ae26125ffbc2a52a4b8..032634a4b919c46d3c090ddb2162988c864660ce 100644
+index 45076390b28c2efeb74c9ae26125ffbc2a52a4b8..7877eaf70a0cbc3152f9017a9272e85929b62d77 100644
 --- a/packaging/windows/vectorcraft.wxs
 +++ b/packaging/windows/vectorcraft.wxs
 @@ -17,14 +17,14 @@
@@ -86038,7 +86029,14 @@ index 45076390b28c2efeb74c9ae26125ffbc2a52a4b8..032634a4b919c46d3c090ddb2162988c
      <!-- Same-version upgrades let successive pre-releases of one X.Y.Z replace each other
           (MSI versions are numeric, so 1.2.3-rc.1 and 1.2.3-rc.2 are both 1.2.3). -->
      <MajorUpgrade AllowSameVersionUpgrades="yes"
-@@ -38,7 +38,7 @@
+@@ -33,19 +33,19 @@
+ 
+     <Icon Id="VectorcraftIcon.ico" SourceFile="$(var.IconPath)" />
+     <Property Id="ARPPRODUCTICON" Value="VectorcraftIcon.ico" />
+-    <Property Id="ARPURLINFOABOUT" Value="https://getartcraft.com/apps/vectorcraft" />
+-    <Property Id="ARPURLUPDATEINFO" Value="https://getartcraft.com/apps/vectorcraft" />
++    <Property Id="ARPURLINFOABOUT" Value="https://kio-library.vercel.app/?program=vector" />
++    <Property Id="ARPURLUPDATEINFO" Value="https://kio-library.vercel.app/?program=vector" />
      <Property Id="ARPHELPLINK" Value="https://discord.gg/artcraft" />
  
      <StandardDirectory Id="ProgramFiles6432Folder">
@@ -86047,21 +86045,37 @@ index 45076390b28c2efeb74c9ae26125ffbc2a52a4b8..032634a4b919c46d3c090ddb2162988c
      </StandardDirectory>
      <StandardDirectory Id="ProgramMenuFolder" />
      <StandardDirectory Id="DesktopFolder" />
-@@ -109,10 +109,10 @@
+ 
+     <!-- An upgrade installs where the user put the previous version (written by VectorcraftApp). -->
+     <Property Id="INSTALLFOLDER">
+-      <RegistrySearch Id="PreviousInstallFolder" Root="HKLM" Key="Software\VectorCraft" Name="InstallDir" Type="raw" />
++      <RegistrySearch Id="PreviousInstallFolder" Root="HKLM" Key="Software\KIO\Vector" Name="InstallDir" Type="raw" />
+     </Property>
+ 
+     <Feature Id="Main" Title="VectorCraft" Level="1">
+@@ -109,15 +109,15 @@
  
    <Fragment>
      <ComponentGroup Id="VectorcraftFiles" Directory="INSTALLFOLDER">
 -      <Component Id="VectorcraftApp" Guid="0E8C6C5E-DE4A-4E1D-9DB0-44E8E38C2103">
-+      <Component Id="VectorcraftApp" Guid="A0B1EDE4-5A15-54BC-A20D-39BD24043279">
-         <File Id="VectorcraftExe" Source="$(var.BinDir)\vectorcraft.exe" KeyPath="yes">
+-        <File Id="VectorcraftExe" Source="$(var.BinDir)\vectorcraft.exe" KeyPath="yes">
 -          <Shortcut Id="StartMenuShortcut" Directory="ProgramMenuFolder" Name="VectorCraft"
 -              Description="VectorCraft vector illustration app" WorkingDirectory="INSTALLFOLDER" Advertise="yes"
++      <Component Id="VectorcraftApp" Guid="A0B1EDE4-5A15-54BC-A20D-39BD24043279">
++        <File Id="VectorcraftExe" Name="KIO Vector.exe" Source="$(var.BinDir)\vectorcraft.exe" KeyPath="yes">
 +          <Shortcut Id="StartMenuShortcut" Directory="ProgramMenuFolder" Name="KIO Vector"
 +              Description="KIO Vector vector illustration app" WorkingDirectory="INSTALLFOLDER" Advertise="yes"
                Icon="VectorcraftIcon.ico" IconIndex="0" />
          </File>
  
-@@ -128,8 +128,8 @@
+-        <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\vectorcraft.exe" Value="[#VectorcraftExe]" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\VectorCraft" Name="InstallDir" Value="[INSTALLFOLDER]" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\KIO Vector.exe" Value="[#VectorcraftExe]" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\KIO\Vector" Name="InstallDir" Value="[INSTALLFOLDER]" Type="string" />
+       </Component>
+ 
+       <Component Id="VectorcraftCli">
+@@ -128,10 +128,10 @@
      <!-- Installed only with INSTALLDESKTOPSHORTCUT set (the Shortcuts page's box); removed with the
           app. A per-machine install puts it on the common desktop. `wix msi validate` reports ICE38,
           ICE43 and ICE57 for it: they take a desktop shortcut for per-user data, which it isn't here. -->
@@ -86070,5 +86084,8 @@ index 45076390b28c2efeb74c9ae26125ffbc2a52a4b8..032634a4b919c46d3c090ddb2162988c
 +    <Component Id="DesktopShortcut" Directory="DesktopFolder" Guid="C0AE7872-B67F-5A70-AB66-F18D06EBB8EC" Condition="INSTALLDESKTOPSHORTCUT">
 +      <Shortcut Id="DesktopShortcut" Name="KIO Vector" Description="KIO Vector vector illustration app"
            Target="[#VectorcraftExe]" WorkingDirectory="INSTALLFOLDER" Icon="VectorcraftIcon.ico" IconIndex="0" />
-       <RegistryValue Root="HKLM" Key="Software\VectorCraft" Name="DesktopShortcut" Value="1" Type="integer" KeyPath="yes" />
+-      <RegistryValue Root="HKLM" Key="Software\VectorCraft" Name="DesktopShortcut" Value="1" Type="integer" KeyPath="yes" />
++      <RegistryValue Root="HKLM" Key="Software\KIO\Vector" Name="DesktopShortcut" Value="1" Type="integer" KeyPath="yes" />
      </Component>
+   </Fragment>
+ </Wix>

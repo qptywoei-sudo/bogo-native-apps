@@ -75934,19 +75934,10 @@ index cf389e7650e5b9baad32f4662acd3148c49661ce..60ae208808dc2297eb2f2d4706cc90d1
      assert_eq!(field(&h, "messageWarning"), json!(false), "an import clears the earlier shortcut conflict warning");
      // Nothing is applied until OK.
 diff --git a/crates/ui-egui/src/links.rs b/crates/ui-egui/src/links.rs
-index e01a19d93d0dae580305ba906ce0c7de50728116..4fb02a39fb49c690c726c96cecb8c96d7f9bf31a 100644
+index e01a19d93d0dae580305ba906ce0c7de50728116..a318e1a29cd65e3c9c2d49e3606df7241ca35b7b 100644
 --- a/crates/ui-egui/src/links.rs
 +++ b/crates/ui-egui/src/links.rs
-@@ -10,7 +10,7 @@ pub const DISCORD: &str = "https://discord.gg/artcraft";
- pub const ARTCRAFT_WEBSITE: &str = "https://getartcraft.com";
- pub const APP_PAGE: &str = "https://getartcraft.com/apps/photocraft";
- pub const GITHUB: &str = "https://github.com/storytold/photocraft";
--pub const ISSUES: &str = "https://github.com/storytold/photocraft/issues";
-+pub const ISSUES: &str = "https://github.com/storytold/com.kio.photo/issues";
- 
- /// Help-menu link commands: (id, url). Labels live in `menus::UI_COMMANDS`.
- pub const COMMANDS: &[(&str, &str)] =
-@@ -41,11 +41,11 @@ pub fn discord_button(app: &mut PhotocraftApp, ui: &mut egui::Ui, min_width: f32
+@@ -41,11 +41,11 @@
      r
  }
  
@@ -78985,7 +78976,7 @@ index 53bf2865585432ecfa4ea0a843d2fe6bce37638d..4f7cd0b9019638faf308cf2626771617
  $Msi = Join-Path $Dist "photocraft-$Version-windows-$Arch.msi"
  & (Join-Path $PSScriptRoot 'check-icons.ps1')
 diff --git a/packaging/windows/photocraft.wxs b/packaging/windows/photocraft.wxs
-index 8be9ff893cb3b170d0b59d51f959090f91789728..2b870096d281ef42c760f2d12b747388017aaadc 100644
+index 8be9ff893cb3b170d0b59d51f959090f91789728..8e454f2a80890f601cb754d9cf2562e60c534a3d 100644
 --- a/packaging/windows/photocraft.wxs
 +++ b/packaging/windows/photocraft.wxs
 @@ -17,14 +17,14 @@
@@ -79007,7 +78998,14 @@ index 8be9ff893cb3b170d0b59d51f959090f91789728..2b870096d281ef42c760f2d12b747388
      <!-- Same-version upgrades let successive pre-releases of one X.Y.Z replace each other
           (MSI versions are numeric, so 1.2.3-rc.1 and 1.2.3-rc.2 are both 1.2.3). -->
      <MajorUpgrade AllowSameVersionUpgrades="yes"
-@@ -40,7 +40,7 @@
+@@ -35,18 +35,18 @@
+          .exe need an .exe icon identifier (ICE50), even when the source is an ICO. -->
+     <Icon Id="PhotocraftIcon.exe" SourceFile="$(var.IconPath)" />
+     <Property Id="ARPPRODUCTICON" Value="PhotocraftIcon.exe" />
+-    <Property Id="ARPURLINFOABOUT" Value="https://getartcraft.com/apps/photocraft" />
+-    <Property Id="ARPURLUPDATEINFO" Value="https://getartcraft.com/apps/photocraft" />
++    <Property Id="ARPURLINFOABOUT" Value="https://kio-library.vercel.app/?program=photo" />
++    <Property Id="ARPURLUPDATEINFO" Value="https://kio-library.vercel.app/?program=photo" />
      <Property Id="ARPHELPLINK" Value="https://discord.gg/artcraft" />
  
      <StandardDirectory Id="ProgramFiles6432Folder">
@@ -79016,30 +79014,43 @@ index 8be9ff893cb3b170d0b59d51f959090f91789728..2b870096d281ef42c760f2d12b747388
      </StandardDirectory>
      <StandardDirectory Id="ProgramMenuFolder" />
  
-@@ -81,15 +81,15 @@
+     <!-- An upgrade installs where the user put the previous version (written by PhotocraftApp). -->
+     <Property Id="INSTALLFOLDER">
+-      <RegistrySearch Id="PreviousInstallFolder" Root="HKLM" Key="Software\PhotoCraft" Name="InstallDir" Type="raw" />
++      <RegistrySearch Id="PreviousInstallFolder" Root="HKLM" Key="Software\KIO\Photo" Name="InstallDir" Type="raw" />
+     </Property>
+ 
+     <Feature Id="Main" Title="PhotoCraft" Level="1">
+@@ -81,71 +81,69 @@
  
    <Fragment>
      <ComponentGroup Id="PhotocraftFiles" Directory="INSTALLFOLDER">
 -      <Component Id="PhotocraftApp" Guid="A6DE41B7-A80F-4C59-A17E-BB68065BF67E">
-+      <Component Id="PhotocraftApp" Guid="9C6F2432-C88F-55E2-8FC1-1277B3397302">
-         <File Id="PhotocraftExe" Source="$(var.BinDir)\photocraft.exe" KeyPath="yes">
+-        <File Id="PhotocraftExe" Source="$(var.BinDir)\photocraft.exe" KeyPath="yes">
 -          <Shortcut Id="StartMenuShortcut" Directory="ProgramMenuFolder" Name="PhotoCraft"
 -              Description="PhotoCraft image editor" WorkingDirectory="INSTALLFOLDER" Advertise="yes"
++      <Component Id="PhotocraftApp" Guid="9C6F2432-C88F-55E2-8FC1-1277B3397302">
++        <File Id="PhotocraftExe" Name="KIO Photo.exe" Source="$(var.BinDir)\photocraft.exe" KeyPath="yes">
 +          <Shortcut Id="StartMenuShortcut" Directory="ProgramMenuFolder" Name="KIO Photo"
 +              Description="KIO Photo image editor" WorkingDirectory="INSTALLFOLDER" Advertise="yes"
                Icon="PhotocraftIcon.exe" IconIndex="0" />
          </File>
  
-         <!-- .pcraft: PhotoCraft's own format; PhotoCraft is its default app. -->
+-        <!-- .pcraft: PhotoCraft's own format; PhotoCraft is its default app. -->
 -        <ProgId Id="Photocraft.Document" Description="PhotoCraft Document" Icon="PhotocraftExe" IconIndex="0">
-+        <ProgId Id="Photocraft.Document" Description="KIO Photo Document" Icon="PhotocraftExe" IconIndex="0">
-           <Extension Id="pcraft" ContentType="application/x-photocraft">
-             <Verb Id="open" Command="Open" TargetFile="PhotocraftExe" Argument="&quot;%1&quot;" />
-           </Extension>
-@@ -99,26 +99,26 @@
-         <RegistryValue Root="HKLM" Key="Software\Classes\Photocraft.PhotoshopDocument\shell\open\command" Value="&quot;[#PhotocraftExe]&quot; &quot;%1&quot;" Type="string" />
-         <ProgId Id="Photocraft.Image" Description="Image" Icon="PhotocraftExe" IconIndex="0" />
-         <RegistryValue Root="HKLM" Key="Software\Classes\Photocraft.Image\shell\open\command" Value="&quot;[#PhotocraftExe]&quot; &quot;%1&quot;" Type="string" />
+-          <Extension Id="pcraft" ContentType="application/x-photocraft">
+-            <Verb Id="open" Command="Open" TargetFile="PhotocraftExe" Argument="&quot;%1&quot;" />
+-          </Extension>
+-        </ProgId>
++        <!-- Offer KIO Photo without changing the user's existing .pcraft default. -->
++        <ProgId Id="KIO.Photo.Document" Description="KIO Photo Document" Icon="PhotocraftExe" IconIndex="0" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\KIO.Photo.Document\shell\open\command" Value="&quot;[#PhotocraftExe]&quot; &quot;%1&quot;" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\.pcraft\OpenWithProgids" Name="KIO.Photo.Document" Value="" Type="string" />
+         <!-- PSD/PSB and images: offered under "Open with", never forced as the default. -->
+-        <ProgId Id="Photocraft.PhotoshopDocument" Description="PSD Document" Icon="PhotocraftExe" IconIndex="0" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\Photocraft.PhotoshopDocument\shell\open\command" Value="&quot;[#PhotocraftExe]&quot; &quot;%1&quot;" Type="string" />
+-        <ProgId Id="Photocraft.Image" Description="Image" Icon="PhotocraftExe" IconIndex="0" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\Photocraft.Image\shell\open\command" Value="&quot;[#PhotocraftExe]&quot; &quot;%1&quot;" Type="string" />
 -        <RegistryValue Root="HKLM" Key="Software\Classes\.psd\OpenWithProgids" Name="Photocraft.PhotoshopDocument" Value="" Type="string" />
 -        <RegistryValue Root="HKLM" Key="Software\Classes\.psb\OpenWithProgids" Name="Photocraft.PhotoshopDocument" Value="" Type="string" />
 -        <RegistryValue Root="HKLM" Key="Software\Classes\.pdn\OpenWithProgids" Name="Photocraft.Image" Value="" Type="string" />
@@ -79060,29 +79071,85 @@ index 8be9ff893cb3b170d0b59d51f959090f91789728..2b870096d281ef42c760f2d12b747388
 -        <RegistryValue Root="HKLM" Key="Software\Classes\.avif\OpenWithProgids" Name="Photocraft.Image" Value="" Type="string" />
 -        <RegistryValue Root="HKLM" Key="Software\Classes\.qoi\OpenWithProgids" Name="Photocraft.Image" Value="" Type="string" />
 -        <RegistryValue Root="HKLM" Key="Software\Classes\.ico\OpenWithProgids" Name="Photocraft.Image" Value="" Type="string" />
-+        <RegistryValue Root="HKLM" Key="Software\Classes\.psd\OpenWithProgids" Name="KIO Photo.PhotoshopDocument" Value="" Type="string" />
-+        <RegistryValue Root="HKLM" Key="Software\Classes\.psb\OpenWithProgids" Name="KIO Photo.PhotoshopDocument" Value="" Type="string" />
-+        <RegistryValue Root="HKLM" Key="Software\Classes\.pdn\OpenWithProgids" Name="KIO Photo.Image" Value="" Type="string" />
-+        <RegistryValue Root="HKLM" Key="Software\Classes\.ora\OpenWithProgids" Name="KIO Photo.Image" Value="" Type="string" />
-+        <RegistryValue Root="HKLM" Key="Software\Classes\.kra\OpenWithProgids" Name="KIO Photo.Image" Value="" Type="string" />
-+        <RegistryValue Root="HKLM" Key="Software\Classes\.krz\OpenWithProgids" Name="KIO Photo.Image" Value="" Type="string" />
-+        <RegistryValue Root="HKLM" Key="Software\Classes\.png\OpenWithProgids" Name="KIO Photo.Image" Value="" Type="string" />
-+        <RegistryValue Root="HKLM" Key="Software\Classes\.jpg\OpenWithProgids" Name="KIO Photo.Image" Value="" Type="string" />
-+        <RegistryValue Root="HKLM" Key="Software\Classes\.jpeg\OpenWithProgids" Name="KIO Photo.Image" Value="" Type="string" />
-+        <RegistryValue Root="HKLM" Key="Software\Classes\.tif\OpenWithProgids" Name="KIO Photo.Image" Value="" Type="string" />
-+        <RegistryValue Root="HKLM" Key="Software\Classes\.tiff\OpenWithProgids" Name="KIO Photo.Image" Value="" Type="string" />
-+        <RegistryValue Root="HKLM" Key="Software\Classes\.webp\OpenWithProgids" Name="KIO Photo.Image" Value="" Type="string" />
-+        <RegistryValue Root="HKLM" Key="Software\Classes\.gif\OpenWithProgids" Name="KIO Photo.Image" Value="" Type="string" />
-+        <RegistryValue Root="HKLM" Key="Software\Classes\.bmp\OpenWithProgids" Name="KIO Photo.Image" Value="" Type="string" />
-+        <RegistryValue Root="HKLM" Key="Software\Classes\.tga\OpenWithProgids" Name="KIO Photo.Image" Value="" Type="string" />
-+        <RegistryValue Root="HKLM" Key="Software\Classes\.exr\OpenWithProgids" Name="KIO Photo.Image" Value="" Type="string" />
-+        <RegistryValue Root="HKLM" Key="Software\Classes\.hdr\OpenWithProgids" Name="KIO Photo.Image" Value="" Type="string" />
-+        <RegistryValue Root="HKLM" Key="Software\Classes\.avif\OpenWithProgids" Name="KIO Photo.Image" Value="" Type="string" />
-+        <RegistryValue Root="HKLM" Key="Software\Classes\.qoi\OpenWithProgids" Name="KIO Photo.Image" Value="" Type="string" />
-+        <RegistryValue Root="HKLM" Key="Software\Classes\.ico\OpenWithProgids" Name="KIO Photo.Image" Value="" Type="string" />
++        <ProgId Id="KIO.Photo.PhotoshopDocument" Description="PSD Document" Icon="PhotocraftExe" IconIndex="0" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\KIO.Photo.PhotoshopDocument\shell\open\command" Value="&quot;[#PhotocraftExe]&quot; &quot;%1&quot;" Type="string" />
++        <ProgId Id="KIO.Photo.Image" Description="Image" Icon="PhotocraftExe" IconIndex="0" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\KIO.Photo.Image\shell\open\command" Value="&quot;[#PhotocraftExe]&quot; &quot;%1&quot;" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\.psd\OpenWithProgids" Name="KIO.Photo.PhotoshopDocument" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\.psb\OpenWithProgids" Name="KIO.Photo.PhotoshopDocument" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\.pdn\OpenWithProgids" Name="KIO.Photo.Image" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\.ora\OpenWithProgids" Name="KIO.Photo.Image" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\.kra\OpenWithProgids" Name="KIO.Photo.Image" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\.krz\OpenWithProgids" Name="KIO.Photo.Image" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\.png\OpenWithProgids" Name="KIO.Photo.Image" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\.jpg\OpenWithProgids" Name="KIO.Photo.Image" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\.jpeg\OpenWithProgids" Name="KIO.Photo.Image" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\.tif\OpenWithProgids" Name="KIO.Photo.Image" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\.tiff\OpenWithProgids" Name="KIO.Photo.Image" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\.webp\OpenWithProgids" Name="KIO.Photo.Image" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\.gif\OpenWithProgids" Name="KIO.Photo.Image" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\.bmp\OpenWithProgids" Name="KIO.Photo.Image" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\.tga\OpenWithProgids" Name="KIO.Photo.Image" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\.exr\OpenWithProgids" Name="KIO.Photo.Image" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\.hdr\OpenWithProgids" Name="KIO.Photo.Image" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\.avif\OpenWithProgids" Name="KIO.Photo.Image" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\.qoi\OpenWithProgids" Name="KIO.Photo.Image" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\.ico\OpenWithProgids" Name="KIO.Photo.Image" Value="" Type="string" />
  
          <!-- "Open with" app list and the Run dialog (Win+R "photocraft"). -->
-         <RegistryValue Root="HKLM" Key="Software\Classes\Applications\photocraft.exe" Name="FriendlyAppName" Value="PhotoCraft" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\photocraft.exe" Name="FriendlyAppName" Value="PhotoCraft" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\photocraft.exe\shell\open\command" Value="&quot;[#PhotocraftExe]&quot; &quot;%1&quot;" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\photocraft.exe\SupportedTypes" Name=".pcraft" Value="" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\photocraft.exe\SupportedTypes" Name=".psd" Value="" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\photocraft.exe\SupportedTypes" Name=".psb" Value="" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\photocraft.exe\SupportedTypes" Name=".pdn" Value="" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\photocraft.exe\SupportedTypes" Name=".ora" Value="" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\photocraft.exe\SupportedTypes" Name=".kra" Value="" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\photocraft.exe\SupportedTypes" Name=".krz" Value="" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\photocraft.exe\SupportedTypes" Name=".png" Value="" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\photocraft.exe\SupportedTypes" Name=".jpg" Value="" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\photocraft.exe\SupportedTypes" Name=".jpeg" Value="" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\photocraft.exe\SupportedTypes" Name=".tif" Value="" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\photocraft.exe\SupportedTypes" Name=".tiff" Value="" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\photocraft.exe\SupportedTypes" Name=".webp" Value="" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\photocraft.exe\SupportedTypes" Name=".gif" Value="" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\photocraft.exe\SupportedTypes" Name=".bmp" Value="" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\photocraft.exe\SupportedTypes" Name=".tga" Value="" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\photocraft.exe\SupportedTypes" Name=".exr" Value="" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\photocraft.exe\SupportedTypes" Name=".hdr" Value="" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\photocraft.exe\SupportedTypes" Name=".avif" Value="" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\photocraft.exe\SupportedTypes" Name=".qoi" Value="" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\photocraft.exe\SupportedTypes" Name=".ico" Value="" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\photocraft.exe" Value="[#PhotocraftExe]" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\PhotoCraft" Name="InstallDir" Value="[INSTALLFOLDER]" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\KIO Photo.exe" Name="FriendlyAppName" Value="KIO Photo" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\KIO Photo.exe\shell\open\command" Value="&quot;[#PhotocraftExe]&quot; &quot;%1&quot;" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\KIO Photo.exe\SupportedTypes" Name=".pcraft" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\KIO Photo.exe\SupportedTypes" Name=".psd" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\KIO Photo.exe\SupportedTypes" Name=".psb" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\KIO Photo.exe\SupportedTypes" Name=".pdn" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\KIO Photo.exe\SupportedTypes" Name=".ora" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\KIO Photo.exe\SupportedTypes" Name=".kra" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\KIO Photo.exe\SupportedTypes" Name=".krz" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\KIO Photo.exe\SupportedTypes" Name=".png" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\KIO Photo.exe\SupportedTypes" Name=".jpg" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\KIO Photo.exe\SupportedTypes" Name=".jpeg" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\KIO Photo.exe\SupportedTypes" Name=".tif" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\KIO Photo.exe\SupportedTypes" Name=".tiff" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\KIO Photo.exe\SupportedTypes" Name=".webp" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\KIO Photo.exe\SupportedTypes" Name=".gif" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\KIO Photo.exe\SupportedTypes" Name=".bmp" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\KIO Photo.exe\SupportedTypes" Name=".tga" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\KIO Photo.exe\SupportedTypes" Name=".exr" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\KIO Photo.exe\SupportedTypes" Name=".hdr" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\KIO Photo.exe\SupportedTypes" Name=".avif" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\KIO Photo.exe\SupportedTypes" Name=".qoi" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Classes\Applications\KIO Photo.exe\SupportedTypes" Name=".ico" Value="" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\KIO Photo.exe" Value="[#PhotocraftExe]" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\KIO\Photo" Name="InstallDir" Value="[INSTALLFOLDER]" Type="string" />
+       </Component>
+ 
+       <Component Id="PhotocraftCli">
 diff --git a/packaging/windows/sign.ps1 b/packaging/windows/sign.ps1
 index 5dcefceb03e25d0d6c3d64b8189727bc0f2a946d..63e472546902481e3f545767ec11fbb0cf2f10d7 100644
 --- a/packaging/windows/sign.ps1

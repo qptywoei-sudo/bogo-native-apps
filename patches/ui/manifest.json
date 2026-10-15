@@ -13,8 +13,8 @@
   },
   "patch": {
     "file": "figcraft-v0.6.0-kio-ui.patch",
-    "sha256": "79667c766c7402a3993587aa43f20b713a19d29b5c8213ac5948e423143d3eda",
-    "bytes": 8665835
+    "sha256": "d5f3e90093e6da2171cc44aa801db16863d4aba496ded1e377d915324a2aafee",
+    "bytes": 8671475
   },
   "counts": {
     "upstreamFiles": 841,
@@ -37,7 +37,8 @@
     "allEmbeddedAssetPathsExist": true,
     "upstreamTrademarkLogoFilesRemoved": true,
     "nativeBuildRun": false,
-    "GUIValidationRun": false
+    "GUIValidationRun": false,
+    "windowsOriginalCoexistenceXmlAudit": true
   },
   "nonUiPlatformBrandingExceptions": [],
   "features": {
@@ -792,8 +793,8 @@
         "bytes": 8254
       },
       "after": {
-        "sha256": "ec7896307f8989551d9e9498ec41ccfea47fcb052650a3f71a5c93571b08d98f",
-        "bytes": 8180
+        "sha256": "ec5cd8f2b8067595f484187af0d5b21c238403450f8dd82d7185c5ace8e85b4f",
+        "bytes": 8278
       }
     },
     {
@@ -3640,5 +3641,36 @@
       "sha256": "9a58cbf7d438bb0fadc981423002adccd267aab21d0ab1c1e5c43d998b7702d2",
       "bytes": 539
     }
-  ]
+  ],
+  "windowsIdentityAudit": {
+    "app": "ui",
+    "wxs": "packaging/windows/figcraft.wxs",
+    "sha256": "ec5cd8f2b8067595f484187af0d5b21c238403450f8dd82d7185c5ace8e85b4f",
+    "name": "KIO UI",
+    "upgradeCode": "6E4725FA-15D6-5F26-ADB2-3D99757DAE8A",
+    "gui": "KIO UI.exe",
+    "fixedComponentGuids": [
+      "80ca7216-59ff-5b12-827f-f27dfd557f02"
+    ],
+    "registryValues": 16,
+    "registrySearches": 1,
+    "progIds": [
+      "kio.ui.document",
+      "kio.ui.image"
+    ],
+    "supportedTypesRetained": [
+      ".figcraft",
+      ".jpeg",
+      ".jpg",
+      ".png",
+      ".svg"
+    ],
+    "checks": {
+      "upstreamRegistryAndComponentIsolation": true,
+      "upstreamDefaultAppUnchanged": true,
+      "kioAppPathsAndGuiMatch": true,
+      "kioInstallDirectory": true,
+      "noNativeExecution": true
+    }
+  }
 }

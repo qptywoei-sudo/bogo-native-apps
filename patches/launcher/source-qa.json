@@ -1,9 +1,9 @@
 {
   "stage": "source-verified-native-cloud-required",
-  "patchSha256": "f06e4836ffe903274167a980ac332396fa2682141a65509d042b9ead06abafcb",
-  "patchBytes": 11731729,
-  "sourceZipSha256": "6d86ebdcf9d8e595d869bf4bda1f3ad5e8cf14e7a6ddb864ff475e40cac31889",
-  "sourceZipBytes": 19572094,
+  "patchSha256": "bc35ee4b0f6bb68bb0c7c6094a6fa4ecf2f0093ac8dbc0d1398ef5afd24201b1",
+  "patchBytes": 11756677,
+  "sourceZipSha256": "aab0f4bc13605addd7dea8db185f9b84ad24614d66576373068554f5c3544dbb",
+  "sourceZipBytes": 19582482,
   "pythonTestsPassed": 38,
   "actualOfflinePrepareSourceArchiveVerified": true,
   "nativeBuildExecutedLocally": false,
@@ -40,5 +40,23 @@
     "originalTestsRetained": true,
     "directRustfmt195CheckPassed": true,
     "rustBuildOrTestsExecutedLocally": false
+  },
+  "windowsInstallIsolation": {
+    "stage": "source-verified-cloud-tests-required",
+    "scope": [
+      "crates/native/src/detect.rs",
+      "crates/ui-egui/tests/ui.rs",
+      "packaging/windows/artcraft-launcher.wxs"
+    ],
+    "msiGuiFilename": "KIO Launcher.exe",
+    "portableOriginalFilenameRetained": "artcraft-launcher.exe",
+    "originalRegistryKeysRead": false,
+    "appPathRequiresMatchingKioInstallerLocationOrKioProgramFiles": true,
+    "uiLinksKeepKioHomepagePerAppPageAndSources": true,
+    "xmlFourteenAppsTestsPassed": 8,
+    "launcherPythonTestsPassed": 8,
+    "rustfmt195Passed": true,
+    "rustTestsExecutedLocally": false,
+    "offlinePrepareSourceArchiveVerified": true
   }
 }

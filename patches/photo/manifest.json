@@ -14,8 +14,8 @@
   },
   "patch": {
     "file": "photocraft-v0.9.0-kio-photo.patch",
-    "sha256": "5616d6da79ac4ffb1be04b7dcb616f3ff6e9dacd698d09ba31f791a6bec6998c",
-    "bytes": 8817087
+    "sha256": "290eecc962ab36b4b94d3a2396aa3b2384999b099b88a37604d5709506561b4a",
+    "bytes": 8825712
   },
   "counts": {
     "upstreamFiles": 1751,
@@ -809,8 +809,8 @@
         "bytes": 5865
       },
       "after": {
-        "sha256": "10f05e0a9ae901841c0dd0d42f1d5221e66852a4e4585b3c492440775db1519b",
-        "bytes": 5866
+        "sha256": "bcd57fcd45f00406efab6f3b120ab27c2f57469c52efe0673152a3c96593b043",
+        "bytes": 5863
       }
     },
     {
@@ -1217,8 +1217,8 @@
         "bytes": 12810
       },
       "after": {
-        "sha256": "a77a8423195decaae7b6026221b511798523d4968878e55f508a4d83baaa4de7",
-        "bytes": 12748
+        "sha256": "2d279c99944648049583fcb5a6593ea2c0cfbb636dbe5e86a2900fdd53ba67b1",
+        "bytes": 12842
       }
     },
     {
@@ -2173,5 +2173,26 @@
     "docs/brand/artcraft-logo.png",
     "docs/brand/artcraft-logo.svg",
     "docs/brand/artcraft-mark.png"
-  ]
+  ],
+  "linkAndUpdateCorrection": {
+    "supersededPatchSha256": "5616d6da79ac4ffb1be04b7dcb616f3ff6e9dacd698d09ba31f791a6bec6998c",
+    "upstreamDocumentationUrlsRestored": [
+      {
+        "file": "crates/ui-egui/src/links.rs",
+        "before": "https://github.com/storytold/com.kio.photo/issues",
+        "after": "https://github.com/storytold/photocraft/issues"
+      }
+    ],
+    "lightFormatLabelMatchedToNineExistingCatalogs": false,
+    "engineAndCargoFeaturesUnchanged": true
+  },
+  "windowsInstallerIsolation": {
+    "supersededPatchSha256": "37d1b78e4835c189d3314e3df344d9e92236faf6b2ff589878eb53a2045ecdbd",
+    "registryNamespace": "Software\\KIO\\Photo",
+    "appPathsExecutable": "KIO Photo.exe",
+    "installedGuiExecutable": "KIO Photo.exe",
+    "originalCargoBinaryAndCliNamesRetained": true,
+    "originalUserDefaultFileAssociationsPreserved": true,
+    "kioPhotoHostInteropUpdated": false
+  }
 }

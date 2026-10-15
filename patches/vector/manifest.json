@@ -14,8 +14,8 @@
   },
   "patch": {
     "file": "vectorcraft-v0.11.0-kio-vector.patch",
-    "sha256": "32680ebf1b82f547e4e21febdc6a3db7a248aea535e4d9ac60d298037bdd9c39",
-    "bytes": 9383877
+    "sha256": "3697d801a00c7063da185d784bf14563d997dccac7f8eac368b8531581f094e1",
+    "bytes": 9385052
   },
   "counts": {
     "upstreamFiles": 1649,
@@ -133,8 +133,8 @@
         "bytes": 56379
       },
       "after": {
-        "sha256": "2233244b12df7a9a89cfad2ff1d92f46ee7e221ecda262262e6b1cd0b48987af",
-        "bytes": 56388
+        "sha256": "f9fab3aacae6a0e207761a28a4b79a8fff64dc543e1c92449c6249b0527d0aad",
+        "bytes": 56385
       }
     },
     {
@@ -1053,8 +1053,8 @@
         "bytes": 9017
       },
       "after": {
-        "sha256": "4db1b5735193829b77104ac51f658e1890322ad353aea3e419a86b533c20d13c",
-        "bytes": 8974
+        "sha256": "6fdf8926e45c83ae764b1bfb063ca7521473fc3a32acdd1bb20a9009be3e17c0",
+        "bytes": 9004
       }
     }
   ],
@@ -2004,5 +2004,26 @@
       "../../vectorcraft/src/prefs_dir.rs",
       "../../vectorcraft/src/system_fonts.rs"
     ]
+  },
+  "linkAndUpdateCorrection": {
+    "supersededPatchSha256": "32680ebf1b82f547e4e21febdc6a3db7a248aea535e4d9ac60d298037bdd9c39",
+    "upstreamDocumentationUrlsRestored": [
+      {
+        "file": "apps/vectorcraft/src/gpu.rs",
+        "before": "https://github.com/storytold/com.kio.vector/blob/main/docs/development.md#desktop-graphics-processor",
+        "after": "https://github.com/storytold/vectorcraft/blob/main/docs/development.md#desktop-graphics-processor"
+      }
+    ],
+    "lightFormatLabelMatchedToNineExistingCatalogs": false,
+    "engineAndCargoFeaturesUnchanged": true
+  },
+  "windowsInstallerIsolation": {
+    "supersededPatchSha256": "0313bfe6bd595464834825a595578b52eb8a7f0873c8236e74aede05a69ddf79",
+    "registryNamespace": "Software\\KIO\\Vector",
+    "appPathsExecutable": "KIO Vector.exe",
+    "installedGuiExecutable": "KIO Vector.exe",
+    "originalCargoBinaryAndCliNamesRetained": true,
+    "originalUserDefaultFileAssociationsPreserved": true,
+    "kioPhotoHostInteropUpdated": false
   }
 }

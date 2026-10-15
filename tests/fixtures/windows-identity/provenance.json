@@ -1,0 +1,160 @@
+{
+  "schema": 1,
+  "scope": "Exact original WiX source fixtures extracted from SHA256-verified pinned official source archives; no app binaries",
+  "files": [
+    {
+      "id": "photo",
+      "file": "photo.wxs",
+      "sha256": "9fd73de35114ecd13060efd90f6c20f4af892e3fbd7c3eb992ee8c3a9a604147",
+      "bytes": 12810,
+      "repository": "storytold/photocraft",
+      "commit": "c699e3cda69f4852b43c0b191ab0091aaeff9d6a",
+      "archiveSha256": "3f682751d94a36d9f85b80fb5e34bf9b893c97e64dd9d9d8f02c68daac4b4c35",
+      "archiveBytes": 18442275,
+      "archiveMember": "photocraft-c699e3cda69f4852b43c0b191ab0091aaeff9d6a/packaging/windows/photocraft.wxs"
+    },
+    {
+      "id": "vector",
+      "file": "vector.wxs",
+      "sha256": "b6ee258959a770b6d4bfbfcb0416da71ec92ba613769602da982620644b69ec1",
+      "bytes": 9017,
+      "repository": "storytold/vectorcraft",
+      "commit": "0a33cff3f6e2a1e9e672f4c3816f58cd8d3d032e",
+      "archiveSha256": "91582b06374205c80a07c58da465c4fd681452777ded9678c240cfca7e39489f",
+      "archiveBytes": 16453954,
+      "archiveMember": "vectorcraft-0a33cff3f6e2a1e9e672f4c3816f58cd8d3d032e/packaging/windows/vectorcraft.wxs"
+    },
+    {
+      "id": "film",
+      "file": "film.wxs",
+      "sha256": "2f5414a8c7dba2cd4d4612bdcb57c34c7165d4e9c8473fda016f08a7cbe0e379",
+      "bytes": 2632,
+      "repository": "storytold/filmcraft",
+      "commit": "f03e21556d8e3a7155b91892d958debd5255d7af",
+      "archiveSha256": "ee62f9048c0088ae47283b4b7ae37a31a2319a27ebdd6af36b43f4999ea55d45",
+      "archiveBytes": 20295015,
+      "archiveMember": "filmcraft-f03e21556d8e3a7155b91892d958debd5255d7af/packaging/windows/filmcraft.wxs"
+    },
+    {
+      "id": "light",
+      "file": "light.wxs",
+      "sha256": "be5d8a57394367b3f1c8115dda421e3369e16e3bc7a28cf230f51c0972644744",
+      "bytes": 12965,
+      "repository": "storytold/lightcraft",
+      "commit": "16dbb90499d3c63a6582fcbba1b2550a6e2da032",
+      "archiveSha256": "6d0d035eacb385f2b810db1d6166c13190c71c8ae8904a3d410cc1530a88a588",
+      "archiveBytes": 16214739,
+      "archiveMember": "lightcraft-16dbb90499d3c63a6582fcbba1b2550a6e2da032/packaging/windows/lightcraft.wxs"
+    },
+    {
+      "id": "pdf",
+      "file": "pdf.wxs",
+      "sha256": "68e1269ba3340bc105a01863687bea6fc67a15303a9cb6ca5ceddd0f727bedea",
+      "bytes": 16954,
+      "repository": "storytold/pdfcraft",
+      "commit": "9931329b9fae0b05373b4dc3ac7c58541f0891a4",
+      "archiveSha256": "953f32944503e09323c4d66aac2528974cb04f94acfc1a4dfe50c1a86f0091ed",
+      "archiveBytes": 14600876,
+      "archiveMember": "pdfcraft-9931329b9fae0b05373b4dc3ac7c58541f0891a4/packaging/windows/pdfcraft.wxs"
+    },
+    {
+      "id": "effect",
+      "file": "effect.wxs",
+      "sha256": "0c4dc888cbad7e07c1d548c338151c76c0df141c8a453160340aed1f9555037f",
+      "bytes": 6000,
+      "repository": "storytold/effectcraft",
+      "commit": "05955c08b4fd025f1a09882df72e6dbff1a8148a",
+      "archiveSha256": "a160b94d9837906e3f129697f8c62ffb80d8342cb2787b2cfa439c0485098f43",
+      "archiveBytes": 11625180,
+      "archiveMember": "effectcraft-05955c08b4fd025f1a09882df72e6dbff1a8148a/packaging/windows/effectcraft.wxs"
+    },
+    {
+      "id": "design",
+      "file": "design.wxs",
+      "sha256": "d423f8ae9a5fd4d0e7e4dcd0c60c2052d5a3a7049940ad307d948612ee14d2ee",
+      "bytes": 2859,
+      "repository": "storytold/designcraft",
+      "commit": "11a51d5b665aec8d6e675bd107a8a01514f10d00",
+      "archiveSha256": "5044162f9e7c2260156419b7e2c69c87801c5facc88e6b7aaa3552aca70c2acf",
+      "archiveBytes": 7805542,
+      "archiveMember": "designcraft-11a51d5b665aec8d6e675bd107a8a01514f10d00/packaging/windows/designcraft.wxs"
+    },
+    {
+      "id": "ui",
+      "file": "ui.wxs",
+      "sha256": "fdaf2cd83f3388946c035401864de1d0d18d4822b1acd49837a8973a190cf768",
+      "bytes": 8254,
+      "repository": "storytold/figcraft",
+      "commit": "833f0d2c27f0acbae5394848930ae531fc89c724",
+      "archiveSha256": "f327701beaf7a025a0f124c8551472ab998d2b07baf3949c8a2d86ebcf457e59",
+      "archiveBytes": 8079741,
+      "archiveMember": "figcraft-833f0d2c27f0acbae5394848930ae531fc89c724/packaging/windows/figcraft.wxs"
+    },
+    {
+      "id": "word",
+      "file": "word.wxs",
+      "sha256": "89db42e2f44af9d90697a846f1a5844bf1ab7e25b7aaa762b1d6eea2373a98ca",
+      "bytes": 12984,
+      "repository": "storytold/wordcraft",
+      "commit": "fc41918814f62645b6746ed68e71e8c2c2e85d6f",
+      "archiveSha256": "ea7a64508f9df85878481f41ad961f8396be0e6a4cf0f9842844a86dc7a48fb6",
+      "archiveBytes": 9370348,
+      "archiveMember": "wordcraft-fc41918814f62645b6746ed68e71e8c2c2e85d6f/packaging/windows/wordcraft.wxs"
+    },
+    {
+      "id": "sound",
+      "file": "sound.wxs",
+      "sha256": "67b034a163fa79f55bb0dd09b4d7f73a0215d786d6ece49ca21271cb42498786",
+      "bytes": 6381,
+      "repository": "storytold/soundcraft",
+      "commit": "3a28a657692c1b98b28c276d8f61df9471074f0f",
+      "archiveSha256": "72a936c404b66a1210a74d3f81142910e868ea51150edd6bee10e6faba5d0325",
+      "archiveBytes": 5186470,
+      "archiveMember": "soundcraft-3a28a657692c1b98b28c276d8f61df9471074f0f/packaging/windows/soundcraft.wxs"
+    },
+    {
+      "id": "deck",
+      "file": "deck.wxs",
+      "sha256": "1204ef8bdba9334709fc07227733c5867a34bdd4f865aea8163f5ace587f09d9",
+      "bytes": 4626,
+      "repository": "storytold/deckcraft",
+      "commit": "d78e657e4cb1e490ceb5445785c052d9cf5ad963",
+      "archiveSha256": "e5dfbccdcbfe7d36566299e3d396bae606d49013fbfe8b2bb8afbfeda62a3f55",
+      "archiveBytes": 3244089,
+      "archiveMember": "deckcraft-d78e657e4cb1e490ceb5445785c052d9cf5ad963/packaging/windows/deckcraft.wxs"
+    },
+    {
+      "id": "cad",
+      "file": "cad.wxs",
+      "sha256": "d55bac5e7ff4fc123b4babd394616207b3d25394990833b3e89b208d825325f1",
+      "bytes": 9840,
+      "repository": "storytold/cadcraft",
+      "commit": "fc4e98315a8d771b5ab832f0ade0b5e7b106df7f",
+      "archiveSha256": "039ee54bfbf6c25f49a24770a5ba0ef4c2d3125c26fa88bafa06da4048b34d17",
+      "archiveBytes": 3979882,
+      "archiveMember": "cadcraft-fc4e98315a8d771b5ab832f0ade0b5e7b106df7f/packaging/windows/cadcraft.wxs"
+    },
+    {
+      "id": "grid",
+      "file": "grid.wxs",
+      "sha256": "a6a4263705450ed6a3f6d87ae4f9093779d2ddb292cd4235fd272638bef18734",
+      "bytes": 15025,
+      "repository": "storytold/gridcraft",
+      "commit": "d9d09f0baa912e88c5111107903fc8c640214b57",
+      "archiveSha256": "3f4fc387e910a3a4c6e435f33b9b123abb6d3347399d589f9b791a9f53c50b25",
+      "archiveBytes": 4191411,
+      "archiveMember": "gridcraft-d9d09f0baa912e88c5111107903fc8c640214b57/packaging/windows/gridcraft.wxs"
+    },
+    {
+      "id": "launcher",
+      "file": "launcher.wxs",
+      "sha256": "9626cc9028c78c56d8b067a31ac2e246675e5ad317a100d68e1a2ccbd431155f",
+      "bytes": 12796,
+      "repository": "storytold/craft-launcher",
+      "commit": "cbae640688c5fa3daa120a7f5e050f8e24148a47",
+      "archiveSha256": "5973336d8a48213feb51e96b2eac73bcdc0e0c94f58b299a6e1b2fb40024ada7",
+      "archiveBytes": 2003171,
+      "archiveMember": "craft-launcher-cbae640688c5fa3daa120a7f5e050f8e24148a47/packaging/windows/artcraft-launcher.wxs"
+    }
+  ]
+}

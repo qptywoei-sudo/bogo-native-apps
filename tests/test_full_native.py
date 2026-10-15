@@ -7,6 +7,7 @@ import tempfile
 import unittest
 import xml.etree.ElementTree as ET
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
 SCRIPTS = Path(__file__).resolve().parents[1] / 'scripts'
@@ -17,6 +18,60 @@ spec.loader.exec_module(builder)
 
 
 class FullNativeGuards(unittest.TestCase):
+    def test_light_build_runs_original_engine_and_native_editor_discovery_tests(self):
+        lock = builder.load_lock('light')
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            binaries = {'app': work / 'lightcraft', 'cli': work / 'lightcraft-cli'}
+            for path in binaries.values():
+                path.write_bytes(b'native binary validation is tested separately')
+            with patch.object(builder, 'assert_host'), patch.object(builder, 'prepared', return_value=(work, work / 'source', work / 'fonts', {})), patch.object(builder, 'build_env', return_value={}), patch.object(builder, 'run', return_value='rustc 1.95.0 (fixture)') as commands, patch.object(builder, 'binary_paths', return_value=binaries), patch.object(builder, 'check_versions', return_value={}), patch.object(builder, 'write_json'):
+                builder.build(SimpleNamespace(platform='macos-arm64'), lock)
+            tests = [call.args[0] for call in commands.call_args_list if 'test' in call.args[0]]
+            self.assertEqual(len(tests), 2)
+            for package in ('lightcraft-denoise-core', 'lightcraft-engine'):
+                self.assertIn(package, tests[0])
+            self.assertIn('editors::tests', tests[1])
+            self.assertIn('lightcraft', tests[1])
+            for command in tests:
+                self.assertIn('--locked', command)
+                self.assertIn('aarch64-apple-darwin', command)
+
+    def test_light_format_literals_must_exist_in_all_original_catalogs(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            source = Path(temporary)
+            for i in range(9):
+                (source / f'{i}-formats.json').write_text(json.dumps({'Downloads from {host}. KIO Light installs it, {after}.': 'translated'}))
+            code = source / 'panel.rs'
+            code.write_text('// tr_format!("comment is not a call")\ntr_format!("Downloads from {host}. KIO Light installs it, {after}.", host = host, after = after);\n')
+            self.assertEqual(builder.light_format_contract(source), {'catalogs': 9, 'keys': 1, 'literalCalls': 1})
+            code.write_text('tr_format!("Downloads from {host}. LightCraft installs it, {after}.", host = host, after = after);\n')
+            with self.assertRaisesRegex(ValueError, 'no catalog key'):
+                builder.light_format_contract(source)
+            code.write_text('tr_format!("Downloads from {host}. KIO Light installs it, {after}.");\n')
+            (source / '0-formats.json').write_text('{}')
+            with self.assertRaisesRegex(ValueError, 'key sets diverged'):
+                builder.light_format_contract(source)
+
+    def test_pdf_build_runs_original_engine_and_both_native_update_boundaries(self):
+        lock = builder.load_lock('pdf')
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            binaries = {'app': work / 'pdfcraft', 'cli': work / 'pdfcraft-cli'}
+            for path in binaries.values():
+                path.write_bytes(b'native header inspection is covered separately')
+            with patch.object(builder, 'assert_host'), patch.object(builder, 'prepared', return_value=(work, work / 'source', work / 'fonts', {})), patch.object(builder, 'build_env', return_value={'CRAFT_FONTS_REQUIRED': '1'}), patch.object(builder, 'run', return_value='rustc 1.95.0 (fixture)') as commands, patch.object(builder, 'binary_paths', return_value=binaries), patch.object(builder, 'check_versions', return_value={}), patch.object(builder, 'write_json'):
+                builder.build(SimpleNamespace(platform='macos-arm64'), lock)
+            tests = [call.args[0] for call in commands.call_args_list if 'test' in call.args[0]]
+            self.assertEqual(len(tests), 3)
+            self.assertIn('pdfcraft-engine', tests[0])
+            self.assertIn('updates::tests', tests[1])
+            self.assertIn('pdfcraft-ui-egui', tests[2])
+            self.assertIn('updates::kio_version_tests', tests[2])
+            for command in tests:
+                self.assertIn('--locked', command)
+                self.assertIn('aarch64-apple-darwin', command)
+
     def test_functional_engine_fix_requires_separate_hash_locked_narrow_scope(self):
         lock = builder.load_lock('word')
         with tempfile.TemporaryDirectory() as tmp:
@@ -76,6 +131,17 @@ class FullNativeGuards(unittest.TestCase):
                 with self.subTest(app=app, file=header):
                     self.assertEqual(paths, [], 'Branding must preserve original Rust module paths')
 
+    def test_branding_keeps_real_upstream_documentation_urls(self):
+        # Reverse-DNS bundle IDs are not GitHub repositories. A profile rename
+        # must not also rename the target of an existing help/issues link.
+        wrong = re.compile(r'https://(?:github\.com/storytold/|api\.github\.com/repos/storytold/)com\.kio\.')
+        for app in builder.IDS:
+            lock = builder.load_lock(app)
+            patch_text = (builder.ROOT / lock['branding']['patch']).read_text(encoding='utf-8')
+            added = '\n'.join(line[1:] for line in patch_text.splitlines() if line.startswith('+') and not line.startswith('+++'))
+            with self.subTest(app=app):
+                self.assertIsNone(wrong.search(added), 'Bundle IDs must not corrupt help or update repository URLs')
+
     def test_source_and_patch_tampering_or_feature_removal_is_refused(self):
         original = json.loads(builder.CATALOG.read_text())
         with tempfile.TemporaryDirectory() as tmp:
@@ -102,6 +168,10 @@ class FullNativeGuards(unittest.TestCase):
         env = builder.build_env(lock, Path('/fonts'), Path('/target'), 'aarch64-apple-darwin')
         self.assertEqual(env['CRAFT_FONTS_REQUIRED'], '1')
         self.assertEqual(env['GRIDCRAFT_BUILD_SHA'], lock['source']['commit'])
+        deck = builder.load_lock('deck')
+        env = builder.build_env(deck, Path('/fonts'), Path('/target'), 'aarch64-apple-darwin')
+        self.assertEqual(env['KIO_RELEASE_VERSION'], deck['version'])
+        self.assertEqual(env['DECKCRAFT_VERSION'], deck['version'])
 
     def test_msi_preserves_original_installer_and_adds_all_legal_files_once(self):
         lock = builder.load_lock('grid')

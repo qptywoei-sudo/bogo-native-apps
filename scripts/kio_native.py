@@ -31,7 +31,7 @@ HEX = re.compile(r"[a-f0-9]{64}\Z")
 PRIVATE = re.compile(r"^(?:\.env(?:\..*)?|\.runtime\.json|id_rsa|id_ed25519|credentials\.json|token\.json)$", re.I)
 RESERVED = re.compile(r"(?:CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\..*)?\Z", re.I)
 PUBLIC_FILES = ("README.md", "LICENSE", ".gitignore", ".gitattributes", "manifests/word.lock.json", "manifests/programs.json",
-                "patches/word/wordcraft-v0.7.0-kio-word.patch", "scripts/kio_native.py", "tests/test_builder.py",
+                "patches/word/wordcraft-v0.7.0-kio-word.patch", "scripts/kio_native.py", "tests/test_builder.py", "tests/test_dependency_notices.py",
                 ".github/workflows/full-native-word.yml")
 
 
@@ -352,7 +352,7 @@ def upstream_license_files(package, folder, cache):
     if root in _UPSTREAM_NOTICE_CACHE:
         return _UPSTREAM_NOTICE_CACHE[root]
     cache.mkdir(parents=True, exist_ok=True)
-    candidates = ("LICENSE", "LICENSE.md", "LICENSE.txt", "LICENSE-MIT", "LICENSE-APACHE", "LICENCE", "LICENCE.md", "COPYING", "LICENSE-ZLIB", "LICENSE_MIT", "LICENSE_APACHE", "NOTICE", "NOTICE.md")
+    candidates = ("LICENSE", "LICENSE.md", "LICENSE.txt", "LICENSE-MIT", "LICENSE-APACHE", "LICENSE-MIT.txt", "LICENSE-APACHE.txt", "LICENCE", "LICENCE.md", "COPYING", "LICENSE-ZLIB", "LICENSE_MIT", "LICENSE_APACHE", "NOTICE", "NOTICE.md")
 
     def fetch(name):
         url = root + name
@@ -393,6 +393,15 @@ def dependency_licenses(lock, source, env, target, destination):
         for p in folder.iterdir():
             if p.is_file() and p.name.upper().startswith(("LICENSE", "COPYING", "NOTICE", "UNLICENSE", "OFL")):
                 names.add(p)
+        # REUSE packages ship their SPDX texts inside LICENSES/ rather than a
+        # root LICENSE. Preserve those original files before seeking any remote
+        # fallback; a Codeberg-hosted crate needs no GitHub mirror to retain them.
+        reuse = folder / "LICENSES"
+        if reuse.is_dir():
+            require(not reuse.is_symlink(), "Dependency license directory is a symlink")
+            for p in reuse.iterdir():
+                if p.is_file() and re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9.+-]*\.txt", p.name):
+                    names.add(p)
         if package.get("license_file"):
             p = (folder / package["license_file"]).resolve()
             require(p.is_relative_to(folder), "Dependency license path escaped package")
@@ -439,13 +448,14 @@ def dependency_licenses(lock, source, env, target, destination):
             out = destination / label / "bundled-notices" / relative
             out.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(p, out)
+        notice_paths = {p: p.relative_to(folder).as_posix() if p.is_relative_to(folder) else p.name for p in names}
         for p in sorted(names):
             require(p.is_file() and not p.is_symlink() and p.stat().st_size <= 4 * 1024 * 1024, "Invalid dependency license file")
-            out = destination / label / p.name
+            out = destination / label / notice_paths[p]
             out.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(p, out)
         index.append({"name": package["name"], "version": package["version"], "license": package.get("license"),
-                      "repository": package.get("repository"), "files": sorted(p.name for p in names) + [r["file"] for r in retrieved], "immutableUpstreamNotices": retrieved, "bundledNotices": [r for r, _ in nested]})
+                      "repository": package.get("repository"), "files": sorted(notice_paths.values()) + [r["file"] for r in retrieved], "immutableUpstreamNotices": retrieved, "bundledNotices": [r for r, _ in nested]})
     write_json(destination / "index.json", index)
     require(not missing, "Dependencies without a packaged license file need review: " + ", ".join(missing))
 

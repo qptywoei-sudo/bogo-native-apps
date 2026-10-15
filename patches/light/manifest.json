@@ -14,16 +14,16 @@
   },
   "patch": {
     "file": "lightcraft-v0.8.0-kio-light.patch",
-    "sha256": "fba2ca35ab09ad1a88365bba9bdcfcf4d5f28b317841c5bef421fbede28d9854",
-    "bytes": 8604740
+    "sha256": "c6662674e64d43cdab581b049bdab7d064042c9deaf68c1200076389c6d9580f",
+    "bytes": 8620208
   },
   "counts": {
     "upstreamFiles": 823,
     "forkFiles": 819,
-    "changedPaths": 105,
+    "changedPaths": 108,
     "added": 18,
     "removed": 22,
-    "modified": 65,
+    "modified": 68,
     "protectedFilesByteIdentical": 480
   },
   "checks": {
@@ -147,6 +147,17 @@
       "after": {
         "sha256": "615d7d6f2888f7c8ea2d7c8f3ac7087902777a5d6dd67eb9e594a58a3ee8cce4",
         "bytes": 1395
+      }
+    },
+    {
+      "path": "apps/lightcraft/src/editors.rs",
+      "before": {
+        "sha256": "4cd9d9d885b0d1fb2d4f4949ad1ab7f9901c3135e239979b037c9e0c9db82b50",
+        "bytes": 14153
+      },
+      "after": {
+        "sha256": "1640757d332b8beb0f1a9ced3a94d993835f58d22b874a0bffac907904873ee5",
+        "bytes": 16245
       }
     },
     {
@@ -679,8 +690,8 @@
         "bytes": 2138
       },
       "after": {
-        "sha256": "0b35a1f4b8ece64ac677d2bb41e38ee6282d043611f6b55168478a881f63e608",
-        "bytes": 2141
+        "sha256": "9eb1aea258d49f7b4935f0b7b520e28c08754f7d05d3a595e2eed24a574c6347",
+        "bytes": 2135
       }
     },
     {
@@ -706,14 +717,25 @@
       }
     },
     {
+      "path": "crates/ui-egui/src/panels/denoise.rs",
+      "before": {
+        "sha256": "80c326dac02e824606f8ee13321f7aab70ceaf8a0216347e3494903045350ebd",
+        "bytes": 33674
+      },
+      "after": {
+        "sha256": "5fd0aca40ca5cb89a66325e8da49f007ed615a78e95b29e27ca2c30975b7b1d7",
+        "bytes": 33673
+      }
+    },
+    {
       "path": "crates/ui-egui/src/panels/dialogs.rs",
       "before": {
         "sha256": "6e3dbadcdb994df95bd5448311775d47c25dfe743a30b8dd523e284126b4e159",
         "bytes": 114063
       },
       "after": {
-        "sha256": "760a981bc8db3fc785cd42ec4eb2bf68da38ba3d1a9937879b6ff9ea001baa77",
-        "bytes": 114058
+        "sha256": "53132a1cde1a62103124580d0dffd8c51e131873d5845097e118d61be8a7b886",
+        "bytes": 114055
       }
     },
     {
@@ -780,6 +802,17 @@
       "after": {
         "sha256": "5ec1302b0bab5a4f82db213efffd52177bdcf77706f95fa78f0415ae80d84c97",
         "bytes": 12678
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/state.rs",
+      "before": {
+        "sha256": "9dbc7b07c532a8401c61faee7b5b55dfcc36156734b2092fb3b52d53dc9acff8",
+        "bytes": 48230
+      },
+      "after": {
+        "sha256": "549c79c1e9c36015ed2ce815dce13acd449b56608f9514958e1c5b302eb4050a",
+        "bytes": 48229
       }
     },
     {
@@ -1065,8 +1098,8 @@
         "bytes": 12965
       },
       "after": {
-        "sha256": "26cdcac0204f9452f8e6d6eb85e20023fa5dbf5b934386281731a332e6e0a015",
-        "bytes": 12924
+        "sha256": "09ae9ac8440e9e3cce5241d0c04cc528b3543a670d16e0176c77112c5fdff02c",
+        "bytes": 12951
       }
     },
     {
@@ -1594,5 +1627,36 @@
     "docs/brand/artcraft-logo.png",
     "docs/brand/artcraft-logo.svg",
     "docs/brand/artcraft-mark.png"
-  ]
+  ],
+  "linkAndUpdateCorrection": {
+    "supersededPatchSha256": "fba2ca35ab09ad1a88365bba9bdcfcf4d5f28b317841c5bef421fbede28d9854",
+    "upstreamDocumentationUrlsRestored": [
+      {
+        "file": "crates/ui-egui/src/links.rs",
+        "before": "https://github.com/storytold/com.kio.light/tree/main/docs",
+        "after": "https://github.com/storytold/lightcraft/tree/main/docs"
+      },
+      {
+        "file": "crates/ui-egui/src/links.rs",
+        "before": "https://github.com/storytold/com.kio.light/issues/new",
+        "after": "https://github.com/storytold/lightcraft/issues/new"
+      },
+      {
+        "file": "crates/ui-egui/src/panels/dialogs.rs",
+        "before": "https://github.com/storytold/com.kio.light/blob/main/docs/ai-masks.md#getting-the-model",
+        "after": "https://github.com/storytold/lightcraft/blob/main/docs/ai-masks.md#getting-the-model"
+      }
+    ],
+    "lightFormatLabelMatchedToNineExistingCatalogs": true,
+    "engineAndCargoFeaturesUnchanged": true
+  },
+  "windowsInstallerIsolation": {
+    "supersededPatchSha256": "f895aaec6c3abd47dbcb2e35b02aff7fc20043dfb3edd8faa5268b52efd698fb",
+    "registryNamespace": "Software\\KIO\\Light",
+    "appPathsExecutable": "KIO Light.exe",
+    "installedGuiExecutable": "KIO Light.exe",
+    "originalCargoBinaryAndCliNamesRetained": true,
+    "originalUserDefaultFileAssociationsPreserved": true,
+    "kioPhotoHostInteropUpdated": true
+  }
 }

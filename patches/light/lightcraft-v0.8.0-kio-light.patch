@@ -223,6 +223,213 @@ index 4947091d64e146c73f2a80fd285cf86e577ba42d..5e9ef3468c3b04e8d9c3f433fe5dd12c
          .set("LegalCopyright", "Copyright (c) the LightCraft authors. MIT OR Apache-2.0.")
          .set("OriginalFilename", "lightcraft.exe")
          .set("InternalName", "lightcraft");
+diff --git a/apps/lightcraft/src/editors.rs b/apps/lightcraft/src/editors.rs
+index cf6d6607970d11a4e56710c4927eda1bec294c80..6f2a992811ea10efabd0537cfe1125372eabdd06 100644
+--- a/apps/lightcraft/src/editors.rs
++++ b/apps/lightcraft/src/editors.rs
+@@ -1,13 +1,13 @@
+-//! Starting external editors for Photo ▸ Edit In: PhotoCraft, found where its installers put it,
++//! Starting external editors for Photo ▸ Edit In: KIO Photo, found where its installers put it,
+ //! or any other application the user named in Settings ▸ External Editing.
+ 
+ use std::path::{Path, PathBuf};
+ use std::process::Command;
+ 
+-/// The name the UI asks for when it means PhotoCraft (`lightcraft_ui_egui::state::PHOTOCRAFT`).
++/// The name the UI asks for when it means KIO Photo (`lightcraft_ui_egui::state::PHOTOCRAFT`).
+ const PHOTOCRAFT: &str = lightcraft_ui_egui::state::PHOTOCRAFT;
+-/// PhotoCraft's application id (Flatpak, desktop entry).
+-const PHOTOCRAFT_ID: &str = "ai.storyteller.photocraft";
++/// KIO Photo's application id (Flatpak, desktop entry).
++const PHOTOCRAFT_ID: &str = "com.kio.photo";
+ 
+ /// How an editor is started.
+ #[derive(Debug, PartialEq)]
+@@ -18,12 +18,12 @@
+     Program(PathBuf),
+     /// macOS: `open -a <app>` (an application name or bundle path).
+     MacApp(String),
+-    /// The PhotoCraft Flatpak, with the file forwarded into its sandbox.
++    /// The KIO Photo Flatpak, with the file forwarded into its sandbox.
+     Flatpak,
+ }
+ 
+ /// Whether `app` can be started (Settings ▸ External Editing names it; "" = the system default):
+-/// for PhotoCraft, that it is installed. The error says what to do instead.
++/// for KIO Photo, that it is installed. The error says what to do instead.
+ pub fn check(app: &str) -> Result<(), String> {
+     launcher(app).map(|_| ())
+ }
+@@ -111,52 +111,72 @@
+     if !app.eq_ignore_ascii_case(PHOTOCRAFT) {
+         return Ok(if cfg!(target_os = "macos") { Launcher::MacApp(app.to_string()) } else { Launcher::Program(PathBuf::from(app)) });
+     }
+-    find_photocraft().ok_or_else(|| {
+-        "PhotoCraft isn't installed. Get it from getartcraft.com/apps/photocraft, or give where it is in Settings ▸ External Editing.".to_string()
+-    })
++    find_photocraft()
++        .ok_or_else(|| "KIO Photo isn't installed. Get it from https://kio-library.vercel.app/?program=photo, or give where it is in Settings ▸ External Editing.".to_string())
+ }
+ 
+ fn find_photocraft() -> Option<Launcher> {
+     let env = |k: &str| std::env::var_os(k).map(|v| v.to_string_lossy().to_string());
+     if cfg!(target_os = "macos") {
+         // LaunchServices finds the app wherever it is; these are only the usual places
+-        let home = env("HOME").map(|h| Path::new(&h).join("Applications/PhotoCraft.app"));
+-        let found = [Some(PathBuf::from("/Applications/PhotoCraft.app")), home].into_iter().flatten().find(|p| p.is_dir());
++        let found = mac_candidates(env("HOME").as_deref()).into_iter().find(|p| p.is_dir());
+         return Some(Launcher::MacApp(found.map_or_else(|| PHOTOCRAFT.to_string(), |p| p.to_string_lossy().to_string())));
+     }
+     if cfg!(target_os = "windows") {
+-        let install_dir = reg_query(r"HKLM\Software\PhotoCraft", Some("InstallDir"));
+-        let app_path = reg_query(r"HKLM\Software\Microsoft\Windows\CurrentVersion\App Paths\photocraft.exe", None);
++        let install_dir = reg_query(r"HKLM\Software\KIO\Photo", Some("InstallDir"));
++        let app_path = reg_query(r"HKLM\Software\Microsoft\Windows\CurrentVersion\App Paths\KIO Photo.exe", None);
+         return windows_candidates(install_dir, app_path, env).into_iter().find(|p| p.is_file()).map(Launcher::Program);
+     }
+-    // Linux, FreeBSD: on the PATH (.deb, .rpm, tarball), a desktop entry (AppImage, which
+-    // registers one on first run), else the Flatpak
+-    let on_path =
+-        env("PATH").into_iter().flat_map(|p| std::env::split_paths(&p).collect::<Vec<_>>()).map(|d| d.join("photocraft")).find(|p| p.is_file());
++    // Linux, FreeBSD: a KIO desktop entry (native package or AppImage), else the KIO Flatpak.
++    // The original and KIO use the same Cargo binary stem. A bare PATH entry
++    // cannot establish application identity; require the KIO desktop registration.
++    let on_path = || env("PATH").into_iter().flat_map(|p| std::env::split_paths(&p).collect::<Vec<_>>()).map(|d| d.join("photocraft")).find(|p| p.is_file());
+     let from_entry = || {
+         desktop_entry_dirs(env).into_iter().find_map(|d| {
+             let text = std::fs::read_to_string(d.join(format!("{PHOTOCRAFT_ID}.desktop"))).ok()?;
+-            desktop_exec(&text).filter(|p| p.is_file())
++            desktop_exec(&text).filter(|p| p.is_file()).or_else(|| {
++                // Resolve a bare command only after the unique KIO desktop entry
++                // confirms the registered application, not an upstream PATH hit.
++                registered_kio_path(&text, on_path)
++            })
+         })
+     };
+-    if let Some(p) = on_path.or_else(from_entry) {
++    if let Some(p) = from_entry() {
+         return Some(Launcher::Program(p));
+     }
+     let flatpak = Command::new("flatpak").args(["info", PHOTOCRAFT_ID]).output().is_ok_and(|o| o.status.success());
+     flatpak.then_some(Launcher::Flatpak)
+ }
+ 
+-/// Where the Windows installers put `photocraft.exe`, most specific first: the folder the MSI
+-/// recorded (`HKLM\Software\PhotoCraft\InstallDir`), its App Paths entry, then the default
++/// A bare original machine name is ambiguous; use it only with the KIO desktop identity.
++fn registered_kio_path(text: &str, on_path: impl FnOnce() -> Option<PathBuf>) -> Option<PathBuf> {
++    let registered = text.lines().any(|line| line == "StartupWMClass=com.kio.photo");
++    let bare = text.lines().any(|line| line == "Exec=photocraft %F");
++    (registered && bare).then(on_path).flatten()
++}
++
++/// Normal KIO installations; LaunchServices still finds another registered location.
++fn mac_candidates(home: Option<&str>) -> Vec<PathBuf> {
++    let mut out = vec![PathBuf::from("/Applications/KIO Photo.app")];
++    if let Some(home) = home {
++        for folder in ["Applications", "Applications/KIO Native Apps"] {
++            out.push(Path::new(home).join(folder).join("KIO Photo.app"));
++        }
++    }
++    out
++}
++
++/// Where the Windows installers put `KIO Photo.exe`, most specific first: the folder the MSI
++/// recorded (`HKLM\Software\KIO\Photo\InstallDir`), its App Paths entry, then the default
+ /// folders (per machine, then per user).
+ fn windows_candidates(install_dir: Option<String>, app_path: Option<String>, env: impl Fn(&str) -> Option<String>) -> Vec<PathBuf> {
+     let mut out: Vec<PathBuf> = Vec::new();
+-    out.extend(install_dir.map(|d| Path::new(&d).join("photocraft.exe")));
++    out.extend(install_dir.map(|d| Path::new(&d).join("KIO Photo.exe")));
+     out.extend(app_path.map(|p| PathBuf::from(p.trim_matches('"'))));
+     for var in ["ProgramW6432", "ProgramFiles"] {
+-        out.extend(env(var).map(|d| Path::new(&d).join("PhotoCraft").join("photocraft.exe")));
+-    }
+-    out.extend(env("LOCALAPPDATA").map(|d| Path::new(&d).join("Programs").join("PhotoCraft").join("photocraft.exe")));
++        out.extend(env(var).map(|d| Path::new(&d).join("KIO Photo").join("KIO Photo.exe")));
++    }
++    out.extend(env("LOCALAPPDATA").map(|d| Path::new(&d).join("Programs").join("KIO Photo").join("KIO Photo.exe")));
+     out
+ }
+ 
+@@ -236,13 +256,35 @@
+         assert_eq!(c.get_program(), r"C:\DxO\DxO.PhotoLab.exe");
+         assert_eq!(args(&c), paths);
+         let c = all_command(Launcher::MacApp("DxO PhotoLab 8".into()), &paths).unwrap();
+-        assert_eq!(
+-            (c.get_program().to_string_lossy().into_owned(), args(&c)),
+-            ("open".into(), vec!["-a".into(), "DxO PhotoLab 8".into(), paths[0].clone(), paths[1].clone()])
+-        );
++        assert_eq!((c.get_program().to_string_lossy().into_owned(), args(&c)), ("open".into(), vec!["-a".into(), "DxO PhotoLab 8".into(), paths[0].clone(), paths[1].clone()]));
+         let c = all_command(Launcher::Flatpak, &paths).unwrap();
+         assert_eq!(args(&c), ["run", "--file-forwarding", PHOTOCRAFT_ID, "@@", &paths[0], &paths[1], "@@"]);
+         assert!(all_command(Launcher::Default, &paths).is_none(), "the system default opens them one by one");
++    }
++
++    #[test]
++    fn a_bare_upstream_path_is_not_an_automatic_kio_editor() {
++        assert_eq!(registered_kio_path("Exec=photocraft %F\nStartupWMClass=ai.storyteller.photocraft\n", || panic!("must not inspect an ambiguous PATH")), None);
++        assert_eq!(registered_kio_path("Exec=other %F\nStartupWMClass=com.kio.photo\n", || panic!("must preserve the registered command")), None);
++        assert_eq!(
++            registered_kio_path("Exec=photocraft %F\nStartupWMClass=com.kio.photo\n", || Some(PathBuf::from("/opt/kio/photocraft"))),
++            Some(PathBuf::from("/opt/kio/photocraft"))
++        );
++    }
++
++    #[test]
++    fn mac_lookup_uses_only_kio_bundle_paths() {
++        let paths = mac_candidates(Some("/Users/test"));
++        assert_eq!(
++            paths,
++            [
++                PathBuf::from("/Applications/KIO Photo.app"),
++                PathBuf::from("/Users/test/Applications/KIO Photo.app"),
++                PathBuf::from("/Users/test/Applications/KIO Native Apps/KIO Photo.app")
++            ]
++        );
++        assert_eq!(PHOTOCRAFT, "KIO Photo");
++        assert_eq!(PHOTOCRAFT_ID, "com.kio.photo");
+     }
+ 
+     #[test]
+@@ -252,27 +294,27 @@
+             "LOCALAPPDATA" => Some(r"C:\Users\Simon\AppData\Local".to_string()),
+             _ => None,
+         };
+-        let c = windows_candidates(Some(r"D:\Apps\PhotoCraft\".into()), Some(r#""C:\Program Files\PhotoCraft\photocraft.exe""#.into()), env);
++        let c = windows_candidates(Some(r"D:\Apps\KIO Photo\".into()), Some(r#""C:\Program Files\KIO Photo\KIO Photo.exe""#.into()), env);
+         let c: Vec<String> = c.iter().map(|p| p.to_string_lossy().replace('/', "\\")).collect();
+-        assert!(c[0].starts_with(r"D:\Apps\PhotoCraft") && c[0].ends_with("photocraft.exe"), "{c:?}");
+-        assert_eq!(c[1], r"C:\Program Files\PhotoCraft\photocraft.exe", "App Paths, quotes dropped");
+-        assert!(c[2].starts_with(r"C:\Program Files") && c[2].ends_with("photocraft.exe"), "{c:?}");
+-        assert!(c[3].contains("Programs") && c[3].ends_with("photocraft.exe"), "{c:?}");
++        assert!(c[0].starts_with(r"D:\Apps\KIO Photo") && c[0].ends_with("KIO Photo.exe"), "{c:?}");
++        assert_eq!(c[1], r"C:\Program Files\KIO Photo\KIO Photo.exe", "App Paths, quotes dropped");
++        assert!(c[2].starts_with(r"C:\Program Files") && c[2].ends_with("KIO Photo.exe"), "{c:?}");
++        assert!(c[3].contains("Programs") && c[3].ends_with("KIO Photo.exe"), "{c:?}");
+         assert_eq!(c.len(), 4);
+     }
+ 
+     #[test]
+     fn reg_query_output_is_read() {
+-        let out = "\r\nHKEY_LOCAL_MACHINE\\Software\\PhotoCraft\r\n    InstallDir    REG_SZ    C:\\Program Files\\PhotoCraft\\\r\n\r\n";
+-        assert_eq!(reg_value(out).as_deref(), Some(r"C:\Program Files\PhotoCraft\"));
+-        let default = "\r\nHKEY_LOCAL_MACHINE\\...\\photocraft.exe\r\n    (Default)    REG_SZ    C:\\Program Files\\PhotoCraft\\photocraft.exe\r\n";
+-        assert_eq!(reg_value(default).as_deref(), Some(r"C:\Program Files\PhotoCraft\photocraft.exe"));
++        let out = "\r\nHKEY_LOCAL_MACHINE\\Software\\KIO\\Photo\r\n    InstallDir    REG_SZ    C:\\Program Files\\KIO Photo\\\r\n\r\n";
++        assert_eq!(reg_value(out).as_deref(), Some(r"C:\Program Files\KIO Photo\"));
++        let default = "\r\nHKEY_LOCAL_MACHINE\\...\\KIO Photo.exe\r\n    (Default)    REG_SZ    C:\\Program Files\\KIO Photo\\KIO Photo.exe\r\n";
++        assert_eq!(reg_value(default).as_deref(), Some(r"C:\Program Files\KIO Photo\KIO Photo.exe"));
+         assert_eq!(reg_value("ERROR: The system was unable to find the specified registry key or value."), None);
+     }
+ 
+     #[test]
+     fn desktop_entries_give_their_program() {
+-        let appimage = "[Desktop Entry]\nName=PhotoCraft\nExec=\"/home/simon/Apps/photocraft-1.2-linux-x86_64.AppImage\" %F\n";
++        let appimage = "[Desktop Entry]\nName=KIO Photo\nExec=\"/home/simon/Apps/photocraft-1.2-linux-x86_64.AppImage\" %F\n";
+         assert_eq!(desktop_exec(appimage), Some(PathBuf::from("/home/simon/Apps/photocraft-1.2-linux-x86_64.AppImage")));
+         assert_eq!(desktop_exec("Exec=/opt/photocraft/photocraft %F\n"), Some(PathBuf::from("/opt/photocraft/photocraft")));
+         assert_eq!(desktop_exec("Exec=photocraft %F\nTryExec=photocraft\n"), None, "a bare name is a PATH lookup");
 diff --git a/apps/lightcraft/src/main.rs b/apps/lightcraft/src/main.rs
 index 1c70e19eab0844da7d10d097429ac84d0b014dfd..17a486e96dbabcc9ef2c1f4ab9181ebd473da9bc 100644
 --- a/apps/lightcraft/src/main.rs
@@ -74958,15 +75165,11 @@ index 195e63e2a00ee57e772e7490b5978ae918d6bbd5..61326487514484790aebb89b4a8f1ee9
  
  /// Whether a Lightroom task currently owns the catalog transition.
 diff --git a/crates/ui-egui/src/links.rs b/crates/ui-egui/src/links.rs
-index 151fac954abe1ccb5c2531e2d5c9526d73cef431..a15b4b92a14c7f206a15714e9fe2cab263756391 100644
+index 151fac954abe1ccb5c2531e2d5c9526d73cef431..06581736db6968593d6466a572aef63f9b9deb9a 100644
 --- a/crates/ui-egui/src/links.rs
 +++ b/crates/ui-egui/src/links.rs
-@@ -13,19 +13,19 @@ pub const GITHUB: &str = "https://github.com/storytold/lightcraft";
- 
- /// (UI command id, menu label, URL) for each link, in Help-menu order.
- /// The user documentation (docs/ in the repository).
--pub const HELP: &str = "https://github.com/storytold/lightcraft/tree/main/docs";
-+pub const HELP: &str = "https://github.com/storytold/com.kio.light/tree/main/docs";
+@@ -16,10 +16,10 @@
+ pub const HELP: &str = "https://github.com/storytold/lightcraft/tree/main/docs";
  
  pub const LINKS: &[(&str, &str, &str)] = &[
 -    ("app.help", "LightCraft Help", HELP),
@@ -74979,13 +75182,6 @@ index 151fac954abe1ccb5c2531e2d5c9526d73cef431..a15b4b92a14c7f206a15714e9fe2cab2
      ("app.artcraft", "ArtCraft Website", WEBSITE),
      ("app.feedback", "Send Feedback…", FEEDBACK),
  ];
- 
- /// Where feedback and bug reports go.
--pub const FEEDBACK: &str = "https://github.com/storytold/lightcraft/issues/new";
-+pub const FEEDBACK: &str = "https://github.com/storytold/com.kio.light/issues/new";
- 
- /// The URL behind a link command id.
- pub fn url_of(cmd: &str) -> Option<&'static str> {
 diff --git a/crates/ui-egui/src/menubar.rs b/crates/ui-egui/src/menubar.rs
 index fe6905cadbc8dc268530392ff251bef7e38527b7..a406c6ebd4b94e74449193bc8329220fb6e0ad89 100644
 --- a/crates/ui-egui/src/menubar.rs
@@ -75044,11 +75240,24 @@ index ad31c57bf8d9cd6b3eb015b6fa474bc948a0d654..db412d8e055d7c78e6c6e0b1972593b9
                      match crate::pick::ask(app, id, p, "path", req, |s| s.save_preset_file.as_mut().map(|f| f(&name).into_iter().collect())) {
                          Picked::Now(v) => v.into_iter().next(),
                          Picked::Later => return Some(Ok(Value::Null)),
+diff --git a/crates/ui-egui/src/panels/denoise.rs b/crates/ui-egui/src/panels/denoise.rs
+index 75488f76b04486956a93ec8d8d9ef43b729b508b..18274f53ddbc1274a968cf8390c81331be9e5e8e 100644
+--- a/crates/ui-egui/src/panels/denoise.rs
++++ b/crates/ui-egui/src/panels/denoise.rs
+@@ -662,7 +662,7 @@
+         ui.add(
+             egui::Label::new(
+                 RichText::new(tr_format!(
+-                    "Downloads from {host}. Once it has arrived and checked out, LightCraft installs it, {after}.",
++                    "Downloads from {host}. Once it has arrived and checked out, KIO Light installs it, {after}.",
+                     host = host,
+                     after = tr(after)
+                 ))
 diff --git a/crates/ui-egui/src/panels/dialogs.rs b/crates/ui-egui/src/panels/dialogs.rs
-index a79261fdc7fa7c42cf41af15a35e67c04847a155..054c63301c5be59679a791742d83f1c32ab56eff 100644
+index a79261fdc7fa7c42cf41af15a35e67c04847a155..20bade39054f04f5334743b5badbe5396f20f333 100644
 --- a/crates/ui-egui/src/panels/dialogs.rs
 +++ b/crates/ui-egui/src/panels/dialogs.rs
-@@ -261,7 +261,7 @@ pub fn show(app: &mut LightcraftApp, ctx: &egui::Context) {
+@@ -261,7 +261,7 @@
          // (nothing to download from in this build: the dialog explains the manual install)
          Dialog::SamModel { .. } if sam_by_hand(&app.session.segmenter) => "Install the SAM 3 Model",
          Dialog::SamModel { .. } => "Download the SAM 3 Model?",
@@ -75057,7 +75266,7 @@ index a79261fdc7fa7c42cf41af15a35e67c04847a155..054c63301c5be59679a791742d83f1c3
          Dialog::Shortcuts => "Keyboard Shortcuts",
      }
      .to_string();
-@@ -956,7 +956,7 @@ pub fn show(app: &mut LightcraftApp, ctx: &egui::Context) {
+@@ -956,7 +956,7 @@
                                  crate::widgets::named(ui.add(egui::TextEdit::singleline(&mut opts.photos_album).hint_text(crate::i18n::tr("none")).desired_width(f32::INFINITY)), crate::i18n::tr("Album"))
                              });
                              ui.label(
@@ -75066,7 +75275,7 @@ index a79261fdc7fa7c42cf41af15a35e67c04847a155..054c63301c5be59679a791742d83f1c3
                                      .size(11.0)
                                      .color(t.text_dim),
                              );
-@@ -1120,7 +1120,7 @@ pub fn show(app: &mut LightcraftApp, ctx: &egui::Context) {
+@@ -1120,7 +1120,7 @@
                  }
                  d @ Dialog::SynchronizeFolder { .. } => crate::sync::body(app, ui, d),
                  Dialog::LightroomCatalog { folder, catalog } => {
@@ -75075,7 +75284,7 @@ index a79261fdc7fa7c42cf41af15a35e67c04847a155..054c63301c5be59679a791742d83f1c3
                      ui.label(egui::RichText::new(catalog.as_deref().unwrap_or(folder.as_str())).color(t.text_dim));
                      ui.label(
                          egui::RichText::new(crate::i18n::tr(
-@@ -1162,7 +1162,7 @@ pub fn show(app: &mut LightcraftApp, ctx: &egui::Context) {
+@@ -1162,7 +1162,7 @@
                          1 => crate::credits::contributors_ui(app, ui),
                          2 => crate::credits::models_ui(ui),
                          _ => {
@@ -75084,7 +75293,7 @@ index a79261fdc7fa7c42cf41af15a35e67c04847a155..054c63301c5be59679a791742d83f1c3
                              ui.label(crate::i18n::tr_format!("Version {} — a clean-room, pure-Rust photo library and raw developer.", env!("CARGO_PKG_VERSION")));
                              ui.label(crate::i18n::tr_format!(
                                  "MIT OR Apache-2.0. Fonts: {} (OFL). Icons: original.",
-@@ -1179,7 +1179,7 @@ pub fn show(app: &mut LightcraftApp, ctx: &egui::Context) {
+@@ -1179,7 +1179,7 @@
                              }
                              ui.add_space(6.0);
                              for (label, url) in [
@@ -75093,16 +75302,7 @@ index a79261fdc7fa7c42cf41af15a35e67c04847a155..054c63301c5be59679a791742d83f1c3
                                  ("Source code on GitHub", crate::links::GITHUB),
                                  ("ArtCraft — more creative apps", crate::links::WEBSITE),
                              ] {
-@@ -1424,7 +1424,7 @@ fn sam_by_hand(sam: &lightcraft_engine::segment::Segmenter) -> bool {
- }
- 
- /// The model installation guide.
--const SAM_HELP: &str = "https://github.com/storytold/lightcraft/blob/main/docs/ai-masks.md#getting-the-model";
-+const SAM_HELP: &str = "https://github.com/storytold/com.kio.light/blob/main/docs/ai-masks.md#getting-the-model";
- 
- /// Open the configured SAM 3 folder itself; revealing a file opens its parent instead.
- pub(crate) fn show_model_folder(app: &mut LightcraftApp) -> Result<serde_json::Value, String> {
-@@ -1466,7 +1466,7 @@ fn sam_model_body(app: &mut LightcraftApp, ui: &mut egui::Ui, error: Option<&str
+@@ -1466,7 +1466,7 @@
      }
      let gb = |b: u64| b as f64 / 1e9;
      ui.label(crate::i18n::tr(
@@ -75111,7 +75311,7 @@ index a79261fdc7fa7c42cf41af15a35e67c04847a155..054c63301c5be59679a791742d83f1c3
      ));
      let dir = seg.dir.as_ref().map(|d| d.display().to_string()).unwrap_or_default();
      ui.label(format!("{} {:.1} GB, {} {dir}", crate::i18n::tr("A one-time download of about"), gb(MODEL_BYTES), crate::i18n::tr("saved in")));
-@@ -1474,7 +1474,7 @@ fn sam_model_body(app: &mut LightcraftApp, ui: &mut egui::Ui, error: Option<&str
+@@ -1474,7 +1474,7 @@
          egui::RichText::new(format!(
              "{} {LICENSE_NAME} — {}",
              crate::i18n::tr("Licence:"),
@@ -75258,6 +75458,19 @@ index 03810aca96b8a60072cc514f5fdb1e2441d1ea1b..dfa95afd353435d0acfa52cb6ec1daa3
                  ("cloud", Icon::Cloud, cloud_tip, ""),
                  ("help", Icon::Help, "Keyboard shortcuts", "app.shortcuts"),
                  ("share", Icon::Share, "Export", "dialog.export"),
+diff --git a/crates/ui-egui/src/state.rs b/crates/ui-egui/src/state.rs
+index cc583e7b34ffc2a52d2da4b2b7741143cb2b2577..9a8d07bef3697aa5d2abb812e33aa4f64648bd5e 100644
+--- a/crates/ui-egui/src/state.rs
++++ b/crates/ui-egui/src/state.rs
+@@ -314,7 +314,7 @@
+ 
+ /// The editor name that means PhotoCraft (Photo ▸ Edit In ▸ Edit in PhotoCraft): the host finds
+ /// where it is installed.
+-pub const PHOTOCRAFT: &str = "PhotoCraft";
++pub const PHOTOCRAFT: &str = "KIO Photo";
+ 
+ /// The file format Edit In renders the copy as.
+ #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 diff --git a/crates/ui-egui/src/tests_library_problem.rs b/crates/ui-egui/src/tests_library_problem.rs
 index 10783ff156914c983e7d7bae20b39481cfa41936..ed95ce9bcb27f07416c2498105f3390403313fa7 100644
 --- a/crates/ui-egui/src/tests_library_problem.rs
@@ -77899,7 +78112,7 @@ index b26aa96d665048d55be6166564eee805457cca42..01c5fd518638df2d36d349786191ea11
    if ! hdiutil_retry detach "$mount" >/dev/null; then
      echo "error: could not detach verification mount" >&2
 diff --git a/packaging/windows/lightcraft.wxs b/packaging/windows/lightcraft.wxs
-index 38fe8f391d7b29ba1f3d700403e9f3cfc0793c43..34aa4c2e32caa211386e0a0f68e831eab56bd19e 100644
+index 38fe8f391d7b29ba1f3d700403e9f3cfc0793c43..f242dddc2d9c3632217086f3e70fdd9a76a37544 100644
 --- a/packaging/windows/lightcraft.wxs
 +++ b/packaging/windows/lightcraft.wxs
 @@ -13,14 +13,14 @@
@@ -77921,7 +78134,14 @@ index 38fe8f391d7b29ba1f3d700403e9f3cfc0793c43..34aa4c2e32caa211386e0a0f68e831ea
      <!-- Same-version upgrades let successive pre-releases of one X.Y.Z replace each other
           (MSI versions are numeric, so 1.2.3-rc.1 and 1.2.3-rc.2 are both 1.2.3). -->
      <MajorUpgrade AllowSameVersionUpgrades="yes"
-@@ -34,7 +34,7 @@
+@@ -29,18 +29,18 @@
+ 
+     <Icon Id="LightcraftIcon.ico" SourceFile="$(var.IconPath)" />
+     <Property Id="ARPPRODUCTICON" Value="LightcraftIcon.ico" />
+-    <Property Id="ARPURLINFOABOUT" Value="https://getartcraft.com/apps/lightcraft" />
+-    <Property Id="ARPURLUPDATEINFO" Value="https://getartcraft.com/apps/lightcraft" />
++    <Property Id="ARPURLINFOABOUT" Value="https://kio-library.vercel.app/?program=light" />
++    <Property Id="ARPURLUPDATEINFO" Value="https://kio-library.vercel.app/?program=light" />
      <Property Id="ARPHELPLINK" Value="https://discord.gg/artcraft" />
  
      <StandardDirectory Id="ProgramFiles6432Folder">
@@ -77930,20 +78150,55 @@ index 38fe8f391d7b29ba1f3d700403e9f3cfc0793c43..34aa4c2e32caa211386e0a0f68e831ea
      </StandardDirectory>
      <!-- The folder of the installed version (written by LightcraftApp), so an upgrade installs
           where the user chose instead of moving back to Program Files (issue #399). Searched into
-@@ -192,10 +192,10 @@
+          its own property: AppSearch would otherwise overwrite INSTALLFOLDER=... given to msiexec. -->
+     <Property Id="PREVIOUSINSTALLFOLDER">
+-      <RegistrySearch Id="PreviousInstallFolder" Root="HKLM" Key="Software\LightCraft" Name="InstallFolder" Type="raw" />
++      <RegistrySearch Id="PreviousInstallFolder" Root="HKLM" Key="Software\KIO\Light" Name="InstallFolder" Type="raw" />
+     </Property>
+     <SetProperty Id="INSTALLFOLDER" Value="[PREVIOUSINSTALLFOLDER]" After="AppSearch" Sequence="both"
+         Condition="PREVIOUSINSTALLFOLDER AND NOT INSTALLFOLDER" />
+@@ -49,7 +49,7 @@
+          the newer InstallFolder value and an explicit INSTALLFOLDER always take precedence. -->
+     <Property Id="LEGACYINSTALLFOLDER">
+       <RegistrySearch Id="LegacyInstallFolder" Root="HKLM"
+-          Key="Software\Microsoft\Windows\CurrentVersion\App Paths\lightcraft.exe" Type="file" />
++          Key="Software\Microsoft\Windows\CurrentVersion\App Paths\KIO Light.exe" Type="file" />
+     </Property>
+     <!-- That directory search doesn't check the executable exists, and when its unquoted path is
+          gone it falls back to the text before the first space: a deleted
+@@ -57,8 +57,8 @@
+          search, which does require lightcraft.exe, finds it too. -->
+     <Property Id="LEGACYINSTALLEXE">
+       <RegistrySearch Id="LegacyInstallExe" Root="HKLM"
+-          Key="Software\Microsoft\Windows\CurrentVersion\App Paths\lightcraft.exe" Type="file">
+-        <FileSearch Id="LegacyInstallExeFile" Name="lightcraft.exe" />
++          Key="Software\Microsoft\Windows\CurrentVersion\App Paths\KIO Light.exe" Type="file">
++        <FileSearch Id="LegacyInstallExeFile" Name="KIO Light.exe" />
+       </RegistrySearch>
+     </Property>
+     <SetProperty Id="INSTALLFOLDER" Action="SetInstallFolderFromAppPaths" Value="[LEGACYINSTALLFOLDER]"
+@@ -192,15 +192,15 @@
  
    <Fragment>
      <ComponentGroup Id="LightcraftFiles" Directory="INSTALLFOLDER">
 -      <Component Id="LightcraftApp" Guid="8A1D3A39-F7C1-47B1-97AE-40C80BF82F4A">
-+      <Component Id="LightcraftApp" Guid="0D759E83-13D7-5D2F-AA71-D927CE06AF2F">
-         <File Id="LightcraftExe" Source="$(var.BinDir)\lightcraft.exe" KeyPath="yes">
+-        <File Id="LightcraftExe" Source="$(var.BinDir)\lightcraft.exe" KeyPath="yes">
 -          <Shortcut Id="StartMenuShortcut" Directory="ProgramMenuFolder" Name="LightCraft"
 -              Description="LightCraft photo library and raw developer" WorkingDirectory="INSTALLFOLDER" Advertise="yes"
++      <Component Id="LightcraftApp" Guid="0D759E83-13D7-5D2F-AA71-D927CE06AF2F">
++        <File Id="LightcraftExe" Name="KIO Light.exe" Source="$(var.BinDir)\lightcraft.exe" KeyPath="yes">
 +          <Shortcut Id="StartMenuShortcut" Directory="ProgramMenuFolder" Name="KIO Light"
 +              Description="KIO Light photo library and raw developer" WorkingDirectory="INSTALLFOLDER" Advertise="yes"
                Icon="LightcraftIcon.ico" IconIndex="0" />
          </File>
  
+-        <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\lightcraft.exe" Value="[#LightcraftExe]" Type="string" />
+-        <RegistryValue Root="HKLM" Key="Software\LightCraft" Name="InstallFolder" Value="[INSTALLFOLDER]" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\KIO Light.exe" Value="[#LightcraftExe]" Type="string" />
++        <RegistryValue Root="HKLM" Key="Software\KIO\Light" Name="InstallFolder" Value="[INSTALLFOLDER]" Type="string" />
+       </Component>
+ 
+       <Component Id="LightcraftCli">
 diff --git a/packaging/windows/package.ps1 b/packaging/windows/package.ps1
 index e2cd2a8e709e0a53fb392b471ed3db6383cb5795..6df2299ac290e5619ef0b8e3abedfe76221e09ca 100644
 --- a/packaging/windows/package.ps1

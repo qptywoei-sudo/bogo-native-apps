@@ -41,9 +41,9 @@
       },
       "branding": {
         "patch": "patches/photo/photocraft-v0.9.0-kio-photo.patch",
-        "sha256": "5616d6da79ac4ffb1be04b7dcb616f3ff6e9dacd698d09ba31f791a6bec6998c",
+        "sha256": "290eecc962ab36b4b94d3a2396aa3b2384999b099b88a37604d5709506561b4a",
         "manifest": "patches/photo/manifest.json",
-        "manifestSha256": "5c4ebbe4a66a6702d92e89f2d9673aa21c244f278c87c5760aacd7ee116192f8"
+        "manifestSha256": "68e0fd52c1023b204279b93f33dcad3588fb5943e03135586cafc0d4b51bc283"
       },
       "cargoPackages": [
         "photocraft",
@@ -167,9 +167,9 @@
       },
       "branding": {
         "patch": "patches/vector/vectorcraft-v0.11.0-kio-vector.patch",
-        "sha256": "32680ebf1b82f547e4e21febdc6a3db7a248aea535e4d9ac60d298037bdd9c39",
+        "sha256": "3697d801a00c7063da185d784bf14563d997dccac7f8eac368b8531581f094e1",
         "manifest": "patches/vector/manifest.json",
-        "manifestSha256": "362b7ff1c73588bfdb230baa5d6f52e9565f3e204fd96deba4e747835a929be0"
+        "manifestSha256": "80289c152d4b0e6071b06e39a8b479f7c5343eb25c2f7cb1bd405863eeb02f0b"
       },
       "cargoPackages": [
         "vectorcraft",
@@ -287,9 +287,9 @@
       },
       "branding": {
         "patch": "patches/film/filmcraft-v0.8.0-kio-film.patch",
-        "sha256": "5ebb0bb092fedbbb03f6b56ca268ff4b3f140c6b5273f68a75251e51847a11c8",
+        "sha256": "b06cb7ac440d6d69a1eda2359bf7031eb0dae7927aec830041fc28e1a6f7255b",
         "manifest": "patches/film/manifest.json",
-        "manifestSha256": "86df72688cc4bc1476dca17803356084fe8fe8b2341974002cec5a2df696b616"
+        "manifestSha256": "7048f48505317f2cc482e88546809d9f896240023e93f22b38e336e6a569a5a4"
       },
       "cargoPackages": [
         "filmcraft",
@@ -498,9 +498,9 @@
       },
       "branding": {
         "patch": "patches/light/lightcraft-v0.8.0-kio-light.patch",
-        "sha256": "fba2ca35ab09ad1a88365bba9bdcfcf4d5f28b317841c5bef421fbede28d9854",
+        "sha256": "c6662674e64d43cdab581b049bdab7d064042c9deaf68c1200076389c6d9580f",
         "manifest": "patches/light/manifest.json",
-        "manifestSha256": "c73ebd9f56981344b0ffe4d1a5c0683676c5cd0e532ed440091aae524b39230e"
+        "manifestSha256": "f526283bc5b597dddd9a9fc4b8231f145fccb615406b193b74f6b8d0308808ee"
       },
       "cargoPackages": [
         "lightcraft",
@@ -628,9 +628,9 @@
       },
       "branding": {
         "patch": "patches/pdf/pdfcraft-v0.8.0-kio-pdf.patch",
-        "sha256": "51acf636a116dfe3f452b5f5845532ea1e961b587afa1bb4d3fb27c721767ba5",
+        "sha256": "c3a7a7302acfb8c357e6524a6bc454e7b0108ae9117c24649072e65f4e927d5e",
         "manifest": "patches/pdf/manifest.json",
-        "manifestSha256": "3794670bac7b02f30963dfa58cacf304993ec9b7253e0605e648d319f631e271"
+        "manifestSha256": "3842d83343248e3fdc17a4a47843a150aa2f5d7338dc512efb854ae41d093302"
       },
       "cargoPackages": [
         "pdfcraft",
@@ -1024,9 +1024,9 @@
       },
       "branding": {
         "patch": "patches/ui/figcraft-v0.6.0-kio-ui.patch",
-        "sha256": "79667c766c7402a3993587aa43f20b713a19d29b5c8213ac5948e423143d3eda",
+        "sha256": "d5f3e90093e6da2171cc44aa801db16863d4aba496ded1e377d915324a2aafee",
         "manifest": "patches/ui/manifest.json",
-        "manifestSha256": "19b77faf2d01ab0101bd198661bbed33349aaec6596c4e873b01a4669663dcd3"
+        "manifestSha256": "e4d9f918c1c9c5ab4669cada7fa22f0ae7d79144e927038538c448cffc981c1d"
       },
       "cargoPackages": [
         "figcraft",
@@ -1255,9 +1255,9 @@
       "fonts": null,
       "branding": {
         "patch": "patches/sound/soundcraft-v0.7.0-kio-sound.patch",
-        "sha256": "3a29f33c98351c5af913fbd654c841fd410ccde4fe01824c5343a3a37ed1f5a9",
+        "sha256": "343ba9410d2fc1037f769227b519702e38ae2221d16d377950cb31b392b896ea",
         "manifest": "patches/sound/manifest.json",
-        "manifestSha256": "aff00e78a7c345f6db92a265bef6c7e0de369ac9b13217f067632edec531ada4"
+        "manifestSha256": "e2b903ece505b102809e29db54e197a908ce137f689a0323b89e903ad15773ba"
       },
       "cargoPackages": [
         "soundcraft",
@@ -1328,7 +1328,7 @@
       "id": "deck",
       "name": "KIO Deck",
       "assetPrefix": "KIO-Deck",
-      "version": "0.7.0-kio.1",
+      "version": "0.7.0-kio.2",
       "upstreamVersion": "0.7.0",
       "rust": "1.95.0",
       "sourceDateEpoch": 1791984783,
@@ -1363,9 +1363,9 @@
       },
       "branding": {
         "patch": "patches/deck/deckcraft-v0.7.0-kio-deck.patch",
-        "sha256": "98ba1e6835eaf961f24b35a2f56b20e698f0d65d79007abd63458f2f5c4e2d56",
+        "sha256": "cb681ae7a745054f4f5d6cfcb8096cd924ad1095048236a0222537b65c134f57",
         "manifest": "patches/deck/manifest.json",
-        "manifestSha256": "9fe34ef2440fda990f93c0071b8ec272ddbcfb7bede94872f53bb146dc86ecfb"
+        "manifestSha256": "ab55c105a83208fbfa299624f686d1308da9327c8b9144583d74b2f6a42c12a0"
       },
       "cargoPackages": [
         "deckcraft",
@@ -1440,7 +1440,8 @@
         "app": "deckcraft",
         "cli": "deckcraft-cli"
       },
-      "windowsGuiVersionCheck": "stdout"
+      "windowsGuiVersionCheck": "stdout",
+      "releaseTag": "deck-v0.7.0-kio.2"
     },
     {
       "id": "cad",

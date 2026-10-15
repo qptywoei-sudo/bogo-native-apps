@@ -14,8 +14,8 @@
   },
   "patch": {
     "file": "pdfcraft-v0.8.0-kio-pdf.patch",
-    "sha256": "51acf636a116dfe3f452b5f5845532ea1e961b587afa1bb4d3fb27c721767ba5",
-    "bytes": 8740582
+    "sha256": "c3a7a7302acfb8c357e6524a6bc454e7b0108ae9117c24649072e65f4e927d5e",
+    "bytes": 8775262
   },
   "counts": {
     "upstreamFiles": 1345,
@@ -220,8 +220,8 @@
         "bytes": 6242
       },
       "after": {
-        "sha256": "ea2d72ebef8878262f1d955bc9215587ba57bc9951a61dd4a454891a2e8a7526",
-        "bytes": 6250
+        "sha256": "c81dfbe059130e76aebe3a282adcb7acc02bc574f193f8a520997e1b9ae7d627",
+        "bytes": 9555
       }
     },
     {
@@ -853,8 +853,8 @@
         "bytes": 7169
       },
       "after": {
-        "sha256": "dc820a344f9007890e12b95f0a4221eeee7c7208ec6ac5699465e6a74669e688",
-        "bytes": 7170
+        "sha256": "25c54d906b4d84fe1b36aa86f65c58ff52ebbfdd84c35348dae527599d2d61df",
+        "bytes": 8579
       }
     },
     {
@@ -963,8 +963,8 @@
         "bytes": 3939
       },
       "after": {
-        "sha256": "8af0c4f2de9c0c4a6a705cdbabf306378a253791620ec5eeb11ec7bd156c4a90",
-        "bytes": 3943
+        "sha256": "b20d969cf05c63e5ad519dd5e90b7a26108057db8ce04ee81feffc03c7328dd4",
+        "bytes": 3974
       }
     },
     {
@@ -1217,8 +1217,8 @@
         "bytes": 16954
       },
       "after": {
-        "sha256": "3485585faf3ccc04fc565f2dcb9dd8703d6c69e9e09fde07a11b91f388efb58c",
-        "bytes": 16908
+        "sha256": "0be7eb9beb2b8ad3e266c5a6951424acc4a22c5a05bb72bf85a5369a2bd65f40",
+        "bytes": 16873
       }
     },
     {
@@ -1570,5 +1570,29 @@
     "docs/brand/artcraft-logo.png",
     "docs/brand/artcraft-logo.svg",
     "docs/brand/artcraft-mark.png"
-  ]
+  ],
+  "linkAndUpdateCorrection": {
+    "supersededPatchSha256": "51acf636a116dfe3f452b5f5845532ea1e961b587afa1bb4d3fb27c721767ba5",
+    "kioPdfUpdateProtocol": {
+      "manifest": "https://kio-library.vercel.app/downloads/native-apps-manifest.json",
+      "programId": "pdf",
+      "repository": "qptywoei777-rgb/kio-native-apps",
+      "releaseTagPrefix": "pdf-v",
+      "fallbackDetailsUrl": "https://kio-library.vercel.app/?program=pdf",
+      "matchingPlatformAndArchitectureRequired": true,
+      "sharedLatestAndUpstreamBinaryRedirectsForbidden": true,
+      "kioRevisionAwareVersionComparison": true,
+      "upstreamCliAndGuiVersionOutputUntouched": true
+    },
+    "engineAndCargoFeaturesUnchanged": true
+  },
+  "windowsInstallerIsolation": {
+    "supersededPatchSha256": "dd2b7a7fe51ebb6b7c8a1f96e0e32590e15f474e8bfeba851cf042c9579712c2",
+    "registryNamespace": "Software\\KIO\\PDF",
+    "appPathsExecutable": "KIO PDF.exe",
+    "installedGuiExecutable": "KIO PDF.exe",
+    "originalCargoBinaryAndCliNamesRetained": true,
+    "originalUserDefaultFileAssociationsPreserved": true,
+    "kioPhotoHostInteropUpdated": false
+  }
 }
