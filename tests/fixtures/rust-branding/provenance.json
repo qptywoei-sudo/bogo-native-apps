@@ -1,0 +1,11 @@
+{
+  "repository": "storytold/figcraft",
+  "commit": "833f0d2c27f0acbae5394848930ae531fc89c724",
+  "sourceArchiveSha256": "f327701beaf7a025a0f124c8551472ab998d2b07baf3949c8a2d86ebcf457e59",
+  "path": "crates/ui-egui/src/home_recents.rs",
+  "file": "ui-home-recents.rs",
+  "bytes": 38168,
+  "sha256": "0e309db8370746c28e84c8250c25a7a814a6d3450915381f273b3b9b5e3a8610",
+  "license": "MIT OR Apache-2.0",
+  "sourceUrl": "https://github.com/storytold/figcraft/blob/833f0d2c27f0acbae5394848930ae531fc89c724/crates/ui-egui/src/home_recents.rs"
+}

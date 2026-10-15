@@ -18,6 +18,23 @@ spec.loader.exec_module(builder)
 
 
 class FullNativeGuards(unittest.TestCase):
+    def test_sound_windows_test_retains_diagnostic_without_moving_fixture(self):
+        lock = builder.load_lock('sound')
+        fixes = builder.functional_fixes(lock)
+        self.assertEqual(len(fixes), 1)
+        fix, meta = fixes[0]
+        self.assertEqual([item['path'] for item in meta['files']], ['crates/engine/src/file_access.rs'])
+        text = (builder.ROOT / fix['patch']).read_text()
+        removed = [line[1:] for line in text.splitlines() if line.startswith('-') and not line.startswith('---')]
+        added = [line[1:] for line in text.splitlines() if line.startswith('+') and not line.startswith('+++')]
+        self.assertEqual(len(removed), 1)
+        self.assertEqual(added, [removed[0].replace('roots.check(upper,', 'roots.check(&upper,')])
+        self.assertIn('roots.check(upper, Access::Read)', removed[0])
+        self.assertEqual(meta['files'][0]['after']['bytes'], meta['files'][0]['before']['bytes'] + 1)
+        for line in added + removed:
+            self.assertNotIn('#[ignore]', line)
+            self.assertNotIn('#[cfg', line)
+
     def test_effect_portability_fix_is_scoped_to_original_test_helpers_and_path_assertions(self):
         lock = builder.load_lock('effect')
         fixes = builder.functional_fixes(lock)

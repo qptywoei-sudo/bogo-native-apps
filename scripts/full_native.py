@@ -18,6 +18,7 @@ from pathlib import Path
 
 import kio_native as common
 import audit_windows_identity
+import audit_rust_branding
 
 ROOT = Path(__file__).resolve().parents[1]
 IDS = ('photo', 'vector', 'film', 'light', 'pdf', 'effect', 'design', 'ui', 'word', 'sound', 'deck', 'cad', 'grid')
@@ -72,7 +73,7 @@ def load_lock(app):
 def functional_fixes(lock):
     result = []
     for fix in lock.get('functionalFixes', []):
-        require(lock['id'] in ('word', 'effect'), 'Functional fixes require an explicit application review')
+        require(lock['id'] in ('word', 'effect', 'sound'), 'Functional fixes require an explicit application review')
         for key, sha_key in (('patch', 'sha256'), ('manifest', 'manifestSha256')):
             relative = common.check_public_path(fix[key])
             require(str(relative).startswith('patches/' + lock['id'] + '/functional-'), 'Functional fix outside its reviewed path')
@@ -83,7 +84,8 @@ def functional_fixes(lock):
         require(meta['base']['brandingPatchSha256'] == lock['branding']['sha256'], 'Functional fix branding base mismatch')
         require(meta['patch']['sha256'] == fix['sha256'] and meta['patch']['bytes'] == (ROOT / fix['patch']).stat().st_size, 'Functional fix patch mismatch')
         allowed = {'word': {'crates/engine/src/io.rs', 'crates/engine/src/cmd/file.rs', 'crates/engine/tests/wordml2003_save.rs'},
-                   'effect': {'crates/engine/src/' + name for name in ('tests_frame_export.rs', 'tests_m137.rs', 'tests_essential.rs', 'tests_import_project.rs', 'commands/relink_moved.rs', 'footage_check.rs')}}[lock['id']]
+                   'effect': {'crates/engine/src/' + name for name in ('tests_frame_export.rs', 'tests_m137.rs', 'tests_essential.rs', 'tests_import_project.rs', 'commands/relink_moved.rs', 'footage_check.rs')},
+                   'sound': {'crates/engine/src/file_access.rs'}}[lock['id']]
         require(meta['files'] and {x['path'] for x in meta['files']} <= allowed, 'Functional fix changed an unreviewed engine or legal file')
         result.append((fix, meta))
     return result
@@ -201,9 +203,11 @@ def prepare(args, lock):
     # Functional corrections are separate, hash-locked, narrow patches, applied only
     # after the original branding-only source and protected engine check succeeded.
     apply_functional_fixes(lock, source)
+    rust_audit = audit_rust_branding.audit_source(source)
+    require(rust_audit['rustFiles'] > 0 and not rust_audit['findings'], 'KIO display name corrupted executable Rust source')
     record = {'schema': 1, 'app': lock['id'], 'catalogSha256': digest(CATALOG), 'lock': lock,
               'sourceTreeSha256': source_fingerprint(lock, source), 'fontsTreeSha256': common.tree_fingerprint(fonts) if fonts.exists() else None,
-              'windowsInstallerIdentity': windows_identity}
+              'windowsInstallerIdentity': windows_identity, 'rustBrandingAudit': rust_audit}
     write_json(work / 'prepared.json', record)
     print('Prepared complete native ' + lock['name'] + ' source, original engine and dependencies retained.')
 
@@ -553,6 +557,8 @@ def public_files(lock):
     files.update({'.github/workflows/native-file-qa.yml', 'docs/native-file-qa.md',
                   'scripts/native_file_qa.py', 'scripts/collect_ci_artifact.py', 'scripts/smoke_word.py', 'scripts/smoke_craft.py', 'scripts/smoke_office.py',
                   'tests/test_native_file_qa.py', 'tests/test_collect_ci_artifact.py', 'tests/test_smoke_word.py', 'tests/test_smoke_craft.py'})
+    files.update({'scripts/audit_rust_branding.py', 'tests/test_rust_branding.py',
+                  'tests/fixtures/rust-branding/provenance.json', 'tests/fixtures/rust-branding/ui-home-recents.rs'})
     # Small original XML fixtures make the installer collision tests independent
     # of the source archive cache. Include the exact Launcher branding input too.
     files.update('tests/fixtures/windows-identity/' + app + '.wxs' for app in (*IDS, 'launcher'))

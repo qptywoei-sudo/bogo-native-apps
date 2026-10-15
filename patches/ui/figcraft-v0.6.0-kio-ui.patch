@@ -73735,19 +73735,6 @@ index 9b57cb0a15ae25527d9d7e71c92a88ad887d3224..eab0c6ee933a42216d5323a26aff8236
      y += 48.0;
      for (section, icon, label) in Section::ALL {
          let r = Rect::from_min_size(pos2(left.min.x + 8.0, y), vec2(SIDEBAR - 16.0, 32.0));
-diff --git a/crates/ui-egui/src/home_recents.rs b/crates/ui-egui/src/home_recents.rs
-index dbc58506717bf5a77357601025eb6fe8e9ea9ceb..6e112b5665a1a6d6b0100597f87a1f806a18084e 100644
---- a/crates/ui-egui/src/home_recents.rs
-+++ b/crates/ui-egui/src/home_recents.rs
-@@ -706,7 +706,7 @@ fn arrows(ui: &Ui, recents: &mut Recents, files: &[Shown], across: usize, down:
- fn file_icon(ui: &Ui, t: &Tokens, center: egui::Pos2, path: &str) {
-     let r = Rect::from_center_size(center, vec2(16.0, 16.0));
-     match FileKind::of(Path::new(path)) {
--        FileKind::FigCraft | FileKind::Fig => {
-+        FileKind::KIO UI | FileKind::Fig => {
-             ui.painter().rect_filled(r, CornerRadius::same(4), ACCENT);
-             icons::paint(ui.painter(), r.shrink(3.0), Icon::Logo, Color32::WHITE);
-         }
 diff --git a/crates/ui-egui/src/icons.rs b/crates/ui-egui/src/icons.rs
 index 726f62f44391b996ac33032debc971d93144200b..1b06dc3af18dc484cca88677eb5aa40adf8f576a 100644
 --- a/crates/ui-egui/src/icons.rs

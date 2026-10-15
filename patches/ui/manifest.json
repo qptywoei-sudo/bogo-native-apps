@@ -13,16 +13,16 @@
   },
   "patch": {
     "file": "figcraft-v0.6.0-kio-ui.patch",
-    "sha256": "d5f3e90093e6da2171cc44aa801db16863d4aba496ded1e377d915324a2aafee",
-    "bytes": 8671475
+    "sha256": "64afa5189f783ec1ba79e34b962a32b61552c2956731d48323e3e53e30f6fccf",
+    "bytes": 8670673
   },
   "counts": {
     "upstreamFiles": 841,
     "forkFiles": 839,
-    "changedPaths": 81,
+    "changedPaths": 80,
     "added": 19,
     "removed": 21,
-    "modified": 41,
+    "modified": 40,
     "protectedFilesByteIdentical": 564
   },
   "checks": {
@@ -38,7 +38,8 @@
     "upstreamTrademarkLogoFilesRemoved": true,
     "nativeBuildRun": false,
     "GUIValidationRun": false,
-    "windowsOriginalCoexistenceXmlAudit": true
+    "windowsOriginalCoexistenceXmlAudit": true,
+    "restoredOriginalRustExecutableIdentifier": true
   },
   "nonUiPlatformBrandingExceptions": [],
   "features": {
@@ -453,17 +454,6 @@
       "after": {
         "sha256": "7d440382a4381450839bc0e2267b0a8984dc47e63ad619b496482e702b410db4",
         "bytes": 23158
-      }
-    },
-    {
-      "path": "crates/ui-egui/src/home_recents.rs",
-      "before": {
-        "sha256": "0e309db8370746c28e84c8250c25a7a814a6d3450915381f273b3b9b5e3a8610",
-        "bytes": 38168
-      },
-      "after": {
-        "sha256": "436d951598e55c31423db6b8f9fe61464e8d4d975858846ef072bef5e03771e0",
-        "bytes": 38166
       }
     },
     {
@@ -3672,5 +3662,14 @@
       "kioInstallDirectory": true,
       "noNativeExecution": true
     }
+  },
+  "rustIdentifierCorrection": {
+    "path": "crates/ui-egui/src/home_recents.rs",
+    "line": 709,
+    "previousBrandedExpression": "FileKind::KIO UI | FileKind::Fig",
+    "restoredOriginalExpression": "FileKind::FigCraft | FileKind::Fig",
+    "previousBrandedSha256": "436d951598e55c31423db6b8f9fe61464e8d4d975858846ef072bef5e03771e0",
+    "correctedSha256": "0e309db8370746c28e84c8250c25a7a814a6d3450915381f273b3b9b5e3a8610",
+    "reason": "Restore the original executable enum variant accidentally changed by display-name branding; no editor behavior change"
   }
 }

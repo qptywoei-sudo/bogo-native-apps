@@ -1032,9 +1032,9 @@
       },
       "branding": {
         "patch": "patches/ui/figcraft-v0.6.0-kio-ui.patch",
-        "sha256": "d5f3e90093e6da2171cc44aa801db16863d4aba496ded1e377d915324a2aafee",
+        "sha256": "64afa5189f783ec1ba79e34b962a32b61552c2956731d48323e3e53e30f6fccf",
         "manifest": "patches/ui/manifest.json",
-        "manifestSha256": "e4d9f918c1c9c5ab4669cada7fa22f0ae7d79144e927038538c448cffc981c1d"
+        "manifestSha256": "29334a0c7de547d9617cfdd28edea4837bfcf900d2fdf457fe90fef0b7a86307"
       },
       "cargoPackages": [
         "figcraft",
@@ -1330,7 +1330,15 @@
         "app": "KIO Sound",
         "cli": "SoundCraft CLI"
       },
-      "windowsGuiVersionCheck": "stdout"
+      "windowsGuiVersionCheck": "stdout",
+      "functionalFixes": [
+        {
+          "patch": "patches/sound/functional-windows-test-borrow.patch",
+          "sha256": "2012034398a978ca66117a8d92e2a0f18137b85e0368d49b0db8182030ad0690",
+          "manifest": "patches/sound/functional-windows-test-borrow.json",
+          "manifestSha256": "0f3b784970738b41bc8fd22bd4a2c69befe4cbb4c1733120b9a022c5b1e578ee"
+        }
+      ]
     },
     {
       "id": "deck",
