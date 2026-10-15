@@ -42,6 +42,8 @@ def collect(catalog, releases):
             if platform!='source' and kind!='app-zip':
                 artifacts.append({'platform':platform,'arch':feed_arch,'kind':kind,'url':url,'sha256':digest[1],'bytes':asset['size']})
         if not artifacts or not any(x['platform']=='source' for x in downloads): continue
+        order={('macos','dmg'):0,('macos','zip'):1,('windows','msi'):2,('windows','zip'):3,('source','zip'):4}
+        downloads.sort(key=lambda item:order[(item['platform'],item['format'])])
         app.update(state='released',version=version,releaseUrl='https://github.com/'+REPOSITORY+'/releases/tag/'+tag,downloads=downloads)
         registry.append({'id':app_id,'name':app['name'],'version':version,'upstreamVersion':version.split('-kio.')[0],'releaseTag':tag,'repository':REPOSITORY,'bundleId':'com.kio.'+app_id,'artifacts':artifacts})
     return {'schemaVersion':1,'programs':registry}
