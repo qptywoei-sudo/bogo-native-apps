@@ -15,8 +15,8 @@
   },
   "patch": {
     "file": "craft-launcher-v0.4.1-kio-launcher.patch",
-    "sha256": "bc35ee4b0f6bb68bb0c7c6094a6fa4ecf2f0093ac8dbc0d1398ef5afd24201b1",
-    "bytes": 11756677
+    "sha256": "bd726aa2f45b1971584c587e7f1d2d4712ab0afa9286c32bed354381e0e1f007",
+    "bytes": 11745013
   },
   "counts": {
     "upstreamFiles": 198,
@@ -36,7 +36,9 @@
     "cargoFmtRust195": true,
     "nativeBuildRunByBrandingAgent": false,
     "testsAddedNotExecutedLocally": true,
-    "windowsOriginalCoexistenceXmlAudit": true
+    "windowsOriginalCoexistenceXmlAudit": true,
+    "windowsInstallerArtUsesExistingKioAssets": true,
+    "windowsInstallerArtFitsOriginalWordmarkRegion": true
   },
   "protectedFiles": [
     {
@@ -1456,8 +1458,8 @@
         "bytes": 11536
       },
       "after": {
-        "sha256": "28bc38b5a06742c26002d47530f8a88c6ff1abb2114dfe00ed62b7aba658ae20",
-        "bytes": 11505
+        "sha256": "9cf5aaac277e7d0a8838006403cc2097fe79f88fc18bedd2b2116c3ed98eaf1d",
+        "bytes": 11462
       }
     },
     {
