@@ -64,7 +64,42 @@ def load_lock(app):
     meta = json.loads((ROOT / branding['manifest']).read_text(encoding='utf-8'))
     require(meta['schema'] == 'kio.native-branding-patch.v1' and meta['programId'] == app and meta['upstream']['commit'] == lock['source']['commit'], 'Patch metadata does not match original source')
     require(meta['patch']['sha256'] == branding['sha256'] and (ROOT / branding['patch']).stat().st_size == meta['patch']['bytes'], 'Patch hash/size mismatch')
+    functional_fixes(lock)
     return lock
+
+
+def functional_fixes(lock):
+    result = []
+    for fix in lock.get('functionalFixes', []):
+        require(lock['id'] == 'word', 'Functional fixes require an explicit application review')
+        for key, sha_key in (('patch', 'sha256'), ('manifest', 'manifestSha256')):
+            relative = common.check_public_path(fix[key])
+            require(str(relative).startswith('patches/word/functional-'), 'Functional fix outside its reviewed path')
+            path = ROOT / relative
+            require(path.is_file() and not path.is_symlink() and digest(path) == fix[sha_key], 'Functional fix bytes changed')
+        meta = json.loads((ROOT / fix['manifest']).read_text(encoding='utf-8'))
+        require(meta['schema'] == 'kio.native-functional-patch.v1' and meta['programId'] == lock['id'] and meta['upstream']['commit'] == lock['source']['commit'], 'Functional fix source identity mismatch')
+        require(meta['base']['brandingPatchSha256'] == lock['branding']['sha256'], 'Functional fix branding base mismatch')
+        require(meta['patch']['sha256'] == fix['sha256'] and meta['patch']['bytes'] == (ROOT / fix['patch']).stat().st_size, 'Functional fix patch mismatch')
+        allowed = {'crates/engine/src/io.rs', 'crates/engine/src/cmd/file.rs', 'crates/engine/tests/wordml2003_save.rs'}
+        require(meta['files'] and {x['path'] for x in meta['files']} <= allowed, 'Functional fix changed an unreviewed engine or legal file')
+        result.append((fix, meta))
+    return result
+
+
+def apply_functional_fixes(lock, source):
+    for fix, meta in functional_fixes(lock):
+        before = {r: digest(p) for r, p in source_files(lock, source)}
+        for item in meta['files']:
+            value = item['before']
+            require((value is None and item['path'] not in before) or (value is not None and before.get(item['path']) == value['sha256']), 'Functional fix base changed')
+        run(['git', 'apply', '--check', '--binary', ROOT / fix['patch']], cwd=source)
+        run(['git', 'apply', '--binary', ROOT / fix['patch']], cwd=source)
+        after = {r: digest(p) for r, p in source_files(lock, source)}
+        require({r for r in before.keys() | after.keys() if before.get(r) != after.get(r)} == {x['path'] for x in meta['files']}, 'Functional fix changed files outside its exact scope')
+        for item in meta['files']:
+            value = item['after']
+            require((value is None and item['path'] not in after) or (value is not None and after.get(item['path']) == value['sha256']), 'Functional fix output changed')
 
 
 def source_validator(lock):
@@ -134,6 +169,9 @@ def prepare(args, lock):
             require((declared is None and item['path'] not in actual) or (declared is not None and actual.get(item['path']) == declared['sha256']), 'Patch roundtrip hash mismatch')
     for r, sha in meta.get('protectedFileHashes', {}).items():
         require(after.get(r) == sha, 'Original protected engine bytes changed: ' + r)
+    # Functional corrections are separate, hash-locked, narrow patches, applied only
+    # after the original branding-only source and protected engine check succeeded.
+    apply_functional_fixes(lock, source)
     record = {'schema': 1, 'app': lock['id'], 'catalogSha256': digest(CATALOG), 'lock': lock,
               'sourceTreeSha256': source_fingerprint(lock, source), 'fontsTreeSha256': common.tree_fingerprint(fonts) if fonts.exists() else None}
     write_json(work / 'prepared.json', record)
@@ -267,6 +305,12 @@ def notices(lock, source, fonts, destination, record, env, target):
     if fonts.exists():
         common.copy_license_tree(fonts, destination / 'craft-fonts')
     common.dependency_licenses(lock, source, env, target, destination / 'Rust-dependencies')
+    for fix, _ in functional_fixes(lock):
+        correction_dir = destination / 'KIO-functional-corrections'
+        correction_dir.mkdir(exist_ok=True)
+        for key in ('patch', 'manifest'):
+            p = ROOT / fix[key]
+            shutil.copyfile(p, correction_dir / p.name)
     for relative in ('KIO-FORK.md', 'KIO-FORK.json', 'README.md', 'ROADMAP.md', 'ATTRIBUTION.md', 'docs/gaps.md', 'docs/target-app-parity.md'):
         p = source / relative
         if p.is_file():
@@ -469,6 +513,8 @@ def public_files(lock):
     for app in IDS:
         other = load_lock(app)
         files.update([other['branding']['patch'], other['branding']['manifest']])
+        for fix in other.get('functionalFixes', []):
+            files.update([fix['patch'], fix['manifest']])
         readme = 'patches/' + app + '/README.md'
         if (ROOT / readme).is_file():
             files.add(readme)

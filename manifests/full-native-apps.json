@@ -1106,7 +1106,7 @@
       "id": "word",
       "name": "KIO Word",
       "assetPrefix": "KIO-Word",
-      "version": "0.7.0-kio.1",
+      "version": "0.7.0-kio.2",
       "upstreamVersion": "0.7.0",
       "rust": "1.95.0",
       "sourceDateEpoch": 1791983245,
@@ -1219,7 +1219,15 @@
         "app": "wordcraft",
         "cli": "wordcraft-cli"
       },
-      "windowsGuiVersionCheck": "stdout"
+      "windowsGuiVersionCheck": "stdout",
+      "functionalFixes": [
+        {
+          "patch": "patches/word/functional-io-boundary.patch",
+          "sha256": "30a32161ed7e1dd8aa0ef4d5c20760e1ac13b0fcc65b73a6e8a8567a869cb84d",
+          "manifest": "patches/word/functional-io-boundary.json",
+          "manifestSha256": "616045624e132eeb132469c6a5009fbc76f2674cc90d37113882275bace231d8"
+        }
+      ]
     },
     {
       "id": "sound",

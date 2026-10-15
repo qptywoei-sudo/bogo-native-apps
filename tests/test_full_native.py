@@ -16,6 +16,32 @@ spec.loader.exec_module(builder)
 
 
 class FullNativeGuards(unittest.TestCase):
+    def test_functional_engine_fix_requires_separate_hash_locked_narrow_scope(self):
+        lock = builder.load_lock('word')
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            folder = root / 'patches/word'
+            folder.mkdir(parents=True)
+            patch_file = folder / 'functional-fixture.patch'
+            patch_file.write_bytes(b'reviewed patch fixture')
+            manifest = folder / 'functional-fixture.json'
+            meta = {'schema':'kio.native-functional-patch.v1','programId':'word','upstream':{'commit':lock['source']['commit']},
+                    'base':{'brandingPatchSha256':lock['branding']['sha256']},
+                    'patch':{'sha256':builder.digest(patch_file),'bytes':patch_file.stat().st_size},
+                    'files':[{'path':'crates/engine/src/io.rs','before':None,'after':None}]}
+            manifest.write_text(json.dumps(meta))
+            fix = {'patch':patch_file.relative_to(root).as_posix(),'sha256':builder.digest(patch_file),
+                   'manifest':manifest.relative_to(root).as_posix(),'manifestSha256':builder.digest(manifest)}
+            lock['functionalFixes'] = [fix]
+            with patch.object(builder,'ROOT',root):
+                self.assertEqual(len(builder.functional_fixes(lock)),1)
+                meta['files'][0]['path']='Cargo.lock'
+                manifest.write_text(json.dumps(meta))
+                fix['manifestSha256']=builder.digest(manifest)
+                with self.assertRaises(ValueError):builder.functional_fixes(lock)
+                patch_file.write_bytes(b'changed after review')
+                with self.assertRaises(ValueError):builder.functional_fixes(lock)
+
     def test_all_original_app_and_cli_and_patch_inputs_are_locked(self):
         self.assertEqual(len(builder.IDS), 13)
         for app in builder.IDS:

@@ -1,0 +1,93 @@
+{
+  "schema": 1,
+  "id": "launcher",
+  "name": "KIO Launcher",
+  "version": "0.4.1-kio.1",
+  "upstreamVersion": "0.4.1",
+  "rust": "1.95.0",
+  "source": {
+    "repository": "storytold/craft-launcher",
+    "commit": "cbae640688c5fa3daa120a7f5e050f8e24148a47",
+    "tag": "v0.4.1",
+    "url": "https://codeload.github.com/storytold/craft-launcher/tar.gz/cbae640688c5fa3daa120a7f5e050f8e24148a47",
+    "root": "craft-launcher-cbae640688c5fa3daa120a7f5e050f8e24148a47",
+    "sha256": "5973336d8a48213feb51e96b2eac73bcdc0e0c94f58b299a6e1b2fb40024ada7",
+    "bytes": 2003171
+  },
+  "fonts": null,
+  "branding": {
+    "patch": "patches/launcher/craft-launcher-v0.4.1-kio-launcher.patch",
+    "sha256": "9d17378861e0e8ed305ab78eda52c0c5ef6cb49acbbc8317122ed1836c44b642",
+    "manifest": "patches/launcher/manifest.json",
+    "manifestSha256": "86ae9c51bea80325b9342e38a209568c93f4e224ac8147e765d585e09081a137"
+  },
+  "cargoPackages": [
+    "artcraft-launcher"
+  ],
+  "testPackages": [
+    "artcraft-launcher-core",
+    "artcraft-launcher-native",
+    "artcraft-launcher-ui-egui"
+  ],
+  "binaries": {
+    "app": "artcraft-launcher",
+    "cli": null
+  },
+  "versionOutputPrefix": "artcraft-launcher",
+  "bundleId": "com.kio.launcher",
+  "icon": "assets/app-icon/artcraft-launcher.icns",
+  "guiOnly": true,
+  "environment": {
+    "KIO_RELEASE_VERSION": "0.4.1-kio.1",
+    "ARTCRAFT_LAUNCHER_VERSION": "0.4.1-kio.1",
+    "ARTCRAFT_LAUNCHER_REQUIRE_WINRES": "1"
+  },
+  "macPackaging": [
+    "bash",
+    "packaging/macos/package.sh",
+    "--arch",
+    "aarch64",
+    "--skip-build"
+  ],
+  "windowsPackaging": [
+    "pwsh",
+    "packaging/windows/package.ps1",
+    "-Arch",
+    "x64",
+    "-SkipBuild"
+  ],
+  "fontStaging": "None: original Archivo, Inter, GeistMono font files and OFL licenses are bundled under assets/fonts.",
+  "nativeRuntimeExtras": [],
+  "releaseTag": "launcher-v0.4.1-kio.1",
+  "artifacts": [
+    "KIO-Launcher-0.4.1-kio.1-macos-arm64.dmg",
+    "KIO-Launcher-0.4.1-kio.1-macos-arm64.zip",
+    "KIO-Launcher-0.4.1-kio.1-windows-x64.msi",
+    "KIO-Launcher-0.4.1-kio.1-windows-x64.zip"
+  ],
+  "notes": [
+    "Original upstream packaging emits artcraft-launcher-... names; rename final signed artifacts to the exact KIO registry contract.",
+    "No CLI binary exists; generic packaging must allow absent cli.",
+    "KIO_MACOS_TEAM_ID is optional; set only when actual KIO DeveloperID signing is configured. Never use the upstream ArtCraft signing team.",
+    "Local-mirror cargo feature is developer-only; never enable in release.",
+    "No local native compilation or execution performed; Rust fmt parses source, source roundtrip verified."
+  ],
+  "sourceDateEpoch": 1791908909,
+  "assetPrefix": "KIO-Launcher",
+  "cargoArgs": [
+    "build",
+    "--release",
+    "--locked",
+    "-p",
+    "artcraft-launcher"
+  ],
+  "features": {
+    "preserveDefaults": true,
+    "officialNativeAdditionalFeatures": [],
+    "developerLocalMirrorEnabled": false
+  },
+  "versionOutputNames": {
+    "app": "artcraft-launcher"
+  },
+  "windowsGuiVersionCheck": "stdout"
+}

@@ -1,0 +1,77 @@
+{
+  "schema": "kio.native-functional-patch.v1",
+  "programId": "word",
+  "upstream": {
+    "repository": "https://github.com/storytold/wordcraft",
+    "commit": "fc41918814f62645b6746ed68e71e8c2c2e85d6f",
+    "tag": "v0.7.0"
+  },
+  "base": {
+    "brandingPatch": "wordcraft-v0.7.0-kio-word.patch",
+    "brandingPatchSha256": "f00037e3815c6e5b835d31dbbd326fe96663105778e4bfedc72b93e383ba9aac"
+  },
+  "patch": {
+    "file": "functional-io-boundary.patch",
+    "sha256": "30a32161ed7e1dd8aa0ef4d5c20760e1ac13b0fcc65b73a6e8a8567a869cb84d",
+    "bytes": 6984
+  },
+  "files": [
+    {
+      "path": "crates/engine/src/cmd/file.rs",
+      "before": {
+        "sha256": "a21aff4a27219b2e8f7130f1627844944c27865363bb7cfa0140b30286bbd6cf",
+        "bytes": 22836
+      },
+      "after": {
+        "sha256": "74bdb24906f4dcb202bd26ede86e5c2a02bca7a1e6017d97d0a0928a4399de5c",
+        "bytes": 22123
+      }
+    },
+    {
+      "path": "crates/engine/src/io.rs",
+      "before": {
+        "sha256": "f90150e7e22a84c274f1a3823364052217c53b756116fc96c4d30f1aefca1024",
+        "bytes": 19233
+      },
+      "after": {
+        "sha256": "cacdec026405876fc2156fa357b01c7a6886d68f22c46de13e08daa0a76f9939",
+        "bytes": 19979
+      }
+    },
+    {
+      "path": "crates/engine/tests/wordml2003_save.rs",
+      "before": null,
+      "after": {
+        "sha256": "ff60fa61de11a5900e1808e6238f1e6ce8347548dfd0f746d30b11545ecfbd48",
+        "bytes": 3729
+      }
+    }
+  ],
+  "summary": "Move unchanged Word 2003 XML detection from command layer to checked I/O layer.",
+  "behavior": [
+    "Retain complete bounded 64 KiB native detector and WASM false stub; only visibility changes to pub(crate).",
+    "Preserve automation check_read before File::open and save_path_with write-root enforcement.",
+    "Preserve plain-save legacy Word 2003 format when read authority exists; no tests skipped or guards weakened."
+  ],
+  "tests": {
+    "nativeBuildRun": false,
+    "nativeTestsRun": false,
+    "staticOriginalFilesystemBoundaryScan": "passed, zero offenders",
+    "relocatedHelperByteEquivalence": "passed after normalizing pub(crate) visibility",
+    "unrelatedFiles": "all baseline source hashes unchanged",
+    "existing": [
+      "word_2003_xml_saves_through_the_save_commands",
+      "file_access::tests::commands_do_not_touch_the_file_system_themselves"
+    ],
+    "added": [
+      "plain_save_keeps_word2003_with_read_and_write_authority",
+      "plain_save_outside_confined_roots_is_denied_and_preserves_original",
+      "plain_save_does_not_sniff_xml_without_read_authority"
+    ],
+    "commands": [
+      "cargo test --locked -p wordcraft-engine file_access::tests::commands_do_not_touch_the_file_system_themselves",
+      "cargo test --locked -p wordcraft-engine word_2003_xml_saves_through_the_save_commands",
+      "cargo test --locked -p wordcraft-engine --test wordml2003_save"
+    ]
+  }
+}

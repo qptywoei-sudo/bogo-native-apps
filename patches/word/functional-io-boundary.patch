@@ -1,0 +1,174 @@
+diff --git a/crates/engine/src/cmd/file.rs b/crates/engine/src/cmd/file.rs
+index 4ca72ab..afd1194 100644
+--- a/crates/engine/src/cmd/file.rs
++++ b/crates/engine/src/cmd/file.rs
+@@ -236,7 +236,7 @@ fn save(s: &mut Session, v: &Value) -> CmdResult {
+     match v.get("format").filter(|f| !f.is_null()) {
+         None => {
+             // Saving over a Word 2003 XML file (one opened as such, say) keeps its format.
+-            opts.word2003 = ext == "xml" && is_word_2003_file(&path);
++            opts.word2003 = ext == "xml" && crate::io::is_word_2003_file(&path);
+         }
+         Some(f) if matches!(f.as_str(), Some(FORMAT_WORD_2003 | FORMAT_FLAT_OPC)) && ext == "xml" => {}
+         Some(_) => {
+@@ -254,27 +254,6 @@ fn save(s: &mut Session, v: &Value) -> CmdResult {
+     Ok(json!({"saved": true, "path": path.to_string_lossy(), "encrypted": encrypted}))
+ }
+ 
+-/// Does `path` hold a Word 2003 XML Document already (so a plain save keeps that format)?
+-#[cfg(not(target_arch = "wasm32"))]
+-fn is_word_2003_file(path: &std::path::Path) -> bool {
+-    use std::io::Read;
+-    if crate::file_access::check_read(&path.to_string_lossy()).is_err() {
+-        return false;
+-    }
+-    let Ok(f) = std::fs::File::open(path) else { return false };
+-    let mut head = Vec::new();
+-    // The root element and its namespaces come first.
+-    if f.take(64 * 1024).read_to_end(&mut head).is_err() {
+-        return false;
+-    }
+-    wordcraft_docx::sniff_xml(&head) == wordcraft_docx::XmlKind::WordMl2003
+-}
+-
+-#[cfg(target_arch = "wasm32")]
+-fn is_word_2003_file(_path: &std::path::Path) -> bool {
+-    false
+-}
+-
+ fn save_as(s: &mut Session, v: &Value) -> CmdResult {
+     if p::str(v, "path").is_none() {
+         s.ui_requests.push(json!({"open": "saveAs"}));
+diff --git a/crates/engine/src/io.rs b/crates/engine/src/io.rs
+index fe451ff..0cd155a 100644
+--- a/crates/engine/src/io.rs
++++ b/crates/engine/src/io.rs
+@@ -56,6 +56,27 @@ pub struct ExportOptions {
+     pub word2003: bool,
+ }
+ 
++/// Does `path` hold a Word 2003 XML Document already (so a plain save keeps that format)?
++#[cfg(not(target_arch = "wasm32"))]
++pub(crate) fn is_word_2003_file(path: &std::path::Path) -> bool {
++    use std::io::Read;
++    if crate::file_access::check_read(&path.to_string_lossy()).is_err() {
++        return false;
++    }
++    let Ok(f) = std::fs::File::open(path) else { return false };
++    let mut head = Vec::new();
++    // The root element and its namespaces come first.
++    if f.take(64 * 1024).read_to_end(&mut head).is_err() {
++        return false;
++    }
++    wordcraft_docx::sniff_xml(&head) == wordcraft_docx::XmlKind::WordMl2003
++}
++
++#[cfg(target_arch = "wasm32")]
++pub(crate) fn is_word_2003_file(_path: &std::path::Path) -> bool {
++    false
++}
++
+ /// A document password: wiped from memory when dropped, never printed (`Debug` shows `***`).
+ #[derive(Clone, Default, PartialEq, Eq)]
+ pub struct Password(zeroize::Zeroizing<String>);
+diff --git a/crates/engine/tests/wordml2003_save.rs b/crates/engine/tests/wordml2003_save.rs
+new file mode 100644
+index 0000000..e4bf82c
+--- /dev/null
++++ b/crates/engine/tests/wordml2003_save.rs
+@@ -0,0 +1,95 @@
++//! KIO regression: legacy XML format detection stays behind checked I/O.
++#![cfg(not(target_arch = "wasm32"))]
++
++use std::path::{Path, PathBuf};
++use std::sync::atomic::{AtomicU64, Ordering};
++
++use serde_json::json;
++use wordcraft_doc::{Document, StoryRef};
++use wordcraft_docx::XmlKind;
++use wordcraft_engine::{Session, file_access, io};
++
++struct Scratch(PathBuf);
++impl Scratch {
++    fn new() -> Self {
++        static NEXT: AtomicU64 = AtomicU64::new(0);
++        let path = std::env::temp_dir().join(format!(
++            "kio-wordml2003-{}-{}",
++            std::process::id(),
++            NEXT.fetch_add(1, Ordering::Relaxed)
++        ));
++        std::fs::create_dir(&path).unwrap();
++        Self(path)
++    }
++    fn path(&self, name: &str) -> PathBuf {
++        self.0.join(name)
++    }
++}
++impl Drop for Scratch {
++    fn drop(&mut self) {
++        let _ = std::fs::remove_dir_all(&self.0);
++    }
++}
++
++fn legacy_file(path: &Path) -> Vec<u8> {
++    let bytes = wordcraft_docx::write_wordml2003(&Document::from_text("Original synthetic legacy content.")).unwrap();
++    std::fs::write(path, &bytes).unwrap();
++    bytes
++}
++
++fn edited(path: &Path) -> Session {
++    let mut session = Session::new(Document::from_text("Edited synthetic content."));
++    session.path = Some(path.to_path_buf());
++    session
++}
++
++#[test]
++fn plain_save_keeps_word2003_with_read_and_write_authority() {
++    let scratch = Scratch::new();
++    let path = scratch.path("legacy.xml");
++    legacy_file(&path);
++    let roots = file_access::AutomationRoots::new(Some(&scratch.0), Some(&scratch.0)).unwrap().unwrap();
++    let mut session = edited(&path);
++    file_access::confine(Some(&roots), || {
++        let saved = session.run("file.save", &json!({})).unwrap();
++        assert_eq!(saved["saved"], true);
++    });
++    let bytes = std::fs::read(&path).unwrap();
++    assert_eq!(wordcraft_docx::sniff_xml(&bytes), XmlKind::WordMl2003);
++    assert!(io::open_path(&path).unwrap().plain_text(StoryRef::Body).contains("Edited synthetic content."));
++}
++
++#[test]
++fn plain_save_outside_confined_roots_is_denied_and_preserves_original() {
++    let scratch = Scratch::new();
++    let allowed = scratch.path("allowed");
++    std::fs::create_dir(&allowed).unwrap();
++    let path = scratch.path("outside.xml");
++    let original = legacy_file(&path);
++    let roots = file_access::AutomationRoots::new(Some(&allowed), Some(&allowed)).unwrap().unwrap();
++    let mut session = edited(&path);
++    file_access::confine(Some(&roots), || {
++        assert!(io::open_path(&path).unwrap_err().contains("outside the read root"));
++        let error = session.run("file.save", &json!({})).unwrap_err().to_string();
++        assert!(error.contains("outside the write root"), "{error}");
++    });
++    assert_eq!(std::fs::read(&path).unwrap(), original);
++}
++
++#[test]
++fn plain_save_does_not_sniff_xml_without_read_authority() {
++    let scratch = Scratch::new();
++    let path = scratch.path("write-only.xml");
++    legacy_file(&path);
++    // Write permission does not also grant read permission. The original detector
++    // must return false and use the default Flat OPC format instead of inspecting
++    // existing file content the automation caller was not authorized to read.
++    let roots = file_access::AutomationRoots::new(None, Some(&scratch.0)).unwrap().unwrap();
++    let mut session = edited(&path);
++    file_access::confine(Some(&roots), || {
++        assert!(file_access::check_read(&path.to_string_lossy()).is_err());
++        assert_eq!(session.run("file.save", &json!({})).unwrap()["saved"], true);
++    });
++    assert_eq!(wordcraft_docx::sniff_xml(&std::fs::read(&path).unwrap()), XmlKind::FlatOpc);
++    assert!(io::open_path(&path).unwrap().plain_text(StoryRef::Body).contains("Edited synthetic content."));
++}

@@ -1,0 +1,107 @@
+name: Full native KIO Launcher (manual)
+on:
+  workflow_dispatch:
+    inputs:
+      publish_draft:
+        description: Create a draft only after both real native builds and complete source pass
+        type: boolean
+        default: false
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: full-native-launcher-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+      - run: python3 -m unittest discover -s tests -p test_launcher_native.py -v
+  native:
+    needs: validate
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            platform: macos-arm64
+            target: aarch64-apple-darwin
+            python: python3
+          - runner: windows-2022
+            platform: windows-x64
+            target: x86_64-pc-windows-msvc
+            python: python
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 180
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+      - name: Install exact compiler, Rust parser/formatter and actual native target
+        run: rustup toolchain install 1.95.0 --profile minimal --component rustfmt --target ${{ matrix.target }}
+      - name: Install original WiX v5 MSI prerequisite
+        if: matrix.platform == 'windows-x64'
+        shell: pwsh
+        run: |
+          dotnet tool install --global wix --version 5.0.2
+          if ($LASTEXITCODE -ne 0) { throw 'WiX installation failed' }
+          wix extension add -g WixToolset.UI.wixext/5.0.2 WixToolset.Util.wixext/5.0.2
+          if ($LASTEXITCODE -ne 0) { throw 'WiX extension installation failed' }
+      - name: Verify pinned complete original source and reviewed fork patch
+        run: ${{ matrix.python }} scripts/launcher_native.py prepare
+      - name: Build actual native app and execute original core, registry, install and UI tests
+        run: ${{ matrix.python }} scripts/launcher_native.py build --platform ${{ matrix.platform }}
+      - name: Package full native app, legal material and original Windows installer
+        run: ${{ matrix.python }} scripts/launcher_native.py package --platform ${{ matrix.platform }}
+      - name: Verify exact Launcher release filenames, SHA256 and byte counts
+        run: ${{ matrix.python }} scripts/launcher_native.py verify --platform ${{ matrix.platform }} --directory dist/launcher-${{ matrix.platform }}
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: launcher-${{ matrix.platform }}
+          path: dist/launcher-${{ matrix.platform }}/
+          if-no-files-found: error
+          retention-days: 14
+  full-source:
+    needs: validate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+      - run: python3 scripts/launcher_native.py prepare
+      - run: python3 scripts/launcher_native.py source
+      - run: python3 scripts/launcher_native.py verify --platform source --directory dist/launcher-source
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: launcher-source
+          path: dist/launcher-source/
+          if-no-files-found: error
+          retention-days: 14
+  publish-draft:
+    if: github.event_name == 'workflow_dispatch' && inputs.publish_draft && github.ref == 'refs/heads/main'
+    needs: [native, full-source]
+    permissions:
+      contents: write
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131
+        with:
+          path: publish-inputs
+          merge-multiple: false
+      - name: Verify all three exact Launcher releases before creating a draft
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          KIO_PUBLISH_DRAFT: 'true'
+        run: python3 scripts/launcher_native.py publish-draft --directory publish-inputs
