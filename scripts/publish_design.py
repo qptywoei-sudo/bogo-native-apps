@@ -19,8 +19,13 @@ import full_native as full
 REPO = collector.REPOSITORY
 APP = 'design'
 BUILD_RUN = 38828671066
+WINDOWS_BUILD_RUN = 38836274669
 TAG = 'design-v0.8.0-kio.1'
 require = full.require
+
+
+def build_run(platform):
+    return BUILD_RUN if platform == 'macos-arm64' else WINDOWS_BUILD_RUN
 
 
 def read_qa(archive, platform, collection, lock):
@@ -39,7 +44,7 @@ def read_qa(archive, platform, collection, lock):
         bundle = bounded('bundle-manifest.json')
         require(report.get('schema') == 'kio.native-file-qa.v1' and report.get('status') == 'passed'
                 and report.get('app') == APP and report.get('platform') == platform
-                and report.get('run') == BUILD_RUN and report.get('repository') == REPO,
+                and report.get('run') == build_run(platform) and report.get('repository') == REPO,
                 'QA identity/status mismatch')
         require(report.get('nativeQaPerformed') is True and report.get('executedNativeBinaries') is True
                 and report.get('tokenPassedToNative') is False
@@ -76,7 +81,7 @@ def collect_qa(github, run_id, platform, collection, lock, root):
     jobs = collector.get_pages(github, f'repos/{REPO}/actions/runs/{run_id}/attempts/{run["run_attempt"]}/jobs', 'jobs')
     require(len(jobs) == 1 and jobs[0].get('conclusion') == 'success', 'QA job incomplete')
     artifacts = collector.get_pages(github, f'repos/{REPO}/actions/runs/{run_id}/artifacts', 'artifacts')
-    selected = [row for row in artifacts if row['name'] == f'file-qa-{APP}-{platform}-{BUILD_RUN}']
+    selected = [row for row in artifacts if row['name'] == f'file-qa-{APP}-{platform}-{build_run(platform)}']
     require(len(selected) == 1, 'Expected exactly one matching QA artifact')
     artifact = selected[0]
     require(not artifact.get('expired') and 0 < artifact['size_in_bytes'] <= 256 * 1024**2,
@@ -90,7 +95,7 @@ def collect_qa(github, run_id, platform, collection, lock, root):
             and 'sha256:' + full.digest(archive) == artifact['digest'], 'QA archive integrity mismatch')
     evidence = read_qa(archive, platform, collection, lock)
     receipt = root / f'KIO-Design-{lock["version"]}-{platform}-file-qa.json'
-    full.write_json(receipt, {'schema': 1, 'buildRun': BUILD_RUN, 'qaRun': run_id,
+    full.write_json(receipt, {'schema': 1, 'buildRun': build_run(platform), 'qaRun': run_id,
                              'qaArtifact': artifact, **evidence})
     return receipt
 
@@ -111,7 +116,7 @@ def main():
         collections, files = {}, []
         for platform in ('macos-arm64', 'windows-x64', 'source'):
             folder = root / platform
-            collections[platform] = collector.collect(BUILD_RUN, APP, platform, folder, github=github)
+            collections[platform] = collector.collect(build_run(platform), APP, platform, folder, github=github)
             files += collector.verify_release(folder / 'release', lock, platform)
         require(len(files) == 14, 'Unexpected Design release inventory')
         for platform, qa_run in [('macos-arm64', args.mac_qa), ('windows-x64', args.windows_qa)]:
@@ -126,7 +131,8 @@ def main():
             'GUI installation, every menu/format, KIO account gating and direct in-editor Drive saving are not verified by these CLI checks. '
             'Development release: Mac ad-hoc signed, not notarized; no Windows publisher certificate. '
             'Full Adobe InDesign compatibility is not claimed.\n\n'
-            f'Build: https://github.com/{REPO}/actions/runs/{BUILD_RUN}\n'
+            f'Mac build: https://github.com/{REPO}/actions/runs/{BUILD_RUN}\n'
+            f'Windows and corresponding-source build: https://github.com/{REPO}/actions/runs/{WINDOWS_BUILD_RUN}\n'
             f'Mac QA: https://github.com/{REPO}/actions/runs/{args.mac_qa}\n'
             f'Windows QA: https://github.com/{REPO}/actions/runs/{args.windows_qa}\n', encoding='utf-8')
         existing = subprocess.run(['gh', 'release', 'view', TAG, '--repo', REPO], capture_output=True)
