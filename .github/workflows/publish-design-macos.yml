@@ -49,15 +49,21 @@ jobs:
               full.require(full.load_lock('design') == lock, 'Source lock changed')
               notes = root / 'notes.md'
               notes.write_text('KIO Design 0.8.0-kio.1 - Apple Silicon macOS preview\n\nFull original native DesignCraft GUI and CLI, supplied KIO Design icon, KIO app identity, original engines, pinned fonts and licenses. Complete corresponding source is attached.\n\nMac DMG and app ZIP passed original engine tests and 11 actual native file assertions: native/IDML save and reopen, EPUB, PDF and PNG output. Artifact and SHA-256 evidence are attached.\n\nWindows installers are still building and are not included. KIO account gating and direct in-editor Google Drive saving are not implemented by this branding/build pipeline. Development release; ad-hoc signed and not Apple notarized. GUI installation and complete InDesign compatibility are not verified.\n\nMac build: https://github.com/qptywoei777-rgb/kio-native-apps/actions/runs/38828671066\nSource build: https://github.com/qptywoei777-rgb/kio-native-apps/actions/runs/38836274669\nMac file QA: https://github.com/qptywoei777-rgb/kio-native-apps/actions/runs/38834062314\n', encoding='utf-8')
-              existing = subprocess.run(['gh', 'release', 'view', tag, '--repo', repo], capture_output=True)
-              full.require(existing.returncode != 0, 'Release already exists; refuse replacement')
-              command = ['gh', 'release', 'create', tag, '--repo', repo, '--target', os.environ['GITHUB_SHA'], '--title', 'KIO Design 0.8.0-kio.1 — macOS', '--notes-file', str(notes), '--draft', '--prerelease']
-              subprocess.run(command + [str(file) for file in files], check=True)
-              uploaded = json.loads(subprocess.check_output(['gh', 'api', f'repos/{repo}/releases/tags/{tag}']))
+              def draft_release():
+                  releases = json.loads(subprocess.check_output(['gh', 'api', f'repos/{repo}/releases?per_page=100']))
+                  matches = [release for release in releases if release.get('tag_name') == tag]
+                  full.require(len(matches) <= 1, 'Duplicate release tag')
+                  return matches[0] if matches else None
+              uploaded = draft_release()
+              if uploaded is None:
+                  command = ['gh', 'release', 'create', tag, '--repo', repo, '--target', os.environ['GITHUB_SHA'], '--title', 'KIO Design 0.8.0-kio.1 - macOS', '--notes-file', str(notes), '--draft', '--prerelease']
+                  subprocess.run(command + [str(file) for file in files], check=True)
+                  uploaded = draft_release()
+              full.require(isinstance(uploaded, dict) and uploaded.get('draft') is True and type(uploaded.get('id')) is int, 'Expected exact unpublished draft; refuse published release replacement')
               assets = {row['name']: row for row in uploaded['assets']}
               full.require(uploaded['draft'] is True and set(assets) == {file.name for file in files}, 'Draft inventory mismatch')
               for file in files:
                   full.require(assets[file.name]['size'] == file.stat().st_size and assets[file.name].get('digest') == 'sha256:' + full.digest(file), 'Uploaded bytes differ')
-              subprocess.run(['gh', 'release', 'edit', tag, '--repo', repo, '--draft=false', '--prerelease'], check=True)
+              subprocess.run(['gh', 'api', '--method', 'PATCH', f'repos/{repo}/releases/{uploaded["id"]}', '-F', 'draft=false', '-F', 'prerelease=true', '-f', 'target_commitish=' + os.environ['GITHUB_SHA']], check=True)
               print('Published verified Mac-only Design preview; current Windows build was not changed.')
           PY
