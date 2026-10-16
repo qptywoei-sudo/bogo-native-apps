@@ -97,9 +97,6 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'WiX extensions installation failed' }
       - name: Verify all original public source, font and branding bytes
         run: ${{ matrix.python }} scripts/full_native.py prepare --app ${{ matrix.app }}
-      - name: Inspect exact Design Windows dependency notices before compiling
-        if: matrix.app == 'design' && matrix.platform == 'windows-x64'
-        run: ${{ matrix.python }} scripts/inspect_design_winit.py
       - name: Build full original GUI and CLI with native features, test original engine and formats
         run: ${{ matrix.python }} scripts/full_native.py build --app ${{ matrix.app }} --platform ${{ matrix.platform }}
       - name: Package real native apps, full legal material and mandatory offline resources
