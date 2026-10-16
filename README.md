@@ -15,9 +15,10 @@ Open the [KIO app store](https://kio-library.vercel.app/) for the measured insta
 | Light | 0.8.0-kio.1 | DMG / ZIP | MSI / ZIP | [Download](https://github.com/qptywoei777-rgb/kio-native-apps/releases/tag/light-v0.8.0-kio.1) |
 | Effect | 0.10.0-kio.1 | DMG / ZIP | MSI / ZIP | [Download](https://github.com/qptywoei777-rgb/kio-native-apps/releases/tag/effect-v0.10.0-kio.1) |
 | Launcher | 0.4.1-kio.1 | DMG / ZIP | MSI / ZIP | [Download](https://github.com/qptywoei777-rgb/kio-native-apps/releases/tag/launcher-v0.4.1-kio.1) |
-| PDF | 0.8.0-kio.1 | DMG / ZIP | New 0.8.0-kio.2 build in progress | [Current download](https://github.com/qptywoei777-rgb/kio-native-apps/releases/tag/pdf-v0.8.0-kio.1) |
+| PDF | 0.8.0-kio.2 | DMG / ZIP | MSI / ZIP | [Download](https://github.com/qptywoei777-rgb/kio-native-apps/releases/tag/pdf-v0.8.0-kio.2) |
+| Vector | 0.11.0-kio.1 | DMG / ZIP | MSI / ZIP | [Download](https://github.com/qptywoei777-rgb/kio-native-apps/releases/tag/vector-v0.11.0-kio.1) |
 
-Photo, Vector, Design and CAD are still completing their native builds and file QA. Studio is distributed separately as an owner-only private test build. Each release explains the actual engine/file checks and remaining interactive GUI/installation work. Development packages have ad-hoc Mac signatures without notarization and no Windows publisher certificate. Complete upstream functionality is retained; full commercial-product feature or format parity is not claimed.
+These 11 applications provide both native operating-system packages and matching source. Photo, Design and CAD are still completing their native builds and file QA. Studio is distributed separately as an owner-only private test build. Each release explains the actual engine/file checks and remaining interactive GUI/installation work. Development packages have ad-hoc Mac signatures without notarization and no Windows publisher certificate. Complete upstream functionality is retained; full commercial-product feature or format parity is not claimed.
 
 ## Build project
 
