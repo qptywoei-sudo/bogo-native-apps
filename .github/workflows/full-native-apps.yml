@@ -10,9 +10,9 @@ on:
         default: grid
         required: true
       platform:
-        description: Native platform to build (keeps successful packages on the other platform)
+        description: Native platform, or Design source only without recompiling native apps
         type: choice
-        options: [all, macos-arm64, windows-x64]
+        options: [all, macos-arm64, windows-x64, source]
         default: all
         required: true
       publish_draft:
@@ -53,10 +53,11 @@ jobs:
           native = subprocess.check_output(['python3', 'scripts/full_native.py', 'matrix', '--app', os.environ['KIO_SELECTED_APP']], text=True).strip()
           rows = json.loads(native)['include']
           platform = os.environ['KIO_SELECTED_PLATFORM']
-          assert platform in ('all', 'macos-arm64', 'windows-x64'), 'Invalid native platform'
+          assert platform in ('all', 'macos-arm64', 'windows-x64', 'source'), 'Invalid native platform'
+          assert platform != 'source' or os.environ['KIO_SELECTED_APP'] == 'design', 'Source-only selection is reviewed only for Design'
           assert os.environ['KIO_DRAFT_PUBLICATION'] in ('true', 'false'), 'Invalid draft publication setting'
           assert os.environ['KIO_DRAFT_PUBLICATION'] == 'false' or platform == 'all', 'Draft publication requires both native platforms'
-          if platform != 'all':
+          if platform not in ('all', 'source'):
               rows = [row for row in rows if row['platform'] == platform]
           assert rows, 'Native platform selection must not be empty'
           native = json.dumps({'include': rows}, separators=(',', ':'))
@@ -67,6 +68,7 @@ jobs:
           PY
 
   native:
+    if: inputs.platform != 'source'
     needs: select
     permissions:
       contents: read

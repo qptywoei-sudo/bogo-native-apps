@@ -311,5 +311,90 @@ class FullNativeGuards(unittest.TestCase):
             self.assertFalse(relative.startswith(('.work/', '.cache/', 'dist/')))
 
 
+class DesignSourceOnlyWorkflowGuards(unittest.TestCase):
+    """Execute the actual matrix program without Rust, network or publication."""
+
+    def workflow(self):
+        return (builder.ROOT / '.github/workflows/full-native-apps.yml').read_text(encoding='utf-8')
+
+    def select(self, app='design', platform='source', publish='false'):
+        import subprocess
+        import textwrap
+        workflow = self.workflow()
+        programs = re.findall(r"          python3 - <<'PY'\n(.*?)\n          PY", workflow, re.S)
+        self.assertEqual(len(programs), 1)
+        apps = builder.IDS if app == 'all' else (app,)
+        rows = [{'app': selected, 'platform': target, 'runner': runner}
+                for selected in apps
+                for target, runner in (('macos-arm64', 'macos-14'), ('windows-x64', 'windows-2022'))]
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary) / 'outputs'
+            env = {'KIO_SELECTED_APP': app, 'KIO_SELECTED_PLATFORM': platform,
+                   'KIO_DRAFT_PUBLICATION': publish, 'GITHUB_OUTPUT': str(output)}
+            with patch.dict(os.environ, env), patch.object(subprocess, 'check_output', return_value=json.dumps({'include': rows})) as commands:
+                exec(compile(textwrap.dedent(programs[0]), '<actual-workflow-matrix>', 'exec'), {})
+            commands.assert_called_once_with(['python3', 'scripts/full_native.py', 'matrix', '--app', app], text=True)
+            return {key: json.loads(value) for key, value in
+                    (line.split('=', 1) for line in output.read_text(encoding='utf-8').splitlines())}
+
+    def test_source_only_selects_design_and_skips_both_native_runners(self):
+        selected = self.select()
+        self.assertEqual(selected['source'], {'app': ['design']})
+        # Retain a valid nonempty matrix; the job-level condition skips every
+        # native runner instead of submitting an empty GitHub Actions matrix.
+        self.assertEqual({row['platform'] for row in selected['native']['include']}, {'macos-arm64', 'windows-x64'})
+        self.assertEqual({row['app'] for row in selected['native']['include']}, {'design'})
+        workflow = self.workflow()
+        native = workflow.split('\n  native:\n', 1)[1].split('\n  full-source:\n', 1)[0]
+        self.assertRegex(native, r"(?m)^    if: inputs\.platform != 'source'$")
+        self.assertIn('python3 -m unittest discover -s tests -v', workflow)
+        source = workflow.split('\n  full-source:\n', 1)[1].split('\n  publish-draft:\n', 1)[0]
+        self.assertIn('scripts/full_native.py source --app ${{ matrix.app }}', source)
+        self.assertIn('scripts/full_native.py verify --app ${{ matrix.app }} --platform source', source)
+        self.assertNotRegex(source, r'(?m)^\s*run:.*(?:rustup|cargo|publish-draft|scripts/full_native.py build)')
+        self.assertIn("inputs.publish_draft && github.ref == 'refs/heads/main'", workflow)
+
+    def test_source_only_rejects_another_app_or_all_apps(self):
+        for app in builder.IDS + ('all',):
+            if app == 'design':
+                continue
+            with self.subTest(app=app), self.assertRaisesRegex(AssertionError, 'Source-only selection is reviewed only for Design'):
+                self.select(app=app)
+
+    def test_source_only_cannot_publish_or_accept_invalid_inputs(self):
+        for publish in ('true', 'yes', ''):
+            with self.subTest(publish=publish), self.assertRaises(AssertionError):
+                self.select(publish=publish)
+        with self.assertRaisesRegex(AssertionError, 'Invalid native platform'):
+            self.select(platform='source-other')
+
+    def test_existing_native_platforms_and_all_apps_keep_their_matrices(self):
+        for app in builder.IDS + ('all',):
+            expected_apps = list(builder.IDS) if app == 'all' else [app]
+            for platform in ('all', 'macos-arm64', 'windows-x64'):
+                with self.subTest(app=app, platform=platform):
+                    selected = self.select(app=app, platform=platform)
+                    self.assertEqual(selected['source'], {'app': expected_apps})
+                    self.assertEqual(len(selected['native']['include']), len(expected_apps) * (2 if platform == 'all' else 1))
+                    if platform != 'all':
+                        self.assertEqual({row['platform'] for row in selected['native']['include']}, {platform})
+        self.assertEqual(len(self.select(platform='all', publish='true')['native']['include']), 2)
+        for platform in ('macos-arm64', 'windows-x64'):
+            with self.assertRaisesRegex(AssertionError, 'Draft publication requires both native platforms'):
+                self.select(platform=platform, publish='true')
+
+    def test_reproducible_source_contains_exact_design_inspector_inputs(self):
+        selected = dict(builder.public_files(builder.load_lock('design')))
+        required = {'scripts/inspect_design_winit.py', 'tests/test_winit_windows_license.py',
+                    'tests/fixtures/winit-LICENSE.txt.b64', 'scripts/full_native.py',
+                    'scripts/kio_native.py', 'tests/test_full_native.py',
+                    '.github/workflows/full-native-apps.yml'}
+        self.assertTrue(required <= selected.keys())
+        self.assertTrue(all(selected[name].is_file() and not selected[name].is_symlink() for name in required))
+        # The build source closure does not authorize a new publishing surface.
+        self.assertTrue({'scripts/publish_design.py', 'tests/test_publish_design.py',
+                         '.github/workflows/publish-design.yml'}.isdisjoint(selected))
+
+
 if __name__ == '__main__':
     unittest.main()

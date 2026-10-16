@@ -755,6 +755,8 @@ def public_files(lock):
                   'tests/fixtures/pdf-msi-brand-contract/before/packaging/windows/pdfcraft.wxs',
                   'tests/fixtures/pdf-msi-brand-contract/before/packaging/windows/test-msi.ps1',
                   'tests/fixtures/pdf-msi-brand-contract/before/packaging/windows/installer-ui.wxs'})
+    files.update({'scripts/inspect_design_winit.py', 'tests/test_winit_windows_license.py',
+                  'tests/fixtures/winit-LICENSE.txt.b64'})
     # Small original XML fixtures make the installer collision tests independent
     # of the source archive cache. Include the exact Launcher branding input too.
     files.update('tests/fixtures/windows-identity/' + app + '.wxs' for app in (*IDS, 'launcher'))
