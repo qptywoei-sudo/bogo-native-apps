@@ -1,0 +1,63 @@
+name: Publish verified KIO Design for macOS (manual)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: publish-design-v0.8.0-kio.1-macos
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: github.repository == 'qptywoei777-rgb/kio-native-apps' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+      - name: Check existing artifact and native-QA guards
+        run: python3 -m unittest discover -s tests -v
+      - name: Publish only measured Mac installers and complete corresponding source
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PYTHONPATH=scripts python3 - <<'PY'
+          import hashlib, json, os, subprocess, tempfile
+          from pathlib import Path
+          import collect_ci_artifact as collector
+          import full_native as full
+          import publish_design as design
+          repo = 'qptywoei777-rgb/kio-native-apps'
+          tag = 'design-v0.8.0-kio.1-macos'
+          full.require(os.environ.get('GITHUB_REPOSITORY') == repo and os.environ.get('GITHUB_REF') == 'refs/heads/main', 'Unexpected publication target')
+          lock = full.load_lock('design')
+          full.require(lock['version'] == '0.8.0-kio.1' and lock['source']['commit'] == '11a51d5b665aec8d6e675bd107a8a01514f10d00', 'Design pin changed')
+          github = collector.GitHub()
+          with tempfile.TemporaryDirectory(prefix='kio-design-mac-publication-') as temporary:
+              root = Path(temporary)
+              files = []
+              collections = {}
+              for platform, run in [('macos-arm64', 38828671066), ('source', 38836274669)]:
+                  folder = root / platform
+                  collections[platform] = collector.collect(run, 'design', platform, folder, github=github)
+                  files += collector.verify_release(folder / 'release', lock, platform)
+              full.require(len(files) == 9, 'Unexpected Mac and source inventory')
+              files.append(design.collect_qa(github, 38834062314, 'macos-arm64', collections['macos-arm64'], lock, root))
+              full.require(full.load_lock('design') == lock, 'Source lock changed')
+              notes = root / 'notes.md'
+              notes.write_text('KIO Design 0.8.0-kio.1 - Apple Silicon macOS preview\n\nFull original native DesignCraft GUI and CLI, supplied KIO Design icon, KIO app identity, original engines, pinned fonts and licenses. Complete corresponding source is attached.\n\nMac DMG and app ZIP passed original engine tests and 11 actual native file assertions: native/IDML save and reopen, EPUB, PDF and PNG output. Artifact and SHA-256 evidence are attached.\n\nWindows installers are still building and are not included. KIO account gating and direct in-editor Google Drive saving are not implemented by this branding/build pipeline. Development release; ad-hoc signed and not Apple notarized. GUI installation and complete InDesign compatibility are not verified.\n\nMac build: https://github.com/qptywoei777-rgb/kio-native-apps/actions/runs/38828671066\nSource build: https://github.com/qptywoei777-rgb/kio-native-apps/actions/runs/38836274669\nMac file QA: https://github.com/qptywoei777-rgb/kio-native-apps/actions/runs/38834062314\n', encoding='utf-8')
+              existing = subprocess.run(['gh', 'release', 'view', tag, '--repo', repo], capture_output=True)
+              full.require(existing.returncode != 0, 'Release already exists; refuse replacement')
+              command = ['gh', 'release', 'create', tag, '--repo', repo, '--target', collections['source']['headSha'], '--title', 'KIO Design 0.8.0-kio.1 — macOS', '--notes-file', str(notes), '--draft', '--prerelease']
+              subprocess.run(command + [str(file) for file in files], check=True)
+              uploaded = json.loads(subprocess.check_output(['gh', 'api', f'repos/{repo}/releases/tags/{tag}']))
+              assets = {row['name']: row for row in uploaded['assets']}
+              full.require(uploaded['draft'] is True and set(assets) == {file.name for file in files}, 'Draft inventory mismatch')
+              for file in files:
+                  full.require(assets[file.name]['size'] == file.stat().st_size and assets[file.name].get('digest') == 'sha256:' + full.digest(file), 'Uploaded bytes differ')
+              subprocess.run(['gh', 'release', 'edit', tag, '--repo', repo, '--draft=false', '--prerelease'], check=True)
+              print('Published verified Mac-only Design preview; current Windows build was not changed.')
+          PY
