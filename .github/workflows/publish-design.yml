@@ -1,0 +1,37 @@
+name: Publish verified KIO Design packages (manual)
+on:
+  workflow_dispatch:
+    inputs:
+      mac_qa:
+        description: Successful Design macOS file-QA run ID for build 38828671066
+        required: true
+        type: string
+      windows_qa:
+        description: Successful Design Windows file-QA run ID for build 38828671066
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: publish-design-v0.8.0-kio.1
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: github.repository == 'qptywoei777-rgb/kio-native-apps' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+      - name: Check release guards
+        run: python3 -m unittest discover -s tests -v
+      - name: Verify exact source, packages and both actual file-QA reports before public release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          KIO_MAC_QA: ${{ inputs.mac_qa }}
+          KIO_WINDOWS_QA: ${{ inputs.windows_qa }}
+        run: python3 scripts/publish_design.py --mac-qa "$KIO_MAC_QA" --windows-qa "$KIO_WINDOWS_QA"
