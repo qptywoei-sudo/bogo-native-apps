@@ -33,6 +33,8 @@ Full original source does not imply full Microsoft Word compatibility. Consult t
 
 ## Local build
 
+The `scripts/kio_native.py` commands in this section use the legacy Word `manifests/word.lock.json` at `0.7.0-kio.1`. The current public Word `0.7.0-kio.2` uses the generic `scripts/full_native.py` pipeline and `manifests/full-native-apps.json`, described below.
+
 Prerequisites: Python 3.11+, Git, Rustup, Rust 1.95.0, and the target OS SDK. Mac builds require Xcode command line tools on arm64 macOS. Windows x64 builds require Visual Studio C++ Build Tools and Windows SDK `rc.exe` on Windows x64. Both full native executables are built; no GUI wrapper is generated.
 
 ```sh
@@ -53,8 +55,9 @@ For the explicitly reviewed implicit-host Mac build already produced by the pare
 ## Artifacts and source
 
 - Mac: `.work/word/package-macos-arm64/KIO Word.app`, plus full `.app` ZIP and drag-to-Applications DMG in `dist/word-macos-arm64`. The app includes the full native GUI, native CLI, original legal notices, bundled-font licenses, dependency licenses and provenance. Signing is inside-out and strictly verified. Default signing is ad-hoc; there is no Apple notarization. `KIO_MAC_SIGN_IDENTITY` optionally selects an already available caller-owned identity; notarization is still not claimed.
-- Windows: a full native GUI/CLI MSI installer and portable ZIP in `dist/word-windows-x64`, retaining the original license/NOTICE/font/dependency material. The published MSI and ZIP have no Windows publisher certificate.
-- `python3 scripts/kio_native.py source --app word` creates `dist/word-source` containing `KIO-Word-0.7.0-kio.2-source.zip`: the complete modified Word workspace, pinned full font tree, Cargo.lock, matching patch, original licenses/notices, an exact allowlist of build scripts/tests/workflow, and reproducible build instructions. Third-party crates remain pinned by Cargo.lock and are fetched by Cargo. Explicit `source --vendor` additionally includes every Cargo dependency source and an offline configuration; this can be substantial. If an individual redistributed dependency requires additional corresponding source, satisfy that exact requirement before publishing instead of assuming the project's MIT/Apache license replaces it.
+- Windows: the legacy `kio_native.py` pipeline creates a full native GUI/CLI portable ZIP in `dist/word-windows-x64`, retaining the original license/NOTICE/font/dependency material. The current public Word `0.7.0-kio.2` MSI installer and portable ZIP are produced by the generic `full_native.py` pipeline. These packages have no Windows publisher certificate.
+- `python3 scripts/kio_native.py source --app word` creates `dist/word-source` containing `KIO-Word-0.7.0-kio.1-source.zip`: the complete modified Word workspace, pinned full font tree, Cargo.lock, matching patch, original licenses/notices, an exact allowlist of build scripts/tests/workflow, and reproducible build instructions. Third-party crates remain pinned by Cargo.lock and are fetched by Cargo. Explicit `source --vendor` additionally includes every Cargo dependency source and an offline configuration; this can be substantial. If an individual redistributed dependency requires additional corresponding source, satisfy that exact requirement before publishing instead of assuming the project's MIT/Apache license replaces it.
+- For the current public Word `0.7.0-kio.2`, `python3 scripts/full_native.py source --app word` creates `dist/word-source/KIO-Word-0.7.0-kio.2-source.zip` from the generic application lock.
 - Each release has a strict file allowlist manifest with exact SHA-256 and bytes, plus a matching checksum file. Unlisted files, links, wrong architecture, source mutation and checksum mismatch stop the pipeline. No private web-app content/configuration/Drive directory is an input.
 
 Inputs are reproducible and source-archive metadata is normalized. Native binaries/signatures/DMGs are measured after packaging; byte-identical binaries across different SDKs or signing times are not promised.
