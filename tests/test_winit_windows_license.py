@@ -1,3 +1,4 @@
+import base64
 import hashlib
 import os
 from pathlib import Path
@@ -10,7 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 import kio_native as builder
 
 PIN = {'name': 'winit', 'version': '0.30.13', 'source': 'git+https://github.com/skylartaylor/winit.git?rev=3d51077fd1a966f84df9ef287839dc84fd5b4ca7#3d51077fd1a966f84df9ef287839dc84fd5b4ca7'}
-ORIGINAL = (Path(__file__).parent / 'fixtures/winit-LICENSE.txt').read_bytes()
+ORIGINAL = base64.b64decode((Path(__file__).parent / 'fixtures/winit-LICENSE.txt.b64').read_text(encoding='ascii').strip(), validate=True)
 
 
 class WinitWindowsLicense(unittest.TestCase):
@@ -38,7 +39,15 @@ class WinitWindowsLicense(unittest.TestCase):
             root = Path(temporary)
             link = self.folder(root, ORIGINAL.replace(b'\n', b'\r\n'))
             link.symlink_to('../LICENSE')
-            with patch.object(builder.os, 'readlink', return_value='..\\LICENSE'):
+            original_readlink = os.readlink
+            first = True
+            def windows_spelling(path, *args, **kwargs):
+                nonlocal first
+                if Path(path) == link and first:
+                    first = False
+                    return '..\\LICENSE'
+                return original_readlink(path, *args, **kwargs)
+            with patch.object(builder.os, 'readlink', side_effect=windows_spelling):
                 self.assertEqual(dict(builder.dependency_source_files(PIN, root))['dpi/LICENSE'], root / 'LICENSE')
 
     def test_other_link_or_package_identity_is_not_an_exception(self):
