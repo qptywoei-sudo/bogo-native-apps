@@ -19,7 +19,7 @@ class DesignPublicationGuards(unittest.TestCase):
         native = {'status': 'passed', 'app': 'design', 'checks': [{'passed': True}] * 11,
                   'steps': [{'exitCode': 0}] * 5, 'cliSha256': 'd' * 64}
         report = {'schema': 'kio.native-file-qa.v1', 'status': 'passed', 'app': 'design',
-                  'platform': 'windows-x64', 'run': release.BUILD_RUN, 'repository': release.REPO,
+                  'platform': 'windows-x64', 'run': release.build_run('windows-x64'), 'repository': release.REPO,
                   'nativeQaPerformed': True, 'executedNativeBinaries': True, 'tokenPassedToNative': False,
                   'version': lock['version'], 'sourceCommit': 'a' * 40, 'headSha': 'b' * 40,
                   'artifact': {'id': 7}, 'checks': 11, 'commands': 5, 'cliSha256': 'd' * 64,
@@ -44,7 +44,7 @@ class DesignPublicationGuards(unittest.TestCase):
 
     def test_unexecuted_failed_or_different_artifact_report_is_rejected(self):
         cases = [('status', 'failed'), ('nativeQaPerformed', False), ('executedNativeBinaries', False),
-                 ('tokenPassedToNative', True), ('artifact', {'id': 8}), ('run', release.BUILD_RUN + 1),
+                 ('tokenPassedToNative', True), ('artifact', {'id': 8}), ('run', release.build_run('windows-x64') + 1),
                  ('platform', 'macos-arm64'), ('checks', 10), ('commands', 4), ('sourceCommit', 'e' * 40),
                  ('bundleManifestSha256', 'f' * 64)]
         for key, value in cases:
