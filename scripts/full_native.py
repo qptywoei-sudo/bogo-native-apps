@@ -132,7 +132,7 @@ def functional_fixes(lock):
                    'effect': {'crates/engine/src/' + name for name in ('tests_frame_export.rs', 'tests_m137.rs', 'tests_essential.rs', 'tests_import_project.rs', 'commands/relink_moved.rs', 'footage_check.rs')},
                    'sound': {'crates/engine/src/file_access.rs'},
                    'design': {'Cargo.lock', 'crates/engine/Cargo.toml', 'crates/engine/src/recovery.rs',
-                              'crates/engine/src/cmd/book/safety_tests.rs'},
+                              'crates/engine/src/cmd/book/safety_tests.rs', 'crates/engine/tests/save_state_atomicity.rs'},
                    'vector': set(), 'photo': set()}[lock['id']]
         if lock['id'] == 'vector':
             allowed = vector_functional_paths(meta)

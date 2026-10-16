@@ -13,8 +13,8 @@
   },
   "patch": {
     "file": "functional-windows-recovery-lock.patch",
-    "sha256": "12da0c7791bcc53b8579022ce2c7272ee842dc2cd5a5e4412daea472954a83c5",
-    "bytes": 8780
+    "sha256": "0b47930f2dc71590be2fe7bf71e91a051d3578f382780721f922531cd6ef1348",
+    "bytes": 9740
   },
   "files": [
     {
@@ -60,15 +60,27 @@
         "sha256": "ca5eae3d23caa5c9867589834a055f2213886d350a8962b14bd43290f83035bd",
         "bytes": 2529
       }
+    },
+    {
+      "path": "crates/engine/tests/save_state_atomicity.rs",
+      "before": {
+        "sha256": "ccbf07df7febe9d41ce1c37dcb8a1a607a58c4956068e1984b22bac4a29d4b58",
+        "bytes": 3387
+      },
+      "after": {
+        "sha256": "091c58e994878a91b91454698593814adb7e36a845a9a85472ff53a2225b5557",
+        "bytes": 3491
+      }
     }
   ],
-  "summary": "Validate Windows recovery-lock ownership by safe live native file identity without reading through a second exclusively locked handle; retain the bounded marker and existing liveness/deletion guards.",
+  "summary": "Validate Windows recovery-lock ownership by safe live native file identity without reading through a second exclusively locked handle; retain the bounded marker and existing liveness/deletion guards. Keep the original Save-a-Copy integration assertion exact using the platform-native relative path that the unchanged production function emits.",
   "behavior": [
     "On Windows only, compare simultaneously open file handles via exact already-locked same-file 1.0.6. Never unlock, use unsafe code, enable nightly APIs, disable features or weaken liveness/foreign-file checks.",
     "Read the bounded marker through the owner handle on Windows. Unix marker/device/inode checks remain active and byte-equivalent.",
     "Reopen and compare the named Windows file after its link/type metadata check to detect replacement.",
     "Adapt the existing book partial-commit assertion to Rust Debug-escaped Windows paths; require the exact one-element completed prefix and retain all failure/unchanged-file/staging assertions.",
     "Windows regression fixture only: move the still-held child lock outside the run folder before the unchanged universal folder rename. This permits actual foreign-folder save/discard protection assertions under Windows directory-rename semantics, without releasing the lock, changing runtime code, skipping a test or weakening an assertion.",
+    "Original Save-a-Copy test fixture only: construct its exact two-parent source/contacts.csv expected path with std::path::Path joins, following the existing datamerge relative_path_and_reopen test. Preserve both original test functions, all 18 assertion macros, every other expected value, and all save/serialization/runtime/Cargo/dependency bytes from revision2.",
     "Apply after immutable original archive, branding patch and original protected-file verification. The original branding patch, all legal files and all unrelated source remain byte-identical."
   ],
   "dependencyLock": {
@@ -124,7 +136,7 @@
       "cargo test --release --locked --target aarch64-apple-darwin -p designcraft-engine"
     ],
     "pending": [
-      "Run new full engine/source snapshot on both actual CI platforms; the prior Windows run passed all five other lock-identity regressions, while the sixth fixture is now adapted to Windows directory-rename semantics."
+      "Run the complete original engine suite and all six existing KIO lock-identity regressions on both actual native CI platforms from the new save-copy-fixture source fingerprint; prior425 whole-source artifacts are historical and will not be retargeted/reused."
     ],
     "targetedProductionCoreProbe": {
       "platform": "macos-arm64",
@@ -148,8 +160,8 @@
       "windowsJob": 116678457288,
       "historicalWindowsResult": "416 passed;1 failed in fixture folder rename;1 original ignored subprocess helper",
       "fiveOtherLockIdentityRegressions": "passed on actual Windows",
-      "newWindowsFixtureExecution": "pending full native CI",
-      "newMacWholeSourceExecution": "pending full native CI",
+      "newWindowsFixtureExecution": "passed on actual Windows run 38818475536, job 116709095680, before the later original save-copy path assertion failed",
+      "newMacWholeSourceExecution": "passed on actual macOS run 38818475536, job 116709095590",
       "officialEvidence": [
         "https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fsa/87f86c9b-6c2a-4803-84b7-131a74a434fa",
         "https://doc.rust-lang.org/std/os/windows/fs/trait.OpenOptionsExt.html#tymethod.share_mode"
@@ -158,7 +170,50 @@
       "onlyAddedLines": [
         "        #[cfg(windows)]",
         "        std::fs::rename(own.join(LOCK), root.path().join(\"relocated-held-lock\")).unwrap();"
-      ]
+      ],
+      "observedNativeHead": "425ca2a6c1b98703c2f86ab421d769ea2be750c5",
+      "observationsApplyToSaveCopyRevision3": false
+    },
+    "saveCopyPathPortability": {
+      "revision": 1,
+      "originalFile": "crates/engine/tests/save_state_atomicity.rs",
+      "original": {
+        "sha256": "ccbf07df7febe9d41ce1c37dcb8a1a607a58c4956068e1984b22bac4a29d4b58",
+        "bytes": 3387
+      },
+      "modified": {
+        "sha256": "091c58e994878a91b91454698593814adb7e36a845a9a85472ff53a2225b5557",
+        "bytes": 3491
+      },
+      "sourceOnlyChangeFrom425": [
+        "crates/engine/tests/save_state_atomicity.rs"
+      ],
+      "expectedPathComponents": [
+        "..",
+        "..",
+        "source",
+        "contacts.csv"
+      ],
+      "exactStringEqualityRetained": true,
+      "testDefinitionsBefore": 2,
+      "testDefinitionsAfter": 2,
+      "assertionMacrosBefore": 18,
+      "assertionMacrosAfter": 18,
+      "skipsAdded": 0,
+      "runtimeChanges": 0,
+      "additionalDependencyChanges": 0,
+      "officialRustPathContract": "https://doc.rust-lang.org/1.95.0/std/path/struct.Path.html#method.join",
+      "existingOriginalExpectedJoinPrecedent": "crates/engine/src/cmd/datamerge/tests.rs:993",
+      "standaloneOriginalFunctionMacProbe": {
+        "rust": "1.95.0",
+        "passed": 6,
+        "failed": 0,
+        "ignored": 0,
+        "wholeEngineBuild": false,
+        "actualWindowsExecution": false
+      },
+      "newWholeNativeBothPlatforms": "pending",
+      "releaseSourcePolicy": "Both native platforms and corresponding source will be rebuilt coherently; existing425 artifacts/provenance remain historical."
     }
   }
 }

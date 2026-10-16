@@ -184,3 +184,17 @@ index 33b9a2a338d06b1363fe90051764920cce03879a..bc7a777d63cde0aaf5cd9a69022c4d60
      fn failed_republication_session() -> (Session, tempfile::TempDir, u64) {
          let root = tempfile::tempdir().unwrap();
          let mut session = Session::new();
+diff --git a/crates/engine/tests/save_state_atomicity.rs b/crates/engine/tests/save_state_atomicity.rs
+index 326d83be8c7018e34b31bcedad2b9de8f5eab82f..efe784a5a26666457ce05f610daa0488fb18a8a4 100644
+--- a/crates/engine/tests/save_state_atomicity.rs
++++ b/crates/engine/tests/save_state_atomicity.rs
+@@ -58,7 +58,8 @@
+     session.execute("file.saveACopy", &json!({"path": destination})).unwrap();
+ 
+     let copy = designcraft_format::load(&std::fs::read(destination).unwrap()).unwrap();
+-    assert_eq!(copy.data_merge.sources[0].relative_path.as_deref(), Some("../../source/contacts.csv"));
++    let relative = Path::new("..").join("..").join("source").join("contacts.csv").to_string_lossy().into_owned();
++    assert_eq!(copy.data_merge.sources[0].relative_path.as_deref(), Some(relative.as_str()));
+     let after = session.doc().unwrap();
+     assert!(Arc::ptr_eq(&before.doc, &after.doc));
+     assert!(Arc::ptr_eq(&before.saved_doc, &after.saved_doc));

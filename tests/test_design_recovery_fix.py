@@ -1,15 +1,22 @@
 """Keep the reviewed Design Windows recovery correction separate and exact."""
+import copy
 import hashlib
 import json
 from pathlib import Path
 import re
+import sys
+import tempfile
 import unittest
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 FOLDER = ROOT / 'patches/design'
 PATCH = FOLDER / 'functional-windows-recovery-lock.patch'
 MANIFEST = FOLDER / 'functional-windows-recovery-lock.json'
-PATHS = {'Cargo.lock', 'crates/engine/Cargo.toml', 'crates/engine/src/recovery.rs', 'crates/engine/src/cmd/book/safety_tests.rs'}
+PATHS = {'Cargo.lock', 'crates/engine/Cargo.toml', 'crates/engine/src/recovery.rs', 'crates/engine/src/cmd/book/safety_tests.rs',
+         'crates/engine/tests/save_state_atomicity.rs'}
+sys.path.insert(0, str(ROOT / 'scripts'))
+import full_native as full
 
 
 def sections(text):
@@ -45,7 +52,7 @@ class DesignRecoveryFix(unittest.TestCase):
         self.assertEqual(hashlib.sha256(PATCH.read_bytes()).hexdigest(), self.meta['patch']['sha256'])
         self.assertEqual(PATCH.stat().st_size, self.meta['patch']['bytes'])
 
-    def test_only_the_exact_four_reviewed_files_change(self):
+    def test_only_the_exact_five_reviewed_files_change(self):
         self.assertEqual(set(self.parts), PATHS)
         self.assertEqual({item['path'] for item in self.meta['files']}, PATHS)
         for item in self.meta['files']:
@@ -143,7 +150,63 @@ class DesignRecoveryFix(unittest.TestCase):
         revision = self.meta['tests']['fixturePortability']
         self.assertEqual(revision['revision'], 2)
         self.assertEqual(revision['onlyAddedLines'], setup.splitlines())
-        self.assertEqual(revision['newWindowsFixtureExecution'], 'pending full native CI')
+        self.assertEqual(revision['observedNativeHead'], '425ca2a6c1b98703c2f86ab421d769ea2be750c5')
+        self.assertIn('passed on actual Windows run 38818475536, job 116709095680', revision['newWindowsFixtureExecution'])
+        self.assertFalse(revision['observationsApplyToSaveCopyRevision3'])
+
+    def test_save_copy_changes_only_the_exact_expected_native_relative_path(self):
+        block = self.parts['crates/engine/tests/save_state_atomicity.rs']
+        self.assertEqual(changed_lines(block, '-'), [
+            '    assert_eq!(copy.data_merge.sources[0].relative_path.as_deref(), Some("../../source/contacts.csv"));'])
+        self.assertEqual(changed_lines(block, '+'), [
+            '    let relative = Path::new("..").join("..").join("source").join("contacts.csv").to_string_lossy().into_owned();',
+            '    assert_eq!(copy.data_merge.sources[0].relative_path.as_deref(), Some(relative.as_str()));'])
+        self.assertEqual(len(re.findall(r'^@@', block, re.M)), 1)
+        self.assertNotIn('#[cfg', block)
+        self.assertNotIn('#[ignore', block)
+        self.assertEqual(sum('assert_eq!(' in line for line in changed_lines(block, '-')), 1)
+        self.assertEqual(sum('assert_eq!(' in line for line in changed_lines(block, '+')), 1)
+        self.assertNotRegex('\n'.join(changed_lines(block, '+')), r'\breturn\b|\.replace\(|canonicalize\(')
+
+    def test_save_copy_manifest_keeps_the_original_two_tests_and_eighteen_assertions(self):
+        path = 'crates/engine/tests/save_state_atomicity.rs'
+        entry = next(item for item in self.meta['files'] if item['path'] == path)
+        self.assertEqual(entry['before'], {'sha256': 'ccbf07df7febe9d41ce1c37dcb8a1a607a58c4956068e1984b22bac4a29d4b58', 'bytes': 3387})
+        self.assertEqual(entry['after'], {'sha256': '091c58e994878a91b91454698593814adb7e36a845a9a85472ff53a2225b5557', 'bytes': 3491})
+        revision = self.meta['tests']['saveCopyPathPortability']
+        self.assertEqual(revision['sourceOnlyChangeFrom425'], [path])
+        self.assertEqual(revision['expectedPathComponents'], ['..', '..', 'source', 'contacts.csv'])
+        self.assertEqual((revision['testDefinitionsBefore'], revision['testDefinitionsAfter']), (2, 2))
+        self.assertEqual((revision['assertionMacrosBefore'], revision['assertionMacrosAfter']), (18, 18))
+        self.assertTrue(revision['exactStringEqualityRetained'])
+        self.assertEqual((revision['skipsAdded'], revision['runtimeChanges'], revision['additionalDependencyChanges']), (0, 0, 0))
+        self.assertEqual(revision['newWholeNativeBothPlatforms'], 'pending')
+
+    def test_actual_functional_guard_accepts_only_the_reviewed_design_paths(self):
+        catalog = json.loads((ROOT / 'manifests/full-native-apps.json').read_text(encoding='utf-8'))
+        lock = next(item for item in catalog['applications'] if item['id'] == 'design')
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            fix = lock['functionalFixes'][0]
+            patch = root / fix['patch']
+            manifest = root / fix['manifest']
+            patch.parent.mkdir(parents=True)
+            patch.write_bytes(PATCH.read_bytes())
+
+            def check(meta):
+                manifest.write_text(json.dumps(meta), encoding='utf-8')
+                candidate = copy.deepcopy(lock)
+                candidate['functionalFixes'][0]['manifestSha256'] = hashlib.sha256(manifest.read_bytes()).hexdigest()
+                with mock.patch.object(full, 'ROOT', root):
+                    return full.functional_fixes(candidate)
+
+            self.assertEqual(len(check(self.meta)), 1)
+            for path in ('crates/engine/src/cmd/file.rs', 'crates/engine/tests/unreviewed.rs', 'LICENSE-MIT'):
+                with self.subTest(path=path):
+                    changed = copy.deepcopy(self.meta)
+                    changed['files'].append({**changed['files'][-1], 'path': path})
+                    with self.assertRaisesRegex(ValueError, 'unreviewed engine or legal file'):
+                        check(changed)
 
     def test_book_partial_commit_assertions_compare_exact_debug_escaped_prefix(self):
         block = self.parts['crates/engine/src/cmd/book/safety_tests.rs']

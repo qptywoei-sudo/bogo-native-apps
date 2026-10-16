@@ -1,5 +1,5 @@
 {
-  "schema": "kio.design-recovery-functional-review.v2",
+  "schema": "kio.design-recovery-functional-review.v3",
   "sourceArchive": {
     "sha256": "5044162f9e7c2260156419b7e2c69c87801c5facc88e6b7aaa3552aca70c2acf",
     "bytes": 7805542
@@ -9,19 +9,20 @@
     "bytes": 8067433
   },
   "functionalPatch": {
-    "sha256": "12da0c7791bcc53b8579022ce2c7272ee842dc2cd5a5e4412daea472954a83c5",
-    "bytes": 8780
+    "sha256": "0b47930f2dc71590be2fe7bf71e91a051d3578f382780721f922531cd6ef1348",
+    "bytes": 9740
   },
   "manifest": {
-    "sha256": "976568c77e4814eeda7b2eeabf37333f98c6a14b5c4fe4ca8a5c47f5647cd0eb",
-    "bytes": 7448
+    "sha256": "496ce283bb46059d90a42fe9c6bca94c5a756e01d931026bcbcf122cc61423f0",
+    "bytes": 10114
   },
   "wholeSourceFiles": 441,
   "onlyChangedPaths": [
     "Cargo.lock",
     "crates/engine/Cargo.toml",
     "crates/engine/src/recovery.rs",
-    "crates/engine/src/cmd/book/safety_tests.rs"
+    "crates/engine/src/cmd/book/safety_tests.rs",
+    "crates/engine/tests/save_state_atomicity.rs"
   ],
   "allOtherFilesByteIdentical": true,
   "cargoLock": {
@@ -94,7 +95,149 @@
     "pending": "Full exact original engine plus new high-level foreign-folder regression must run on both actual CI platforms; Windows identity branch is not executed by this Mac probe.",
     "scope": "Historical pre-revision2 production-core probe; production prefix remains byte-identical. This did not execute the new Windows fixture."
   },
-  "pythonTests": {
+  "limits": [
+    "This revision changes only one original integration-test expected native path; production/save/serialization/Cargo/GUI/fonts bytes remain identical to425.",
+    "The exact upstream relative_between function passed six standalone std-only Rust1.95 tests on macOS; this is not execution of the complete app or Windows suite.",
+    "Both full native platforms and source must be rebuilt; existing425 whole-source/native evidence remains historical and is not relabeled."
+  ],
+  "revision": 3,
+  "fixturePortability": {
+    "revision": 2,
+    "scope": "Two lines in sixth new test only; all original/runtime/dependency/GUI source bytes unchanged from previous KIO fix.",
+    "historicalNativeRun": 38809250304,
+    "historicalHead": "c62d16318618d205d8380413dc21446d0f141c11",
+    "windowsJob": 116678457288,
+    "historicalWindowsResult": "416 passed;1 failed in fixture folder rename;1 original ignored subprocess helper",
+    "fiveOtherLockIdentityRegressions": "passed on actual Windows",
+    "newWindowsFixtureExecution": "passed on actual Windows run 38818475536, job 116709095680, before the later original save-copy path assertion failed",
+    "newMacWholeSourceExecution": "passed on actual macOS run 38818475536, job 116709095590",
+    "officialEvidence": [
+      "https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fsa/87f86c9b-6c2a-4803-84b7-131a74a434fa",
+      "https://doc.rust-lang.org/std/os/windows/fs/trait.OpenOptionsExt.html#tymethod.share_mode"
+    ],
+    "priorRecoverySha256": "b18daa100d2170b560a1e8b2f0408c999e7ef05ac356268ee8bfc862e9f41b71",
+    "onlyAddedLines": [
+      "        #[cfg(windows)]",
+      "        std::fs::rename(own.join(LOCK), root.path().join(\"relocated-held-lock\")).unwrap();"
+    ],
+    "observedNativeHead": "425ca2a6c1b98703c2f86ab421d769ea2be750c5",
+    "observationsApplyToSaveCopyRevision3": false
+  },
+  "historicalNativeSnapshot": {
+    "run": 38809250304,
+    "head": "c62d16318618d205d8380413dc21446d0f141c11",
+    "sourceTreeSha256": "9d981683e2867bf7565a57da7a04b17a1522ed973943c1e8e1d9a6dbd1b7b684",
+    "windows": {
+      "job": 116678457288,
+      "guiAndCliBuild": "passed",
+      "engineTests": {
+        "passed": 416,
+        "failed": 1,
+        "originalIgnoredSubprocessHelper": 1
+      },
+      "failure": "sixth newly added regression fixture failed while renaming a directory containing the held lock; all five other new lock-identity regressions passed"
+    },
+    "macos": {
+      "nativeJob": 116678457321,
+      "nativeResult": "success",
+      "qaRun": 38814300881,
+      "qaJob": 116694993997,
+      "qaResult": "6 commands and 11 checks passed; 684 portable files verified"
+    },
+    "appliesToRevision2Source": false,
+    "preserveHistoricalEvidence": true
+  },
+  "revision2ChangeFromPriorNative": {
+    "files": [
+      "crates/engine/src/recovery.rs"
+    ],
+    "addedLines": [
+      "        #[cfg(windows)]",
+      "        std::fs::rename(own.join(LOCK), root.path().join(\"relocated-held-lock\")).unwrap();"
+    ],
+    "other440AppFilesUnchanged": true,
+    "all25FontFilesUnchanged": true,
+    "productionPrefixUnchanged": true,
+    "cargoLockUnchanged": true,
+    "engineCargoUnchanged": true,
+    "existingTestNamesAndIgnoresUnchanged": true,
+    "nativeBuildRun": false,
+    "windowsExecutionRun": false
+  },
+  "historicalRevision2Evidence": {
+    "functionalPatch": {
+      "sha256": "12da0c7791bcc53b8579022ce2c7272ee842dc2cd5a5e4412daea472954a83c5",
+      "bytes": 8780
+    },
+    "functionalManifest": {
+      "sha256": "976568c77e4814eeda7b2eeabf37333f98c6a14b5c4fe4ca8a5c47f5647cd0eb",
+      "bytes": 7448
+    },
+    "sourceTreeSha256": "4f813634eb84b712330af00fa6a08fe5e8f347ca50eeedaf1382c5e3367c273e",
+    "nativeRun": 38818475536,
+    "head": "425ca2a6c1b98703c2f86ab421d769ea2be750c5",
+    "windowsJob": 116709095680,
+    "windowsEngineUnitPassed": 417,
+    "windowsEngineUnitFailed": 0,
+    "windowsOriginalIgnoredSubprocessHelper": 1,
+    "allSixRecoveryRegressionsPassed": true,
+    "laterOriginalIntegrationFailure": {
+      "path": "crates/engine/tests/save_state_atomicity.rs",
+      "line": 61,
+      "expected": "../../source/contacts.csv",
+      "actual": "..\\..\\source\\contacts.csv"
+    },
+    "macJob": 116709095590,
+    "macNativeResult": "success",
+    "rawWindowsLog": {
+      "sha256": "265f8069faafc8e386f7aeddff701a442e0d71b683e72b0fb5797d113415ef00",
+      "bytes": 119425
+    },
+    "appliesToRevision3Source": false,
+    "preserveHistoricalEvidence": true
+  },
+  "revision3SaveCopyPath": {
+    "revision": 1,
+    "originalFile": "crates/engine/tests/save_state_atomicity.rs",
+    "original": {
+      "sha256": "ccbf07df7febe9d41ce1c37dcb8a1a607a58c4956068e1984b22bac4a29d4b58",
+      "bytes": 3387
+    },
+    "modified": {
+      "sha256": "091c58e994878a91b91454698593814adb7e36a845a9a85472ff53a2225b5557",
+      "bytes": 3491
+    },
+    "sourceOnlyChangeFrom425": [
+      "crates/engine/tests/save_state_atomicity.rs"
+    ],
+    "expectedPathComponents": [
+      "..",
+      "..",
+      "source",
+      "contacts.csv"
+    ],
+    "exactStringEqualityRetained": true,
+    "testDefinitionsBefore": 2,
+    "testDefinitionsAfter": 2,
+    "assertionMacrosBefore": 18,
+    "assertionMacrosAfter": 18,
+    "skipsAdded": 0,
+    "runtimeChanges": 0,
+    "additionalDependencyChanges": 0,
+    "officialRustPathContract": "https://doc.rust-lang.org/1.95.0/std/path/struct.Path.html#method.join",
+    "existingOriginalExpectedJoinPrecedent": "crates/engine/src/cmd/datamerge/tests.rs:993",
+    "standaloneOriginalFunctionMacProbe": {
+      "rust": "1.95.0",
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "wholeEngineBuild": false,
+      "actualWindowsExecution": false
+    },
+    "newWholeNativeBothPlatforms": "pending",
+    "releaseSourcePolicy": "Both native platforms and corresponding source will be rebuilt coherently; existing425 artifacts/provenance remain historical."
+  },
+  "historicalPythonTests": {
     "command": "python3 -m unittest discover -s tests -v",
     "passed": 235,
     "failed": 0,
@@ -106,13 +249,19 @@
     },
     "nativeExecution": false
   },
-  "limits": [
-    "Revision2 changes only the sixth test fixture on Windows; no local whole native build or Windows execution was performed.",
-    "Prior actual Windows native run passed the other five new lock-identity regressions, but failed the sixth fixture before the save/discard assertions; that historical success does not prove this revision.",
-    "New source fingerprint requires actual full original engine plus all six added regressions on both CI platforms before release; historical Mac and Windows evidence must remain distinct."
-  ],
-  "revision": 2,
-  "wholeOriginalAndFunctionalRoundtrip": {
+  "pythonTests": {
+    "command": "python3 -m unittest discover -s tests -v",
+    "passed": 275,
+    "failed": 0,
+    "designScopeTests": 11,
+    "newRevision3ScopeTests": 3,
+    "log": {
+      "sha256": "da8a923522128b5ca6f1bb5b966ed563705c6dddbf2e9eb2ddef6e0192a101e7",
+      "bytes": 32330
+    },
+    "nativeExecution": false
+  },
+  "historicalRevision2WholeOriginalAndFunctionalRoundtrip": {
     "schema": "kio.design-fixture-v2-roundtrip.v1",
     "status": "passed",
     "immutableArchive": {
@@ -160,65 +309,209 @@
     "fullNativeBuildExecuted": false,
     "windowsExecutionOfNewFixture": false
   },
-  "fixturePortability": {
-    "revision": 2,
-    "scope": "Two lines in sixth new test only; all original/runtime/dependency/GUI source bytes unchanged from previous KIO fix.",
-    "historicalNativeRun": 38809250304,
-    "historicalHead": "c62d16318618d205d8380413dc21446d0f141c11",
-    "windowsJob": 116678457288,
-    "historicalWindowsResult": "416 passed;1 failed in fixture folder rename;1 original ignored subprocess helper",
-    "fiveOtherLockIdentityRegressions": "passed on actual Windows",
-    "newWindowsFixtureExecution": "pending full native CI",
-    "newMacWholeSourceExecution": "pending full native CI",
-    "officialEvidence": [
-      "https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fsa/87f86c9b-6c2a-4803-84b7-131a74a434fa",
-      "https://doc.rust-lang.org/std/os/windows/fs/trait.OpenOptionsExt.html#tymethod.share_mode"
+  "wholeOriginalAndFunctionalRoundtrip": {
+    "schema": "kio.design-save-copy-revision3-roundtrip.v1",
+    "status": "passed",
+    "baseBuilderCommit": "343f77a82122bef53d21ab5ad528dd7d3fdca56b",
+    "immutableOriginalArchive": {
+      "sha256": "5044162f9e7c2260156419b7e2c69c87801c5facc88e6b7aaa3552aca70c2acf",
+      "bytes": 7805542
+    },
+    "brandingPatch": {
+      "sha256": "7194f461cba04891621767cf4f26576508432600fcadf2455d37ff3534d65b5c",
+      "bytes": 8067433
+    },
+    "functionalPatch": {
+      "sha256": "0b47930f2dc71590be2fe7bf71e91a051d3578f382780721f922531cd6ef1348",
+      "bytes": 9740
+    },
+    "functionalManifest": {
+      "sha256": "496ce283bb46059d90a42fe9c6bca94c5a756e01d931026bcbcf122cc61423f0",
+      "bytes": 10114
+    },
+    "originalFiles": 446,
+    "wholeAppFiles": 441,
+    "wholeFontFiles": 25,
+    "existingFourFunctionalSectionsByteIdentical": true,
+    "existingFourFunctionalFileHashesByteIdentical": true,
+    "changedFrom425": [
+      "crates/engine/tests/save_state_atomicity.rs"
     ],
-    "priorRecoverySha256": "b18daa100d2170b560a1e8b2f0408c999e7ef05ac356268ee8bfc862e9f41b71",
-    "onlyAddedLines": [
-      "        #[cfg(windows)]",
-      "        std::fs::rename(own.join(LOCK), root.path().join(\"relocated-held-lock\")).unwrap();"
-    ]
+    "allOther440AppFilesByteIdentical": true,
+    "all25FontFilesByteIdentical": true,
+    "runtimeCargoLegalAndOriginalRecoveryBytesUnchangedFrom425": true,
+    "otherTwelveAppRowsUnchanged": true,
+    "builderChangedFunctions": [
+      "functional_fixes"
+    ],
+    "otherBuilderFunctionsAstIdentical": 31,
+    "newSourceTreeSha256": "a4de1e98deeaa920ce93c4696452da16377b7badb1a086fd3e2616e8eeb3e897",
+    "oldSourceTreeSha256": "4f813634eb84b712330af00fa6a08fe5e8f347ca50eeedaf1382c5e3367c273e",
+    "fontsTreeSha256": "9282a006f65f4bd0be2473ef25bb64f90f9d0544958f949833de6347eb68ee53",
+    "wholeOriginalBrandingFunctionalForwardReverseRoundtrip": true,
+    "canonicalPreparedMatchesFreshOriginalRoundtrip": true,
+    "allOriginalSaveCopyTests": 2,
+    "allOriginalSaveCopyAssertions": 18,
+    "skipsAdded": 0,
+    "wholeNativeBuildExecuted": false,
+    "windowsNewFixtureExecuted": false,
+    "releaseRequirement": "New both native platforms and source from one coherent reviewed commit; existing425 artifacts remain historical."
   },
-  "historicalNativeSnapshot": {
-    "run": 38809250304,
-    "head": "c62d16318618d205d8380413dc21446d0f141c11",
-    "sourceTreeSha256": "9d981683e2867bf7565a57da7a04b17a1522ed973943c1e8e1d9a6dbd1b7b684",
-    "windows": {
-      "job": 116678457288,
-      "guiAndCliBuild": "passed",
-      "engineTests": {
-        "passed": 416,
-        "failed": 1,
-        "originalIgnoredSubprocessHelper": 1
+  "revision3TargetedMacPathProbe": {
+    "nativeHost": "macOS arm64",
+    "rust": "1.95.0",
+    "probeScope": "Only exact upstream relative_between function plus standalone std-only contract tests; not the app or complete integration suite. Windows expectation is static/documented, not an executed Windows pass.",
+    "standaloneTests": 6,
+    "passed": 6,
+    "failed": 0,
+    "ignored": 0,
+    "stdout": {
+      "sha256": "1277c59854d12004716104524e4723abb03110704cc783ebc57b2563d5534762",
+      "bytes": 411
+    },
+    "stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "source": {
+      "sha256": "731155b74faf4adacf245511bb874ddb0998cd0bb29bff04558bf7e0a2323258",
+      "bytes": 2263
+    },
+    "patchCheckAndRoundtrip": true,
+    "preparedSourceUnmodified": true
+  },
+  "remainingOriginalTestsAudit": {
+    "selectedPackage": "designcraft-engine",
+    "integrationFiles": [
+      {
+        "path": "crates/engine/tests/book_safety.rs",
+        "sha256": "0d735f8ba18b55794a5cddecc90abbdebde38735942664be64c7bd8119aa065e",
+        "bytes": 8240,
+        "immutableOriginalEqual": true,
+        "testDefinitions": 8,
+        "assertionMacros": 25,
+        "relativePathMentions": 0,
+        "nativePathAPIReferences": 37,
+        "notExecutedAfterFailure": false
       },
-      "failure": "sixth newly added regression fixture failed while renaming a directory containing the held lock; all five other new lock-identity regressions passed"
-    },
-    "macos": {
-      "nativeJob": 116678457321,
-      "nativeResult": "success",
-      "qaRun": 38814300881,
-      "qaJob": 116694993997,
-      "qaResult": "6 commands and 11 checks passed; 684 portable files verified"
-    },
-    "appliesToRevision2Source": false,
-    "preserveHistoricalEvidence": true
-  },
-  "revision2ChangeFromPriorNative": {
-    "files": [
-      "crates/engine/src/recovery.rs"
+      {
+        "path": "crates/engine/tests/browser_print.rs",
+        "sha256": "039e2347a232e0e9f3952bda0d371dd7dff2619db766d0664f77d0382c95103d",
+        "bytes": 1261,
+        "immutableOriginalEqual": true,
+        "testDefinitions": 0,
+        "assertionMacros": 5,
+        "relativePathMentions": 0,
+        "nativePathAPIReferences": 0,
+        "notExecutedAfterFailure": false
+      },
+      {
+        "path": "crates/engine/tests/character_style_from_selection.rs",
+        "sha256": "a45a4c68874e938aa2eafa488b06c7c2c68e294ef8029c3681f2382c0d28bbd0",
+        "bytes": 16343,
+        "immutableOriginalEqual": true,
+        "testDefinitions": 7,
+        "assertionMacros": 65,
+        "relativePathMentions": 0,
+        "nativePathAPIReferences": 0,
+        "notExecutedAfterFailure": false
+      },
+      {
+        "path": "crates/engine/tests/collection_state_atomicity.rs",
+        "sha256": "dcfb6022298b673ca4594157d1a387d7e8fb41a3d8e527d75f52005c9d37b23e",
+        "bytes": 3313,
+        "immutableOriginalEqual": true,
+        "testDefinitions": 5,
+        "assertionMacros": 10,
+        "relativePathMentions": 0,
+        "nativePathAPIReferences": 10,
+        "notExecutedAfterFailure": false
+      },
+      {
+        "path": "crates/engine/tests/distribute_locks.rs",
+        "sha256": "d3210af1c7bccaa5b961d5e81dcf47ea1a912b310a49e835bbef01dfc9d412d7",
+        "bytes": 6000,
+        "immutableOriginalEqual": true,
+        "testDefinitions": 3,
+        "assertionMacros": 10,
+        "relativePathMentions": 0,
+        "nativePathAPIReferences": 0,
+        "notExecutedAfterFailure": false
+      },
+      {
+        "path": "crates/engine/tests/preflight_resolution.rs",
+        "sha256": "a1242fc9c18e53b42f3cb3450ed45a098f86e7f16cda71048f0795bc295fe043",
+        "bytes": 9806,
+        "immutableOriginalEqual": true,
+        "testDefinitions": 8,
+        "assertionMacros": 18,
+        "relativePathMentions": 0,
+        "nativePathAPIReferences": 0,
+        "notExecutedAfterFailure": false
+      },
+      {
+        "path": "crates/engine/tests/primary_frame_columns.rs",
+        "sha256": "3c11a8c567064a8899389632647d063f973878bc1d18716368c31e8353f110f8",
+        "bytes": 1582,
+        "immutableOriginalEqual": true,
+        "testDefinitions": 1,
+        "assertionMacros": 4,
+        "relativePathMentions": 0,
+        "nativePathAPIReferences": 0,
+        "notExecutedAfterFailure": false
+      },
+      {
+        "path": "crates/engine/tests/save_state_atomicity.rs",
+        "sha256": "ccbf07df7febe9d41ce1c37dcb8a1a607a58c4956068e1984b22bac4a29d4b58",
+        "bytes": 3387,
+        "immutableOriginalEqual": true,
+        "testDefinitions": 2,
+        "assertionMacros": 18,
+        "relativePathMentions": 1,
+        "nativePathAPIReferences": 14,
+        "notExecutedAfterFailure": false
+      },
+      {
+        "path": "crates/engine/tests/text_decorations.rs",
+        "sha256": "635405b271f2131b6e6a5ed50ad5f1703ab33783f4da29fbcfc1883785e850d4",
+        "bytes": 9873,
+        "immutableOriginalEqual": true,
+        "testDefinitions": 4,
+        "assertionMacros": 15,
+        "relativePathMentions": 0,
+        "nativePathAPIReferences": 0,
+        "notExecutedAfterFailure": true
+      },
+      {
+        "path": "crates/engine/tests/text_thread_regressions.rs",
+        "sha256": "43cfbfa3f9065a21382689440b66b03e8963193e8317d7522102105765f0ac1a",
+        "bytes": 12651,
+        "immutableOriginalEqual": true,
+        "testDefinitions": 13,
+        "assertionMacros": 34,
+        "relativePathMentions": 0,
+        "nativePathAPIReferences": 0,
+        "notExecutedAfterFailure": true
+      },
+      {
+        "path": "crates/engine/tests/thread_color_safety.rs",
+        "sha256": "b0fd50aebd9b86eb7ef69e44d8514b33e90ed1ff22d1e93698c370146668508f",
+        "bytes": 10614,
+        "immutableOriginalEqual": true,
+        "testDefinitions": 8,
+        "assertionMacros": 38,
+        "relativePathMentions": 0,
+        "nativePathAPIReferences": 0,
+        "notExecutedAfterFailure": true
+      }
     ],
-    "addedLines": [
-      "        #[cfg(windows)]",
-      "        std::fs::rename(own.join(LOCK), root.path().join(\"relocated-held-lock\")).unwrap();"
-    ],
-    "other440AppFilesUnchanged": true,
-    "all25FontFilesUnchanged": true,
-    "productionPrefixUnchanged": true,
-    "cargoLockUnchanged": true,
-    "engineCargoUnchanged": true,
-    "existingTestNamesAndIgnoresUnchanged": true,
-    "nativeBuildRun": false,
-    "windowsExecutionRun": false
+    "unexecutedIntegrationTestDefinitions": 25,
+    "originalEngineRustSourceFiles": 75,
+    "docCodeFences": 0,
+    "docAttributes": 0,
+    "includedText": 0,
+    "additionalSameCauseCandidates": [],
+    "actualNewWindowsExecution": false,
+    "scope": "Read-only original source audit; preserve every remaining test and every format-specific URL/PDF/EPUB/XML/style string."
   }
 }
