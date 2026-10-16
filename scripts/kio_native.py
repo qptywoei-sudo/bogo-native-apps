@@ -924,11 +924,14 @@ def dependency_source_files(package, folder):
     link, target = root / "dpi/LICENSE", root / "LICENSE"
     require(link.is_symlink() or link.is_file(), "Reviewed winit license link missing")
     # Windows Git may materialize a symlink as its exact 10-byte target text.
-    require((link.is_symlink() and os.readlink(link) == "../LICENSE") or
+    require((link.is_symlink() and os.readlink(link).replace("\\", "/") == "../LICENSE" and link.resolve() == target.resolve()) or
             (not link.is_symlink() and link.is_file() and link.stat().st_size == 10 and link.read_bytes() == b"../LICENSE"),
             "Reviewed winit license link target changed")
-    require(target.is_file() and not target.is_symlink() and target.stat().st_size == 11323 and
-            digest(target) == "6dc0e068dcf3a5bc8e054205b85b7720e1d49265bbc64bf515d2cf79197df69a",
+    # Git on Windows converts this exact upstream text to CRLF. Both hashes are
+    # derived from the immutable original; preserve the checked-out bytes.
+    require(target.is_file() and not target.is_symlink() and (target.stat().st_size, digest(target)) in (
+            (11323, "6dc0e068dcf3a5bc8e054205b85b7720e1d49265bbc64bf515d2cf79197df69a"),
+            (11523, "de556eb1415648cc1bba68d1e602d8a54e3e5b3592770df34d863449e8f0303c")),
             "Reviewed winit original license changed")
     result = []
     for base, dirs, files in os.walk(root, followlinks=False):
