@@ -228,6 +228,9 @@ class ReviewedDeclaredLicenseTests(unittest.TestCase):
             'simd_helpers-0.1.0': ('95890f873bec569a0362c235787f3aca6e1e887302ba4840839bcc6459c42da6', 'ca1a2f84aa386d758e98f8a609d990263932fb85', 1527, 7),
             'zune-inflate-0.2.54': ('73ab332fe2f6680068f3582b16a24f90ad7096d5d39b974d1c0aff0125116f02', '69502ce83fdfecdd0beefd677e2abb3781b29d98', 37973, 16),
             'qrcodegen-1.8.0': ('4339fc7a1021c9c1621d87f5e3505f2805c8c105420ba2f2a4df86814590c142', '720f62bddb7226106071d4728c292cb1df519ceb', 15014, 6),
+            'fax-0.2.6': ('f05de7d48f37cd6730705cbca900770cab77a89f413d23e100ad7fad7795a0ab', '40b226eb97b391355e971fd95a8dd532a4c127a0', 13279, 17),
+            'fax_derive-0.2.0': ('a0aca10fb742cb43f9e7bb8467c91aa9bcb8e3ffbc6a6f7389bb93ffc920577d', '40b226eb97b391355e971fd95a8dd532a4c127a0', 4442, 5),
+            'zune-core-0.4.12': ('3f423a2c17029964870cfaabb1f13dfab7d092a62a29a89264f4d36990ca414a', 'f8fbb123d5ed04441e8324a555bfcda0cb1bd28f', 17355, 18),
         }
         self.assertEqual(set(builder._REVIEWED_DECLARED_LICENSES), set(expected))
         declarations = {
@@ -240,6 +243,9 @@ class ReviewedDeclaredLicenseTests(unittest.TestCase):
             'simd_helpers-0.1.0': ('https://github.com/lu-zero/simd_helpers', 'MIT', None, ['Luca Barbato <lu_zero@gentoo.org>'], '7b361c6f6baf32d9baf33d39ec80036472a375245075b7d279cfb47eff1155bf'),
             'zune-inflate-0.2.54': (None, 'MIT OR Apache-2.0 OR Zlib', 'zune-inflate', [], 'eb32c5ed232eb27d811b9c3c662514e4a4c6a898bef7bad44a81e5c0388319df'),
             'qrcodegen-1.8.0': ('https://github.com/nayuki/QR-Code-generator', 'MIT', None, ['Project Nayuki'], '48f3460745b4e80d5b8028c8b7a7895628f954d2f7dc83f16ae9da33a7f6e38e'),
+            'fax-0.2.6': ('https://github.com/pdf-rs/fax', 'MIT', '', ['Sebastian K <s3bk@protonmail.com>'], 'b8be9723e8633167a4b3fa23beac27c8c11c7673985c18258fe9ff24b8334a5b'),
+            'fax_derive-0.2.0': ('https://github.com/pdf-rs/fax', 'MIT', 'derive', ['Sebastian K <s3bk@protonmail.com>'], '10199d02f627838ea29401aa541997d9ee26cbbcdaac37dfc0cd65d0fe12be62'),
+            'zune-core-0.4.12': (None, 'MIT OR Apache-2.0 OR Zlib', 'crates/zune-core', [], '15708727978a23ce1fca2279ba155296e537653e250cedac8e563a27e11e654c'),
         }
         for label, values in expected.items():
             pin = builder._REVIEWED_DECLARED_LICENSES[label]
@@ -247,10 +253,12 @@ class ReviewedDeclaredLicenseTests(unittest.TestCase):
             self.assertEqual(tuple(pin[key] for key in ('repository', 'license', 'pathInVcs', 'authors', 'filesManifestSha256')), declarations[label])
         first_four = {label: builder._REVIEWED_DECLARED_LICENSES[label] for label in ('cms-0.2.3', 'fmt-derive-0.1.2', 'fmt-derive-proc-0.1.2', 'rustls-cng-0.7.1')}
         self.assertEqual(sum(p['archiveBytes'] for p in first_four.values()), 217604)
-        first_seven = {label: pin for label, pin in builder._REVIEWED_DECLARED_LICENSES.items() if label not in ('zune-inflate-0.2.54', 'qrcodegen-1.8.0')}
+        previous_nine = {label: pin for label, pin in builder._REVIEWED_DECLARED_LICENSES.items() if label not in ('fax-0.2.6', 'fax_derive-0.2.0', 'zune-core-0.4.12')}
+        first_seven = {label: pin for label, pin in previous_nine.items() if label not in ('zune-inflate-0.2.54', 'qrcodegen-1.8.0')}
         self.assertEqual(sum(p['archiveBytes'] for p in first_seven.values()), 224447)
-        self.assertEqual(sum(p['archiveBytes'] for label, p in builder._REVIEWED_DECLARED_LICENSES.items() if label != 'qrcodegen-1.8.0'), 262420)
-        self.assertEqual(sum(p['archiveBytes'] for p in builder._REVIEWED_DECLARED_LICENSES.values()), 277434)
+        self.assertEqual(sum(p['archiveBytes'] for label, p in previous_nine.items() if label != 'qrcodegen-1.8.0'), 262420)
+        self.assertEqual(sum(p['archiveBytes'] for p in previous_nine.values()), 277434)
+        self.assertEqual(sum(p['archiveBytes'] for p in builder._REVIEWED_DECLARED_LICENSES.values()), 312510)
         self.assertEqual(sum(len(p['publicTestCertificates']) for p in builder._REVIEWED_DECLARED_LICENSES.values()), 4)
         with self.assertRaisesRegex(ValueError, 'no reviewed'):
             builder.reviewed_declared_license(self.package, self.folder, self.output)
@@ -638,7 +646,7 @@ class ReviewedDeclaredLicenseTests(unittest.TestCase):
             {'path': 'LICENSE-ZLIB', 'bytes': 818, 'sha256': '7fa429541e55b1509909e058f2d21a37467e4958ec713b357f6e0cf9dc4ee352'},
         ])
         self.assertFalse(any('upstreamNotices' in value for key, value in builder._REVIEWED_DECLARED_LICENSES.items()
-                             if key != 'zune-inflate-0.2.54'))
+                             if key not in ('zune-inflate-0.2.54', 'zune-core-0.4.12')))
 
     def test_zune_original_notices_are_retained_and_indexed_beside_all_source(self):
         label = self.fixture('zune-inflate-0.2.54')
@@ -1116,6 +1124,157 @@ class StagedPublicNoticeTests(unittest.TestCase):
                     self.assertEqual(archive.read('KIO PDF/' + path), contents)
             self.assertEqual(len(msi_calls), 1)
             self.assertEqual(msi_calls[0][1], len(files))
+
+
+class PhotoDependencyNoticeTests(unittest.TestCase):
+    """Exact Photo packaging omissions reuse the authenticated source collector.
+
+    Fixtures are small synthetic archives; no network or native execution is
+    required. Production archives and immutable originals are audited separately.
+    """
+    labels = ('fax-0.2.6', 'fax_derive-0.2.0', 'zune-core-0.4.12')
+    setUp = DependencyNotices.setUp
+    tearDown = DependencyNotices.tearDown
+    collect = DependencyNotices.collect
+    fixture = ReviewedDeclaredLicenseTests.fixture
+    rehash = ReviewedDeclaredLicenseTests.rehash
+    reviewed_collect = ReviewedDeclaredLicenseTests.reviewed_collect
+    notice_response = ReviewedDeclaredLicenseTests.notice_response
+    assert_refused = ReviewedDeclaredLicenseTests.assert_refused
+
+    def test_exact_photo_archives_source_manifests_and_no_new_private_exceptions(self):
+        expected = {
+            'fax-0.2.6': (13279, 17, 49986, 'b8be9723e8633167a4b3fa23beac27c8c11c7673985c18258fe9ff24b8334a5b'),
+            'fax_derive-0.2.0': (4442, 5, 14434, '10199d02f627838ea29401aa541997d9ee26cbbcdaac37dfc0cd65d0fe12be62'),
+            'zune-core-0.4.12': (17355, 18, 76660, '15708727978a23ce1fca2279ba155296e537653e250cedac8e563a27e11e654c'),
+        }
+        for label, values in expected.items():
+            pin = builder._REVIEWED_DECLARED_LICENSES[label]
+            self.assertEqual(tuple(pin[k] for k in ('archiveBytes', 'fileCount', 'sourceBytes', 'filesManifestSha256')), values)
+            self.assertEqual(pin['publicTestCertificates'], {})
+        zune = builder._REVIEWED_DECLARED_LICENSES['zune-core-0.4.12']
+        self.assertIsNone(zune['repository'])
+        self.assertEqual(zune['authors'], [])
+        self.assertEqual(zune['upstreamNotices'], [
+            {'path': 'LICENSE.md', 'bytes': 357, 'sha256': 'c6dff146a9f31848ac296faa5a08a4253caf2c384c86f906dc99e7fc0a39cc8c'},
+            {'path': 'LICENSE-ZLIB', 'bytes': 818, 'sha256': '7fa429541e55b1509909e058f2d21a37467e4958ec713b357f6e0cf9dc4ee352'},
+        ])
+
+    def test_all_three_preserve_complete_source_without_inventing_original_notices(self):
+        for label in self.labels:
+            with self.subTest(label=label):
+                self.fixture(label)
+                self.reviewed_collect(label)
+                output = self.output / label
+                proof = json.loads((output / 'REVIEWED-LICENSE-PROVENANCE.json').read_text())
+                self.assertEqual(proof['authors'], self.pin['authors'])
+                self.assertEqual(proof['repository'], self.pin['repository'])
+                self.assertEqual(proof['declaredLicense'], self.pin['license'])
+                self.assertEqual(proof['selectedLicense'], 'MIT')
+                self.assertFalse(proof['standardMit']['isUpstreamOriginal'])
+                self.assertFalse(proof['standardMit']['addsCopyrightNotice'])
+                text = (output / 'STANDARD-MIT-TEXT.txt').read_text()
+                self.assertIn('not an upstream license file', text)
+                self.assertNotIn('Copyright (c)', text)
+                for relative, data in self.contents.items():
+                    self.assertEqual((output / 'original-crate' / relative).read_bytes(), data)
+                for notice in self.pin.get('upstreamNotices', []):
+                    self.assertEqual((output / ('UPSTREAM-' + notice['path'])).read_bytes(), self.notice_contents[notice['path']])
+                if label.startswith('fax'):
+                    self.assertNotIn('upstreamNotices', proof)
+                    self.assertNotIn('inlineOriginalNotice', proof)
+
+    def test_all_three_registry_unpack_without_vendor_checksum_is_honest(self):
+        for label in self.labels:
+            with self.subTest(label=label):
+                self.fixture(label)
+                (self.folder / '.cargo-checksum.json').unlink()
+                self.reviewed_collect(label)
+                proof = json.loads((self.output / label / 'REVIEWED-LICENSE-PROVENANCE.json').read_text())
+                self.assertEqual(proof['cargoChecksumMetadata'], {'present': False, 'generatedByCollector': False,
+                                                                 'status': 'absent-in-original-registry-unpack'})
+                self.assertFalse((self.output / label / 'original-crate/.cargo-checksum.json').exists())
+
+    def test_all_three_refuse_source_tampering_before_output(self):
+        for label in self.labels:
+            with self.subTest(label=label):
+                self.fixture(label)
+                source = self.folder / 'src/lib.rs'
+                source.write_bytes(source.read_bytes() + b'// changed\n')
+                self.assert_refused(label)
+
+    def test_all_three_refuse_unreviewed_private_or_extra_files(self):
+        for label in self.labels:
+            with self.subTest(label=label):
+                self.fixture(label)
+                (self.folder / 'private.pfx').write_bytes(b'Not an approved public certificate fixture')
+                self.assert_refused(label)
+
+    def test_all_three_refuse_wrong_archive_even_with_matching_unpacked_metadata(self):
+        for label in self.labels:
+            with self.subTest(label=label):
+                self.fixture(label)
+                data = self.archive.read_bytes()
+                self.archive.write_bytes(bytes([data[0] ^ 1]) + data[1:])
+                self.assert_refused(label)
+
+    def test_all_three_refuse_forged_vendor_checksum_or_published_vcs_identity(self):
+        for label in self.labels:
+            with self.subTest(label=label):
+                self.fixture(label)
+                checksum = self.folder / '.cargo-checksum.json'
+                original = checksum.read_bytes()
+                metadata = json.loads(original)
+                metadata['package'] = '0' * 64
+                builder.write_json(checksum, metadata)
+                self.assert_refused(label)
+                checksum.write_bytes(original)
+                metadata['package'] = self.pin['archiveSha256']
+                metadata['files']['src/lib.rs'] = '0' * 64
+                builder.write_json(checksum, metadata)
+                self.assert_refused(label)
+                checksum.write_bytes(original)
+                vcs = self.folder / '.cargo_vcs_info.json'
+                metadata = json.loads(vcs.read_text())
+                metadata['git']['sha1'] = '0' * 40
+                builder.write_json(vcs, metadata)
+                self.assert_refused(label)
+
+    def test_all_three_refuse_invented_authors_repository_license_or_versions(self):
+        for label in self.labels:
+            with self.subTest(label=label):
+                self.fixture(label)
+                original = dict(self.package)
+                for key, value in [('authors', ['Invented KIO copyright holder']), ('repository', 'https://github.com/other/project'),
+                                   ('license', 'Apache-2.0')]:
+                    self.package = dict(original, **{key: value})
+                    self.assert_refused(label)
+                with self.assertRaisesRegex(ValueError, 'no reviewed omitted-license exception'):
+                    builder.reviewed_declared_license(dict(original, version=self.pin['version'] + '.1'),
+                                                      self.folder, self.output / label)
+                self.assertFalse((self.output / label).exists())
+
+    def test_zune_core_refuses_changed_or_redirected_original_notice_before_output(self):
+        label = self.fixture('zune-core-0.4.12')
+        original_response = self.notice_response
+
+        def changed(request, timeout):
+            response = original_response(request, timeout)
+            response.read = lambda limit: b'X' * len(self.notice_contents['LICENSE.md'])
+            return response
+
+        with self.assertRaisesRegex(ValueError, 'original upstream notice checksum'):
+            self.reviewed_collect(label, changed)
+        self.assertFalse((self.output / label).exists())
+
+        def redirected(request, timeout):
+            response = original_response(request, timeout)
+            response.url = 'https://example.org/unreviewed-license'
+            return response
+
+        with self.assertRaisesRegex(ValueError, 'redirect refused'):
+            self.reviewed_collect(label, redirected)
+        self.assertFalse((self.output / label).exists())
 
 
 if __name__ == '__main__':

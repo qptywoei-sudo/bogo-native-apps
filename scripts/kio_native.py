@@ -444,6 +444,39 @@ _REVIEWED_DECLARED_LICENSES = {
             "officialSourceUrl": "https://raw.githubusercontent.com/nayuki/QR-Code-generator/720f62bddb7226106071d4728c292cb1df519ceb/rust/src/lib.rs",
         },
     },
+    "fax-0.2.6": {
+        "name": "fax", "version": "0.2.6", "repository": "https://github.com/pdf-rs/fax",
+        "vcsRepository": "pdf-rs/fax", "commit": "40b226eb97b391355e971fd95a8dd532a4c127a0", "pathInVcs": "",
+        "license": "MIT", "authors": ["Sebastian K <s3bk@protonmail.com>"],
+        "vcsInfoPresent": True, "pathInVcsPresent": True, "declarationFiles": ["Cargo.toml", "Cargo.toml.orig", "README.md"],
+        "archiveSha256": "f05de7d48f37cd6730705cbca900770cab77a89f413d23e100ad7fad7795a0ab", "archiveBytes": 13279,
+        "filesManifestSha256": "b8be9723e8633167a4b3fa23beac27c8c11c7673985c18258fe9ff24b8334a5b", "fileCount": 17, "sourceBytes": 49986,
+        "publicTestCertificates": {},
+    },
+    "fax_derive-0.2.0": {
+        "name": "fax_derive", "version": "0.2.0", "repository": "https://github.com/pdf-rs/fax",
+        "vcsRepository": "pdf-rs/fax", "commit": "40b226eb97b391355e971fd95a8dd532a4c127a0", "pathInVcs": "derive",
+        "license": "MIT", "authors": ["Sebastian K <s3bk@protonmail.com>"],
+        "vcsInfoPresent": True, "pathInVcsPresent": True, "declarationFiles": ["Cargo.toml", "Cargo.toml.orig"],
+        "archiveSha256": "a0aca10fb742cb43f9e7bb8467c91aa9bcb8e3ffbc6a6f7389bb93ffc920577d", "archiveBytes": 4442,
+        "filesManifestSha256": "10199d02f627838ea29401aa541997d9ee26cbbcdaac37dfc0cd65d0fe12be62", "fileCount": 5, "sourceBytes": 14434,
+        "publicTestCertificates": {},
+    },
+    "zune-core-0.4.12": {
+        "name": "zune-core", "version": "0.4.12", "repository": None,
+        "vcsRepository": "etemesi254/zune-image", "commit": "f8fbb123d5ed04441e8324a555bfcda0cb1bd28f", "pathInVcs": "crates/zune-core",
+        "license": "MIT OR Apache-2.0 OR Zlib", "authors": [],
+        "vcsInfoPresent": True, "pathInVcsPresent": True, "declarationFiles": ["Cargo.toml", "Cargo.toml.orig", "README.md"],
+        "archiveSha256": "3f423a2c17029964870cfaabb1f13dfab7d092a62a29a89264f4d36990ca414a", "archiveBytes": 17355,
+        "filesManifestSha256": "15708727978a23ce1fca2279ba155296e537653e250cedac8e563a27e11e654c", "fileCount": 18, "sourceBytes": 76660,
+        "publicTestCertificates": {},
+        # The published manifests omit repository/authors. Preserve those
+        # omissions and authenticate the exact original VCS-root notices.
+        "upstreamNotices": [
+            {"path": "LICENSE.md", "bytes": 357, "sha256": "c6dff146a9f31848ac296faa5a08a4253caf2c384c86f906dc99e7fc0a39cc8c"},
+            {"path": "LICENSE-ZLIB", "bytes": 818, "sha256": "7fa429541e55b1509909e058f2d21a37467e4958ec713b357f6e0cf9dc4ee352"},
+        ],
+    },
 }
 
 
