@@ -2,7 +2,7 @@
 
 ## Downloads
 
-Open the [KIO app store](https://kio-library.vercel.app/) for the measured installers, portable packages and matching complete source. The table records published files as of 2026-10-16; a prepared source or running build is not a published download.
+Open the [KIO app store](https://kio-library.vercel.app/), then **Home → KIO Apps → 전체 설치 파일 (14개)**, for the measured installers, portable packages and matching complete source. The table records published files as of 2026-10-16; a prepared source or running build is not a published download.
 
 | Application | Version | macOS Apple Silicon | Windows x64 | Release and matching source |
 |---|---|---|---|---|
@@ -17,8 +17,11 @@ Open the [KIO app store](https://kio-library.vercel.app/) for the measured insta
 | Launcher | 0.4.1-kio.1 | DMG / ZIP | MSI / ZIP | [Download](https://github.com/qptywoei777-rgb/kio-native-apps/releases/tag/launcher-v0.4.1-kio.1) |
 | PDF | 0.8.0-kio.2 | DMG / ZIP | MSI / ZIP | [Download](https://github.com/qptywoei777-rgb/kio-native-apps/releases/tag/pdf-v0.8.0-kio.2) |
 | Vector | 0.11.0-kio.1 | DMG / ZIP | MSI / ZIP | [Download](https://github.com/qptywoei777-rgb/kio-native-apps/releases/tag/vector-v0.11.0-kio.1) |
+| Photo | 0.9.0-kio.1 | DMG / ZIP | MSI / ZIP | [Download](https://github.com/qptywoei777-rgb/kio-native-apps/releases/tag/photo-v0.9.0-kio.1) |
+| Design | 0.8.0-kio.1 | DMG / ZIP | MSI / ZIP | [Download](https://github.com/qptywoei777-rgb/kio-native-apps/releases/tag/design-v0.8.0-kio.1) |
+| CAD | 0.7.0-kio.1 | DMG / ZIP | MSI / ZIP | [Download](https://github.com/qptywoei777-rgb/kio-native-apps/releases/tag/cad-v0.7.0-kio.1) |
 
-These 11 applications provide both native operating-system packages and matching source. Photo, Design and CAD are still completing their native builds and file QA. Studio is distributed separately as an owner-only private test build. Each release explains the actual engine/file checks and remaining interactive GUI/installation work. Development packages have ad-hoc Mac signatures without notarization and no Windows publisher certificate. Complete upstream functionality is retained; full commercial-product feature or format parity is not claimed.
+All 14 applications are published as public prereleases with native macOS Apple Silicon DMG/ZIP packages, Windows x64 MSI/ZIP packages and matching complete source. Studio is distributed separately as an owner-only private test build. Each release explains the actual engine/file checks and remaining interactive GUI/installation work. Development packages have ad-hoc Mac signatures without notarization and no Windows publisher certificate. Complete upstream functionality is retained; full commercial-product feature or format parity is not claimed.
 
 ## Build project
 
@@ -50,8 +53,8 @@ For the explicitly reviewed implicit-host Mac build already produced by the pare
 ## Artifacts and source
 
 - Mac: `.work/word/package-macos-arm64/KIO Word.app`, plus full `.app` ZIP and drag-to-Applications DMG in `dist/word-macos-arm64`. The app includes the full native GUI, native CLI, original legal notices, bundled-font licenses, dependency licenses and provenance. Signing is inside-out and strictly verified. Default signing is ad-hoc; there is no Apple notarization. `KIO_MAC_SIGN_IDENTITY` optionally selects an already available caller-owned identity; notarization is still not claimed.
-- Windows: a full native GUI/CLI portable ZIP in `dist/word-windows-x64`, retaining the original license/NOTICE/font/dependency material. It has no Windows publisher certificate. MSI creation is not required for this initial portable release.
-- `python3 scripts/kio_native.py source --app word` creates `dist/word-source` containing `KIO-Word-0.7.0-kio.1-source.zip`: the complete modified Word workspace, pinned full font tree, Cargo.lock, matching patch, original licenses/notices, an exact allowlist of build scripts/tests/workflow, and reproducible build instructions. Third-party crates remain pinned by Cargo.lock and are fetched by Cargo. Explicit `source --vendor` additionally includes every Cargo dependency source and an offline configuration; this can be substantial. If an individual redistributed dependency requires additional corresponding source, satisfy that exact requirement before publishing instead of assuming the project's MIT/Apache license replaces it.
+- Windows: a full native GUI/CLI MSI installer and portable ZIP in `dist/word-windows-x64`, retaining the original license/NOTICE/font/dependency material. The published MSI and ZIP have no Windows publisher certificate.
+- `python3 scripts/kio_native.py source --app word` creates `dist/word-source` containing `KIO-Word-0.7.0-kio.2-source.zip`: the complete modified Word workspace, pinned full font tree, Cargo.lock, matching patch, original licenses/notices, an exact allowlist of build scripts/tests/workflow, and reproducible build instructions. Third-party crates remain pinned by Cargo.lock and are fetched by Cargo. Explicit `source --vendor` additionally includes every Cargo dependency source and an offline configuration; this can be substantial. If an individual redistributed dependency requires additional corresponding source, satisfy that exact requirement before publishing instead of assuming the project's MIT/Apache license replaces it.
 - Each release has a strict file allowlist manifest with exact SHA-256 and bytes, plus a matching checksum file. Unlisted files, links, wrong architecture, source mutation and checksum mismatch stop the pipeline. No private web-app content/configuration/Drive directory is an input.
 
 Inputs are reproducible and source-archive metadata is normalized. Native binaries/signatures/DMGs are measured after packaging; byte-identical binaries across different SDKs or signing times are not promised.
