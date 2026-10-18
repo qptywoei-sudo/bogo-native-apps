@@ -54,6 +54,8 @@ def paths(lock):
 def public_files(lock):
     files = ['README.md', 'LICENSE', '.gitignore', '.gitattributes', 'scripts/kio_native.py', 'scripts/full_native.py', 'scripts/launcher_native.py',
              'tests/test_launcher_native.py', 'scripts/audit_windows_identity.py', 'scripts/audit_rust_branding.py', 'manifests/launcher.lock.json', 'patches/launcher/manifest.json', lock['branding']['patch'], '.github/workflows/full-native-launcher.yml']
+    files += ['scripts/audit_localization.py', 'scripts/launcher_six_languages.py', 'tests/test_localization_audit.py',
+              'patches/launcher/six-language-keys.json', 'patches/launcher/six-language-translations.tsv']
     for relative in files:
         p = ROOT / common.check_public_path(relative)
         require(p.is_file() and not p.is_symlink(), 'Missing reviewed Launcher source input')

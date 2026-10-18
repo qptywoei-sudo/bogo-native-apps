@@ -15,16 +15,16 @@
   },
   "patch": {
     "file": "craft-launcher-v0.4.1-kio-launcher.patch",
-    "sha256": "bd726aa2f45b1971584c587e7f1d2d4712ab0afa9286c32bed354381e0e1f007",
-    "bytes": 11745013
+    "sha256": "8665f6e1d28b72f9cf8cc8be35640c6cfc76404988d4806b684e9182b609fe0d",
+    "bytes": 11815718
   },
   "counts": {
     "upstreamFiles": 198,
-    "forkFiles": 193,
-    "changedPaths": 130,
-    "added": 18,
+    "forkFiles": 197,
+    "changedPaths": 136,
+    "added": 22,
     "removed": 23,
-    "modified": 89,
+    "modified": 91,
     "protectedFilesByteIdentical": 18
   },
   "checks": {
@@ -163,7 +163,20 @@
       "numeric-only manual installs treat exact positive integer KIO revisions as unknown revision zero; normal rc semantics retained"
     ],
     "studioOwnerTokensEmbedded": false,
-    "installOrLaunchRequiresUserAction": true
+    "installOrLaunchRequiresUserAction": true,
+    "sixLanguageRevision": {
+      "languages": [
+        "vi",
+        "en",
+        "ko",
+        "ja",
+        "zh-TW",
+        "zh-CN"
+      ],
+      "catalogKeys": 308,
+      "osDetection": "existing native sys-locale preferred UI list; independent of account; explicit preference retained",
+      "buildAndGuiValidation": "pending CI; static catalog checks only"
+    }
   },
   "coverage": {
     "completeOriginalRustDesktopAndWasmSourceRetained": true,
@@ -901,14 +914,25 @@
       }
     },
     {
+      "path": "crates/ui-egui/src/cjk_font.rs",
+      "before": {
+        "sha256": "1531689a85a733bb184ad4e376507d7440fa860945766472e0e910e4ae3f255b",
+        "bytes": 15698
+      },
+      "after": {
+        "sha256": "4231bdf4588288e59986de7cadbc62495022d5c41a4f61a04afa62e8bfffde17",
+        "bytes": 18267
+      }
+    },
+    {
       "path": "crates/ui-egui/src/dialogs.rs",
       "before": {
         "sha256": "0139d87673a7819d7b8fe5b582237fcd3b96f61138ebb3925905779aaaca22e8",
         "bytes": 19762
       },
       "after": {
-        "sha256": "3211e607351990074d05f49638a6dc2cbb7a55fadf13daed635917e0e197c238",
-        "bytes": 19737
+        "sha256": "26117f5f9009955be6163709a8ad6e8672e9858e4f123bae815a89836c84ffc3",
+        "bytes": 20252
       }
     },
     {
@@ -918,8 +942,8 @@
         "bytes": 15535
       },
       "after": {
-        "sha256": "66626b91ec969f27a4635448dc280943aebbb59880e50ca8b13dfca81265aa66",
-        "bytes": 15411
+        "sha256": "cc14576cb450b635743d3d210c6c92731a3fd32562ded5d61a34c79007f130de",
+        "bytes": 15630
       }
     },
     {
@@ -929,8 +953,16 @@
         "bytes": 16435
       },
       "after": {
-        "sha256": "3b9559ef3135b86881272c0246dc256e159624f768932b471a82195f3861c8fb",
-        "bytes": 16290
+        "sha256": "0eddb7f1b2a4acea39e4d44d37e5ca0acbb175093939f3d650b33852f522e3fa",
+        "bytes": 16542
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/en.tsv",
+      "before": null,
+      "after": {
+        "sha256": "eb7b47f1812ba25c3f8175f6ee4808fe77a6950b32c019c74a043e9037ca4186",
+        "bytes": 13530
       }
     },
     {
@@ -940,8 +972,8 @@
         "bytes": 16038
       },
       "after": {
-        "sha256": "85b8a4e41d2169d2e8145d8d6e86ac20e703b7ede472ece4989f2ad7bc454922",
-        "bytes": 15888
+        "sha256": "c432cb1d0b8684f6d2a9bbdedf09da193632f994f8e8f2e58912e2526e80846d",
+        "bytes": 16116
       }
     },
     {
@@ -951,8 +983,8 @@
         "bytes": 16827
       },
       "after": {
-        "sha256": "ee73dea7ae8879b6dedac78c36391e6782975a42fa65ec37303452a83762ac49",
-        "bytes": 16682
+        "sha256": "cad566eb59a3df854878f6e5892b3be12c9a008edf6e96999f63d7af4811bac2",
+        "bytes": 16926
       }
     },
     {
@@ -962,8 +994,8 @@
         "bytes": 17322
       },
       "after": {
-        "sha256": "04dc7a1f7ccf85001cfb5cf0f82902c11705ed2fb6080bddcf77b6d9f5a0a5fd",
-        "bytes": 17187
+        "sha256": "84511fed5fe52843efbd888dd911650f45c29ac2c0212b02de42478df2f043a0",
+        "bytes": 17439
       }
     },
     {
@@ -973,8 +1005,27 @@
         "bytes": 18628
       },
       "after": {
-        "sha256": "09272d6bf60f9d58d413cb4a94185d34a5d147428b313597819919967df51ce9",
-        "bytes": 18488
+        "sha256": "9d31ab6df8eed68e9cbe21b83b35f362d6d515cd6b053863856ddea6a5b4cb74",
+        "bytes": 18813
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/ko.tsv",
+      "before": null,
+      "after": {
+        "sha256": "69ef88c8bfcf2e55ab4e8faa261b9f486de32c9cc3b05e3f66c67fac17487ae5",
+        "bytes": 14803
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/lang.rs",
+      "before": {
+        "sha256": "b6aac5ff361b2e6285bb446496a237632e36af3dc2f632e328f9f5e708274139",
+        "bytes": 10705
+      },
+      "after": {
+        "sha256": "eb9e63a3b67928294e651d26996a3d22ed37c547eb95f22437c06ed6e1ea2e92",
+        "bytes": 12320
       }
     },
     {
@@ -995,8 +1046,8 @@
         "bytes": 16703
       },
       "after": {
-        "sha256": "2a12f3ddc96fb5028319fecba647d88dd22da3a8576d938c2c779a55121f1cce",
-        "bytes": 16553
+        "sha256": "63b4b7241763e535ef5ac1c47903f2d0096369c2b5afd7db28cdff6cbbbbd306",
+        "bytes": 16785
       }
     },
     {
@@ -1006,8 +1057,8 @@
         "bytes": 15521
       },
       "after": {
-        "sha256": "2b94d409578d5f31367d4e6b35e13f91170c14be38301b77689d685e151dfe51",
-        "bytes": 15402
+        "sha256": "376a4fdc7870d6101c3c1b472d7d42855d294aecc23a611c0137ef61d39c10e5",
+        "bytes": 15626
       }
     },
     {
@@ -1017,8 +1068,8 @@
         "bytes": 21115
       },
       "after": {
-        "sha256": "58a440eb3e9202dde873a97f02e4205a4dbb35d01f76b3133acb7aed5fa3bb4a",
-        "bytes": 20965
+        "sha256": "89e41e9d3670919594c98799e2490302b18ad357518acd3094baa24f77559de5",
+        "bytes": 21251
       }
     },
     {
@@ -1028,8 +1079,16 @@
         "bytes": 22673
       },
       "after": {
-        "sha256": "262219ec109035317d1ddee261e633426ff527123324cb6c462c686c4d55cef1",
-        "bytes": 22650
+        "sha256": "a956d02d2a09f270e4cd431acc7a46ca273e4b1fd28cc18e80e54c93b9bc3318",
+        "bytes": 24459
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/vi.tsv",
+      "before": null,
+      "after": {
+        "sha256": "56984f9e6983e3089f295631be0c06a9273d397515cc247649f94606b9628b3d",
+        "bytes": 16191
       }
     },
     {
@@ -1039,8 +1098,16 @@
         "bytes": 13647
       },
       "after": {
-        "sha256": "9b0063294134a38f8f1d310a82672a882d34e9508f2e4ab3ca66672da7f780a3",
-        "bytes": 13525
+        "sha256": "8839f1e1ad08f2964b3948f42e3118d0143b36601d962c55ab27d2e7bcade72f",
+        "bytes": 13924
+      }
+    },
+    {
+      "path": "crates/ui-egui/src/i18n/zh-TW.tsv",
+      "before": null,
+      "after": {
+        "sha256": "da45a090bca4c7eb147dda9c9ecec1292185e8927334b465d09dedbb5ca19e3d",
+        "bytes": 13820
       }
     },
     {

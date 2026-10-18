@@ -1,5 +1,5 @@
 diff --git a/.github/workflows/release.yml b/.github/workflows/release.yml
-index 81efce52a994dc7d157df16a3aa5d9f8258d80f6..2dc01a7e15fb251d7bc76d1035c76be773d3975b 100644
+index 81efce5..2dc01a7 100644
 --- a/.github/workflows/release.yml
 +++ b/.github/workflows/release.yml
 @@ -23,7 +23,7 @@ jobs:
@@ -12,7 +12,7 @@ index 81efce52a994dc7d157df16a3aa5d9f8258d80f6..2dc01a7e15fb251d7bc76d1035c76be7
      secrets:
        APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
 diff --git a/.github/workflows/windows-arm64.yml b/.github/workflows/windows-arm64.yml
-index 24ca8743d934d474e70a2872bd8b58dc92340abf..46d177bcca8384558f848c71f7d90fa79c622d35 100644
+index 24ca874..46d177b 100644
 --- a/.github/workflows/windows-arm64.yml
 +++ b/.github/workflows/windows-arm64.yml
 @@ -29,6 +29,6 @@ jobs:
@@ -25,14 +25,14 @@ index 24ca8743d934d474e70a2872bd8b58dc92340abf..46d177bcca8384558f848c71f7d90fa7
        main-binary: artcraft-launcher.exe
 diff --git a/KIO-FORK.json b/KIO-FORK.json
 new file mode 100644
-index 0000000000000000000000000000000000000000..e68a5ca9afc8bae0cc0c41274a5bfd454c6f0692
+index 0000000..e68a5ca
 --- /dev/null
 +++ b/KIO-FORK.json
 @@ -0,0 +1 @@
 +{"schema":1,"programId":"launcher","displayName":"KIO Launcher","applicationId":"com.kio.launcher","upstream":{"repository":"storytold/craft-launcher","tag":"v0.4.1","commit":"cbae640688c5fa3daa120a7f5e050f8e24148a47","license":"MIT OR Apache-2.0"},"registry":"https://kio-library.vercel.app/downloads/native-apps-manifest.json","artifactRepository":"qptywoei777-rgb/kio-native-apps","privateStudioPubliclyAvailable":false,"originalLegalFilesRetained":true,"replacementArtwork":"Product owner supplied KIO icons; upstream trademarks removed"}
 diff --git a/KIO-FORK.md b/KIO-FORK.md
 new file mode 100644
-index 0000000000000000000000000000000000000000..6912fe0f4da69cd0aa94fcec686ced3cac5b11eb
+index 0000000..6912fe0
 --- /dev/null
 +++ b/KIO-FORK.md
 @@ -0,0 +1,9 @@
@@ -46,7 +46,7 @@ index 0000000000000000000000000000000000000000..6912fe0f4da69cd0aa94fcec686ced3c
 +
 +KIO replacement artwork is supplied by the product owner. Upstream trademark artwork under docs/brand is removed from this fork; its separate license notice is retained. Original machine binary/crate names stay unchanged for full upstream build compatibility.
 diff --git a/apps/artcraft-launcher-web/index.html b/apps/artcraft-launcher-web/index.html
-index 95c446115dba4bab95f2eb182447fbcdbff3a579..4495547fe1ce391612a27399ee091c4842d784b9 100644
+index 95c4461..4495547 100644
 --- a/apps/artcraft-launcher-web/index.html
 +++ b/apps/artcraft-launcher-web/index.html
 @@ -3,9 +3,9 @@
@@ -70,7 +70,7 @@ index 95c446115dba4bab95f2eb182447fbcdbff3a579..4495547fe1ce391612a27399ee091c48
  </body>
  </html>
 diff --git a/apps/artcraft-launcher-web/src/main.rs b/apps/artcraft-launcher-web/src/main.rs
-index e4642b5094d27e43fb48a0a40231ae83126c64c0..4e1bee1a3a7005b16570d71585cbfeccc98743da 100644
+index e4642b5..4e1bee1 100644
 --- a/apps/artcraft-launcher-web/src/main.rs
 +++ b/apps/artcraft-launcher-web/src/main.rs
 @@ -1,6 +1,6 @@
@@ -83,7 +83,7 @@ index e4642b5094d27e43fb48a0a40231ae83126c64c0..4e1bee1a3a7005b16570d71585cbfecc
  //! right download for the visitor's system.
  
 diff --git a/apps/artcraft-launcher-web/src/web.rs b/apps/artcraft-launcher-web/src/web.rs
-index dbe031fd264e1b69cffaeeaa59634aa0f5b51d25..e1f2eb0bcd169cb72584e776b5bb8e1fac0b4186 100644
+index dbe031f..e1f2eb0 100644
 --- a/apps/artcraft-launcher-web/src/web.rs
 +++ b/apps/artcraft-launcher-web/src/web.rs
 @@ -5,7 +5,7 @@ use std::rc::Rc;
@@ -180,7 +180,7 @@ index dbe031fd264e1b69cffaeeaa59634aa0f5b51d25..e1f2eb0bcd169cb72584e776b5bb8e1f
  
  /// The visitor's OS and CPU, as far as the browser says.
 diff --git a/apps/artcraft-launcher/build.rs b/apps/artcraft-launcher/build.rs
-index 10ea99d27e2971a56182dc4aad0f1040ae559fb5..fc951b4a9faa485d4dd7cfd1537303314b06b149 100644
+index 10ea99d..fc951b4 100644
 --- a/apps/artcraft-launcher/build.rs
 +++ b/apps/artcraft-launcher/build.rs
 @@ -13,9 +13,9 @@ fn main() {
@@ -197,7 +197,7 @@ index 10ea99d27e2971a56182dc4aad0f1040ae559fb5..fc951b4a9faa485d4dd7cfd153730331
          .set("OriginalFilename", "artcraft-launcher.exe")
          .set("InternalName", "artcraft-launcher");
 diff --git a/apps/artcraft-launcher/src/main.rs b/apps/artcraft-launcher/src/main.rs
-index 3806d42823e05821da3157f2b1c5e1adb6f537c2..2fd6a901353d2f9ab28aae235a3e9a463e3b426f 100644
+index 3806d42..2fd6a90 100644
 --- a/apps/artcraft-launcher/src/main.rs
 +++ b/apps/artcraft-launcher/src/main.rs
 @@ -1,4 +1,4 @@
@@ -256,7 +256,7 @@ index 3806d42823e05821da3157f2b1c5e1adb6f537c2..2fd6a901353d2f9ab28aae235a3e9a46
              n.app_id(APP_ID);
              #[cfg(all(unix, not(target_os = "macos")))]
 diff --git a/apps/artcraft-launcher/src/tray.rs b/apps/artcraft-launcher/src/tray.rs
-index 9627fd655b2670432904b9d25bec2c2c5f109fa5..7f7b9b47829283df7eef1b95c0bdd36eb9970a6f 100644
+index 9627fd6..7f7b9b4 100644
 --- a/apps/artcraft-launcher/src/tray.rs
 +++ b/apps/artcraft-launcher/src/tray.rs
 @@ -31,9 +31,9 @@ fn load_icon() -> Result<tray_icon::Icon, String> {
@@ -33971,7 +33971,7 @@ zIcX!=p(tLn4UV^jMKuExURRY5o&td1-HTfQa_IlZOZ)$EVNiv|1G~P4p^cni|N8~U
 Fe*vuoGEx8l
 
 diff --git a/assets/app-icon/artcraft-launcher.svg b/assets/app-icon/artcraft-launcher.svg
-index 72e191f8ab8a4e142c2ee860bc21ee3e074723fc..a557e8e6913f4d9a0732945aac72522787ae2083 100644
+index 72e191f..a557e8e 100644
 --- a/assets/app-icon/artcraft-launcher.svg
 +++ b/assets/app-icon/artcraft-launcher.svg
 @@ -1,4 +1 @@
@@ -41000,7 +41000,7 @@ HcmV?d00001
 
 diff --git a/assets/app-icon/hicolor/scalable/apps/ai.storyteller.artcraft-launcher.svg b/assets/app-icon/hicolor/scalable/apps/ai.storyteller.artcraft-launcher.svg
 deleted file mode 100644
-index 72e191f8ab8a4e142c2ee860bc21ee3e074723fc..0000000000000000000000000000000000000000
+index 72e191f..0000000
 --- a/assets/app-icon/hicolor/scalable/apps/ai.storyteller.artcraft-launcher.svg
 +++ /dev/null
 @@ -1,4 +0,0 @@
@@ -41010,7 +41010,7 @@ index 72e191f8ab8a4e142c2ee860bc21ee3e074723fc..00000000000000000000000000000000
 -</svg>
 diff --git a/assets/app-icon/hicolor/scalable/apps/com.kio.launcher.svg b/assets/app-icon/hicolor/scalable/apps/com.kio.launcher.svg
 new file mode 100644
-index 0000000000000000000000000000000000000000..a557e8e6913f4d9a0732945aac72522787ae2083
+index 0000000..a557e8e
 --- /dev/null
 +++ b/assets/app-icon/hicolor/scalable/apps/com.kio.launcher.svg
 @@ -0,0 +1 @@
@@ -48773,7 +48773,7 @@ HcmV?d00001
 
 diff --git a/assets/app-icon/kio.svg b/assets/app-icon/kio.svg
 new file mode 100644
-index 0000000000000000000000000000000000000000..a557e8e6913f4d9a0732945aac72522787ae2083
+index 0000000..a557e8e
 --- /dev/null
 +++ b/assets/app-icon/kio.svg
 @@ -0,0 +1 @@
@@ -145020,7 +145020,7 @@ zLqog$2V1on>H|baB@c=@!glpOe=~XPo}r~sD7M-GNs}FswpbR~_c~?>$sp?XQMHZg
 gT@-NEn$kt#1KI{z3WxDEX8-^I07*qoM6N<$f?97sVgLXD
 
 diff --git a/crates/core/src/catalog.rs b/crates/core/src/catalog.rs
-index d13444ccf177681844fea7d89f733a7f8de6925e..90ec812ac0bc456bba9e3de3bb977543f80796c6 100644
+index d13444c..90ec812 100644
 --- a/crates/core/src/catalog.rs
 +++ b/crates/core/src/catalog.rs
 @@ -1,4 +1,4 @@
@@ -145296,7 +145296,7 @@ index d13444ccf177681844fea7d89f733a7f8de6925e..90ec812ac0bc456bba9e3de3bb977543
      }
  }
 diff --git a/crates/core/src/details.rs b/crates/core/src/details.rs
-index 4ffe83f94de9b99259f24e85a4eac0993011fef6..f5815da56b70fc7fe1d654febbf6a6c5b32373b0 100644
+index 4ffe83f..f5815da 100644
 --- a/crates/core/src/details.rs
 +++ b/crates/core/src/details.rs
 @@ -73,7 +73,7 @@ pub const DETAILS: [AppDetails; 13] = [
@@ -145309,7 +145309,7 @@ index 4ffe83f94de9b99259f24e85a4eac0993011fef6..f5815da56b70fc7fe1d654febbf6a6c5
          features: &[
              feature("Native GPU canvas", "No Electron and no web view: a fast native compositor."),
 diff --git a/crates/core/src/feed.rs b/crates/core/src/feed.rs
-index 4d24d8f2f77170816a4aecabf936ff5a5ad82574..542c6f624c75004429c447e47ed37e94ec2c75be 100644
+index 4d24d8f..542c6f6 100644
 --- a/crates/core/src/feed.rs
 +++ b/crates/core/src/feed.rs
 @@ -23,7 +23,7 @@ use crate::time::parse_rfc3339;
@@ -145449,7 +145449,7 @@ index 4d24d8f2f77170816a4aecabf936ff5a5ad82574..542c6f624c75004429c447e47ed37e94
      }
 diff --git a/crates/core/src/kio_registry.rs b/crates/core/src/kio_registry.rs
 new file mode 100644
-index 0000000000000000000000000000000000000000..b0ac5f40dabf10a6d7d3b3daa33f1ed9a8e4e634
+index 0000000..b0ac5f4
 --- /dev/null
 +++ b/crates/core/src/kio_registry.rs
 @@ -0,0 +1,206 @@
@@ -145660,7 +145660,7 @@ index 0000000000000000000000000000000000000000..b0ac5f40dabf10a6d7d3b3daa33f1ed9
 +    }
 +}
 diff --git a/crates/core/src/lib.rs b/crates/core/src/lib.rs
-index 592f4ad133b0a62ee006950a2ee89faa2195e86b..a2c47676863415db4be5c34d87017b796ef85411 100644
+index 592f4ad..a2c4767 100644
 --- a/crates/core/src/lib.rs
 +++ b/crates/core/src/lib.rs
 @@ -1,7 +1,7 @@
@@ -145682,7 +145682,7 @@ index 592f4ad133b0a62ee006950a2ee89faa2195e86b..a2c47676863415db4be5c34d87017b79
  pub mod protocol;
  pub mod release;
 diff --git a/crates/core/src/platform.rs b/crates/core/src/platform.rs
-index 398b34d1b6b991feb78bb0c45a57ea2a7ccd6732..0e996360cffe8d0cf7cfe55f007f1c306eeb6be3 100644
+index 398b34d..0e99636 100644
 --- a/crates/core/src/platform.rs
 +++ b/crates/core/src/platform.rs
 @@ -143,7 +143,9 @@ impl Platform {
@@ -145716,7 +145716,7 @@ index 398b34d1b6b991feb78bb0c45a57ea2a7ccd6732..0e996360cffe8d0cf7cfe55f007f1c30
          assert!(parse_asset_name("figcraft-0.5.1-linux-x86_64.tar.gz", &["figcraft"]).is_some());
      }
 diff --git a/crates/core/src/protocol.rs b/crates/core/src/protocol.rs
-index b183995e7548e55fd20fc176b144c25f8212f677..7ad1503d406729bb3ac5448dd224791deada4a92 100644
+index b183995..7ad1503 100644
 --- a/crates/core/src/protocol.rs
 +++ b/crates/core/src/protocol.rs
 @@ -41,7 +41,7 @@ pub enum Command {
@@ -145738,7 +145738,7 @@ index b183995e7548e55fd20fc176b144c25f8212f677..7ad1503d406729bb3ac5448dd224791d
      /// The new launcher is in place (or will be, once this one exits): quit now so it can start.
      LauncherRestarting,
 diff --git a/crates/core/src/release.rs b/crates/core/src/release.rs
-index 1f2998da0a304a6a32e6655d795a87e0eb570a1d..5a9637e039ab76205c9fbd00947c7cbfcf28f560 100644
+index 1f2998d..5a9637e 100644
 --- a/crates/core/src/release.rs
 +++ b/crates/core/src/release.rs
 @@ -24,7 +24,7 @@ pub struct Asset {
@@ -145769,7 +145769,7 @@ index 1f2998da0a304a6a32e6655d795a87e0eb570a1d..5a9637e039ab76205c9fbd00947c7cbf
          assert_eq!(r.assets.len(), 1);
          assert_eq!(r.assets[0].sha256.as_deref(), Some(HASH));
 diff --git a/crates/core/src/status.rs b/crates/core/src/status.rs
-index 43459c3703c4be4e4d96954275cb0cba73efd088..629e58eec031f79a505dfd0b428915e4c6673e38 100644
+index 43459c3..629e58e 100644
 --- a/crates/core/src/status.rs
 +++ b/crates/core/src/status.rs
 @@ -30,7 +30,7 @@ pub enum InstallSource {
@@ -145801,7 +145801,7 @@ index 43459c3703c4be4e4d96954275cb0cba73efd088..629e58eec031f79a505dfd0b428915e4
 +    }
  }
 diff --git a/crates/core/src/version.rs b/crates/core/src/version.rs
-index 0beceef15a3c2396b4e5784ece23759ca2b04d2d..9785c19bccde6ee8ca3730c26e1c2b0ab9a2c0ff 100644
+index 0beceef..9785c19 100644
 --- a/crates/core/src/version.rs
 +++ b/crates/core/src/version.rs
 @@ -10,6 +10,7 @@ pub use semver::Version;
@@ -145879,7 +145879,7 @@ index 0beceef15a3c2396b4e5784ece23759ca2b04d2d..9785c19bccde6ee8ca3730c26e1c2b0a
 +    }
  }
 diff --git a/crates/native/src/backend.rs b/crates/native/src/backend.rs
-index 04d78f52e772112ccd8308fdce2c84a1b0026a64..e038fe00d113c5b24b11805bd5509c0f18dd64a2 100644
+index 04d78f5..e038fe0 100644
 --- a/crates/native/src/backend.rs
 +++ b/crates/native/src/backend.rs
 @@ -15,12 +15,13 @@ use artcraft_launcher_core::protocol::{
@@ -146175,7 +146175,7 @@ index 04d78f52e772112ccd8308fdce2c84a1b0026a64..e038fe00d113c5b24b11805bd5509c0f
  
      #[test]
 diff --git a/crates/native/src/desktop_entry.rs b/crates/native/src/desktop_entry.rs
-index 0a519f57af769d0f251090ab9032b79e2d0b9246..3f37b1f77e5f4f6b1f07bf2b1110bffd95a14daa 100644
+index 0a519f5..3f37b1f 100644
 --- a/crates/native/src/desktop_entry.rs
 +++ b/crates/native/src/desktop_entry.rs
 @@ -144,9 +144,9 @@ mod tests {
@@ -146211,7 +146211,7 @@ index 0a519f57af769d0f251090ab9032b79e2d0b9246..3f37b1f77e5f4f6b1f07bf2b1110bffd
          assert!(!is_ours(theirs));
          assert_eq!(exec_program("[Desktop Entry]\nExec=photocraft %F\n").as_deref(), Some("photocraft"));
 diff --git a/crates/native/src/detect.rs b/crates/native/src/detect.rs
-index bb10123bb25cb7b6e478b90281abe1bb45ca2971..535d0bac9b2505a5ebce33788419862e45fab8cd 100644
+index bb10123..535d0ba 100644
 --- a/crates/native/src/detect.rs
 +++ b/crates/native/src/detect.rs
 @@ -36,6 +36,30 @@ impl Snapshot {
@@ -146547,7 +146547,7 @@ index bb10123bb25cb7b6e478b90281abe1bb45ca2971..535d0bac9b2505a5ebce33788419862e
      }
  }
 diff --git a/crates/native/src/http.rs b/crates/native/src/http.rs
-index 8a304489e59b32b6ed07c22b099c30368a542c23..4a104612974162056ac87c7d88f97283cbaebdf3 100644
+index 8a30448..4a10461 100644
 --- a/crates/native/src/http.rs
 +++ b/crates/native/src/http.rs
 @@ -9,7 +9,7 @@ use std::time::Duration;
@@ -146578,7 +146578,7 @@ index 8a304489e59b32b6ed07c22b099c30368a542c23..4a104612974162056ac87c7d88f97283
                  return Ok(());
              }
 diff --git a/crates/native/src/install.rs b/crates/native/src/install.rs
-index b33c62a2bcfa24326500bf99be6c9f38af509586..b2efb98591c596f825da2c26f0918e475c6ebe5e 100644
+index b33c62a..b2efb98 100644
 --- a/crates/native/src/install.rs
 +++ b/crates/native/src/install.rs
 @@ -68,7 +68,7 @@ pub fn install(
@@ -146828,7 +146828,7 @@ index b33c62a2bcfa24326500bf99be6c9f38af509586..b2efb98591c596f825da2c26f0918e47
          #[test]
          #[ignore = "needs a Craft App from a real release"]
 diff --git a/crates/native/src/lib.rs b/crates/native/src/lib.rs
-index 3d83fc5514fe151f8d55ad97fcbe533336a52bde..f24250378b3e72bce1c06d3a2e4d1f9f54d8c642 100644
+index 3d83fc5..f242503 100644
 --- a/crates/native/src/lib.rs
 +++ b/crates/native/src/lib.rs
 @@ -1,4 +1,4 @@
@@ -146838,7 +146838,7 @@ index 3d83fc5514fe151f8d55ad97fcbe533336a52bde..f24250378b3e72bce1c06d3a2e4d1f9f
  //! [`NativeBackend`] runs every slow thing (HTTP, scanning disks, installers) on worker threads
  //! and reports back through [`Event`](artcraft_launcher_core::protocol::Event)s, so the UI never
 diff --git a/crates/native/src/login.rs b/crates/native/src/login.rs
-index 138d17afd60d24b1e1b30f143bd0e2ee34037720..7b99d315f2fb1021794669665201b123c079178f 100644
+index 138d17a..7b99d31 100644
 --- a/crates/native/src/login.rs
 +++ b/crates/native/src/login.rs
 @@ -1,4 +1,4 @@
@@ -146887,7 +146887,7 @@ index 138d17afd60d24b1e1b30f143bd0e2ee34037720..7b99d315f2fb1021794669665201b123
          crate::paths::write_atomic(&path, entry.as_bytes())
      }
 diff --git a/crates/native/src/manifest.rs b/crates/native/src/manifest.rs
-index 923cd1125b4121252a58bffb5592a62ef4a8b9e6..d298089acf45d4823431bd9e7f6713e6ed94f3e1 100644
+index 923cd11..d298089 100644
 --- a/crates/native/src/manifest.rs
 +++ b/crates/native/src/manifest.rs
 @@ -26,6 +26,16 @@ pub struct Record {
@@ -146908,7 +146908,7 @@ index 923cd1125b4121252a58bffb5592a62ef4a8b9e6..d298089acf45d4823431bd9e7f6713e6
  
  impl Manifest {
 diff --git a/crates/native/src/packages.rs b/crates/native/src/packages.rs
-index 7af538c10d9cfbf0c09baabad614b49a165a1b75..0f820a6711d563b05310bb28fd448a4ca8dce7fc 100644
+index 7af538c..0f820a6 100644
 --- a/crates/native/src/packages.rs
 +++ b/crates/native/src/packages.rs
 @@ -66,7 +66,7 @@ pub fn parse_flatpak_info(text: &str) -> Option<String> {
@@ -146973,7 +146973,7 @@ index 7af538c10d9cfbf0c09baabad614b49a165a1b75..0f820a6711d563b05310bb28fd448a4c
          assert_eq!(hit.manager, InstallSource::Deb);
          // 0.5.0-1 is the 0.5.0 release, not a pre-release of it.
 diff --git a/crates/native/src/paths.rs b/crates/native/src/paths.rs
-index 83b31dca1fde743c91693ed5b92f9df1049f9cd4..a25a2fc99d473b4f860f03187cb37f0c6f3658b7 100644
+index 83b31dc..a25a2fc 100644
 --- a/crates/native/src/paths.rs
 +++ b/crates/native/src/paths.rs
 @@ -11,7 +11,7 @@ pub struct Paths {
@@ -146998,7 +146998,7 @@ index 83b31dca1fde743c91693ed5b92f9df1049f9cd4..a25a2fc99d473b4f860f03187cb37f0c
 +    dir.join("portable.txt").is_file().then(|| dir.join("KIO-Launcher-Data"))
  }
 diff --git a/crates/native/src/process.rs b/crates/native/src/process.rs
-index fc8d30486d178af3719f671d5a3ce6f732e11165..9f8209c83f52282829cb850a41cafe2484910705 100644
+index fc8d304..9f8209c 100644
 --- a/crates/native/src/process.rs
 +++ b/crates/native/src/process.rs
 @@ -292,10 +292,10 @@ mod tests {
@@ -147038,7 +147038,7 @@ index fc8d30486d178af3719f671d5a3ce6f732e11165..9f8209c83f52282829cb850a41cafe24
      }
  }
 diff --git a/crates/native/src/self_update.rs b/crates/native/src/self_update.rs
-index 7110b1b247a2899b75850abc1fefe65e2e00ebad..9af2241f1c508655cc83bdcd39e28416f2a177b8 100644
+index 7110b1b..9af2241 100644
 --- a/crates/native/src/self_update.rs
 +++ b/crates/native/src/self_update.rs
 @@ -1,4 +1,4 @@
@@ -147186,7 +147186,7 @@ index 7110b1b247a2899b75850abc1fefe65e2e00ebad..9af2241f1c508655cc83bdcd39e28416
  
      #[test]
 diff --git a/crates/native/src/single_instance.rs b/crates/native/src/single_instance.rs
-index 180a6b21c3b897a5b1d1dafb6105b2d4947893f5..ca226a0abb8969ef27a7d2fdd373fb72c36a5787 100644
+index 180a6b2..ca226a0 100644
 --- a/crates/native/src/single_instance.rs
 +++ b/crates/native/src/single_instance.rs
 @@ -23,13 +23,13 @@ use std::time::{Duration, Instant};
@@ -147247,7 +147247,7 @@ index 180a6b21c3b897a5b1d1dafb6105b2d4947893f5..ca226a0abb8969ef27a7d2fdd373fb72
          assert_eq!(verdict(b"", &v("0.1.2")), Answer::Legacy);
      }
 diff --git a/crates/native/src/source.rs b/crates/native/src/source.rs
-index c190ae7a0eea762b12dc2070774b0fff5f1ec6a0..6cfabd892aa5d39129daeb2dcbbd41382951555a 100644
+index c190ae7..6cfabd8 100644
 --- a/crates/native/src/source.rs
 +++ b/crates/native/src/source.rs
 @@ -179,3 +179,22 @@ impl ReleaseSource for GitHubSource {
@@ -147274,7 +147274,7 @@ index c190ae7a0eea762b12dc2070774b0fff5f1ec6a0..6cfabd892aa5d39129daeb2dcbbd4138
 +    fn save(&self) {}
 +}
 diff --git a/crates/ui-egui/src/app.rs b/crates/ui-egui/src/app.rs
-index 5e0f9229962c5f059de1fdd6616062f4999fb9ff..499dca6f12258b53670fc53fe06771e9a5d22eb3 100644
+index 5e0f922..499dca6 100644
 --- a/crates/ui-egui/src/app.rs
 +++ b/crates/ui-egui/src/app.rs
 @@ -437,7 +437,7 @@ impl LauncherUi {
@@ -147286,8 +147286,91 @@ index 5e0f9229962c5f059de1fdd6616062f4999fb9ff..499dca6f12258b53670fc53fe06771e9
                      (crate::i18n::fmt(tl!("{name} {v} is available"), &[("name", name), ("v", v)]), body)
                  }
                  many => {
+diff --git a/crates/ui-egui/src/cjk_font.rs b/crates/ui-egui/src/cjk_font.rs
+index a02e030..e34b4d8 100644
+--- a/crates/ui-egui/src/cjk_font.rs
++++ b/crates/ui-egui/src/cjk_font.rs
+@@ -39,7 +39,9 @@ fn face_metrics(data: &[u8], index: u32) -> (f32, f32) {
+ fn script_name(script: Script) -> &'static str {
+     match script {
+         Script::Chinese => "Chinese",
++        Script::TraditionalChinese => "Traditional Chinese",
+         Script::Japanese => "Japanese",
++        Script::Korean => "Korean",
+     }
+ }
+ 
+@@ -47,7 +49,9 @@ fn script_name(script: Script) -> &'static str {
+ fn script_families(script: Script) -> &'static str {
+     match script {
+         Script::Chinese => "PingFang SC, Hiragino Sans GB, Heiti SC, Microsoft YaHei, SimSun, Noto Sans CJK SC and WenQuanYi",
++        Script::TraditionalChinese => "PingFang TC, Heiti TC, Microsoft JhengHei, MingLiU and Noto Sans CJK TC",
+         Script::Japanese => "Hiragino Sans, Yu Gothic, Meiryo, MS Gothic, Noto Sans CJK JP, Noto Sans JP, IPAGothic and TakaoGothic",
++        Script::Korean => "Apple SD Gothic Neo, Malgun Gothic and Noto Sans CJK KR",
+     }
+ }
+ 
+@@ -122,10 +126,58 @@ pub(crate) fn face_index(data: &[u8], family: &str) -> Option<u32> {
+ fn candidates(script: Script) -> Vec<Candidate> {
+     match script {
+         Script::Chinese => chinese_candidates(),
++        Script::TraditionalChinese => traditional_candidates(),
+         Script::Japanese => japanese_candidates(),
++        Script::Korean => korean_candidates(),
+     }
+ }
+ 
++/// Use the installed regional face without redistributing operating-system fonts.
++fn traditional_candidates() -> Vec<Candidate> {
++    let mut out = Vec::new();
++    #[cfg(target_os = "macos")]
++    {
++        out.push(Candidate { path: "/System/Library/Fonts/PingFang.ttc".into(), family: "PingFang TC" });
++        for path in mac_font_assets("PingFang.ttc") {
++            out.push(Candidate { path, family: "PingFang TC" });
++        }
++        out.push(Candidate { path: "/System/Library/Fonts/STHeiti Medium.ttc".into(), family: "Heiti TC" });
++    }
++    #[cfg(target_os = "windows")]
++    {
++        let root = std::env::var_os("SystemRoot").map_or_else(|| PathBuf::from(r"C:\Windows"), PathBuf::from);
++        out.push(Candidate { path: root.join("Fonts/msjh.ttc"), family: "Microsoft JhengHei" });
++        out.push(Candidate { path: root.join("Fonts/mingliu.ttc"), family: "MingLiU" });
++    }
++    #[cfg(all(unix, not(target_os = "macos")))]
++    for dir in ["/usr/share/fonts/opentype/noto", "/usr/share/fonts/noto-cjk", "/usr/local/share/fonts/noto"] {
++        for file in ["NotoSansCJK-Regular.ttc", "NotoSansCJKtc-Regular.otf"] {
++            out.push(Candidate { path: Path::new(dir).join(file), family: "Noto Sans CJK TC" });
++        }
++    }
++    out
++}
++
++fn korean_candidates() -> Vec<Candidate> {
++    let mut out = Vec::new();
++    #[cfg(target_os = "macos")]
++    for file in ["AppleSDGothicNeo.ttc", "AppleSDGothicNeo.ttf"] {
++        out.push(Candidate { path: Path::new("/System/Library/Fonts").join(file), family: "Apple SD Gothic Neo" });
++    }
++    #[cfg(target_os = "windows")]
++    {
++        let root = std::env::var_os("SystemRoot").map_or_else(|| PathBuf::from(r"C:\Windows"), PathBuf::from);
++        out.push(Candidate { path: root.join("Fonts/malgun.ttf"), family: "Malgun Gothic" });
++    }
++    #[cfg(all(unix, not(target_os = "macos")))]
++    for dir in ["/usr/share/fonts/opentype/noto", "/usr/share/fonts/noto-cjk", "/usr/local/share/fonts/noto"] {
++        for file in ["NotoSansCJK-Regular.ttc", "NotoSansCJKkr-Regular.otf"] {
++            out.push(Candidate { path: Path::new(dir).join(file), family: "Noto Sans CJK KR" });
++        }
++    }
++    out
++}
++
+ /// Where each system keeps a Simplified Chinese font, best first.
+ fn chinese_candidates() -> Vec<Candidate> {
+     let mut out = Vec::new();
 diff --git a/crates/ui-egui/src/dialogs.rs b/crates/ui-egui/src/dialogs.rs
-index 9c7f05ed2cc267534b0b45939d7abb7f7f07e2d6..24f5cfc2bce51a12e8c00ffa0a80f3a1def17957 100644
+index 9c7f05e..62797f5 100644
 --- a/crates/ui-egui/src/dialogs.rs
 +++ b/crates/ui-egui/src/dialogs.rs
 @@ -111,7 +111,7 @@ impl LauncherUi {
@@ -147320,7 +147403,39 @@ index 9c7f05ed2cc267534b0b45939d7abb7f7f07e2d6..24f5cfc2bce51a12e8c00ffa0a80f3a1
                  host.quit();
              }
          };
-@@ -328,7 +328,7 @@ impl LauncherUi {
+@@ -244,10 +244,17 @@ impl LauncherUi {
+         let mut lang_code = self.settings.language.clone();
+         let installed = self.cjk_font;
+         row(ui, tl!("Language"), 180.0, &mut |ui| {
+-            egui::ComboBox::from_id_salt("language").selected_text(Settings::language_label(&lang_code, installed)).width(180.0).show_ui(ui, |ui| {
++            let (rect, _) = ui.allocate_exact_size(egui::vec2(18.0, 18.0), egui::Sense::hover());
++            let stroke = egui::Stroke::new(1.2, ui.visuals().text_color());
++            ui.painter().circle_stroke(rect.center(), 7.0, stroke);
++            ui.painter().add(egui::Shape::ellipse_stroke(rect.center(), egui::vec2(3.5, 7.0), stroke));
++            ui.painter().line_segment([rect.center() - egui::vec2(7.0, 0.0), rect.center() + egui::vec2(7.0, 0.0)], stroke);
++            egui::ComboBox::from_id_salt("language").selected_text(Settings::language_label(&lang_code, installed)).width(220.0).show_ui(ui, |ui| {
+                 ui.selectable_value(&mut lang_code, Settings::LANGUAGE_AUTO.to_string(), tl!("Auto"));
+-                for lang in crate::i18n::Lang::all() {
+-                    ui.selectable_value(&mut lang_code, lang.code().to_string(), Settings::language_label(lang.code(), installed));
++                for lang in crate::i18n::Lang::ordered(crate::i18n::Lang::from_pref(&lang_code)) {
++                    let label = Settings::language_label(lang.code(), installed);
++                    let label = if lang_code == lang.code() { format!("✓ {label}") } else { label };
++                    ui.selectable_value(&mut lang_code, lang.code().to_string(), label);
+                 }
+             });
+         });
+@@ -257,9 +264,7 @@ impl LauncherUi {
+         }
+         let pref = crate::i18n::Lang::from_pref(&self.settings.language);
+         if pref.needs_cjk_font() && !theme::cjk_font_available(pref) {
+-            // In English on purpose: the language asked for can't be drawn.
+-            let note = "No font for this language was found on this system, so the interface stays in English. \
+-                        Installing one (for example Noto Sans CJK) and restarting fixes it.";
++            let note = tl!("No font for this language was found on this system. Install a font for this language and restart KIO Launcher.");
+             ui.add(egui::Label::new(RichText::new(note).size(12.0).color(t.warn)).wrap());
+         }
+ 
+@@ -328,7 +333,7 @@ impl LauncherUi {
                      .on_hover_text(tl!("When on, opening the launcher from the menu bar brings its window to the desktop you're on. When off, macOS switches you to the desktop the window was on."));
              }
              if let Some(mut on) = host.login_item()
@@ -147330,7 +147445,7 @@ index 9c7f05ed2cc267534b0b45939d7abb7f7f07e2d6..24f5cfc2bce51a12e8c00ffa0a80f3a1
              {
                  let ctx = ui.ctx().clone();
 diff --git a/crates/ui-egui/src/i18n/cs.tsv b/crates/ui-egui/src/i18n/cs.tsv
-index 9bfcba5833d5258c644bab8ed81f5b003a4967ec..ee940931eaca8827cc796fd6c0f8bc41aed5d7bb 100644
+index 9bfcba5..f5a53c6 100644
 --- a/crates/ui-egui/src/i18n/cs.tsv
 +++ b/crates/ui-egui/src/i18n/cs.tsv
 @@ -1,4 +1,4 @@
@@ -147416,7 +147531,7 @@ index 9bfcba5833d5258c644bab8ed81f5b003a4967ec..ee940931eaca8827cc796fd6c0f8bc41
  @id	view.grid	Mřížka
  @id	view.table	Tabulka
  @id	filter.all	Vše
-@@ -304,11 +304,11 @@ filter	Installed	Nainstalováno
+@@ -304,11 +304,12 @@ filter	Installed	Nainstalováno
  @id	linux.preferred_kind	Instalovat nové aplikace jako
  @id	tray.close_to_tray	Po zavření okna ponechat spuštěné v oznamovací oblasti
  @id	tray.show_on_current_desktop	Zobrazit okno na aktuální ploše
@@ -147431,8 +147546,9 @@ index 9bfcba5833d5258c644bab8ed81f5b003a4967ec..ee940931eaca8827cc796fd6c0f8bc41
  	Join the ArtCraft Discord	Připojit se na ArtCraft Discord
 -@plural	ArtCraft Launcher · {n} update available|ArtCraft Launcher · {n} updates available	ArtCraft Launcher · {n} dostupná aktualizace|ArtCraft Launcher · {n} dostupné aktualizace|ArtCraft Launcher · {n} dostupných aktualizací
 +@plural	KIO Launcher · {n} update available|KIO Launcher · {n} updates available	KIO Launcher · {n} dostupná aktualizace|KIO Launcher · {n} dostupné aktualizace|KIO Launcher · {n} dostupných aktualizací
++	No font for this language was found on this system. Install a font for this language and restart KIO Launcher.	V systému nebylo nalezeno písmo pro tento jazyk. Nainstalujte vhodné písmo a restartujte KIO Launcher.
 diff --git a/crates/ui-egui/src/i18n/de.tsv b/crates/ui-egui/src/i18n/de.tsv
-index 3145467f9876dbcc0c6ae7dcb0e73b4cef3ca6a8..84f04adaf3d10ff2dddfd4a0bbe096f044b0f8ab 100644
+index 3145467..1139a7a 100644
 --- a/crates/ui-egui/src/i18n/de.tsv
 +++ b/crates/ui-egui/src/i18n/de.tsv
 @@ -1,4 +1,4 @@
@@ -147551,14 +147667,330 @@ index 3145467f9876dbcc0c6ae7dcb0e73b4cef3ca6a8..84f04adaf3d10ff2dddfd4a0bbe096f0
  	Check for Updates	Nach Updates suchen
  	Visit getartcraft.com	getartcraft.com besuchen
  	ArtCraft on GitHub	ArtCraft auf GitHub
-@@ -343,4 +343,4 @@ filter	Installed	Installiert
+@@ -343,4 +343,5 @@ filter	Installed	Installiert
  	Next picture (→)	Nächstes Bild (→)
  	Loading pictures…	Bilder werden geladen…
  	Pictures couldn't be loaded. Reopen this page to try again.	Die Bilder konnten nicht geladen werden. Beim erneuten Öffnen der Seite wird es noch einmal versucht.
 -@plural	ArtCraft Launcher · {n} update available|ArtCraft Launcher · {n} updates available	ArtCraft Launcher · {n} Update verfügbar|ArtCraft Launcher · {n} Updates verfügbar
 +@plural	KIO Launcher · {n} update available|KIO Launcher · {n} updates available	KIO Launcher · {n} Update verfügbar|KIO Launcher · {n} Updates verfügbar
++	No font for this language was found on this system. Install a font for this language and restart KIO Launcher.	Auf diesem System wurde keine Schrift für diese Sprache gefunden. Installieren Sie eine passende Schrift und starten Sie KIO Launcher neu.
+diff --git a/crates/ui-egui/src/i18n/en.tsv b/crates/ui-egui/src/i18n/en.tsv
+new file mode 100644
+index 0000000..b00f846
+--- /dev/null
++++ b/crates/ui-egui/src/i18n/en.tsv
+@@ -0,0 +1,309 @@
++# English source messages. MIT.
++	Launcher	Launcher
++	KIO App Suite	KIO App Suite
++	Open Source Tools for Creatives, Makers, and Builders	Open Source Tools for Creatives, Makers, and Builders
++	Settings	Settings
++	Check for updates	Check for updates
++	Grid	Grid
++	Table	Table
++	Show apps as cards	Show apps as cards
++	Show apps as a table	Show apps as a table
++	All	All
++	Updates	Updates
++	Not installed	Not installed
++	Search apps	Search apps
++	Sort	Sort
++	Suite order	Suite order
++	Name	Name
++	Inspired by	Inspired by
++	Status	Status
++	Installed version	Installed version
++	Latest version	Latest version
++	Newest release	Newest release
++	Discord	Discord
++	GitHub	GitHub
++	Website	Website
++	Classic apps	Classic apps
++	Classic	Classic
++	New apps	New apps
++	NEW	NEW
++	Install	Install
++	Update to {v}	Update to {v}
++	Open	Open
++	Download for {os}	Download for {os}
++	Download	Download
++	Coming soon	Coming soon
++	Checking…	Checking…
++	Not available	Not available
++	Offline	Offline
++	Downloading {done} of {total}	Downloading {done} of {total}
++	Downloading…	Downloading…
++	Reconnecting…	Reconnecting…
++	Verifying…	Verifying…
++	Installing, then restarting…	Installing, then restarting…
++	Installing…	Installing…
++	Removing…	Removing…
++	Pause download	Pause download
++	Cancel download	Cancel download
++	Resume download	Resume download
++	Discard download	Discard download
++	Release notes	Release notes
++	Show in Finder	Show in Finder
++	Show in Explorer	Show in Explorer
++	Show in Files	Show in Files
++	Reinstall	Reinstall
++	Uninstall…	Uninstall…
++	All releases	All releases
++	KIO Launcher {version} is available.	KIO Launcher {version} is available.
++	Dismiss	Dismiss
++	Update and restart	Update and restart
++	A new version is available. Would you like to relaunch with the updated version?	A new version is available. Would you like to relaunch with the updated version?
++	Later	Later
++	What's new	What's new
++	No notes were published with this release.	No notes were published with this release.
++	Released {date}	Released {date}
++	Open on GitHub	Open on GitHub
++	Close	Close
++	KIO Launcher {version}	KIO Launcher {version}
++	Only when I ask	Only when I ask
++	Automatically download and install updates	Automatically download and install updates
++	Notify me when an installed app has an update	Notify me when an installed app has an update
++	Include pre-releases (betas and release candidates)	Include pre-releases (betas and release candidates)
++	Installing on Linux	Installing on Linux
++	Install new apps as	Install new apps as
++	System package (recommended)	System package (recommended)
++	Updates always use the format an app was installed with.	Updates always use the format an app was installed with.
++	Running in the background	Running in the background
++	Keep running in the tray when the window is closed	Keep running in the tray when the window is closed
++	Show the window on the current desktop	Show the window on the current desktop
++	Start KIO Launcher when I log in	Start KIO Launcher when I log in
++	Community	Community
++	Questions, ideas and news from the ArtCraft team	Questions, ideas and news from the ArtCraft team
++	Appearance	Appearance
++	Quit KIO Launcher	Quit KIO Launcher
++	Done	Done
++	Uninstall {name}?	Uninstall {name}?
++	The app will be moved to the Trash. Your documents and settings stay.	The app will be moved to the Trash. Your documents and settings stay.
++	Windows will remove it like any installed program. Your documents and settings stay.	Windows will remove it like any installed program. Your documents and settings stay.
++	Your system's package manager will remove it, and may ask for your password. Your documents and settings stay.	Your system's package manager will remove it, and may ask for your password. Your documents and settings stay.
++	The app will be removed. Your documents and settings stay.	The app will be removed. Your documents and settings stay.
++	Uninstall	Uninstall
++	Cancel	Cancel
++	Checked {ago}	Checked {ago}
++	just now	just now
++	yesterday	yesterday
++	{month} {day}, {year}	{month} {day}, {year}
++	Automatically	Automatically
++	Every Craft app	Every Craft app
++	Apps on this computer	Apps on this computer
++	Installed apps with a newer version	Installed apps with a newer version
++	Apps you can install	Apps you can install
++	Hide App	Hide App
++	Unhide App	Unhide App
++	Hidden Apps	Hidden Apps
++	Apps you hid	Apps you hid
++	Checked {ago} · using {sources}	Checked {ago} · using {sources}
++	{a} and {b}	{a} and {b}
++	Join the Discord	Join the Discord
++	Learn more	Learn more
++	Minimize	Minimize
++	Maximize	Maximize
++	Restore	Restore
++	New	New
++	OK	OK
++	Open link	Open link
++	Update	Update
++	{name} icon	{name} icon
++	Loading KIO Launcher…	Loading KIO Launcher…
++	Cancel update	Cancel update
++	Stop waiting; the update can be started again later	Stop waiting; the update can be started again later
++	Download again	Download again
++	Install cancelled	Install cancelled
++	Install cancelled. The download is kept for the next try.	Install cancelled. The download is kept for the next try.
++	Update cancelled	Update cancelled
++	Uninstall cancelled	Uninstall cancelled
++	Retry install	Retry install
++	Retry update to {version}	Retry update to {version}
++	The download is still here. It's checked again, then installed.	The download is still here. It's checked again, then installed.
++	Waiting for another app…	Waiting for another app…
++	Waiting for other installs…	Waiting for other installs…
++	Installer (.msi)	Installer (.msi)
++	Portable (.zip)	Portable (.zip)
++	Disk image (.dmg)	Disk image (.dmg)
++	Debian package (.deb)	Debian package (.deb)
++	RPM package (.rpm)	RPM package (.rpm)
++	Flatpak bundle	Flatpak bundle
++	Tarball (.tar.gz)	Tarball (.tar.gz)
++photocraft	Image editing	Image editing
++vectorcraft	Vector illustration	Vector illustration
++filmcraft	Video editing, color and sound	Video editing, color and sound
++lightcraft	Photo library and raw development	Photo library and raw development
++pdfcraft	Reading, organizing and protecting PDFs	Reading, organizing and protecting PDFs
++effectcraft	Motion graphics and visual effects	Motion graphics and visual effects
++designcraft	Page layout and publishing	Page layout and publishing
++wordcraft	Writing and document design	Writing and document design
++deckcraft	Presentations and slide shows	Presentations and slide shows
++gridcraft	Spreadsheets and data	Spreadsheets and data
++cadcraft	Computer-aided design and drafting	Computer-aided design and drafting
++soundcraft	Recording, editing and mixing audio	Recording, editing and mixing audio
++figcraft	Interface design and prototyping	Interface design and prototyping
++month	Jan	Jan
++month	Feb	Feb
++month	Mar	Mar
++month	Apr	Apr
++month	May	May
++month	Jun	Jun
++month	Jul	Jul
++month	Aug	Aug
++month	Sep	Sep
++month	Oct	Oct
++month	Nov	Nov
++month	Dec	Dec
++	Not checked yet	Not checked yet
++	GitHub's hourly limit was reached; full details return in {min} min	GitHub's hourly limit was reached; full details return in {min} min
++	GitHub limit hit; back in {min} min	GitHub limit hit; back in {min} min
++	Installing for {platform}	Installing for {platform}
++	Downloads for {platform}	Downloads for {platform}
++	No downloads for this system	No downloads for this system
++	Join the ArtCraft community on Discord	Join the ArtCraft community on Discord
++	ArtCraft on {name}	ArtCraft on {name}
++	Couldn't open {name}: {e}	Couldn't open {name}: {e}
++	Download cancelled	Download cancelled
++	Available to install	Available to install
++	Available	Available
++	Installed · up to date	Installed · up to date
++	Update available	Update available
++	Installed	Installed
++	installed	installed
++	Not available here	Not available here
++	Updating…	Updating…
++	Update paused	Update paused
++	Download paused	Download paused
++	{version} installed → {latest} released	{version} installed → {latest} released
++	Version {version}	Version {version}
++	{installed} installed · latest {latest}	{installed} installed · latest {latest}
++	Installed · latest {latest}	Installed · latest {latest}
++	Version {version} installed	Version {version} installed
++	Version {latest}	Version {latest}
++	No release published yet	No release published yet
++	KIO Launcher	KIO Launcher
++	App	App
++	Latest	Latest
++	Released	Released
++	Auto	Auto
++	Language	Language
++	Ascending	Ascending
++	Descending	Descending
++	Click to reverse the order	Click to reverse the order
++	Click to sort by this column	Click to sort by this column
++	Like {name}	Like {name}
++	{done} of {total}	{done} of {total}
++	Downloading	Downloading
++	Verifying checksum…	Verifying checksum…
++	Resume	Resume
++	{done} of {total} downloaded	{done} of {total} downloaded
++	{done} downloaded	{done} downloaded
++	Checking for updates…	Checking for updates…
++	Downloads the new version, replaces this one and opens it again	Downloads the new version, replaces this one and opens it again
++	Couldn't check for updates: {f}	Couldn't check for updates: {f}
++	Website (coming soon)	Website (coming soon)
++	GitHub repository	GitHub repository
++	ArtCraft	ArtCraft
++	Update 1 app	Update 1 app
++	Update all ({count})	Update all ({count})
++	⊞  Grid	⊞  Grid
++	☰  Table	☰  Table
++	🔍  Search apps	🔍  Search apps
++	{name} {version}	{name} {version}
++	Match system	Match system
++	Dark	Dark
++	Light	Light
++	Full changelog	Full changelog
++	link	link
++	No apps match	No apps match
++	Open KIO Launcher to update.	Open KIO Launcher to update.
++	{name} {v} is available	{name} {v} is available
++	{count} updates are available	{count} updates are available
++	These notes weren't fetched (GitHub's request limit was reached). They're on the release page.	These notes weren't fetched (GitHub's request limit was reached). They're on the release page.
++	When on, opening the launcher from the menu bar brings its window to the desktop you're on. When off, macOS switches you to the desktop the window was on.	When on, opening the launcher from the menu bar brings its window to the desktop you're on. When off, macOS switches you to the desktop the window was on.
++	Couldn't change the login item: {e}	Couldn't change the login item: {e}
++column	App	App
++column	Installed	Installed
++column	Latest	Latest
++column	Released	Released
++filter	Installed	Installed
++	App details	App details
++	Close (Esc)	Close (Esc)
++	Features	Features
++	Latest release	Latest release
++	Version	Version
++	Platforms	Platforms
++	Releases	Releases
++	Enlarge picture	Enlarge picture
++	Click to enlarge	Click to enlarge
++	Previous picture (←)	Previous picture (←)
++	Next picture (→)	Next picture (→)
++	Loading pictures…	Loading pictures…
++	Pictures couldn't be loaded. Reopen this page to try again.	Pictures couldn't be loaded. Reopen this page to try again.
++	{name} details	{name} details
++@plural	{n} app|{n} apps	{n} app|{n} apps
++@plural	{n} min ago|{n} min ago	{n} min ago|{n} min ago
++@plural	{n} h ago|{n} h ago	{n} h ago|{n} h ago
++@plural	{n} day ago|{n} days ago	{n} day ago|{n} days ago
++@msg	Couldn't open {name}: {e}	Couldn't open {name}: {e}
++@msg	Download cancelled	Download cancelled
++@msg	{name} updated to {version}	{name} updated to {version}
++@msg	{name} installed: {version}	{name} installed: {version}
++@msg	{name} updated to {version} (this release publishes no checksum, so only its size was checked)	{name} updated to {version} (this release publishes no checksum, so only its size was checked)
++@msg	{name} installed: {version} (this release publishes no checksum, so only its size was checked)	{name} installed: {version} (this release publishes no checksum, so only its size was checked)
++@msg	{name} was removed	{name} was removed
++@msg	{name} is running. Quit it, then try again.	{name} is running. Quit it, then try again.
++@id	app.install	Install
++@id	app.update	Update to {v}
++@id	app.open	Open
++@id	app.download	Download for {os}
++@id	app.reveal	Show in Finder
++@id	app.reinstall	Reinstall
++@id	app.uninstall	Uninstall…
++@id	app.notes	Release notes
++@id	app.website	Website
++@id	app.github	GitHub repository
++@id	app.releases	All releases
++@id	launcher.update	Update and restart
++@id	launcher.download	Download
++@id	launcher.notes	What's new
++@id	launcher.dismiss	Dismiss
++@id	settings.open	Settings
++@id	settings.quit	Quit KIO Launcher
++@id	view.grid	Grid
++@id	view.table	Table
++@id	filter.all	All
++@id	filter.installed	Installed
++@id	filter.updates	Updates
++@id	filter.notinstalled	Not installed
++@id	sort.suite	Suite order
++@id	sort.name	Name
++@id	sort.inspired	Inspired by
++@id	sort.status	Status
++@id	sort.installed	Installed version
++@id	sort.latest	Latest version
++@id	sort.released	Newest release
++@id	help.discord	Discord
++@id	help.github	GitHub
++@id	help.website	Website
++@id	update.check	Check for updates
++@id	update.check_auto	Check for updates automatically
++@id	update.notify	Notify me when an installed app has an update
++@id	update.prereleases	Include pre-releases (betas and release candidates)
++@id	linux.preferred_kind	Install new apps as
++@id	tray.close_to_tray	Keep running in the tray when the window is closed
++@id	tray.show_on_current_desktop	Show the window on the current desktop
++@id	tray.login_item	Start KIO Launcher when I log in
++@id	appearance.theme	Appearance
++	Show KIO Launcher	Show KIO Launcher
++	Check for Updates	Check for Updates
++	Visit getartcraft.com	Visit getartcraft.com
++	ArtCraft on GitHub	ArtCraft on GitHub
++	Join the ArtCraft Discord	Join the ArtCraft Discord
++@plural	KIO Launcher · {n} update available|KIO Launcher · {n} updates available	KIO Launcher · {n} update available|KIO Launcher · {n} updates available
++	No font for this language was found on this system. Install a font for this language and restart KIO Launcher.	No font for this language was found on this system. Install a font for this language and restart KIO Launcher.
 diff --git a/crates/ui-egui/src/i18n/es.tsv b/crates/ui-egui/src/i18n/es.tsv
-index f5a016393016ca786e66c5ca3ff0ca30977fe5f6..cab3b712b3da1a22c0f8be26a915e128db7e480f 100644
+index f5a0163..641e77c 100644
 --- a/crates/ui-egui/src/i18n/es.tsv
 +++ b/crates/ui-egui/src/i18n/es.tsv
 @@ -1,4 +1,4 @@
@@ -147668,7 +148100,7 @@ index f5a016393016ca786e66c5ca3ff0ca30977fe5f6..cab3b712b3da1a22c0f8be26a915e128
  @id	view.grid	Cuadrícula
  @id	view.table	Tabla
  @id	filter.all	Todas
-@@ -317,11 +317,11 @@ filter	Installed	Instaladas
+@@ -317,11 +317,12 @@ filter	Installed	Instaladas
  @id	linux.preferred_kind	Instalar las aplicaciones nuevas como
  @id	tray.close_to_tray	Seguir abierto en la bandeja del sistema al cerrar la ventana
  @id	tray.show_on_current_desktop	Mostrar la ventana en el escritorio actual
@@ -147683,8 +148115,9 @@ index f5a016393016ca786e66c5ca3ff0ca30977fe5f6..cab3b712b3da1a22c0f8be26a915e128
  	Join the ArtCraft Discord	Únete al Discord de ArtCraft
 -@plural	ArtCraft Launcher · {n} update available|ArtCraft Launcher · {n} updates available	ArtCraft Launcher · {n} actualización disponible|ArtCraft Launcher · {n} actualizaciones disponibles
 +@plural	KIO Launcher · {n} update available|KIO Launcher · {n} updates available	KIO Launcher · {n} actualización disponible|KIO Launcher · {n} actualizaciones disponibles
++	No font for this language was found on this system. Install a font for this language and restart KIO Launcher.	No se encontró ninguna fuente para este idioma en el sistema. Instale una fuente adecuada y reinicie KIO Launcher.
 diff --git a/crates/ui-egui/src/i18n/fr.tsv b/crates/ui-egui/src/i18n/fr.tsv
-index 2d89a4c0554745edab2a9711a1a8dcfa05e48f34..23204836aa6ea1d31529dce4f710509991d1e4db 100644
+index 2d89a4c..090fee2 100644
 --- a/crates/ui-egui/src/i18n/fr.tsv
 +++ b/crates/ui-egui/src/i18n/fr.tsv
 @@ -1,4 +1,4 @@
@@ -147800,14 +148233,15 @@ index 2d89a4c0554745edab2a9711a1a8dcfa05e48f34..23204836aa6ea1d31529dce4f7105099
  	Check for Updates	Rechercher des mises à jour
  	Visit getartcraft.com	Visiter getartcraft.com
  	ArtCraft on GitHub	ArtCraft sur GitHub
-@@ -341,4 +341,4 @@ filter	Installed	Installées
+@@ -341,4 +341,5 @@ filter	Installed	Installées
  	Next picture (→)	Image suivante (→)
  	Loading pictures…	Chargement des images…
  	Pictures couldn't be loaded. Reopen this page to try again.	Impossible de charger les images. Rouvrir la page permet de réessayer.
 -@plural	ArtCraft Launcher · {n} update available|ArtCraft Launcher · {n} updates available	ArtCraft Launcher · {n} mise à jour disponible|ArtCraft Launcher · {n} mises à jour disponibles
 +@plural	KIO Launcher · {n} update available|KIO Launcher · {n} updates available	KIO Launcher · {n} mise à jour disponible|KIO Launcher · {n} mises à jour disponibles
++	No font for this language was found on this system. Install a font for this language and restart KIO Launcher.	Aucune police pour cette langue n’a été trouvée sur ce système. Installez une police adaptée, puis redémarrez KIO Launcher.
 diff --git a/crates/ui-egui/src/i18n/hu.tsv b/crates/ui-egui/src/i18n/hu.tsv
-index 8915ab7b7cf8ef5e28283fe56b0d993d35d2ca52..c5a598d288912b519d288547502c9c5d59efd9be 100644
+index 8915ab7..2d90ca6 100644
 --- a/crates/ui-egui/src/i18n/hu.tsv
 +++ b/crates/ui-egui/src/i18n/hu.tsv
 @@ -1,4 +1,4 @@
@@ -147908,7 +148342,7 @@ index 8915ab7b7cf8ef5e28283fe56b0d993d35d2ca52..c5a598d288912b519d288547502c9c5d
  	Couldn't change the login item: {e}	Az automatikus indítás beállítását nem sikerült módosítani: {e}
  
  # Contextual: table column headers
-@@ -335,13 +335,13 @@ filter	Installed	Telepítve
+@@ -335,13 +335,14 @@ filter	Installed	Telepítve
  @id	linux.preferred_kind	Új alkalmazások csomagformátuma
  @id	tray.close_to_tray	Az ablak bezárásakor kerüljön a tálcára
  @id	tray.show_on_current_desktop	Ablak megjelenítése az aktuális asztalon
@@ -147925,8 +148359,9 @@ index 8915ab7b7cf8ef5e28283fe56b0d993d35d2ca52..c5a598d288912b519d288547502c9c5d
  	Join the ArtCraft Discord	Csatlakozás az ArtCraft Discord-közösségéhez
 -@plural	ArtCraft Launcher · {n} update available|ArtCraft Launcher · {n} updates available	ArtCraft Launcher · {n} frissítés elérhető|ArtCraft Launcher · {n} frissítés elérhető
 +@plural	KIO Launcher · {n} update available|KIO Launcher · {n} updates available	KIO Launcher · {n} frissítés elérhető|KIO Launcher · {n} frissítés elérhető
++	No font for this language was found on this system. Install a font for this language and restart KIO Launcher.	A rendszer nem talált betűtípust ehhez a nyelvhez. Telepítsen megfelelő betűtípust, majd indítsa újra a KIO Launcher alkalmazást.
 diff --git a/crates/ui-egui/src/i18n/ja.tsv b/crates/ui-egui/src/i18n/ja.tsv
-index 1548831f6996f51d30971db866fef6c7c00ef170..ac2f5668bccf85165daa5287dfe6b58181d7d40e 100644
+index 1548831..b1cc1f6 100644
 --- a/crates/ui-egui/src/i18n/ja.tsv
 +++ b/crates/ui-egui/src/i18n/ja.tsv
 @@ -1,4 +1,4 @@
@@ -147935,7 +148370,7 @@ index 1548831f6996f51d30971db866fef6c7c00ef170..ac2f5668bccf85165daa5287dfe6b581
  # Format: context<TAB>source<TAB>translation
  # Empty context = plain UI string (tl!, t).
  # @id = command-id keyed (tr_id).
-@@ -6,15 +6,15 @@
+@@ -6,23 +6,23 @@
  # @msg = status/error message template (message, msg).
  # Other context = disambiguation for tr_ctx.
  #
@@ -147956,11 +148391,12 @@ index 1548831f6996f51d30971db866fef6c7c00ef170..ac2f5668bccf85165daa5287dfe6b581
  # Shortcut keys keep their key-cap names (Shift, Alt, Ctrl, Cmd, Esc).
  # Trailing "…" (U+2026) must be preserved. Placeholders {name}, {n}, {version}, {count}, {v},
  # {what}, {unit}, {real}, {e} must appear in translation.
-@@ -22,7 +22,7 @@
+ # Japanese has one plural form. Shown with the system's Japanese font (see cjk_font.rs); where the
  # system has none, the interface stays in English.
  
- 	Launcher	Launcher
+-	Launcher	Launcher
 -	Craft App Suite	Craft App Suite
++	Launcher	ランチャー
 +	KIO App Suite	KIO App Suite
  	Open Source Tools for Creatives, Makers, and Builders	クリエイター、メイカー、ビルダーのためのオープンソースツール
  	Settings	設定
@@ -148033,7 +148469,7 @@ index 1548831f6996f51d30971db866fef6c7c00ef170..ac2f5668bccf85165daa5287dfe6b581
  @id	view.grid	グリッド
  @id	view.table	テーブル
  @id	filter.all	すべて
-@@ -337,13 +337,13 @@ filter	Installed	インストール済み
+@@ -337,13 +337,15 @@ filter	Installed	インストール済み
  @id	linux.preferred_kind	新しいアプリのインストール形式
  @id	tray.close_to_tray	ウィンドウを閉じてもトレイで実行し続ける
  @id	tray.show_on_current_desktop	現在のデスクトップにウィンドウを表示
@@ -148050,8 +148486,442 @@ index 1548831f6996f51d30971db866fef6c7c00ef170..ac2f5668bccf85165daa5287dfe6b581
  	Join the ArtCraft Discord	ArtCraft Discord に参加
 -@plural	ArtCraft Launcher · {n} update available|ArtCraft Launcher · {n} updates available	ArtCraft Launcher · {n} 件の更新があります
 +@plural	KIO Launcher · {n} update available|KIO Launcher · {n} updates available	KIO Launcher · {n} 件の更新があります
++	Classic	クラシック
++	No font for this language was found on this system. Install a font for this language and restart KIO Launcher.	この言語に対応するフォントがシステムに見つかりません。対応するフォントをインストールして、KIO Launcherを再起動してください。
+diff --git a/crates/ui-egui/src/i18n/ko.tsv b/crates/ui-egui/src/i18n/ko.tsv
+new file mode 100644
+index 0000000..96b76f9
+--- /dev/null
++++ b/crates/ui-egui/src/i18n/ko.tsv
+@@ -0,0 +1,310 @@
++# KIO original translations. MIT. context<TAB>source<TAB>translation.
++# Official product names, URLs and file extensions are preserved.
++	Launcher	런처
++	KIO App Suite	KIO App Suite
++	Open Source Tools for Creatives, Makers, and Builders	창작자와 제작자를 위한 오픈 소스 도구
++	Settings	설정
++	Check for updates	업데이트 확인
++	Grid	격자
++	Table	표
++	Show apps as cards	앱을 카드로 표시
++	Show apps as a table	앱을 표로 표시
++	All	전체
++	Updates	업데이트
++	Not installed	설치되지 않음
++	Search apps	앱 검색
++	Sort	정렬
++	Suite order	제품군 순서
++	Name	이름
++	Inspired by	참고 프로그램
++	Status	상태
++	Installed version	설치된 버전
++	Latest version	최신 버전
++	Newest release	최신 릴리스
++	Discord	Discord
++	GitHub	GitHub
++	Website	웹사이트
++	Classic apps	기존 앱
++	Classic	기존
++	New apps	새 앱
++	NEW	신규
++	Install	설치
++	Update to {v}	{v}(으)로 업데이트
++	Open	열기
++	Download for {os}	{os}용 다운로드
++	Download	다운로드
++	Coming soon	출시 예정
++	Checking…	확인 중…
++	Not available	사용할 수 없음
++	Offline	오프라인
++	Downloading {done} of {total}	{total} 중 {done} 다운로드 중
++	Downloading…	다운로드 중…
++	Reconnecting…	다시 연결 중…
++	Verifying…	검증 중…
++	Installing, then restarting…	설치 후 다시 시작하는 중…
++	Installing…	설치 중…
++	Removing…	제거 중…
++	Pause download	다운로드 일시 중지
++	Cancel download	다운로드 취소
++	Resume download	다운로드 재개
++	Discard download	다운로드 파일 삭제
++	Release notes	릴리스 안내
++	Show in Finder	Finder에서 보기
++	Show in Explorer	파일 탐색기에서 보기
++	Show in Files	파일 관리자에서 보기
++	Reinstall	다시 설치
++	Uninstall…	제거…
++	All releases	모든 릴리스
++	KIO Launcher {version} is available.	KIO Launcher {version} 버전을 사용할 수 있습니다.
++	Dismiss	닫기
++	Update and restart	업데이트 후 다시 시작
++	A new version is available. Would you like to relaunch with the updated version?	새 버전이 있습니다. 업데이트된 버전으로 다시 시작할까요?
++	Later	나중에
++	What's new	새로운 기능
++	No notes were published with this release.	이 릴리스에는 안내가 없습니다.
++	Released {date}	{date} 출시
++	Open on GitHub	GitHub에서 열기
++	Close	닫기
++	KIO Launcher {version}	KIO Launcher {version}
++	Only when I ask	직접 요청할 때만
++	Automatically download and install updates	업데이트 자동 다운로드 및 설치
++	Notify me when an installed app has an update	설치된 앱의 업데이트 알림
++	Include pre-releases (betas and release candidates)	시험판 포함(베타 및 릴리스 후보)
++	Installing on Linux	Linux에 설치
++	Install new apps as	새 앱 설치 형식
++	System package (recommended)	시스템 패키지(권장)
++	Updates always use the format an app was installed with.	업데이트는 앱을 설치할 때 사용한 형식을 유지합니다.
++	Running in the background	백그라운드 실행
++	Keep running in the tray when the window is closed	창을 닫아도 트레이에서 계속 실행
++	Show the window on the current desktop	현재 데스크톱에 창 표시
++	Start KIO Launcher when I log in	로그인할 때 KIO Launcher 시작
++	Community	커뮤니티
++	Questions, ideas and news from the ArtCraft team	ArtCraft 팀의 질문, 아이디어 및 소식
++	Appearance	모양
++	Quit KIO Launcher	KIO Launcher 종료
++	Done	완료
++	Uninstall {name}?	{name} 앱을 제거할까요?
++	The app will be moved to the Trash. Your documents and settings stay.	앱이 휴지통으로 이동합니다. 문서와 설정은 유지됩니다.
++	Windows will remove it like any installed program. Your documents and settings stay.	Windows가 설치된 다른 프로그램과 같은 방식으로 제거합니다. 문서와 설정은 유지됩니다.
++	Your system's package manager will remove it, and may ask for your password. Your documents and settings stay.	시스템 패키지 관리자가 앱을 제거하며 암호를 요청할 수 있습니다. 문서와 설정은 유지됩니다.
++	The app will be removed. Your documents and settings stay.	앱이 제거됩니다. 문서와 설정은 유지됩니다.
++	Uninstall	제거
++	Cancel	취소
++	Checked {ago}	{ago} 확인
++	just now	방금
++	yesterday	어제
++	{month} {day}, {year}	{year}년 {month} {day}일
++	Automatically	자동
++	Every Craft app	모든 Craft 앱
++	Apps on this computer	이 컴퓨터의 앱
++	Installed apps with a newer version	새 버전이 있는 설치된 앱
++	Apps you can install	설치할 수 있는 앱
++	Hide App	앱 숨기기
++	Unhide App	앱 숨기기 해제
++	Hidden Apps	숨긴 앱
++	Apps you hid	숨긴 앱 목록
++	Checked {ago} · using {sources}	{ago} 확인 · {sources} 사용
++	{a} and {b}	{a} 및 {b}
++	Join the Discord	Discord 참여
++	Learn more	자세히 알아보기
++	Minimize	최소화
++	Maximize	최대화
++	Restore	복원
++	New	새로 만들기
++	OK	확인
++	Open link	링크 열기
++	Update	업데이트
++	{name} icon	{name} 아이콘
++	Loading KIO Launcher…	KIO Launcher 불러오는 중…
++	Cancel update	업데이트 취소
++	Stop waiting; the update can be started again later	대기를 중지합니다. 나중에 업데이트를 다시 시작할 수 있습니다
++	Download again	다시 다운로드
++	Install cancelled	설치 취소됨
++	Install cancelled. The download is kept for the next try.	설치가 취소되었습니다. 다음 시도를 위해 다운로드 파일을 유지합니다.
++	Update cancelled	업데이트 취소됨
++	Uninstall cancelled	제거 취소됨
++	Retry install	설치 다시 시도
++	Retry update to {version}	{version} 업데이트 다시 시도
++	The download is still here. It's checked again, then installed.	다운로드 파일이 유지되어 있습니다. 다시 확인한 후 설치합니다.
++	Waiting for another app…	다른 앱을 기다리는 중…
++	Waiting for other installs…	다른 설치를 기다리는 중…
++	Installer (.msi)	설치 프로그램(.msi)
++	Portable (.zip)	포터블(.zip)
++	Disk image (.dmg)	디스크 이미지(.dmg)
++	Debian package (.deb)	Debian 패키지(.deb)
++	RPM package (.rpm)	RPM 패키지(.rpm)
++	Flatpak bundle	Flatpak 번들
++	Tarball (.tar.gz)	압축 파일(.tar.gz)
++photocraft	Image editing	이미지 편집
++vectorcraft	Vector illustration	벡터 일러스트레이션
++filmcraft	Video editing, color and sound	영상·색상·음향 편집
++lightcraft	Photo library and raw development	사진 라이브러리 및 RAW 현상
++pdfcraft	Reading, organizing and protecting PDFs	PDF 읽기·정리·보호
++effectcraft	Motion graphics and visual effects	모션 그래픽 및 시각 효과
++designcraft	Page layout and publishing	페이지 레이아웃 및 출판
++wordcraft	Writing and document design	문서 작성 및 디자인
++deckcraft	Presentations and slide shows	프레젠테이션 및 슬라이드 쇼
++gridcraft	Spreadsheets and data	스프레드시트 및 데이터
++cadcraft	Computer-aided design and drafting	컴퓨터 지원 설계 및 제도
++soundcraft	Recording, editing and mixing audio	오디오 녹음·편집·믹싱
++figcraft	Interface design and prototyping	인터페이스 디자인 및 프로토타입
++month	Jan	1월
++month	Feb	2월
++month	Mar	3월
++month	Apr	4월
++month	May	5월
++month	Jun	6월
++month	Jul	7월
++month	Aug	8월
++month	Sep	9월
++month	Oct	10월
++month	Nov	11월
++month	Dec	12월
++	Not checked yet	아직 확인하지 않음
++	GitHub's hourly limit was reached; full details return in {min} min	GitHub 시간당 요청 한도에 도달했습니다. {min}분 후 전체 정보를 다시 확인할 수 있습니다
++	GitHub limit hit; back in {min} min	GitHub 한도 도달 · {min}분 후 재개
++	Installing for {platform}	{platform}용 설치
++	Downloads for {platform}	{platform}용 다운로드
++	No downloads for this system	이 시스템용 다운로드 없음
++	Join the ArtCraft community on Discord	Discord에서 ArtCraft 커뮤니티 참여
++	ArtCraft on {name}	{name}의 ArtCraft
++	Couldn't open {name}: {e}	{name}을(를) 열 수 없습니다: {e}
++	Download cancelled	다운로드 취소됨
++	Available to install	설치 가능
++	Available	사용 가능
++	Installed · up to date	설치됨 · 최신 버전
++	Update available	업데이트 있음
++	Installed	설치됨
++	installed	설치됨
++	Not available here	여기서는 사용할 수 없음
++	Updating…	업데이트 중…
++	Update paused	업데이트 일시 중지됨
++	Download paused	다운로드 일시 중지됨
++	{version} installed → {latest} released	설치 {version} → 출시 {latest}
++	Version {version}	버전 {version}
++	{installed} installed · latest {latest}	설치 {installed} · 최신 {latest}
++	Installed · latest {latest}	설치됨 · 최신 {latest}
++	Version {version} installed	버전 {version} 설치됨
++	Version {latest}	버전 {latest}
++	No release published yet	아직 출시된 버전 없음
++	KIO Launcher	KIO Launcher
++	App	앱
++	Latest	최신
++	Released	출시일
++	Auto	자동
++	Language	언어
++	Ascending	오름차순
++	Descending	내림차순
++	Click to reverse the order	클릭하여 순서 뒤집기
++	Click to sort by this column	클릭하여 이 열로 정렬
++	Like {name}	{name}와(과) 유사
++	{done} of {total}	{total} 중 {done}
++	Downloading	다운로드 중
++	Verifying checksum…	체크섬 검증 중…
++	Resume	계속
++	{done} of {total} downloaded	{total} 중 {done} 다운로드됨
++	{done} downloaded	{done} 다운로드됨
++	Checking for updates…	업데이트 확인 중…
++	Downloads the new version, replaces this one and opens it again	새 버전을 다운로드하여 현재 버전을 교체한 후 다시 엽니다
++	Couldn't check for updates: {f}	업데이트를 확인할 수 없습니다: {f}
++	Website (coming soon)	웹사이트(출시 예정)
++	GitHub repository	GitHub 저장소
++	ArtCraft	ArtCraft
++	Update 1 app	앱 1개 업데이트
++	Update all ({count})	모두 업데이트({count})
++	⊞  Grid	⊞  격자
++	☰  Table	☰  표
++	🔍  Search apps	🔍  앱 검색
++	{name} {version}	{name} {version}
++	Match system	시스템 설정 따르기
++	Dark	어둡게
++	Light	밝게
++	Full changelog	전체 변경 내역
++	link	링크
++	No apps match	일치하는 앱 없음
++	Open KIO Launcher to update.	업데이트하려면 KIO Launcher를 여세요.
++	{name} {v} is available	{name} {v} 사용 가능
++	{count} updates are available	업데이트 {count}개 있음
++	These notes weren't fetched (GitHub's request limit was reached). They're on the release page.	GitHub 요청 한도에 도달하여 안내를 가져오지 못했습니다. 릴리스 페이지에서 확인할 수 있습니다.
++	When on, opening the launcher from the menu bar brings its window to the desktop you're on. When off, macOS switches you to the desktop the window was on.	켜면 메뉴 막대에서 실행기를 열 때 현재 데스크톱으로 창을 가져옵니다. 끄면 macOS가 창이 있는 데스크톱으로 전환합니다.
++	Couldn't change the login item: {e}	로그인 항목을 변경할 수 없습니다: {e}
++column	App	앱
++column	Installed	설치됨
++column	Latest	최신
++column	Released	출시일
++filter	Installed	설치됨
++	App details	앱 상세 정보
++	Close (Esc)	닫기(Esc)
++	Features	기능
++	Latest release	최신 릴리스
++	Version	버전
++	Platforms	플랫폼
++	Releases	릴리스
++	Enlarge picture	사진 확대
++	Click to enlarge	클릭하여 확대
++	Previous picture (←)	이전 사진(←)
++	Next picture (→)	다음 사진(→)
++	Loading pictures…	사진 불러오는 중…
++	Pictures couldn't be loaded. Reopen this page to try again.	사진을 불러오지 못했습니다. 이 페이지를 다시 열어 재시도하세요.
++	{name} details	{name} 상세 정보
++@plural	{n} app|{n} apps	앱 {n}개
++@plural	{n} min ago|{n} min ago	{n}분 전
++@plural	{n} h ago|{n} h ago	{n}시간 전
++@plural	{n} day ago|{n} days ago	{n}일 전
++@msg	Couldn't open {name}: {e}	{name}을(를) 열 수 없습니다: {e}
++@msg	Download cancelled	다운로드 취소됨
++@msg	{name} updated to {version}	{name}을(를) {version}(으)로 업데이트했습니다
++@msg	{name} installed: {version}	{name} 설치됨: {version}
++@msg	{name} updated to {version} (this release publishes no checksum, so only its size was checked)	{name}을(를) {version}(으)로 업데이트했습니다(이 릴리스에는 체크섬이 없어 파일 크기만 확인했습니다)
++@msg	{name} installed: {version} (this release publishes no checksum, so only its size was checked)	{name} 설치됨: {version}(이 릴리스에는 체크섬이 없어 파일 크기만 확인했습니다)
++@msg	{name} was removed	{name}이(가) 제거되었습니다
++@msg	{name} is running. Quit it, then try again.	{name}이(가) 실행 중입니다. 종료한 후 다시 시도하세요.
++@id	app.install	설치
++@id	app.update	{v}(으)로 업데이트
++@id	app.open	열기
++@id	app.download	{os}용 다운로드
++@id	app.reveal	Finder에서 보기
++@id	app.reinstall	다시 설치
++@id	app.uninstall	제거…
++@id	app.notes	릴리스 안내
++@id	app.website	웹사이트
++@id	app.github	GitHub 저장소
++@id	app.releases	모든 릴리스
++@id	launcher.update	업데이트 후 다시 시작
++@id	launcher.download	다운로드
++@id	launcher.notes	새로운 기능
++@id	launcher.dismiss	닫기
++@id	settings.open	설정
++@id	settings.quit	KIO Launcher 종료
++@id	view.grid	격자
++@id	view.table	표
++@id	filter.all	전체
++@id	filter.installed	설치됨
++@id	filter.updates	업데이트
++@id	filter.notinstalled	설치되지 않음
++@id	sort.suite	제품군 순서
++@id	sort.name	이름
++@id	sort.inspired	참고 프로그램
++@id	sort.status	상태
++@id	sort.installed	설치된 버전
++@id	sort.latest	최신 버전
++@id	sort.released	최신 릴리스
++@id	help.discord	Discord
++@id	help.github	GitHub
++@id	help.website	웹사이트
++@id	update.check	업데이트 확인
++@id	update.check_auto	업데이트 자동 확인
++@id	update.notify	설치된 앱의 업데이트 알림
++@id	update.prereleases	시험판 포함(베타 및 릴리스 후보)
++@id	linux.preferred_kind	새 앱 설치 형식
++@id	tray.close_to_tray	창을 닫아도 트레이에서 계속 실행
++@id	tray.show_on_current_desktop	현재 데스크톱에 창 표시
++@id	tray.login_item	로그인할 때 KIO Launcher 시작
++@id	appearance.theme	모양
++	Show KIO Launcher	KIO Launcher 표시
++	Check for Updates	업데이트 확인
++	Visit getartcraft.com	getartcraft.com 방문
++	ArtCraft on GitHub	GitHub의 ArtCraft
++	Join the ArtCraft Discord	ArtCraft Discord 참여
++@plural	KIO Launcher · {n} update available|KIO Launcher · {n} updates available	KIO Launcher · 업데이트 {n}개 있음
++	No font for this language was found on this system. Install a font for this language and restart KIO Launcher.	시스템에서 이 언어의 글꼴을 찾을 수 없습니다. 해당 언어의 글꼴을 설치한 후 KIO Launcher를 다시 시작하세요.
+diff --git a/crates/ui-egui/src/i18n/lang.rs b/crates/ui-egui/src/i18n/lang.rs
+index 458b9f3..2ceaa33 100644
+--- a/crates/ui-egui/src/i18n/lang.rs
++++ b/crates/ui-egui/src/i18n/lang.rs
+@@ -12,12 +12,14 @@ use super::detect::system_lang;
+ #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+ pub enum Script {
+     Chinese,
++    TraditionalChinese,
+     Japanese,
++    Korean,
+ }
+ 
+ impl Script {
+     /// Every script a language can be written in.
+-    pub const ALL: [Script; 2] = [Script::Chinese, Script::Japanese];
++    pub const ALL: [Script; 4] = [Script::Chinese, Script::TraditionalChinese, Script::Japanese, Script::Korean];
+ }
+ 
+ /// One supported UI language.
+@@ -94,7 +96,7 @@ pub(super) fn plural_polish(n: u64) -> usize {
+ }
+ 
+ /// The registry. English first: it is the fallback and the source language.
+-pub static LANGUAGES: [LangInfo; 11] = [
++pub static LANGUAGES: [LangInfo; 14] = [
+     LangInfo {
+         code: "en",
+         name: "English",
+@@ -216,6 +218,39 @@ pub static LANGUAGES: [LangInfo; 11] = [
+         complete_menus: true,
+         catalog: OnceLock::new(),
+     },
++    LangInfo {
++        code: "vi",
++        name: "Tiếng Việt",
++        english_name: "Vietnamese",
++        script: None,
++        source: include_str!("vi.tsv"),
++        plural: plural_none,
++        plural_forms: 1,
++        complete_menus: true,
++        catalog: OnceLock::new(),
++    },
++    LangInfo {
++        code: "ko",
++        name: "한국어",
++        english_name: "Korean",
++        script: Some(Script::Korean),
++        source: include_str!("ko.tsv"),
++        plural: plural_none,
++        plural_forms: 1,
++        complete_menus: true,
++        catalog: OnceLock::new(),
++    },
++    LangInfo {
++        code: "zh-TW",
++        name: "繁體中文",
++        english_name: "Traditional Chinese",
++        script: Some(Script::TraditionalChinese),
++        source: include_str!("zh-TW.tsv"),
++        plural: plural_none,
++        plural_forms: 1,
++        complete_menus: true,
++        catalog: OnceLock::new(),
++    },
+ ];
+ 
+ impl LangInfo {
+@@ -254,6 +289,9 @@ impl Lang {
+     pub const PL: Lang = Lang(&LANGUAGES[8]);
+     pub const HU: Lang = Lang(&LANGUAGES[9]);
+     pub const JA: Lang = Lang(&LANGUAGES[10]);
++    pub const VI: Lang = Lang(&LANGUAGES[11]);
++    pub const KO: Lang = Lang(&LANGUAGES[12]);
++    pub const ZH_TW: Lang = Lang(&LANGUAGES[13]);
+ 
+     pub fn code(self) -> &'static str {
+         self.0.code
+@@ -275,6 +313,15 @@ impl Lang {
+         LANGUAGES.iter().map(Lang)
+     }
+ 
++    /// Keep the chosen language first without changing stable registry indices.
++    pub fn ordered(current: Lang) -> Vec<Lang> {
++        let required = [Self::VI, Self::EN, Self::KO, Self::JA, Self::ZH_TW, Self::ZH_CN];
++        let mut result = vec![current];
++        result.extend(required.into_iter().filter(|lang| *lang != current));
++        result.extend(Self::all().filter(|lang| *lang != current && !required.contains(lang)));
++        result
++    }
++
+     pub fn name(self) -> &'static str {
+         self.0.name
+     }
+@@ -331,14 +378,16 @@ pub fn lang_from_tag(tag: &str) -> Option<Lang> {
+ 
+ /// Chinese by script: Simplified for `zh-Hans`, and for a bare `zh` or the regions that write
+ /// Simplified (mainland China, Singapore) when no script is given. An explicit script wins over
+-/// the region (`zh-Hant-CN` is Traditional); Traditional Chinese isn't offered.
++/// the region (`zh-Hant-CN` is Traditional).
+ fn chinese(tag: &str) -> Option<Lang> {
+     let parts: Vec<&str> = tag.split('-').collect();
+     if parts.contains(&"hant") {
+-        None
+-    } else if parts.contains(&"hans") || parts.len() == 1 || parts.iter().any(|p| matches!(*p, "cn" | "sg")) {
++        Some(Lang::ZH_TW)
++    } else if parts.contains(&"hans") {
+         Some(Lang::ZH_CN)
++    } else if parts.iter().any(|p| matches!(*p, "tw" | "hk" | "mo")) {
++        Some(Lang::ZH_TW)
+     } else {
+-        None
++        Some(Lang::ZH_CN)
+     }
+ }
 diff --git a/crates/ui-egui/src/i18n/mod.rs b/crates/ui-egui/src/i18n/mod.rs
-index f5e65fa12c94fc43cb70ef38f0777aaaf3e79b1d..c3746cff2f983acbbf6728865b6ada21fc5d6060 100644
+index f5e65fa..c3746cf 100644
 --- a/crates/ui-egui/src/i18n/mod.rs
 +++ b/crates/ui-egui/src/i18n/mod.rs
 @@ -1,4 +1,4 @@
@@ -148061,7 +148931,7 @@ index f5e65fa12c94fc43cb70ef38f0777aaaf3e79b1d..c3746cff2f983acbbf6728865b6ada21
  //!
  //! # Adding a language
 diff --git a/crates/ui-egui/src/i18n/pl.tsv b/crates/ui-egui/src/i18n/pl.tsv
-index f4ee0f74eafd752333736ee05031f84786d3911a..4b899169c2c62be2f247a17c163ba67354d14da7 100644
+index f4ee0f7..58369b5 100644
 --- a/crates/ui-egui/src/i18n/pl.tsv
 +++ b/crates/ui-egui/src/i18n/pl.tsv
 @@ -1,4 +1,4 @@
@@ -148165,7 +149035,7 @@ index f4ee0f74eafd752333736ee05031f84786d3911a..4b899169c2c62be2f247a17c163ba673
  @id	view.grid	Siatka
  @id	view.table	Tabela
  @id	filter.all	Wszystkie
-@@ -336,13 +336,13 @@ filter	Installed	Zainstalowane
+@@ -336,13 +336,14 @@ filter	Installed	Zainstalowane
  @id	linux.preferred_kind	Instaluj nowe aplikacje jako
  @id	tray.close_to_tray	Po zamknięciu okna działaj w zasobniku systemowym
  @id	tray.show_on_current_desktop	Pokaż okno na bieżącym pulpicie
@@ -148182,8 +149052,9 @@ index f4ee0f74eafd752333736ee05031f84786d3911a..4b899169c2c62be2f247a17c163ba673
  	Join the ArtCraft Discord	Dołącz do Discorda ArtCraft
 -@plural	ArtCraft Launcher · {n} update available|ArtCraft Launcher · {n} updates available	ArtCraft Launcher · {n} dostępna aktualizacja|ArtCraft Launcher · {n} dostępne aktualizacje|ArtCraft Launcher · {n} dostępnych aktualizacji
 +@plural	KIO Launcher · {n} update available|KIO Launcher · {n} updates available	KIO Launcher · {n} dostępna aktualizacja|KIO Launcher · {n} dostępne aktualizacje|KIO Launcher · {n} dostępnych aktualizacji
++	No font for this language was found on this system. Install a font for this language and restart KIO Launcher.	W systemie nie znaleziono czcionki dla tego języka. Zainstaluj odpowiednią czcionkę i uruchom ponownie KIO Launcher.
 diff --git a/crates/ui-egui/src/i18n/pt-BR.tsv b/crates/ui-egui/src/i18n/pt-BR.tsv
-index 471986177e9636cc973c47acb49e9d942274af79..d65306fb643aa319b45521c3660119c21b4337d7 100644
+index 4719861..b82015e 100644
 --- a/crates/ui-egui/src/i18n/pt-BR.tsv
 +++ b/crates/ui-egui/src/i18n/pt-BR.tsv
 @@ -1,4 +1,4 @@
@@ -148283,14 +149154,15 @@ index 471986177e9636cc973c47acb49e9d942274af79..d65306fb643aa319b45521c3660119c2
  	Check for Updates	Verificar atualizações
  	Visit getartcraft.com	Visitar getartcraft.com
  	ArtCraft on GitHub	ArtCraft no GitHub
-@@ -331,4 +331,4 @@ filter	Installed	Instalados
+@@ -331,4 +331,5 @@ filter	Installed	Instalados
  	Next picture (→)	Próxima imagem (→)
  	Loading pictures…	Carregando imagens…
  	Pictures couldn't be loaded. Reopen this page to try again.	Não foi possível carregar as imagens. Abra a página novamente para tentar de novo.
 -@plural	ArtCraft Launcher · {n} update available|ArtCraft Launcher · {n} updates available	ArtCraft Launcher · {n} atualização disponível|ArtCraft Launcher · {n} atualizações disponíveis
 +@plural	KIO Launcher · {n} update available|KIO Launcher · {n} updates available	KIO Launcher · {n} atualização disponível|KIO Launcher · {n} atualizações disponíveis
++	No font for this language was found on this system. Install a font for this language and restart KIO Launcher.	Nenhuma fonte para este idioma foi encontrada no sistema. Instale uma fonte adequada e reinicie o KIO Launcher.
 diff --git a/crates/ui-egui/src/i18n/ru.tsv b/crates/ui-egui/src/i18n/ru.tsv
-index 8179d1d63775465e2c43111ad7c2dc5f3446e7fe..294d08722e32358b872d1a335e0f3c8cddec7ec4 100644
+index 8179d1d..72837ce 100644
 --- a/crates/ui-egui/src/i18n/ru.tsv
 +++ b/crates/ui-egui/src/i18n/ru.tsv
 @@ -1,4 +1,4 @@
@@ -148408,14 +149280,15 @@ index 8179d1d63775465e2c43111ad7c2dc5f3446e7fe..294d08722e32358b872d1a335e0f3c8c
  	Check for Updates	Проверить обновления
  	Visit getartcraft.com	Открыть getartcraft.com
  	ArtCraft on GitHub	ArtCraft на GitHub
-@@ -339,4 +339,4 @@ filter	Installed	Установлены
+@@ -339,4 +339,5 @@ filter	Installed	Установлены
  	Next picture (→)	Следующее изображение (→)
  	Loading pictures…	Загрузка изображений…
  	Pictures couldn't be loaded. Reopen this page to try again.	Не удалось загрузить изображения. Откройте страницу снова, чтобы повторить попытку.
 -@plural	ArtCraft Launcher · {n} update available|ArtCraft Launcher · {n} updates available	ArtCraft Launcher · {n} обновление|ArtCraft Launcher · {n} обновления|ArtCraft Launcher · {n} обновлений
 +@plural	KIO Launcher · {n} update available|KIO Launcher · {n} updates available	KIO Launcher · {n} обновление|KIO Launcher · {n} обновления|KIO Launcher · {n} обновлений
++	No font for this language was found on this system. Install a font for this language and restart KIO Launcher.	В системе не найден шрифт для этого языка. Установите подходящий шрифт и перезапустите KIO Launcher.
 diff --git a/crates/ui-egui/src/i18n/tests.rs b/crates/ui-egui/src/i18n/tests.rs
-index 524b69a4c902f3b299c99bfabcec04f7d458b37a..66d6498545ad224705b28529eb6052babc5ba4c0 100644
+index 524b69a..ced884b 100644
 --- a/crates/ui-egui/src/i18n/tests.rs
 +++ b/crates/ui-egui/src/i18n/tests.rs
 @@ -188,7 +188,7 @@ fn complete_catalogs_translate_every_tagline() {
@@ -148454,7 +149327,61 @@ index 524b69a4c902f3b299c99bfabcec04f7d458b37a..66d6498545ad224705b28529eb6052ba
  }
  
  #[test]
-@@ -363,7 +363,7 @@ fn chinese_counts_and_english_fallback_work() {
+@@ -349,10 +349,50 @@ fn simplified_chinese_locales_respect_the_script() {
+         assert_eq!(lang_from_tag(tag), Some(Lang::ZH_CN), "{tag}");
+     }
+     for tag in ["zh-TW", "zh-HK", "zh-MO", "zh-Hant", "zh-Hant-CN", "zh-Hant-SG", "zh_TW.UTF-8"] {
+-        assert_eq!(lang_from_tag(tag), None, "{tag}");
++        assert_eq!(lang_from_tag(tag), Some(Lang::ZH_TW), "{tag}");
++    }
++    assert_eq!(super::detect::first_supported(["zh-Hant-TW", "en-US"]), Some(Lang::ZH_TW));
++}
++
++#[test]
++fn kio_six_language_order_and_explicit_preferences_survive_system_changes() {
++    let base = [Lang::VI, Lang::EN, Lang::KO, Lang::JA, Lang::ZH_TW, Lang::ZH_CN];
++    for selected in base {
++        let ordered = Lang::ordered(selected);
++        assert_eq!(ordered.first(), Some(&selected));
++        assert_eq!(ordered.iter().filter(|lang| **lang == selected).count(), 1);
++        assert_eq!(
++            ordered.iter().copied().skip(1).take(5).collect::<Vec<_>>(),
++            base.into_iter().filter(|lang| *lang != selected).collect::<Vec<_>>()
++        );
++        assert_eq!(Lang::from_pref(selected.code()), selected);
++    }
++    for (tag, expected) in
++        [("vi-VN", Lang::VI), ("ko-KR", Lang::KO), ("ja-JP", Lang::JA), ("en-GB", Lang::EN), ("zh-MO", Lang::ZH_TW), ("zh-Hans", Lang::ZH_CN)]
++    {
++        assert_eq!(super::detect::first_supported([tag]), Some(expected));
++    }
++    assert_eq!(super::detect::first_supported(["xx-XY"]).unwrap_or(Lang::EN), Lang::EN);
++}
++
++#[test]
++fn kio_required_catalogs_have_identical_keys_and_preserve_placeholders() {
++    let english = include_str!("en.tsv");
++    let keys = |text: &str| -> BTreeSet<(String, String)> {
++        text.lines()
++            .filter(|line| !line.is_empty() && !line.starts_with('#'))
++            .filter_map(|line| {
++                let mut fields = line.split('\t');
++                Some((fields.next()?.to_owned(), fields.next()?.to_owned()))
++            })
++            .collect()
++    };
++    for lang in [Lang::VI, Lang::KO, Lang::JA, Lang::ZH_TW, Lang::ZH_CN] {
++        assert_eq!(keys(lang.0.source), keys(english), "{}", lang.code());
++        assert!(!tr(lang, "Settings").is_empty());
++        assert_ne!(tr(lang, "Check for updates"), "Check for updates");
++        assert_ne!(message(lang, "KIO Photo is running. Quit it, then try again."), "KIO Photo is running. Quit it, then try again.");
+     }
+-    // A Traditional Chinese system that also lists English gets English, not Simplified.
+-    assert_eq!(super::detect::first_supported(["zh-Hant-TW", "en-US"]), Some(Lang::EN));
+ }
+ 
+ #[test]
+@@ -363,7 +403,7 @@ fn chinese_counts_and_english_fallback_work() {
      }
      assert_eq!(trn(Lang::ZH_CN, 2, "{n} unknown item", "{n} unknown items"), "2 unknown items");
      assert_eq!(tr(Lang::ZH_CN, "Untranslated diagnostic"), "Untranslated diagnostic");
@@ -148463,7 +149390,7 @@ index 524b69a4c902f3b299c99bfabcec04f7d458b37a..66d6498545ad224705b28529eb6052ba
  }
  
  #[test]
-@@ -381,7 +381,7 @@ fn japanese_locales_and_counts_work() {
+@@ -381,7 +421,7 @@ fn japanese_locales_and_counts_work() {
      assert_eq!(tr(Lang::JA, "Untranslated diagnostic"), "Untranslated diagnostic");
      assert_eq!(super::tr_ctx(Lang::JA, "month", "Mar"), "3月");
      assert_eq!(tr(Lang::JA, "{month} {day}, {year}"), "{year}年{month}{day}日");
@@ -148472,7 +149399,7 @@ index 524b69a4c902f3b299c99bfabcec04f7d458b37a..66d6498545ad224705b28529eb6052ba
  }
  
  /// With the system's Chinese font installed, every UI family can draw the whole Chinese catalog.
-@@ -502,10 +502,10 @@ fn message_templates_match_real_messages() {
+@@ -502,10 +542,10 @@ fn message_templates_match_real_messages() {
           @msg\t{a}{b}\tnever\n",
      );
      assert_eq!(cat.message("Download cancelled").as_deref(), Some("Скачивание отменено"));
@@ -148486,8 +149413,324 @@ index 524b69a4c902f3b299c99bfabcec04f7d458b37a..66d6498545ad224705b28529eb6052ba
      // Placeholders never match nothing, and unknown messages aren't touched.
      assert_eq!(cat.message("Couldn't open : x"), None);
      assert_eq!(cat.message("Something else"), None);
+diff --git a/crates/ui-egui/src/i18n/vi.tsv b/crates/ui-egui/src/i18n/vi.tsv
+new file mode 100644
+index 0000000..c325dca
+--- /dev/null
++++ b/crates/ui-egui/src/i18n/vi.tsv
+@@ -0,0 +1,310 @@
++# KIO original translations. MIT. context<TAB>source<TAB>translation.
++# Official product names, URLs and file extensions are preserved.
++	Launcher	Trình khởi chạy
++	KIO App Suite	KIO App Suite
++	Open Source Tools for Creatives, Makers, and Builders	Công cụ nguồn mở dành cho người sáng tạo, chế tác và xây dựng
++	Settings	Cài đặt
++	Check for updates	Kiểm tra bản cập nhật
++	Grid	Lưới
++	Table	Bảng
++	Show apps as cards	Hiển thị ứng dụng dạng thẻ
++	Show apps as a table	Hiển thị ứng dụng dạng bảng
++	All	Tất cả
++	Updates	Bản cập nhật
++	Not installed	Chưa cài đặt
++	Search apps	Tìm ứng dụng
++	Sort	Sắp xếp
++	Suite order	Thứ tự bộ ứng dụng
++	Name	Tên
++	Inspired by	Lấy cảm hứng từ
++	Status	Trạng thái
++	Installed version	Phiên bản đã cài
++	Latest version	Phiên bản mới nhất
++	Newest release	Bản phát hành mới nhất
++	Discord	Discord
++	GitHub	GitHub
++	Website	Trang web
++	Classic apps	Ứng dụng cổ điển
++	Classic	Cổ điển
++	New apps	Ứng dụng mới
++	NEW	MỚI
++	Install	Cài đặt
++	Update to {v}	Cập nhật lên {v}
++	Open	Mở
++	Download for {os}	Tải cho {os}
++	Download	Tải xuống
++	Coming soon	Sắp ra mắt
++	Checking…	Đang kiểm tra…
++	Not available	Không khả dụng
++	Offline	Ngoại tuyến
++	Downloading {done} of {total}	Đang tải {done} trên {total}
++	Downloading…	Đang tải xuống…
++	Reconnecting…	Đang kết nối lại…
++	Verifying…	Đang xác minh…
++	Installing, then restarting…	Đang cài đặt, sau đó khởi động lại…
++	Installing…	Đang cài đặt…
++	Removing…	Đang gỡ cài đặt…
++	Pause download	Tạm dừng tải
++	Cancel download	Hủy tải
++	Resume download	Tiếp tục tải
++	Discard download	Xóa bản tải xuống
++	Release notes	Ghi chú phát hành
++	Show in Finder	Hiển thị trong Finder
++	Show in Explorer	Hiển thị trong Explorer
++	Show in Files	Hiển thị trong trình quản lý tệp
++	Reinstall	Cài đặt lại
++	Uninstall…	Gỡ cài đặt…
++	All releases	Tất cả bản phát hành
++	KIO Launcher {version} is available.	Đã có KIO Launcher {version}.
++	Dismiss	Bỏ qua
++	Update and restart	Cập nhật và khởi động lại
++	A new version is available. Would you like to relaunch with the updated version?	Đã có phiên bản mới. Bạn có muốn khởi động lại bằng phiên bản đã cập nhật không?
++	Later	Để sau
++	What's new	Có gì mới
++	No notes were published with this release.	Bản phát hành này không có ghi chú.
++	Released {date}	Phát hành {date}
++	Open on GitHub	Mở trên GitHub
++	Close	Đóng
++	KIO Launcher {version}	KIO Launcher {version}
++	Only when I ask	Chỉ khi tôi yêu cầu
++	Automatically download and install updates	Tự động tải và cài đặt bản cập nhật
++	Notify me when an installed app has an update	Thông báo khi có bản cập nhật cho ứng dụng đã cài
++	Include pre-releases (betas and release candidates)	Bao gồm bản phát hành thử nghiệm (beta và ứng viên phát hành)
++	Installing on Linux	Cài đặt trên Linux
++	Install new apps as	Định dạng cài ứng dụng mới
++	System package (recommended)	Gói hệ thống (khuyên dùng)
++	Updates always use the format an app was installed with.	Bản cập nhật luôn dùng định dạng đã dùng để cài ứng dụng.
++	Running in the background	Chạy nền
++	Keep running in the tray when the window is closed	Tiếp tục chạy trong khay hệ thống khi đóng cửa sổ
++	Show the window on the current desktop	Hiển thị cửa sổ trên màn hình làm việc hiện tại
++	Start KIO Launcher when I log in	Khởi chạy KIO Launcher khi tôi đăng nhập
++	Community	Cộng đồng
++	Questions, ideas and news from the ArtCraft team	Câu hỏi, ý tưởng và tin tức từ nhóm ArtCraft
++	Appearance	Giao diện
++	Quit KIO Launcher	Thoát KIO Launcher
++	Done	Xong
++	Uninstall {name}?	Gỡ cài đặt {name}?
++	The app will be moved to the Trash. Your documents and settings stay.	Ứng dụng sẽ được chuyển vào Thùng rác. Tài liệu và cài đặt của bạn được giữ lại.
++	Windows will remove it like any installed program. Your documents and settings stay.	Windows sẽ gỡ ứng dụng như các chương trình đã cài khác. Tài liệu và cài đặt của bạn được giữ lại.
++	Your system's package manager will remove it, and may ask for your password. Your documents and settings stay.	Trình quản lý gói của hệ thống sẽ gỡ ứng dụng và có thể yêu cầu mật khẩu. Tài liệu và cài đặt của bạn được giữ lại.
++	The app will be removed. Your documents and settings stay.	Ứng dụng sẽ bị gỡ. Tài liệu và cài đặt của bạn được giữ lại.
++	Uninstall	Gỡ cài đặt
++	Cancel	Hủy
++	Checked {ago}	Đã kiểm tra {ago}
++	just now	vừa xong
++	yesterday	ngày hôm qua
++	{month} {day}, {year}	{day}/{month}/{year}
++	Automatically	Tự động
++	Every Craft app	Mọi ứng dụng Craft
++	Apps on this computer	Ứng dụng trên máy tính này
++	Installed apps with a newer version	Ứng dụng đã cài có phiên bản mới hơn
++	Apps you can install	Ứng dụng có thể cài đặt
++	Hide App	Ẩn ứng dụng
++	Unhide App	Hiện lại ứng dụng
++	Hidden Apps	Ứng dụng đã ẩn
++	Apps you hid	Ứng dụng bạn đã ẩn
++	Checked {ago} · using {sources}	Đã kiểm tra {ago} · dùng {sources}
++	{a} and {b}	{a} và {b}
++	Join the Discord	Tham gia Discord
++	Learn more	Tìm hiểu thêm
++	Minimize	Thu nhỏ
++	Maximize	Phóng to
++	Restore	Khôi phục
++	New	Mới
++	OK	OK
++	Open link	Mở liên kết
++	Update	Cập nhật
++	{name} icon	Biểu tượng {name}
++	Loading KIO Launcher…	Đang tải KIO Launcher…
++	Cancel update	Hủy cập nhật
++	Stop waiting; the update can be started again later	Dừng chờ; bạn có thể bắt đầu lại bản cập nhật sau
++	Download again	Tải lại
++	Install cancelled	Đã hủy cài đặt
++	Install cancelled. The download is kept for the next try.	Đã hủy cài đặt. Bản tải xuống được giữ lại để thử lần sau.
++	Update cancelled	Đã hủy cập nhật
++	Uninstall cancelled	Đã hủy gỡ cài đặt
++	Retry install	Thử cài đặt lại
++	Retry update to {version}	Thử cập nhật lại lên {version}
++	The download is still here. It's checked again, then installed.	Bản tải xuống vẫn được giữ. Tệp sẽ được kiểm tra lại rồi cài đặt.
++	Waiting for another app…	Đang chờ ứng dụng khác…
++	Waiting for other installs…	Đang chờ các lượt cài đặt khác…
++	Installer (.msi)	Trình cài đặt (.msi)
++	Portable (.zip)	Bản di động (.zip)
++	Disk image (.dmg)	Ảnh đĩa (.dmg)
++	Debian package (.deb)	Gói Debian (.deb)
++	RPM package (.rpm)	Gói RPM (.rpm)
++	Flatpak bundle	Gói Flatpak
++	Tarball (.tar.gz)	Kho lưu trữ (.tar.gz)
++photocraft	Image editing	Chỉnh sửa ảnh
++vectorcraft	Vector illustration	Vẽ đồ họa vector
++filmcraft	Video editing, color and sound	Biên tập video, màu sắc và âm thanh
++lightcraft	Photo library and raw development	Thư viện ảnh và xử lý ảnh thô
++pdfcraft	Reading, organizing and protecting PDFs	Đọc, sắp xếp và bảo vệ tệp PDF
++effectcraft	Motion graphics and visual effects	Đồ họa chuyển động và hiệu ứng hình ảnh
++designcraft	Page layout and publishing	Dàn trang và xuất bản
++wordcraft	Writing and document design	Soạn thảo và thiết kế tài liệu
++deckcraft	Presentations and slide shows	Bài thuyết trình và trình chiếu
++gridcraft	Spreadsheets and data	Bảng tính và dữ liệu
++cadcraft	Computer-aided design and drafting	Thiết kế và vẽ kỹ thuật trên máy tính
++soundcraft	Recording, editing and mixing audio	Thu, biên tập và trộn âm thanh
++figcraft	Interface design and prototyping	Thiết kế giao diện và tạo mẫu
++month	Jan	tháng 1
++month	Feb	tháng 2
++month	Mar	tháng 3
++month	Apr	tháng 4
++month	May	tháng 5
++month	Jun	tháng 6
++month	Jul	tháng 7
++month	Aug	tháng 8
++month	Sep	tháng 9
++month	Oct	tháng 10
++month	Nov	tháng 11
++month	Dec	tháng 12
++	Not checked yet	Chưa kiểm tra
++	GitHub's hourly limit was reached; full details return in {min} min	Đã đạt giới hạn yêu cầu mỗi giờ của GitHub; chi tiết đầy đủ sẽ có lại sau {min} phút
++	GitHub limit hit; back in {min} min	Đã đạt giới hạn GitHub; thử lại sau {min} phút
++	Installing for {platform}	Cài đặt cho {platform}
++	Downloads for {platform}	Tệp tải cho {platform}
++	No downloads for this system	Không có bản tải cho hệ thống này
++	Join the ArtCraft community on Discord	Tham gia cộng đồng ArtCraft trên Discord
++	ArtCraft on {name}	ArtCraft trên {name}
++	Couldn't open {name}: {e}	Không thể mở {name}: {e}
++	Download cancelled	Đã hủy tải
++	Available to install	Có thể cài đặt
++	Available	Khả dụng
++	Installed · up to date	Đã cài · đã cập nhật
++	Update available	Có bản cập nhật
++	Installed	Đã cài đặt
++	installed	đã cài
++	Not available here	Không khả dụng ở đây
++	Updating…	Đang cập nhật…
++	Update paused	Đã tạm dừng cập nhật
++	Download paused	Đã tạm dừng tải
++	{version} installed → {latest} released	Đã cài {version} → đã phát hành {latest}
++	Version {version}	Phiên bản {version}
++	{installed} installed · latest {latest}	Đã cài {installed} · mới nhất {latest}
++	Installed · latest {latest}	Đã cài · mới nhất {latest}
++	Version {version} installed	Đã cài phiên bản {version}
++	Version {latest}	Phiên bản {latest}
++	No release published yet	Chưa có bản phát hành
++	KIO Launcher	KIO Launcher
++	App	Ứng dụng
++	Latest	Mới nhất
++	Released	Ngày phát hành
++	Auto	Tự động
++	Language	Ngôn ngữ
++	Ascending	Tăng dần
++	Descending	Giảm dần
++	Click to reverse the order	Nhấp để đảo thứ tự
++	Click to sort by this column	Nhấp để sắp xếp theo cột này
++	Like {name}	Tương tự {name}
++	{done} of {total}	{done} trên {total}
++	Downloading	Đang tải xuống
++	Verifying checksum…	Đang xác minh tổng kiểm tra…
++	Resume	Tiếp tục
++	{done} of {total} downloaded	Đã tải {done} trên {total}
++	{done} downloaded	Đã tải {done}
++	Checking for updates…	Đang kiểm tra bản cập nhật…
++	Downloads the new version, replaces this one and opens it again	Tải phiên bản mới, thay thế phiên bản này rồi mở lại
++	Couldn't check for updates: {f}	Không thể kiểm tra bản cập nhật: {f}
++	Website (coming soon)	Trang web (sắp ra mắt)
++	GitHub repository	Kho mã nguồn trên GitHub
++	ArtCraft	ArtCraft
++	Update 1 app	Cập nhật 1 ứng dụng
++	Update all ({count})	Cập nhật tất cả ({count})
++	⊞  Grid	⊞  Lưới
++	☰  Table	☰  Bảng
++	🔍  Search apps	🔍  Tìm ứng dụng
++	{name} {version}	{name} {version}
++	Match system	Theo hệ thống
++	Dark	Tối
++	Light	Sáng
++	Full changelog	Nhật ký thay đổi đầy đủ
++	link	liên kết
++	No apps match	Không có ứng dụng phù hợp
++	Open KIO Launcher to update.	Mở KIO Launcher để cập nhật.
++	{name} {v} is available	Đã có {name} {v}
++	{count} updates are available	Có {count} bản cập nhật
++	These notes weren't fetched (GitHub's request limit was reached). They're on the release page.	Không tải được ghi chú này do đã đạt giới hạn yêu cầu GitHub. Bạn có thể xem trên trang phát hành.
++	When on, opening the launcher from the menu bar brings its window to the desktop you're on. When off, macOS switches you to the desktop the window was on.	Khi bật, mở trình khởi chạy từ thanh menu sẽ đưa cửa sổ đến màn hình làm việc hiện tại. Khi tắt, macOS chuyển đến màn hình làm việc đang chứa cửa sổ.
++	Couldn't change the login item: {e}	Không thể thay đổi mục đăng nhập: {e}
++column	App	Ứng dụng
++column	Installed	Đã cài đặt
++column	Latest	Mới nhất
++column	Released	Ngày phát hành
++filter	Installed	Đã cài đặt
++	App details	Chi tiết ứng dụng
++	Close (Esc)	Đóng (Esc)
++	Features	Tính năng
++	Latest release	Bản phát hành mới nhất
++	Version	Phiên bản
++	Platforms	Nền tảng
++	Releases	Bản phát hành
++	Enlarge picture	Phóng to ảnh
++	Click to enlarge	Nhấp để phóng to
++	Previous picture (←)	Ảnh trước (←)
++	Next picture (→)	Ảnh tiếp (→)
++	Loading pictures…	Đang tải ảnh…
++	Pictures couldn't be loaded. Reopen this page to try again.	Không tải được ảnh. Mở lại trang này để thử lại.
++	{name} details	Chi tiết {name}
++@plural	{n} app|{n} apps	{n} ứng dụng
++@plural	{n} min ago|{n} min ago	{n} phút trước
++@plural	{n} h ago|{n} h ago	{n} giờ trước
++@plural	{n} day ago|{n} days ago	{n} ngày trước
++@msg	Couldn't open {name}: {e}	Không thể mở {name}: {e}
++@msg	Download cancelled	Đã hủy tải
++@msg	{name} updated to {version}	Đã cập nhật {name} lên {version}
++@msg	{name} installed: {version}	Đã cài {name}: {version}
++@msg	{name} updated to {version} (this release publishes no checksum, so only its size was checked)	Đã cập nhật {name} lên {version} (bản phát hành này không cung cấp tổng kiểm tra nên chỉ kiểm tra kích thước tệp)
++@msg	{name} installed: {version} (this release publishes no checksum, so only its size was checked)	Đã cài {name}: {version} (bản phát hành này không cung cấp tổng kiểm tra nên chỉ kiểm tra kích thước tệp)
++@msg	{name} was removed	Đã gỡ {name}
++@msg	{name} is running. Quit it, then try again.	{name} đang chạy. Hãy thoát rồi thử lại.
++@id	app.install	Cài đặt
++@id	app.update	Cập nhật lên {v}
++@id	app.open	Mở
++@id	app.download	Tải cho {os}
++@id	app.reveal	Hiển thị trong Finder
++@id	app.reinstall	Cài đặt lại
++@id	app.uninstall	Gỡ cài đặt…
++@id	app.notes	Ghi chú phát hành
++@id	app.website	Trang web
++@id	app.github	Kho mã nguồn trên GitHub
++@id	app.releases	Tất cả bản phát hành
++@id	launcher.update	Cập nhật và khởi động lại
++@id	launcher.download	Tải xuống
++@id	launcher.notes	Có gì mới
++@id	launcher.dismiss	Bỏ qua
++@id	settings.open	Cài đặt
++@id	settings.quit	Thoát KIO Launcher
++@id	view.grid	Lưới
++@id	view.table	Bảng
++@id	filter.all	Tất cả
++@id	filter.installed	Đã cài đặt
++@id	filter.updates	Bản cập nhật
++@id	filter.notinstalled	Chưa cài đặt
++@id	sort.suite	Thứ tự bộ ứng dụng
++@id	sort.name	Tên
++@id	sort.inspired	Lấy cảm hứng từ
++@id	sort.status	Trạng thái
++@id	sort.installed	Phiên bản đã cài
++@id	sort.latest	Phiên bản mới nhất
++@id	sort.released	Bản phát hành mới nhất
++@id	help.discord	Discord
++@id	help.github	GitHub
++@id	help.website	Trang web
++@id	update.check	Kiểm tra bản cập nhật
++@id	update.check_auto	Tự động kiểm tra bản cập nhật
++@id	update.notify	Thông báo khi có bản cập nhật cho ứng dụng đã cài
++@id	update.prereleases	Bao gồm bản phát hành thử nghiệm (beta và ứng viên phát hành)
++@id	linux.preferred_kind	Định dạng cài ứng dụng mới
++@id	tray.close_to_tray	Tiếp tục chạy trong khay hệ thống khi đóng cửa sổ
++@id	tray.show_on_current_desktop	Hiển thị cửa sổ trên màn hình làm việc hiện tại
++@id	tray.login_item	Khởi chạy KIO Launcher khi tôi đăng nhập
++@id	appearance.theme	Giao diện
++	Show KIO Launcher	Hiển thị KIO Launcher
++	Check for Updates	Kiểm tra bản cập nhật
++	Visit getartcraft.com	Truy cập getartcraft.com
++	ArtCraft on GitHub	ArtCraft trên GitHub
++	Join the ArtCraft Discord	Tham gia Discord của ArtCraft
++@plural	KIO Launcher · {n} update available|KIO Launcher · {n} updates available	KIO Launcher · có {n} bản cập nhật
++	No font for this language was found on this system. Install a font for this language and restart KIO Launcher.	Không tìm thấy phông chữ cho ngôn ngữ này trên hệ thống. Hãy cài phông chữ phù hợp rồi khởi động lại KIO Launcher.
 diff --git a/crates/ui-egui/src/i18n/zh-CN.tsv b/crates/ui-egui/src/i18n/zh-CN.tsv
-index bdc9e1221835d7ab237a34df724e8b324a2c4899..e42bd7533aeef3d7f72ba8996ec59036f6957a9d 100644
+index bdc9e12..b6becfc 100644
 --- a/crates/ui-egui/src/i18n/zh-CN.tsv
 +++ b/crates/ui-egui/src/i18n/zh-CN.tsv
 @@ -1,12 +1,12 @@
@@ -148501,8 +149744,9 @@ index bdc9e1221835d7ab237a34df724e8b324a2c4899..e42bd7533aeef3d7f72ba8996ec59036
  # Shown with the system's Chinese font (PingFang, Microsoft YaHei, Noto Sans CJK…): see cjk_font.rs.
  # Chinese has one plural form. Placeholders and trailing ellipses are preserved.
  
- 	Launcher	Launcher
+-	Launcher	Launcher
 -	Craft App Suite	Craft App Suite
++	Launcher	启动器
 +	KIO App Suite	KIO App Suite
  	Open Source Tools for Creatives, Makers, and Builders	为创作者和开发者打造的开源工具
  	Settings	设置
@@ -148599,8 +149843,334 @@ index bdc9e1221835d7ab237a34df724e8b324a2c4899..e42bd7533aeef3d7f72ba8996ec59036
  	Download cancelled	下载已取消
  	Automatically	自动
  	Checked {ago} · using {sources}	上次检查：{ago} · 来源：{sources}
+@@ -312,3 +312,9 @@ figcraft	Interface design and prototyping	界面设计与原型制作
+ @msg	{name} installed: {version} (this release publishes no checksum, so only its size was checked)	{name} 已安装：{version}（此版本未发布校验和，因此只检查了文件大小）
+ @msg	{name} was removed	{name} 已卸载
+ @msg	{name} is running. Quit it, then try again.	{name} 正在运行。请先退出，然后重试。
++	Inspired by	灵感来源
++	Couldn't open {name}: {e}	无法打开 {name}：{e}
++	Like {name}	类似 {name}
++	Website (coming soon)	网站（即将推出）
++@id	sort.inspired	灵感来源
++	No font for this language was found on this system. Install a font for this language and restart KIO Launcher.	系统找不到此语言适用的字体。请安装适用字体，然后重新启动 KIO Launcher。
+diff --git a/crates/ui-egui/src/i18n/zh-TW.tsv b/crates/ui-egui/src/i18n/zh-TW.tsv
+new file mode 100644
+index 0000000..2f9ab98
+--- /dev/null
++++ b/crates/ui-egui/src/i18n/zh-TW.tsv
+@@ -0,0 +1,310 @@
++# KIO original translations. MIT. context<TAB>source<TAB>translation.
++# Official product names, URLs and file extensions are preserved.
++	Launcher	啟動器
++	KIO App Suite	KIO App Suite
++	Open Source Tools for Creatives, Makers, and Builders	為創作者、製作者與開發者打造的開放原始碼工具
++	Settings	設定
++	Check for updates	檢查更新
++	Grid	格狀
++	Table	表格
++	Show apps as cards	以卡片顯示應用程式
++	Show apps as a table	以表格顯示應用程式
++	All	全部
++	Updates	更新
++	Not installed	尚未安裝
++	Search apps	搜尋應用程式
++	Sort	排序
++	Suite order	套件順序
++	Name	名稱
++	Inspired by	靈感來源
++	Status	狀態
++	Installed version	已安裝版本
++	Latest version	最新版本
++	Newest release	最新發行版本
++	Discord	Discord
++	GitHub	GitHub
++	Website	網站
++	Classic apps	經典應用程式
++	Classic	經典
++	New apps	新應用程式
++	NEW	全新
++	Install	安裝
++	Update to {v}	更新至 {v}
++	Open	開啟
++	Download for {os}	下載 {os} 版本
++	Download	下載
++	Coming soon	即將推出
++	Checking…	正在檢查…
++	Not available	無法使用
++	Offline	離線
++	Downloading {done} of {total}	正在下載 {done}／{total}
++	Downloading…	正在下載…
++	Reconnecting…	正在重新連線…
++	Verifying…	正在驗證…
++	Installing, then restarting…	正在安裝，完成後將重新啟動…
++	Installing…	正在安裝…
++	Removing…	正在移除…
++	Pause download	暫停下載
++	Cancel download	取消下載
++	Resume download	繼續下載
++	Discard download	捨棄下載檔案
++	Release notes	版本說明
++	Show in Finder	在 Finder 中顯示
++	Show in Explorer	在檔案總管中顯示
++	Show in Files	在檔案管理員中顯示
++	Reinstall	重新安裝
++	Uninstall…	解除安裝…
++	All releases	所有發行版本
++	KIO Launcher {version} is available.	KIO Launcher {version} 已推出。
++	Dismiss	關閉
++	Update and restart	更新並重新啟動
++	A new version is available. Would you like to relaunch with the updated version?	已有新版本。要以更新後的版本重新啟動嗎？
++	Later	稍後
++	What's new	新功能
++	No notes were published with this release.	此版本未提供版本說明。
++	Released {date}	發行日期：{date}
++	Open on GitHub	在 GitHub 開啟
++	Close	關閉
++	KIO Launcher {version}	KIO Launcher {version}
++	Only when I ask	僅在我要求時
++	Automatically download and install updates	自動下載並安裝更新
++	Notify me when an installed app has an update	已安裝的應用程式有更新時通知我
++	Include pre-releases (betas and release candidates)	包含預先發行版本（測試版與候選版本）
++	Installing on Linux	在 Linux 上安裝
++	Install new apps as	新應用程式安裝格式
++	System package (recommended)	系統套件（建議）
++	Updates always use the format an app was installed with.	更新一律使用原本安裝應用程式時的格式。
++	Running in the background	在背景執行
++	Keep running in the tray when the window is closed	關閉視窗後繼續在系統匣執行
++	Show the window on the current desktop	在目前的桌面顯示視窗
++	Start KIO Launcher when I log in	登入時啟動 KIO Launcher
++	Community	社群
++	Questions, ideas and news from the ArtCraft team	ArtCraft 團隊的問答、想法與消息
++	Appearance	外觀
++	Quit KIO Launcher	結束 KIO Launcher
++	Done	完成
++	Uninstall {name}?	要解除安裝 {name} 嗎？
++	The app will be moved to the Trash. Your documents and settings stay.	應用程式將移至垃圾桶。您的文件與設定會保留。
++	Windows will remove it like any installed program. Your documents and settings stay.	Windows 會像移除其他已安裝的程式一樣移除此應用程式。您的文件與設定會保留。
++	Your system's package manager will remove it, and may ask for your password. Your documents and settings stay.	系統套件管理員將移除應用程式，過程中可能要求輸入密碼。您的文件與設定會保留。
++	The app will be removed. Your documents and settings stay.	應用程式將被移除。您的文件與設定會保留。
++	Uninstall	解除安裝
++	Cancel	取消
++	Checked {ago}	上次檢查：{ago}
++	just now	剛剛
++	yesterday	昨天
++	{month} {day}, {year}	{year} 年 {month} {day} 日
++	Automatically	自動
++	Every Craft app	所有 Craft 應用程式
++	Apps on this computer	這部電腦上的應用程式
++	Installed apps with a newer version	已有新版本的已安裝應用程式
++	Apps you can install	可安裝的應用程式
++	Hide App	隱藏應用程式
++	Unhide App	取消隱藏應用程式
++	Hidden Apps	已隱藏的應用程式
++	Apps you hid	您隱藏的應用程式
++	Checked {ago} · using {sources}	上次檢查：{ago} · 使用 {sources}
++	{a} and {b}	{a} 與 {b}
++	Join the Discord	加入 Discord
++	Learn more	瞭解更多
++	Minimize	最小化
++	Maximize	最大化
++	Restore	還原
++	New	新增
++	OK	確定
++	Open link	開啟連結
++	Update	更新
++	{name} icon	{name} 圖示
++	Loading KIO Launcher…	正在載入 KIO Launcher…
++	Cancel update	取消更新
++	Stop waiting; the update can be started again later	停止等候；稍後可重新開始更新
++	Download again	重新下載
++	Install cancelled	已取消安裝
++	Install cancelled. The download is kept for the next try.	已取消安裝。下載檔案會保留供下次重試。
++	Update cancelled	已取消更新
++	Uninstall cancelled	已取消解除安裝
++	Retry install	重試安裝
++	Retry update to {version}	重試更新至 {version}
++	The download is still here. It's checked again, then installed.	下載檔案仍在，將重新檢查後安裝。
++	Waiting for another app…	正在等候其他應用程式…
++	Waiting for other installs…	正在等候其他安裝作業…
++	Installer (.msi)	安裝程式（.msi）
++	Portable (.zip)	可攜版（.zip）
++	Disk image (.dmg)	磁碟映像檔（.dmg）
++	Debian package (.deb)	Debian 套件（.deb）
++	RPM package (.rpm)	RPM 套件（.rpm）
++	Flatpak bundle	Flatpak 套件
++	Tarball (.tar.gz)	壓縮檔（.tar.gz）
++photocraft	Image editing	影像編輯
++vectorcraft	Vector illustration	向量繪圖
++filmcraft	Video editing, color and sound	影片、色彩與音效編輯
++lightcraft	Photo library and raw development	相片圖庫與 RAW 顯影
++pdfcraft	Reading, organizing and protecting PDFs	閱讀、整理與保護 PDF
++effectcraft	Motion graphics and visual effects	動態圖形與視覺特效
++designcraft	Page layout and publishing	頁面編排與出版
++wordcraft	Writing and document design	文件撰寫與設計
++deckcraft	Presentations and slide shows	簡報與投影片放映
++gridcraft	Spreadsheets and data	試算表與資料
++cadcraft	Computer-aided design and drafting	電腦輔助設計與製圖
++soundcraft	Recording, editing and mixing audio	音訊錄製、編輯與混音
++figcraft	Interface design and prototyping	介面設計與原型製作
++month	Jan	1 月
++month	Feb	2 月
++month	Mar	3 月
++month	Apr	4 月
++month	May	5 月
++month	Jun	6 月
++month	Jul	7 月
++month	Aug	8 月
++month	Sep	9 月
++month	Oct	10 月
++month	Nov	11 月
++month	Dec	12 月
++	Not checked yet	尚未檢查
++	GitHub's hourly limit was reached; full details return in {min} min	已達 GitHub 每小時請求上限；{min} 分鐘後可再次查看完整資訊
++	GitHub limit hit; back in {min} min	已達 GitHub 上限；{min} 分鐘後恢復
++	Installing for {platform}	安裝 {platform} 版本
++	Downloads for {platform}	{platform} 的下載項目
++	No downloads for this system	沒有適用於此系統的下載項目
++	Join the ArtCraft community on Discord	在 Discord 加入 ArtCraft 社群
++	ArtCraft on {name}	{name} 上的 ArtCraft
++	Couldn't open {name}: {e}	無法開啟 {name}：{e}
++	Download cancelled	已取消下載
++	Available to install	可安裝
++	Available	可用
++	Installed · up to date	已安裝 · 已是最新版本
++	Update available	有可用更新
++	Installed	已安裝
++	installed	已安裝
++	Not available here	此處無法使用
++	Updating…	正在更新…
++	Update paused	已暫停更新
++	Download paused	已暫停下載
++	{version} installed → {latest} released	已安裝 {version} → 已發行 {latest}
++	Version {version}	版本 {version}
++	{installed} installed · latest {latest}	已安裝 {installed} · 最新 {latest}
++	Installed · latest {latest}	已安裝 · 最新 {latest}
++	Version {version} installed	已安裝版本 {version}
++	Version {latest}	版本 {latest}
++	No release published yet	尚未發行任何版本
++	KIO Launcher	KIO Launcher
++	App	應用程式
++	Latest	最新
++	Released	發行日期
++	Auto	自動
++	Language	語言
++	Ascending	遞增
++	Descending	遞減
++	Click to reverse the order	按一下以反轉順序
++	Click to sort by this column	按一下依此欄排序
++	Like {name}	類似 {name}
++	{done} of {total}	{done}／{total}
++	Downloading	正在下載
++	Verifying checksum…	正在驗證檢查碼…
++	Resume	繼續
++	{done} of {total} downloaded	已下載 {done}／{total}
++	{done} downloaded	已下載 {done}
++	Checking for updates…	正在檢查更新…
++	Downloads the new version, replaces this one and opens it again	下載新版本、取代目前版本，然後重新開啟
++	Couldn't check for updates: {f}	無法檢查更新：{f}
++	Website (coming soon)	網站（即將推出）
++	GitHub repository	GitHub 原始碼儲存庫
++	ArtCraft	ArtCraft
++	Update 1 app	更新 1 個應用程式
++	Update all ({count})	全部更新（{count}）
++	⊞  Grid	⊞  格狀
++	☰  Table	☰  表格
++	🔍  Search apps	🔍  搜尋應用程式
++	{name} {version}	{name} {version}
++	Match system	跟隨系統
++	Dark	深色
++	Light	淺色
++	Full changelog	完整更新紀錄
++	link	連結
++	No apps match	沒有符合條件的應用程式
++	Open KIO Launcher to update.	請開啟 KIO Launcher 進行更新。
++	{name} {v} is available	{name} {v} 已推出
++	{count} updates are available	有 {count} 項可用更新
++	These notes weren't fetched (GitHub's request limit was reached). They're on the release page.	已達 GitHub 請求上限，無法取得這些說明。您可前往版本頁面查看。
++	When on, opening the launcher from the menu bar brings its window to the desktop you're on. When off, macOS switches you to the desktop the window was on.	啟用時，從選單列開啟啟動器會將視窗帶到目前的桌面。停用時，macOS 會切換至視窗所在的桌面。
++	Couldn't change the login item: {e}	無法變更登入項目：{e}
++column	App	應用程式
++column	Installed	已安裝
++column	Latest	最新
++column	Released	發行日期
++filter	Installed	已安裝
++	App details	應用程式詳細資訊
++	Close (Esc)	關閉（Esc）
++	Features	功能
++	Latest release	最新發行版本
++	Version	版本
++	Platforms	平台
++	Releases	發行版本
++	Enlarge picture	放大圖片
++	Click to enlarge	按一下以放大
++	Previous picture (←)	上一張圖片（←）
++	Next picture (→)	下一張圖片（→）
++	Loading pictures…	正在載入圖片…
++	Pictures couldn't be loaded. Reopen this page to try again.	無法載入圖片。請重新開啟此頁面再試一次。
++	{name} details	{name} 詳細資訊
++@plural	{n} app|{n} apps	{n} 個應用程式
++@plural	{n} min ago|{n} min ago	{n} 分鐘前
++@plural	{n} h ago|{n} h ago	{n} 小時前
++@plural	{n} day ago|{n} days ago	{n} 天前
++@msg	Couldn't open {name}: {e}	無法開啟 {name}：{e}
++@msg	Download cancelled	已取消下載
++@msg	{name} updated to {version}	{name} 已更新至 {version}
++@msg	{name} installed: {version}	已安裝 {name}：{version}
++@msg	{name} updated to {version} (this release publishes no checksum, so only its size was checked)	{name} 已更新至 {version}（此版本未提供檢查碼，因此僅檢查檔案大小）
++@msg	{name} installed: {version} (this release publishes no checksum, so only its size was checked)	已安裝 {name}：{version}（此版本未提供檢查碼，因此僅檢查檔案大小）
++@msg	{name} was removed	已移除 {name}
++@msg	{name} is running. Quit it, then try again.	{name} 正在執行。請結束後再試一次。
++@id	app.install	安裝
++@id	app.update	更新至 {v}
++@id	app.open	開啟
++@id	app.download	下載 {os} 版本
++@id	app.reveal	在 Finder 中顯示
++@id	app.reinstall	重新安裝
++@id	app.uninstall	解除安裝…
++@id	app.notes	版本說明
++@id	app.website	網站
++@id	app.github	GitHub 原始碼儲存庫
++@id	app.releases	所有發行版本
++@id	launcher.update	更新並重新啟動
++@id	launcher.download	下載
++@id	launcher.notes	新功能
++@id	launcher.dismiss	關閉
++@id	settings.open	設定
++@id	settings.quit	結束 KIO Launcher
++@id	view.grid	格狀
++@id	view.table	表格
++@id	filter.all	全部
++@id	filter.installed	已安裝
++@id	filter.updates	更新
++@id	filter.notinstalled	尚未安裝
++@id	sort.suite	套件順序
++@id	sort.name	名稱
++@id	sort.inspired	靈感來源
++@id	sort.status	狀態
++@id	sort.installed	已安裝版本
++@id	sort.latest	最新版本
++@id	sort.released	最新發行版本
++@id	help.discord	Discord
++@id	help.github	GitHub
++@id	help.website	網站
++@id	update.check	檢查更新
++@id	update.check_auto	自動檢查更新
++@id	update.notify	已安裝的應用程式有更新時通知我
++@id	update.prereleases	包含預先發行版本（測試版與候選版本）
++@id	linux.preferred_kind	新應用程式安裝格式
++@id	tray.close_to_tray	關閉視窗後繼續在系統匣執行
++@id	tray.show_on_current_desktop	在目前的桌面顯示視窗
++@id	tray.login_item	登入時啟動 KIO Launcher
++@id	appearance.theme	外觀
++	Show KIO Launcher	顯示 KIO Launcher
++	Check for Updates	檢查更新
++	Visit getartcraft.com	前往 getartcraft.com
++	ArtCraft on GitHub	GitHub 上的 ArtCraft
++	Join the ArtCraft Discord	加入 ArtCraft Discord
++@plural	KIO Launcher · {n} update available|KIO Launcher · {n} updates available	KIO Launcher · 有 {n} 項可用更新
++	No font for this language was found on this system. Install a font for this language and restart KIO Launcher.	系統找不到此語言適用的字型。請安裝適用字型，然後重新啟動 KIO Launcher。
 diff --git a/crates/ui-egui/src/icons.rs b/crates/ui-egui/src/icons.rs
-index eb79df57d993c18c33c80685333a172ff0164a13..a6d112bed8f4a31ff8063b876a61547a72bdc6f8 100644
+index eb79df5..a6d112b 100644
 --- a/crates/ui-egui/src/icons.rs
 +++ b/crates/ui-egui/src/icons.rs
 @@ -25,15 +25,11 @@ pub fn app(id: &str) -> Option<ImageSource<'static>> {
@@ -148629,7 +150199,7 @@ index eb79df57d993c18c33c80685333a172ff0164a13..a6d112bed8f4a31ff8063b876a61547a
 +    egui::include_image!("../../../assets/app-icon/kio.svg")
  }
 diff --git a/crates/ui-egui/src/lib.rs b/crates/ui-egui/src/lib.rs
-index 3198378f444156034a722bbc6eeffb837dd0c301..064b24a5703ccd3a830e981a113cad85477c10fa 100644
+index 3198378..064b24a 100644
 --- a/crates/ui-egui/src/lib.rs
 +++ b/crates/ui-egui/src/lib.rs
 @@ -1,4 +1,4 @@
@@ -148639,7 +150209,7 @@ index 3198378f444156034a722bbc6eeffb837dd0c301..064b24a5703ccd3a830e981a113cad85
  //!
  //! The UI is thin: it draws [`model::AppEntry`]s and sends
 diff --git a/crates/ui-egui/src/theme.rs b/crates/ui-egui/src/theme.rs
-index 57067fd51151d9a35cc5ebd07d812a58b38cddc3..2620e860377b0cc79110d8898a205d9b4cfd4b1b 100644
+index 57067fd..2620e86 100644
 --- a/crates/ui-egui/src/theme.rs
 +++ b/crates/ui-egui/src/theme.rs
 @@ -91,7 +91,7 @@ impl Tokens {
@@ -148652,7 +150222,7 @@ index 57067fd51151d9a35cc5ebd07d812a58b38cddc3..2620e860377b0cc79110d8898a205d9b
          warn: hex(0xffc14d),
          bad: hex(0xff6259),
 diff --git a/crates/ui-egui/src/views.rs b/crates/ui-egui/src/views.rs
-index bf844fe1a6167b0cc28019d49cae7d995eb42f88..004f45a34fdf173062a9c8cd90ab08d61452440a 100644
+index bf844fe..004f45a 100644
 --- a/crates/ui-egui/src/views.rs
 +++ b/crates/ui-egui/src/views.rs
 @@ -117,9 +117,9 @@ impl LauncherUi {
@@ -148677,7 +150247,7 @@ index bf844fe1a6167b0cc28019d49cae7d995eb42f88..004f45a34fdf173062a9c8cd90ab08d6
                                  .color(t.ink_strong),
                          );
 diff --git a/crates/ui-egui/tests/french.rs b/crates/ui-egui/tests/french.rs
-index af9a9eb53a0698445c8e4dc61f9857225c9f35cf..4cbad7447ce526292b47762c1ad7c1f555dfe162 100644
+index af9a9eb..4cbad74 100644
 --- a/crates/ui-egui/tests/french.rs
 +++ b/crates/ui-egui/tests/french.rs
 @@ -75,7 +75,7 @@ fn events() -> Vec<Event> {
@@ -148705,7 +150275,7 @@ index af9a9eb53a0698445c8e4dc61f9857225c9f35cf..4cbad7447ce526292b47762c1ad7c1f5
      let mut table = harness(ViewMode::Table);
      table.run_steps(8);
 diff --git a/crates/ui-egui/tests/german.rs b/crates/ui-egui/tests/german.rs
-index eb80c39337a473a6b261b2bbd9c4d4de4b16aa39..23f872ffea2799d81e9f1f6b3fb95f7234a443a4 100644
+index eb80c39..23f872f 100644
 --- a/crates/ui-egui/tests/german.rs
 +++ b/crates/ui-egui/tests/german.rs
 @@ -190,7 +190,7 @@ fn german_switches_persists_and_keeps_install_actions() {
@@ -148718,7 +150288,7 @@ index eb80c39337a473a6b261b2bbd9c4d4de4b16aa39..23f872ffea2799d81e9f1f6b3fb95f72
                      assert!(!rect.intersects(text.rect()), "{width}: {label} overlaps {rect:?}");
                  }
 diff --git a/crates/ui-egui/tests/hungarian.rs b/crates/ui-egui/tests/hungarian.rs
-index a80a4eb656eddc82065be7a01fa76dc226c1333f..1a0475e38fc6a8270709890e4570a1be632365fe 100644
+index a80a4eb..1a0475e 100644
 --- a/crates/ui-egui/tests/hungarian.rs
 +++ b/crates/ui-egui/tests/hungarian.rs
 @@ -83,7 +83,7 @@ fn events() -> Vec<Event> {
@@ -148746,7 +150316,7 @@ index a80a4eb656eddc82065be7a01fa76dc226c1333f..1a0475e38fc6a8270709890e4570a1be
      let mut table = harness(ViewMode::Table);
      table.run_steps(8);
 diff --git a/crates/ui-egui/tests/polish.rs b/crates/ui-egui/tests/polish.rs
-index 6293f431d5b4b49d82960788d3c07bd5ca46c2b4..853b4e4b2be2e7effae3476a0d4937c35f90e2bb 100644
+index 6293f43..853b4e4 100644
 --- a/crates/ui-egui/tests/polish.rs
 +++ b/crates/ui-egui/tests/polish.rs
 @@ -75,7 +75,7 @@ fn events() -> Vec<Event> {
@@ -148774,7 +150344,7 @@ index 6293f431d5b4b49d82960788d3c07bd5ca46c2b4..853b4e4b2be2e7effae3476a0d4937c3
      let mut table = harness(ViewMode::Table);
      table.run_steps(8);
 diff --git a/crates/ui-egui/tests/portuguese.rs b/crates/ui-egui/tests/portuguese.rs
-index e3eea7e37f73d31debf1da45c612b4c206a5b27a..07a14ae06eac8b2579f615c4c0086c29aec2e508 100644
+index e3eea7e..07a14ae 100644
 --- a/crates/ui-egui/tests/portuguese.rs
 +++ b/crates/ui-egui/tests/portuguese.rs
 @@ -72,7 +72,7 @@ fn events() -> Vec<Event> {
@@ -148802,7 +150372,7 @@ index e3eea7e37f73d31debf1da45c612b4c206a5b27a..07a14ae06eac8b2579f615c4c0086c29
      let mut table = harness(ViewMode::Table);
      table.run_steps(8);
 diff --git a/crates/ui-egui/tests/russian.rs b/crates/ui-egui/tests/russian.rs
-index 204a84dda5fb25f0d181316caf1e65b42785413d..2650f45e72d9ad5a645e9d0e0f073f012bd59aff 100644
+index 204a84d..2650f45 100644
 --- a/crates/ui-egui/tests/russian.rs
 +++ b/crates/ui-egui/tests/russian.rs
 @@ -75,7 +75,7 @@ fn events() -> Vec<Event> {
@@ -148830,7 +150400,7 @@ index 204a84dda5fb25f0d181316caf1e65b42785413d..2650f45e72d9ad5a645e9d0e0f073f01
      let mut table = harness(ViewMode::Table);
      table.run_steps(8);
 diff --git a/crates/ui-egui/tests/spanish.rs b/crates/ui-egui/tests/spanish.rs
-index 8f85180eda3f41000487dee9264d07f4afa1d0bb..d6d0a1fd72ef6bce416b76bdda7393518756f0ed 100644
+index 8f85180..d6d0a1f 100644
 --- a/crates/ui-egui/tests/spanish.rs
 +++ b/crates/ui-egui/tests/spanish.rs
 @@ -75,7 +75,7 @@ fn events() -> Vec<Event> {
@@ -148858,7 +150428,7 @@ index 8f85180eda3f41000487dee9264d07f4afa1d0bb..d6d0a1fd72ef6bce416b76bdda739351
      let mut table = harness(ViewMode::Table);
      table.run_steps(8);
 diff --git a/crates/ui-egui/tests/ui.rs b/crates/ui-egui/tests/ui.rs
-index a89a4aa158a22d6d70f5bb96fed167185ac56688..74f0c98ba2597eb42acdeb8d53499cd64a9f899e 100644
+index a89a4aa..74f0c98 100644
 --- a/crates/ui-egui/tests/ui.rs
 +++ b/crates/ui-egui/tests/ui.rs
 @@ -389,8 +389,8 @@ fn a_kept_update_names_its_version_and_an_up_to_date_app_is_not_downloaded_again
@@ -149787,7 +151357,7 @@ tf56#M-sj)H5EK5_7m~~V-~M~UhsPu0=Yf5}`_KzsRMS3}sX}=8{{T<KFP{Ja
 
 diff --git a/docs/brand/artcraft-logo-white.svg b/docs/brand/artcraft-logo-white.svg
 deleted file mode 100644
-index 4af80f757045619475435b3ec52dbf5ed6d15cf7..0000000000000000000000000000000000000000
+index 4af80f7..0000000
 --- a/docs/brand/artcraft-logo-white.svg
 +++ /dev/null
 @@ -1,7 +0,0 @@
@@ -150374,7 +151944,7 @@ ew&(x%&)c}D8%*^he-v=&6Y45j7qZXe1OE?JG~1&9
 
 diff --git a/docs/brand/artcraft-logo.svg b/docs/brand/artcraft-logo.svg
 deleted file mode 100644
-index d63f3eae1b78ec78c2d3c95ce697d2330446cf73..0000000000000000000000000000000000000000
+index d63f3ea..0000000
 --- a/docs/brand/artcraft-logo.svg
 +++ /dev/null
 @@ -1,7 +0,0 @@
@@ -150884,7 +152454,7 @@ e&&}|E4FfI_y3)`krUrPI@WZsQ-d?nobN+v7Axq-`
 
 diff --git a/docs/brand/artcraft-mark-black.svg b/docs/brand/artcraft-mark-black.svg
 deleted file mode 100644
-index 6394353783591b1bd88b4376cbd890ffe16b2077..0000000000000000000000000000000000000000
+index 6394353..0000000
 --- a/docs/brand/artcraft-mark-black.svg
 +++ /dev/null
 @@ -1,4 +0,0 @@
@@ -151294,7 +152864,7 @@ Cm;%NC
 
 diff --git a/docs/brand/artcraft-mark.svg b/docs/brand/artcraft-mark.svg
 deleted file mode 100644
-index 72e191f8ab8a4e142c2ee860bc21ee3e074723fc..0000000000000000000000000000000000000000
+index 72e191f..0000000
 --- a/docs/brand/artcraft-mark.svg
 +++ /dev/null
 @@ -1,4 +0,0 @@
@@ -151303,7 +152873,7 @@ index 72e191f8ab8a4e142c2ee860bc21ee3e074723fc..00000000000000000000000000000000
 -  <path fill="#4e7bfb" d="M104.28,49.49L81.55,0h-31.23l-3.17,4.76L14.75,53.63,0,75.85l21.55,21.55,63.79-36.94,16.99,37.04,14.01-21.74-12.06-26.27ZM32.89,65.66l32.42-48.87,10.91,23.77-43.32,25.09Z"/>
 -</svg>
 diff --git a/packaging/env.sh b/packaging/env.sh
-index 737b18d1385f5d07f648ae406e5b028b6da79978..f1109cd3bf0dcaaf3897ff916444803eb1bf7ce8 100644
+index 737b18d..f1109cd 100644
 --- a/packaging/env.sh
 +++ b/packaging/env.sh
 @@ -48,7 +48,7 @@ warn() {
@@ -151316,7 +152886,7 @@ index 737b18d1385f5d07f648ae406e5b028b6da79978..f1109cd3bf0dcaaf3897ff916444803e
    done
  }
 diff --git a/packaging/freebsd/package.sh b/packaging/freebsd/package.sh
-index de61c36f524fe23bca3857e88830b75f0eac2807..2cb1cc0711be13c0837f3b72dc813139a6f6b38a 100644
+index de61c36..2cb1cc0 100755
 --- a/packaging/freebsd/package.sh
 +++ b/packaging/freebsd/package.sh
 @@ -1,5 +1,5 @@
@@ -151345,7 +152915,7 @@ index de61c36f524fe23bca3857e88830b75f0eac2807..2cb1cc0711be13c0837f3b72dc813139
  export CARGO_BUILD_JOBS="${CARGO_BUILD_JOBS:-4}"
  if [ "$SKIP_BUILD" = 0 ]; then
 diff --git a/packaging/icons.sh b/packaging/icons.sh
-index b004d0dd397e530d543062e5b18c12689f44a00e..ec5ed3707893c703d1e4e6ac8c8db855c691739e 100644
+index b004d0d..ec5ed37 100755
 --- a/packaging/icons.sh
 +++ b/packaging/icons.sh
 @@ -16,7 +16,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -151358,7 +152928,7 @@ index b004d0dd397e530d543062e5b18c12689f44a00e..ec5ed3707893c703d1e4e6ac8c8db855
  trap 'rm -rf "$TMP"' EXIT
  
 diff --git a/packaging/linux/apprun-test.sh b/packaging/linux/apprun-test.sh
-index 23007d1bc2d786611311fa5358d5a08253de2edf..337c687cb7cd6b8b0828ecacd4dc0aeec9106060 100644
+index 23007d1..337c687 100755
 --- a/packaging/linux/apprun-test.sh
 +++ b/packaging/linux/apprun-test.sh
 @@ -8,7 +8,7 @@ set -euo pipefail
@@ -151374,7 +152944,7 @@ diff --git a/packaging/linux/ai.storyteller.artcraft-launcher.desktop b/packagin
 similarity index 71%
 rename from packaging/linux/ai.storyteller.artcraft-launcher.desktop
 rename to packaging/linux/com.kio.launcher.desktop
-index 88e13a21dd416f347e5df3d9d02314b84b5da01a..959f16ad96cda51ccad50827cccdfc27ee6ad2d6 100644
+index 88e13a2..959f16a 100644
 --- a/packaging/linux/ai.storyteller.artcraft-launcher.desktop
 +++ b/packaging/linux/com.kio.launcher.desktop
 @@ -1,11 +1,11 @@
@@ -151396,7 +152966,7 @@ diff --git a/packaging/linux/ai.storyteller.artcraft-launcher.metainfo.xml.in b/
 similarity index 73%
 rename from packaging/linux/ai.storyteller.artcraft-launcher.metainfo.xml.in
 rename to packaging/linux/com.kio.launcher.metainfo.xml.in
-index 7a885ff4f3e0fe5e69d63b3626bf41b4f6fd3ea1..d938dbfc37508f907a7436d1a2306da0a1fad215 100644
+index 7a885ff..d938dbf 100644
 --- a/packaging/linux/ai.storyteller.artcraft-launcher.metainfo.xml.in
 +++ b/packaging/linux/com.kio.launcher.metainfo.xml.in
 @@ -2,19 +2,19 @@
@@ -151438,7 +153008,7 @@ index 7a885ff4f3e0fe5e69d63b3626bf41b4f6fd3ea1..d938dbfc37508f907a7436d1a2306da0
    <url type="homepage">https://getartcraft.com/apps</url>
    <url type="bugtracker">https://github.com/storytold/craft-launcher/issues</url>
 diff --git a/packaging/linux/flatpak-bundle.sh b/packaging/linux/flatpak-bundle.sh
-index e6d36525485134f404a2e623b39087f191665566..dec60e5f8246c7091f5b92e06efbd80b37a865bb 100644
+index e6d3652..dec60e5 100755
 --- a/packaging/linux/flatpak-bundle.sh
 +++ b/packaging/linux/flatpak-bundle.sh
 @@ -1,5 +1,5 @@
@@ -151476,7 +153046,7 @@ diff --git a/packaging/linux/flatpak/ai.storyteller.artcraft-launcher.bundle.yml
 similarity index 83%
 rename from packaging/linux/flatpak/ai.storyteller.artcraft-launcher.bundle.yml
 rename to packaging/linux/flatpak/com.kio.launcher.bundle.yml
-index 836cd11b4ffd61388d44aeee5dc8b4c09ed80f0f..25ed9503406b1075d05d37a5557090551551df1b 100644
+index 836cd11..25ed950 100644
 --- a/packaging/linux/flatpak/ai.storyteller.artcraft-launcher.bundle.yml
 +++ b/packaging/linux/flatpak/com.kio.launcher.bundle.yml
 @@ -9,9 +9,9 @@
@@ -151529,7 +153099,7 @@ diff --git a/packaging/linux/flatpak/ai.storyteller.artcraft-launcher.yml b/pack
 similarity index 80%
 rename from packaging/linux/flatpak/ai.storyteller.artcraft-launcher.yml
 rename to packaging/linux/flatpak/com.kio.launcher.yml
-index f3166436d000da8da0ff380562731fd310bb3bbb..f78ec03391cc5e6d9ff5e0351ffeb71cd2642ed5 100644
+index f316643..f78ec03 100644
 --- a/packaging/linux/flatpak/ai.storyteller.artcraft-launcher.yml
 +++ b/packaging/linux/flatpak/com.kio.launcher.yml
 @@ -1,17 +1,17 @@
@@ -151594,7 +153164,7 @@ index f3166436d000da8da0ff380562731fd310bb3bbb..f78ec03391cc5e6d9ff5e0351ffeb71c
        - type: dir
          path: ../../..
 diff --git a/packaging/linux/package.sh b/packaging/linux/package.sh
-index d3241b0304122656ca666e194c8300af23421966..17203b0804a6812ee54d3b14b4630c8a2c8f1dca 100644
+index d3241b0..17203b0 100755
 --- a/packaging/linux/package.sh
 +++ b/packaging/linux/package.sh
 @@ -1,5 +1,5 @@
@@ -151627,7 +153197,7 @@ index d3241b0304122656ca666e194c8300af23421966..17203b0804a6812ee54d3b14b4630c8a
  if [ "$SKIP_BUILD" = 0 ]; then
    if [ -n "${CROSS_TARGET:-}" ]; then
 diff --git a/packaging/macos/Info.plist.in b/packaging/macos/Info.plist.in
-index 08f16388f58d6e41a10f62ec25b29fc603bb0029..8a29b3a73872580e8a8000b49ea2c0057e192531 100644
+index 08f1638..8a29b3a 100644
 --- a/packaging/macos/Info.plist.in
 +++ b/packaging/macos/Info.plist.in
 @@ -2,20 +2,20 @@
@@ -151673,7 +153243,7 @@ index 08f16388f58d6e41a10f62ec25b29fc603bb0029..8a29b3a73872580e8a8000b49ea2c005
    <string>public.app-category.utilities</string>
    <!-- Must match MACOSX_DEPLOYMENT_TARGET in package.sh. -->
 diff --git a/packaging/macos/package.sh b/packaging/macos/package.sh
-index 3ccc7bc37a40df24c81d0004ffa454e477bb2514..86af68859fbba759100fcf1a81de705d55875567 100644
+index 3ccc7bc..86af688 100755
 --- a/packaging/macos/package.sh
 +++ b/packaging/macos/package.sh
 @@ -1,7 +1,7 @@
@@ -151716,7 +153286,7 @@ index 3ccc7bc37a40df24c81d0004ffa454e477bb2514..86af68859fbba759100fcf1a81de705d
  # `hdiutil create -srcfolder` writes the files as they are. `makehybrid -hfs` gave every file a
  # com.apple.FinderInfo, which `codesign --verify --strict` rejects as "Finder information, or
 diff --git a/packaging/macos/verify.sh b/packaging/macos/verify.sh
-index 2f82656aacd69aa1897432f4f20ec7c3d1c9b3e0..94145a60ada3152fb720d24224d596ca3cacdd88 100644
+index 2f82656..94145a6 100755
 --- a/packaging/macos/verify.sh
 +++ b/packaging/macos/verify.sh
 @@ -17,7 +17,7 @@ set -euo pipefail
@@ -151729,7 +153299,7 @@ index 2f82656aacd69aa1897432f4f20ec7c3d1c9b3e0..94145a60ada3152fb720d24224d596ca
  ARCH=universal
  while [ $# -gt 0 ]; do
 diff --git a/packaging/windows/artcraft-launcher.en-us.wxl b/packaging/windows/artcraft-launcher.en-us.wxl
-index 23e2866299bcf6ded007f0d35a9b904fd115b870..96f0c34767f65a2e4bec299ee2a6788ceb61f995 100644
+index 23e2866..96f0c34 100644
 --- a/packaging/windows/artcraft-launcher.en-us.wxl
 +++ b/packaging/windows/artcraft-launcher.en-us.wxl
 @@ -6,11 +6,11 @@
@@ -151747,7 +153317,7 @@ index 23e2866299bcf6ded007f0d35a9b904fd115b870..96f0c34767f65a2e4bec299ee2a6788c
    <String Id="VerifyReadyDlgInstallTitle" Value="{\WixUI_Font_Title}Ready to install [ProductName] [ArtCraftLauncherVersion]" />
    <!-- Also shown after a repair or removal from the same wizard, so it doesn't say "installed". -->
 diff --git a/packaging/windows/artcraft-launcher.wxs b/packaging/windows/artcraft-launcher.wxs
-index fecba724bf21fac0f131d02ac2e866f0781be4d7..60ad31e2a4f07b7f1c05d3e14b4bdb08a38b5db3 100644
+index fecba72..60ad31e 100644
 --- a/packaging/windows/artcraft-launcher.wxs
 +++ b/packaging/windows/artcraft-launcher.wxs
 @@ -1,6 +1,6 @@
@@ -151908,7 +153478,7 @@ index fecba724bf21fac0f131d02ac2e866f0781be4d7..60ad31e2a4f07b7f1c05d3e14b4bdb08
      </ComponentGroup>
    </Fragment>
 diff --git a/packaging/windows/check-icons.ps1 b/packaging/windows/check-icons.ps1
-index 750aa5ba029163fffda6d93328d69d979492da6f..904e8f6ef284e93f87a756257a6b970ff050e763 100644
+index 750aa5b..904e8f6 100644
 --- a/packaging/windows/check-icons.ps1
 +++ b/packaging/windows/check-icons.ps1
 @@ -1,6 +1,6 @@
@@ -151929,7 +153499,7 @@ index 750aa5ba029163fffda6d93328d69d979492da6f..904e8f6ef284e93f87a756257a6b970f
  $Ns = [Xml.XmlNamespaceManager]::new($Wxs.NameTable)
  $Ns.AddNamespace('w', 'http://wixtoolset.org/schemas/v4/wxs')
 diff --git a/packaging/windows/package.ps1 b/packaging/windows/package.ps1
-index 52cb1e82bcd25cef08efb98f1efce6e4d495f896..54e9a7220cf1b65b0a0c679fc057b06d6c8d6ba6 100644
+index 52cb1e8..54e9a72 100644
 --- a/packaging/windows/package.ps1
 +++ b/packaging/windows/package.ps1
 @@ -1,6 +1,6 @@
@@ -151991,7 +153561,7 @@ index 52cb1e82bcd25cef08efb98f1efce6e4d495f896..54e9a7220cf1b65b0a0c679fc057b06d
  $Zip = Join-Path $Dist "$Pkg-$Version-windows-$Arch-portable.zip"
  Remove-Item -Force $Zip -ErrorAction SilentlyContinue
 diff --git a/packaging/windows/sign.ps1 b/packaging/windows/sign.ps1
-index abc8b45f499ce4c1f1f66de7a7a7b4256da623b4..715694e4d80cc36c85aca7ac29861ce63b74118c 100644
+index abc8b45..715694e 100644
 --- a/packaging/windows/sign.ps1
 +++ b/packaging/windows/sign.ps1
 @@ -55,7 +55,7 @@ if (-not $haveCert -and -not $haveAzure) {
@@ -152004,7 +153574,7 @@ index abc8b45f499ce4c1f1f66de7a7a7b4256da623b4..715694e4d80cc36c85aca7ac29861ce6
  New-Item -ItemType Directory -Force -Path $tmp | Out-Null
  
 diff --git a/xtask/src/local.rs b/xtask/src/local.rs
-index 77283d5b44253fe879ff54719d27caa90edab8fe..90ee8293fe98192d2f1ae84a44dcb3868049f020 100644
+index 77283d5..90ee829 100644
 --- a/xtask/src/local.rs
 +++ b/xtask/src/local.rs
 @@ -19,19 +19,19 @@ use std::time::{SystemTime, UNIX_EPOCH};

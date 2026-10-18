@@ -55,6 +55,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'WiX extension installation failed' }
       - name: Verify pinned complete original source and reviewed fork patch
         run: ${{ matrix.python }} scripts/launcher_native.py prepare
+      - name: Require complete six-language catalogs and exact placeholders
+        run: ${{ matrix.python }} scripts/audit_localization.py --app launcher --require-complete --output dist/launcher-localization.json
       - name: Build actual native app and execute original core, registry, install and UI tests
         run: ${{ matrix.python }} scripts/launcher_native.py build --platform ${{ matrix.platform }}
       - name: Package full native app, legal material and original Windows installer

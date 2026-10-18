@@ -1,0 +1,1230 @@
+[
+  [
+    "",
+    "Launcher"
+  ],
+  [
+    "",
+    "KIO App Suite"
+  ],
+  [
+    "",
+    "Open Source Tools for Creatives, Makers, and Builders"
+  ],
+  [
+    "",
+    "Settings"
+  ],
+  [
+    "",
+    "Check for updates"
+  ],
+  [
+    "",
+    "Grid"
+  ],
+  [
+    "",
+    "Table"
+  ],
+  [
+    "",
+    "Show apps as cards"
+  ],
+  [
+    "",
+    "Show apps as a table"
+  ],
+  [
+    "",
+    "All"
+  ],
+  [
+    "",
+    "Updates"
+  ],
+  [
+    "",
+    "Not installed"
+  ],
+  [
+    "",
+    "Search apps"
+  ],
+  [
+    "",
+    "Sort"
+  ],
+  [
+    "",
+    "Suite order"
+  ],
+  [
+    "",
+    "Name"
+  ],
+  [
+    "",
+    "Inspired by"
+  ],
+  [
+    "",
+    "Status"
+  ],
+  [
+    "",
+    "Installed version"
+  ],
+  [
+    "",
+    "Latest version"
+  ],
+  [
+    "",
+    "Newest release"
+  ],
+  [
+    "",
+    "Discord"
+  ],
+  [
+    "",
+    "GitHub"
+  ],
+  [
+    "",
+    "Website"
+  ],
+  [
+    "",
+    "Classic apps"
+  ],
+  [
+    "",
+    "Classic"
+  ],
+  [
+    "",
+    "New apps"
+  ],
+  [
+    "",
+    "NEW"
+  ],
+  [
+    "",
+    "Install"
+  ],
+  [
+    "",
+    "Update to {v}"
+  ],
+  [
+    "",
+    "Open"
+  ],
+  [
+    "",
+    "Download for {os}"
+  ],
+  [
+    "",
+    "Download"
+  ],
+  [
+    "",
+    "Coming soon"
+  ],
+  [
+    "",
+    "Checking…"
+  ],
+  [
+    "",
+    "Not available"
+  ],
+  [
+    "",
+    "Offline"
+  ],
+  [
+    "",
+    "Downloading {done} of {total}"
+  ],
+  [
+    "",
+    "Downloading…"
+  ],
+  [
+    "",
+    "Reconnecting…"
+  ],
+  [
+    "",
+    "Verifying…"
+  ],
+  [
+    "",
+    "Installing, then restarting…"
+  ],
+  [
+    "",
+    "Installing…"
+  ],
+  [
+    "",
+    "Removing…"
+  ],
+  [
+    "",
+    "Pause download"
+  ],
+  [
+    "",
+    "Cancel download"
+  ],
+  [
+    "",
+    "Resume download"
+  ],
+  [
+    "",
+    "Discard download"
+  ],
+  [
+    "",
+    "Release notes"
+  ],
+  [
+    "",
+    "Show in Finder"
+  ],
+  [
+    "",
+    "Show in Explorer"
+  ],
+  [
+    "",
+    "Show in Files"
+  ],
+  [
+    "",
+    "Reinstall"
+  ],
+  [
+    "",
+    "Uninstall…"
+  ],
+  [
+    "",
+    "All releases"
+  ],
+  [
+    "",
+    "KIO Launcher {version} is available."
+  ],
+  [
+    "",
+    "Dismiss"
+  ],
+  [
+    "",
+    "Update and restart"
+  ],
+  [
+    "",
+    "A new version is available. Would you like to relaunch with the updated version?"
+  ],
+  [
+    "",
+    "Later"
+  ],
+  [
+    "",
+    "What's new"
+  ],
+  [
+    "",
+    "No notes were published with this release."
+  ],
+  [
+    "",
+    "Released {date}"
+  ],
+  [
+    "",
+    "Open on GitHub"
+  ],
+  [
+    "",
+    "Close"
+  ],
+  [
+    "",
+    "KIO Launcher {version}"
+  ],
+  [
+    "",
+    "Only when I ask"
+  ],
+  [
+    "",
+    "Automatically download and install updates"
+  ],
+  [
+    "",
+    "Notify me when an installed app has an update"
+  ],
+  [
+    "",
+    "Include pre-releases (betas and release candidates)"
+  ],
+  [
+    "",
+    "Installing on Linux"
+  ],
+  [
+    "",
+    "Install new apps as"
+  ],
+  [
+    "",
+    "System package (recommended)"
+  ],
+  [
+    "",
+    "Updates always use the format an app was installed with."
+  ],
+  [
+    "",
+    "Running in the background"
+  ],
+  [
+    "",
+    "Keep running in the tray when the window is closed"
+  ],
+  [
+    "",
+    "Show the window on the current desktop"
+  ],
+  [
+    "",
+    "Start KIO Launcher when I log in"
+  ],
+  [
+    "",
+    "Community"
+  ],
+  [
+    "",
+    "Questions, ideas and news from the ArtCraft team"
+  ],
+  [
+    "",
+    "Appearance"
+  ],
+  [
+    "",
+    "Quit KIO Launcher"
+  ],
+  [
+    "",
+    "Done"
+  ],
+  [
+    "",
+    "Uninstall {name}?"
+  ],
+  [
+    "",
+    "The app will be moved to the Trash. Your documents and settings stay."
+  ],
+  [
+    "",
+    "Windows will remove it like any installed program. Your documents and settings stay."
+  ],
+  [
+    "",
+    "Your system's package manager will remove it, and may ask for your password. Your documents and settings stay."
+  ],
+  [
+    "",
+    "The app will be removed. Your documents and settings stay."
+  ],
+  [
+    "",
+    "Uninstall"
+  ],
+  [
+    "",
+    "Cancel"
+  ],
+  [
+    "",
+    "Checked {ago}"
+  ],
+  [
+    "",
+    "just now"
+  ],
+  [
+    "",
+    "yesterday"
+  ],
+  [
+    "",
+    "{month} {day}, {year}"
+  ],
+  [
+    "",
+    "Automatically"
+  ],
+  [
+    "",
+    "Every Craft app"
+  ],
+  [
+    "",
+    "Apps on this computer"
+  ],
+  [
+    "",
+    "Installed apps with a newer version"
+  ],
+  [
+    "",
+    "Apps you can install"
+  ],
+  [
+    "",
+    "Hide App"
+  ],
+  [
+    "",
+    "Unhide App"
+  ],
+  [
+    "",
+    "Hidden Apps"
+  ],
+  [
+    "",
+    "Apps you hid"
+  ],
+  [
+    "",
+    "Checked {ago} · using {sources}"
+  ],
+  [
+    "",
+    "{a} and {b}"
+  ],
+  [
+    "",
+    "Join the Discord"
+  ],
+  [
+    "",
+    "Learn more"
+  ],
+  [
+    "",
+    "Minimize"
+  ],
+  [
+    "",
+    "Maximize"
+  ],
+  [
+    "",
+    "Restore"
+  ],
+  [
+    "",
+    "New"
+  ],
+  [
+    "",
+    "OK"
+  ],
+  [
+    "",
+    "Open link"
+  ],
+  [
+    "",
+    "Update"
+  ],
+  [
+    "",
+    "{name} icon"
+  ],
+  [
+    "",
+    "Loading KIO Launcher…"
+  ],
+  [
+    "",
+    "Cancel update"
+  ],
+  [
+    "",
+    "Stop waiting; the update can be started again later"
+  ],
+  [
+    "",
+    "Download again"
+  ],
+  [
+    "",
+    "Install cancelled"
+  ],
+  [
+    "",
+    "Install cancelled. The download is kept for the next try."
+  ],
+  [
+    "",
+    "Update cancelled"
+  ],
+  [
+    "",
+    "Uninstall cancelled"
+  ],
+  [
+    "",
+    "Retry install"
+  ],
+  [
+    "",
+    "Retry update to {version}"
+  ],
+  [
+    "",
+    "The download is still here. It's checked again, then installed."
+  ],
+  [
+    "",
+    "Waiting for another app…"
+  ],
+  [
+    "",
+    "Waiting for other installs…"
+  ],
+  [
+    "",
+    "Installer (.msi)"
+  ],
+  [
+    "",
+    "Portable (.zip)"
+  ],
+  [
+    "",
+    "Disk image (.dmg)"
+  ],
+  [
+    "",
+    "Debian package (.deb)"
+  ],
+  [
+    "",
+    "RPM package (.rpm)"
+  ],
+  [
+    "",
+    "Flatpak bundle"
+  ],
+  [
+    "",
+    "Tarball (.tar.gz)"
+  ],
+  [
+    "photocraft",
+    "Image editing"
+  ],
+  [
+    "vectorcraft",
+    "Vector illustration"
+  ],
+  [
+    "filmcraft",
+    "Video editing, color and sound"
+  ],
+  [
+    "lightcraft",
+    "Photo library and raw development"
+  ],
+  [
+    "pdfcraft",
+    "Reading, organizing and protecting PDFs"
+  ],
+  [
+    "effectcraft",
+    "Motion graphics and visual effects"
+  ],
+  [
+    "designcraft",
+    "Page layout and publishing"
+  ],
+  [
+    "wordcraft",
+    "Writing and document design"
+  ],
+  [
+    "deckcraft",
+    "Presentations and slide shows"
+  ],
+  [
+    "gridcraft",
+    "Spreadsheets and data"
+  ],
+  [
+    "cadcraft",
+    "Computer-aided design and drafting"
+  ],
+  [
+    "soundcraft",
+    "Recording, editing and mixing audio"
+  ],
+  [
+    "figcraft",
+    "Interface design and prototyping"
+  ],
+  [
+    "month",
+    "Jan"
+  ],
+  [
+    "month",
+    "Feb"
+  ],
+  [
+    "month",
+    "Mar"
+  ],
+  [
+    "month",
+    "Apr"
+  ],
+  [
+    "month",
+    "May"
+  ],
+  [
+    "month",
+    "Jun"
+  ],
+  [
+    "month",
+    "Jul"
+  ],
+  [
+    "month",
+    "Aug"
+  ],
+  [
+    "month",
+    "Sep"
+  ],
+  [
+    "month",
+    "Oct"
+  ],
+  [
+    "month",
+    "Nov"
+  ],
+  [
+    "month",
+    "Dec"
+  ],
+  [
+    "",
+    "Not checked yet"
+  ],
+  [
+    "",
+    "GitHub's hourly limit was reached; full details return in {min} min"
+  ],
+  [
+    "",
+    "GitHub limit hit; back in {min} min"
+  ],
+  [
+    "",
+    "Installing for {platform}"
+  ],
+  [
+    "",
+    "Downloads for {platform}"
+  ],
+  [
+    "",
+    "No downloads for this system"
+  ],
+  [
+    "",
+    "Join the ArtCraft community on Discord"
+  ],
+  [
+    "",
+    "ArtCraft on {name}"
+  ],
+  [
+    "",
+    "Couldn't open {name}: {e}"
+  ],
+  [
+    "",
+    "Download cancelled"
+  ],
+  [
+    "",
+    "Available to install"
+  ],
+  [
+    "",
+    "Available"
+  ],
+  [
+    "",
+    "Installed · up to date"
+  ],
+  [
+    "",
+    "Update available"
+  ],
+  [
+    "",
+    "Installed"
+  ],
+  [
+    "",
+    "installed"
+  ],
+  [
+    "",
+    "Not available here"
+  ],
+  [
+    "",
+    "Updating…"
+  ],
+  [
+    "",
+    "Update paused"
+  ],
+  [
+    "",
+    "Download paused"
+  ],
+  [
+    "",
+    "{version} installed → {latest} released"
+  ],
+  [
+    "",
+    "Version {version}"
+  ],
+  [
+    "",
+    "{installed} installed · latest {latest}"
+  ],
+  [
+    "",
+    "Installed · latest {latest}"
+  ],
+  [
+    "",
+    "Version {version} installed"
+  ],
+  [
+    "",
+    "Version {latest}"
+  ],
+  [
+    "",
+    "No release published yet"
+  ],
+  [
+    "",
+    "KIO Launcher"
+  ],
+  [
+    "",
+    "App"
+  ],
+  [
+    "",
+    "Latest"
+  ],
+  [
+    "",
+    "Released"
+  ],
+  [
+    "",
+    "Auto"
+  ],
+  [
+    "",
+    "Language"
+  ],
+  [
+    "",
+    "Ascending"
+  ],
+  [
+    "",
+    "Descending"
+  ],
+  [
+    "",
+    "Click to reverse the order"
+  ],
+  [
+    "",
+    "Click to sort by this column"
+  ],
+  [
+    "",
+    "Like {name}"
+  ],
+  [
+    "",
+    "{done} of {total}"
+  ],
+  [
+    "",
+    "Downloading"
+  ],
+  [
+    "",
+    "Verifying checksum…"
+  ],
+  [
+    "",
+    "Resume"
+  ],
+  [
+    "",
+    "{done} of {total} downloaded"
+  ],
+  [
+    "",
+    "{done} downloaded"
+  ],
+  [
+    "",
+    "Checking for updates…"
+  ],
+  [
+    "",
+    "Downloads the new version, replaces this one and opens it again"
+  ],
+  [
+    "",
+    "Couldn't check for updates: {f}"
+  ],
+  [
+    "",
+    "Website (coming soon)"
+  ],
+  [
+    "",
+    "GitHub repository"
+  ],
+  [
+    "",
+    "ArtCraft"
+  ],
+  [
+    "",
+    "Update 1 app"
+  ],
+  [
+    "",
+    "Update all ({count})"
+  ],
+  [
+    "",
+    "⊞  Grid"
+  ],
+  [
+    "",
+    "☰  Table"
+  ],
+  [
+    "",
+    "🔍  Search apps"
+  ],
+  [
+    "",
+    "{name} {version}"
+  ],
+  [
+    "",
+    "Match system"
+  ],
+  [
+    "",
+    "Dark"
+  ],
+  [
+    "",
+    "Light"
+  ],
+  [
+    "",
+    "Full changelog"
+  ],
+  [
+    "",
+    "link"
+  ],
+  [
+    "",
+    "No apps match"
+  ],
+  [
+    "",
+    "Open KIO Launcher to update."
+  ],
+  [
+    "",
+    "{name} {v} is available"
+  ],
+  [
+    "",
+    "{count} updates are available"
+  ],
+  [
+    "",
+    "These notes weren't fetched (GitHub's request limit was reached). They're on the release page."
+  ],
+  [
+    "",
+    "When on, opening the launcher from the menu bar brings its window to the desktop you're on. When off, macOS switches you to the desktop the window was on."
+  ],
+  [
+    "",
+    "Couldn't change the login item: {e}"
+  ],
+  [
+    "column",
+    "App"
+  ],
+  [
+    "column",
+    "Installed"
+  ],
+  [
+    "column",
+    "Latest"
+  ],
+  [
+    "column",
+    "Released"
+  ],
+  [
+    "filter",
+    "Installed"
+  ],
+  [
+    "",
+    "App details"
+  ],
+  [
+    "",
+    "Close (Esc)"
+  ],
+  [
+    "",
+    "Features"
+  ],
+  [
+    "",
+    "Latest release"
+  ],
+  [
+    "",
+    "Version"
+  ],
+  [
+    "",
+    "Platforms"
+  ],
+  [
+    "",
+    "Releases"
+  ],
+  [
+    "",
+    "Enlarge picture"
+  ],
+  [
+    "",
+    "Click to enlarge"
+  ],
+  [
+    "",
+    "Previous picture (←)"
+  ],
+  [
+    "",
+    "Next picture (→)"
+  ],
+  [
+    "",
+    "Loading pictures…"
+  ],
+  [
+    "",
+    "Pictures couldn't be loaded. Reopen this page to try again."
+  ],
+  [
+    "",
+    "{name} details"
+  ],
+  [
+    "@plural",
+    "{n} app|{n} apps"
+  ],
+  [
+    "@plural",
+    "{n} min ago|{n} min ago"
+  ],
+  [
+    "@plural",
+    "{n} h ago|{n} h ago"
+  ],
+  [
+    "@plural",
+    "{n} day ago|{n} days ago"
+  ],
+  [
+    "@msg",
+    "Couldn't open {name}: {e}"
+  ],
+  [
+    "@msg",
+    "Download cancelled"
+  ],
+  [
+    "@msg",
+    "{name} updated to {version}"
+  ],
+  [
+    "@msg",
+    "{name} installed: {version}"
+  ],
+  [
+    "@msg",
+    "{name} updated to {version} (this release publishes no checksum, so only its size was checked)"
+  ],
+  [
+    "@msg",
+    "{name} installed: {version} (this release publishes no checksum, so only its size was checked)"
+  ],
+  [
+    "@msg",
+    "{name} was removed"
+  ],
+  [
+    "@msg",
+    "{name} is running. Quit it, then try again."
+  ],
+  [
+    "@id",
+    "app.install"
+  ],
+  [
+    "@id",
+    "app.update"
+  ],
+  [
+    "@id",
+    "app.open"
+  ],
+  [
+    "@id",
+    "app.download"
+  ],
+  [
+    "@id",
+    "app.reveal"
+  ],
+  [
+    "@id",
+    "app.reinstall"
+  ],
+  [
+    "@id",
+    "app.uninstall"
+  ],
+  [
+    "@id",
+    "app.notes"
+  ],
+  [
+    "@id",
+    "app.website"
+  ],
+  [
+    "@id",
+    "app.github"
+  ],
+  [
+    "@id",
+    "app.releases"
+  ],
+  [
+    "@id",
+    "launcher.update"
+  ],
+  [
+    "@id",
+    "launcher.download"
+  ],
+  [
+    "@id",
+    "launcher.notes"
+  ],
+  [
+    "@id",
+    "launcher.dismiss"
+  ],
+  [
+    "@id",
+    "settings.open"
+  ],
+  [
+    "@id",
+    "settings.quit"
+  ],
+  [
+    "@id",
+    "view.grid"
+  ],
+  [
+    "@id",
+    "view.table"
+  ],
+  [
+    "@id",
+    "filter.all"
+  ],
+  [
+    "@id",
+    "filter.installed"
+  ],
+  [
+    "@id",
+    "filter.updates"
+  ],
+  [
+    "@id",
+    "filter.notinstalled"
+  ],
+  [
+    "@id",
+    "sort.suite"
+  ],
+  [
+    "@id",
+    "sort.name"
+  ],
+  [
+    "@id",
+    "sort.inspired"
+  ],
+  [
+    "@id",
+    "sort.status"
+  ],
+  [
+    "@id",
+    "sort.installed"
+  ],
+  [
+    "@id",
+    "sort.latest"
+  ],
+  [
+    "@id",
+    "sort.released"
+  ],
+  [
+    "@id",
+    "help.discord"
+  ],
+  [
+    "@id",
+    "help.github"
+  ],
+  [
+    "@id",
+    "help.website"
+  ],
+  [
+    "@id",
+    "update.check"
+  ],
+  [
+    "@id",
+    "update.check_auto"
+  ],
+  [
+    "@id",
+    "update.notify"
+  ],
+  [
+    "@id",
+    "update.prereleases"
+  ],
+  [
+    "@id",
+    "linux.preferred_kind"
+  ],
+  [
+    "@id",
+    "tray.close_to_tray"
+  ],
+  [
+    "@id",
+    "tray.show_on_current_desktop"
+  ],
+  [
+    "@id",
+    "tray.login_item"
+  ],
+  [
+    "@id",
+    "appearance.theme"
+  ],
+  [
+    "",
+    "Show KIO Launcher"
+  ],
+  [
+    "",
+    "Check for Updates"
+  ],
+  [
+    "",
+    "Visit getartcraft.com"
+  ],
+  [
+    "",
+    "ArtCraft on GitHub"
+  ],
+  [
+    "",
+    "Join the ArtCraft Discord"
+  ],
+  [
+    "@plural",
+    "KIO Launcher · {n} update available|KIO Launcher · {n} updates available"
+  ]
+]

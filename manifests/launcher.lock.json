@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "launcher",
   "name": "KIO Launcher",
-  "version": "0.4.1-kio.1",
+  "version": "0.4.1-kio.2",
   "upstreamVersion": "0.4.1",
   "rust": "1.95.0",
   "source": {
@@ -17,9 +17,9 @@
   "fonts": null,
   "branding": {
     "patch": "patches/launcher/craft-launcher-v0.4.1-kio-launcher.patch",
-    "sha256": "bd726aa2f45b1971584c587e7f1d2d4712ab0afa9286c32bed354381e0e1f007",
+    "sha256": "8665f6e1d28b72f9cf8cc8be35640c6cfc76404988d4806b684e9182b609fe0d",
     "manifest": "patches/launcher/manifest.json",
-    "manifestSha256": "05a8c95dbb63712d612be387df33c3fb12e6ffcefa331fd93f6ef80d57e167a2"
+    "manifestSha256": "3cfe1ceb20a8e8aff7c9ed2d17d52396ea04c17e88b4772bd9fda0d058252e25"
   },
   "cargoPackages": [
     "artcraft-launcher"
@@ -38,8 +38,8 @@
   "icon": "assets/app-icon/artcraft-launcher.icns",
   "guiOnly": true,
   "environment": {
-    "KIO_RELEASE_VERSION": "0.4.1-kio.1",
-    "ARTCRAFT_LAUNCHER_VERSION": "0.4.1-kio.1",
+    "KIO_RELEASE_VERSION": "0.4.1-kio.2",
+    "ARTCRAFT_LAUNCHER_VERSION": "0.4.1-kio.2",
     "ARTCRAFT_LAUNCHER_REQUIRE_WINRES": "1"
   },
   "macPackaging": [
