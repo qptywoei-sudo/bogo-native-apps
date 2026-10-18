@@ -36,7 +36,9 @@ class WinitWindowsLicense(unittest.TestCase):
     @unittest.skipIf(os.name == 'nt', 'Unix fixture creates a real link; actual Windows symlink is checked by the native preflight')
     def test_windows_link_spelling_keeps_the_same_real_target(self):
         with tempfile.TemporaryDirectory() as temporary:
-            root = Path(temporary)
+            # macOS aliases /var to /private/var. Match the builder's canonical
+            # path so this actually exercises the Windows link spelling there.
+            root = Path(temporary).resolve()
             link = self.folder(root, ORIGINAL.replace(b'\n', b'\r\n'))
             link.symlink_to('../LICENSE')
             original_readlink = os.readlink
@@ -49,6 +51,7 @@ class WinitWindowsLicense(unittest.TestCase):
                 return original_readlink(path, *args, **kwargs)
             with patch.object(builder.os, 'readlink', side_effect=windows_spelling):
                 self.assertEqual(dict(builder.dependency_source_files(PIN, root))['dpi/LICENSE'], root / 'LICENSE')
+            self.assertFalse(first, 'the simulated Windows spelling must be exercised')
 
     def test_other_link_or_package_identity_is_not_an_exception(self):
         for text in [b'../OTHER', b'../LICENSE\n', b'../../LICENSE', b'..\\LICENSE']:
