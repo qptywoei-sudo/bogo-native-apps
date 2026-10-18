@@ -13,11 +13,11 @@ NOTES = ['Không tìm thấy phông chữ cho ngôn ngữ này trên hệ thốn
 
 
 def write_catalogs(source):
-    keys = json.loads((DATA / 'six-language-keys.json').read_text())
+    keys = json.loads((DATA / 'six-language-keys.json').read_text(encoding='utf-8'))
     if len(keys) != 307 or keys[259] != ['@id', 'app.install']:
         raise ValueError('Translation key order changed')
     translations = {}
-    for line in (DATA / 'six-language-translations.tsv').read_text().splitlines():
+    for line in (DATA / 'six-language-translations.tsv').read_text(encoding='utf-8').splitlines():
         if not line or line.startswith('#'):
             continue
         fields = line.split('\t')
@@ -34,10 +34,10 @@ def write_catalogs(source):
         for index, (context, english) in enumerate(keys):
             lines.append('\t'.join((context, english, translations[index][column])))
         lines.append('\t'.join(('', FONT_NOTE, NOTES[column])))
-        (folder / (lang + '.tsv')).write_text('\n'.join(lines) + '\n')
+        (folder / (lang + '.tsv')).write_text('\n'.join(lines) + '\n', encoding='utf-8')
     additions = {
-        'ja': {0: 'ランチャー', 25: 'クラシック'},
-        'zh-CN': {0: '启动器', 16: '灵感来源', 168: '无法打开 {name}：{e}', 197: '类似 {name}', 207: '网站（即将推出）', 284: '灵感来源'},
+        'ja': {0: 'Launcher', 25: 'クラシック'},
+        'zh-CN': {0: 'Launcher', 16: '灵感来源', 168: '无法打开 {name}：{e}', 197: '类似 {name}', 207: '网站（即将推出）', 284: '灵感来源'},
     }
     other_notes = {
         'ru': 'В системе не найден шрифт для этого языка. Установите подходящий шрифт и перезапустите KIO Launcher.',
@@ -51,7 +51,7 @@ def write_catalogs(source):
     }
     for lang, rows in {**{code: {} for code in other_notes}, **additions}.items():
         p = folder / (lang + '.tsv')
-        content = p.read_text()
+        content = p.read_text(encoding='utf-8')
         present = {tuple(l.split('\t')[:2]) for l in content.splitlines() if l and not l.startswith('#')}
         for index, value in rows.items():
             if tuple(keys[index]) in present:
@@ -63,7 +63,7 @@ def write_catalogs(source):
         note = other_notes.get(lang) or ('この言語に対応するフォントがシステムに見つかりません。対応するフォントをインストールして、KIO Launcherを再起動してください。' if lang == 'ja' else '系统找不到此语言适用的字体。请安装适用字体，然后重新启动 KIO Launcher。')
         if ('', FONT_NOTE) not in present:
             content += '\t'.join(('', FONT_NOTE, note)) + '\n'
-        p.write_text(content)
+        p.write_text(content, encoding='utf-8')
     # English has no runtime lookup file; this file supports exact key/variable audits.
     english = []
     for index, (context, value) in enumerate(keys):
@@ -73,7 +73,7 @@ def write_catalogs(source):
             label = keys[target][1] if target is not None else 'Check for updates automatically'
         english.append('\t'.join((context, value, label)))
     english.append('\t'.join(('', FONT_NOTE, FONT_NOTE)))
-    (folder / 'en.tsv').write_text('# English source messages. MIT.\n' + '\n'.join(english) + '\n')
+    (folder / 'en.tsv').write_text('# English source messages. MIT.\n' + '\n'.join(english) + '\n', encoding='utf-8')
 
 
 if __name__ == '__main__':

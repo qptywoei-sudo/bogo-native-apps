@@ -35,7 +35,7 @@ class LauncherNativeGuards(unittest.TestCase):
 
     def test_source_and_patch_and_full_default_features_cannot_be_substituted(self):
         original = json.loads(launcher.LOCK.read_text())
-        for variant in ['source', 'patch', 'features', 'binary', 'mirror']:
+        for variant in ['source', 'patch', 'features', 'binary', 'mirror', 'releaseTag', 'artifacts']:
             with self.subTest(variant=variant), tempfile.TemporaryDirectory() as tmp:
                 changed = json.loads(json.dumps(original))
                 if variant == 'source': changed['source']['url'] = 'https://attacker.invalid/source.tar.gz'
@@ -43,6 +43,8 @@ class LauncherNativeGuards(unittest.TestCase):
                 if variant == 'features': changed['cargoArgs'] += ['--no-default-features']
                 if variant == 'binary': changed['binaries']['app'] = 'other'
                 if variant == 'mirror': changed['features']['developerLocalMirrorEnabled'] = True
+                if variant == 'releaseTag': changed['releaseTag'] = 'launcher-v0.4.1-kio.1'
+                if variant == 'artifacts': changed['artifacts'][0] = 'KIO-Launcher-0.4.1-kio.1-macos-arm64.dmg'
                 p = Path(tmp) / 'lock.json'
                 p.write_text(json.dumps(changed))
                 with patch.object(launcher, 'LOCK', p), self.assertRaises(ValueError):

@@ -15,8 +15,8 @@
   },
   "patch": {
     "file": "craft-launcher-v0.4.1-kio-launcher.patch",
-    "sha256": "8665f6e1d28b72f9cf8cc8be35640c6cfc76404988d4806b684e9182b609fe0d",
-    "bytes": 11815718
+    "sha256": "807cc3615529069f14af5df1152a9652eb600570844b282df9da7d5a217a18bc",
+    "bytes": 11815578
   },
   "counts": {
     "upstreamFiles": 198,
@@ -1005,16 +1005,16 @@
         "bytes": 18628
       },
       "after": {
-        "sha256": "9d31ab6df8eed68e9cbe21b83b35f362d6d515cd6b053863856ddea6a5b4cb74",
-        "bytes": 18813
+        "sha256": "08039724ab176f5d89934f6e6e6450972357f07bfe9181af65c50c1f8f9789b5",
+        "bytes": 18806
       }
     },
     {
       "path": "crates/ui-egui/src/i18n/ko.tsv",
       "before": null,
       "after": {
-        "sha256": "69ef88c8bfcf2e55ab4e8faa261b9f486de32c9cc3b05e3f66c67fac17487ae5",
-        "bytes": 14803
+        "sha256": "b881063dd5c44109085ff906387d292c0030b097149d3ccc22b3cb2e0a9e5e2c",
+        "bytes": 14805
       }
     },
     {
@@ -1087,8 +1087,8 @@
       "path": "crates/ui-egui/src/i18n/vi.tsv",
       "before": null,
       "after": {
-        "sha256": "56984f9e6983e3089f295631be0c06a9273d397515cc247649f94606b9628b3d",
-        "bytes": 16191
+        "sha256": "dc8a289c564aba71e97f4d05c087070b9131a1ee0480d62f1ba4b3f3d4773b64",
+        "bytes": 16180
       }
     },
     {
@@ -1098,16 +1098,16 @@
         "bytes": 13647
       },
       "after": {
-        "sha256": "8839f1e1ad08f2964b3948f42e3118d0143b36601d962c55ab27d2e7bcade72f",
-        "bytes": 13924
+        "sha256": "2df25652e491044cdec729f18c4eb6dcbbdfcc9aa43beb75b7c3bb432a2e7e58",
+        "bytes": 13923
       }
     },
     {
       "path": "crates/ui-egui/src/i18n/zh-TW.tsv",
       "before": null,
       "after": {
-        "sha256": "da45a090bca4c7eb147dda9c9ecec1292185e8927334b465d09dedbb5ca19e3d",
-        "bytes": 13820
+        "sha256": "aacf891744e560ae9bfdabb35c2df1838bafc6bc3cb56a0b36d59c0f45adbfbb",
+        "bytes": 13819
       }
     },
     {

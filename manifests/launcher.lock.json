@@ -17,9 +17,9 @@
   "fonts": null,
   "branding": {
     "patch": "patches/launcher/craft-launcher-v0.4.1-kio-launcher.patch",
-    "sha256": "8665f6e1d28b72f9cf8cc8be35640c6cfc76404988d4806b684e9182b609fe0d",
+    "sha256": "807cc3615529069f14af5df1152a9652eb600570844b282df9da7d5a217a18bc",
     "manifest": "patches/launcher/manifest.json",
-    "manifestSha256": "3cfe1ceb20a8e8aff7c9ed2d17d52396ea04c17e88b4772bd9fda0d058252e25"
+    "manifestSha256": "3d34b947136d8e8d08a3a487627c8168a1e61bd893e118dee23ca778e5b31bef"
   },
   "cargoPackages": [
     "artcraft-launcher"
@@ -58,12 +58,12 @@
   ],
   "fontStaging": "None: original Archivo, Inter, GeistMono font files and OFL licenses are bundled under assets/fonts.",
   "nativeRuntimeExtras": [],
-  "releaseTag": "launcher-v0.4.1-kio.1",
+  "releaseTag": "launcher-v0.4.1-kio.2",
   "artifacts": [
-    "KIO-Launcher-0.4.1-kio.1-macos-arm64.dmg",
-    "KIO-Launcher-0.4.1-kio.1-macos-arm64.zip",
-    "KIO-Launcher-0.4.1-kio.1-windows-x64.msi",
-    "KIO-Launcher-0.4.1-kio.1-windows-x64.zip"
+    "KIO-Launcher-0.4.1-kio.2-macos-arm64.dmg",
+    "KIO-Launcher-0.4.1-kio.2-macos-arm64.zip",
+    "KIO-Launcher-0.4.1-kio.2-windows-x64.msi",
+    "KIO-Launcher-0.4.1-kio.2-windows-x64.zip"
   ],
   "notes": [
     "Original upstream packaging emits artcraft-launcher-... names; rename final signed artifacts to the exact KIO registry contract.",

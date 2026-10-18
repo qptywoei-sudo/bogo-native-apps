@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 SCRIPT = Path(__file__).resolve().parents[1] / 'scripts/audit_localization.py'
 spec = importlib.util.spec_from_file_location('localization_audit', SCRIPT)
@@ -14,9 +15,27 @@ class LocalizationFailures(unittest.TestCase):
     def fixture(self, root, translation='Cài {name}', ui='tr("Install {name}")'):
         folder = root / 'crates/ui-egui/src/i18n'
         folder.mkdir(parents=True)
-        (folder.parent / 'lib.rs').write_text(ui)
+        (folder.parent / 'lib.rs').write_text(ui, encoding='utf-8')
         for lang in ('vi', 'ko', 'ja', 'zh-hant', 'zh-hans'):
-            (folder / (lang + '.tsv')).write_text('\tInstall {name}\t' + translation + '\n')
+            (folder / (lang + '.tsv')).write_text('\tInstall {name}\t' + translation + '\n', encoding='utf-8')
+
+    def test_multilingual_sources_work_with_a_windows_legacy_default_encoding(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.fixture(root, 'Cài {name} — 설정 設定')
+            original_open = Path.open
+
+            def legacy_open(path, mode='r', buffering=-1, encoding=None, errors=None, newline=None):
+                if 'b' not in mode and encoding in (None, 'locale'):
+                    encoding = 'cp1252'
+                return original_open(path, mode, buffering, encoding, errors, newline)
+
+            # Windows runners can use cp1252 while the repository contains UTF-8.
+            # Exercise real catalog and Rust-source reads under that default.
+            with patch.object(Path, 'open', legacy_open):
+                result = audit.audit_app('fixture', root)
+            self.assertTrue(result['complete'])
+            self.assertEqual(result['languages']['vi']['keys'], 1)
 
     def test_missing_language_cannot_be_counted_as_complete(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -32,7 +51,7 @@ class LocalizationFailures(unittest.TestCase):
             root = Path(tmp)
             self.fixture(root, 'Cài {other}')
             p = root / 'crates/ui-egui/src/i18n/vi.tsv'
-            p.write_text(p.read_text() + '\tInstall {name}\t\n')
+            p.write_text(p.read_text(encoding='utf-8') + '\tInstall {name}\t\n', encoding='utf-8')
             result = audit.audit_app('fixture', root)
             self.assertTrue(result['parseErrors'])
             self.assertEqual(result['languages']['vi']['empty'], 1)
@@ -50,7 +69,7 @@ class LocalizationFailures(unittest.TestCase):
     def test_invariant_plural_and_contextual_keys_are_not_conflated(self):
         with tempfile.TemporaryDirectory() as tmp:
             p = Path(tmp) / 'vi.tsv'
-            p.write_text('@plural\t{n} app|{n} apps\t{n} ứng dụng\ncolumn\tApp\tỨng dụng\n\tApp\tỨng dụng\n')
+            p.write_text('@plural\t{n} app|{n} apps\t{n} ứng dụng\ncolumn\tApp\tỨng dụng\n\tApp\tỨng dụng\n', encoding='utf-8')
             rows, errors = audit.read_tsv(p)
             self.assertFalse(errors)
             self.assertEqual(len(rows), 3)

@@ -148361,7 +148361,7 @@ index 8915ab7..2d90ca6 100644
 +@plural	KIO Launcher · {n} update available|KIO Launcher · {n} updates available	KIO Launcher · {n} frissítés elérhető|KIO Launcher · {n} frissítés elérhető
 +	No font for this language was found on this system. Install a font for this language and restart KIO Launcher.	A rendszer nem talált betűtípust ehhez a nyelvhez. Telepítsen megfelelő betűtípust, majd indítsa újra a KIO Launcher alkalmazást.
 diff --git a/crates/ui-egui/src/i18n/ja.tsv b/crates/ui-egui/src/i18n/ja.tsv
-index 1548831..b1cc1f6 100644
+index 1548831..966b683 100644
 --- a/crates/ui-egui/src/i18n/ja.tsv
 +++ b/crates/ui-egui/src/i18n/ja.tsv
 @@ -1,4 +1,4 @@
@@ -148370,7 +148370,7 @@ index 1548831..b1cc1f6 100644
  # Format: context<TAB>source<TAB>translation
  # Empty context = plain UI string (tl!, t).
  # @id = command-id keyed (tr_id).
-@@ -6,23 +6,23 @@
+@@ -6,15 +6,15 @@
  # @msg = status/error message template (message, msg).
  # Other context = disambiguation for tr_ctx.
  #
@@ -148391,12 +148391,11 @@ index 1548831..b1cc1f6 100644
  # Shortcut keys keep their key-cap names (Shift, Alt, Ctrl, Cmd, Esc).
  # Trailing "…" (U+2026) must be preserved. Placeholders {name}, {n}, {version}, {count}, {v},
  # {what}, {unit}, {real}, {e} must appear in translation.
- # Japanese has one plural form. Shown with the system's Japanese font (see cjk_font.rs); where the
+@@ -22,7 +22,7 @@
  # system has none, the interface stays in English.
  
--	Launcher	Launcher
+ 	Launcher	Launcher
 -	Craft App Suite	Craft App Suite
-+	Launcher	ランチャー
 +	KIO App Suite	KIO App Suite
  	Open Source Tools for Creatives, Makers, and Builders	クリエイター、メイカー、ビルダーのためのオープンソースツール
  	Settings	設定
@@ -148490,13 +148489,13 @@ index 1548831..b1cc1f6 100644
 +	No font for this language was found on this system. Install a font for this language and restart KIO Launcher.	この言語に対応するフォントがシステムに見つかりません。対応するフォントをインストールして、KIO Launcherを再起動してください。
 diff --git a/crates/ui-egui/src/i18n/ko.tsv b/crates/ui-egui/src/i18n/ko.tsv
 new file mode 100644
-index 0000000..96b76f9
+index 0000000..1915fb8
 --- /dev/null
 +++ b/crates/ui-egui/src/i18n/ko.tsv
 @@ -0,0 +1,310 @@
 +# KIO original translations. MIT. context<TAB>source<TAB>translation.
 +# Official product names, URLs and file extensions are preserved.
-+	Launcher	런처
++	Launcher	Launcher
 +	KIO App Suite	KIO App Suite
 +	Open Source Tools for Creatives, Makers, and Builders	창작자와 제작자를 위한 오픈 소스 도구
 +	Settings	설정
@@ -149415,13 +149414,13 @@ index 524b69a..ced884b 100644
      assert_eq!(cat.message("Something else"), None);
 diff --git a/crates/ui-egui/src/i18n/vi.tsv b/crates/ui-egui/src/i18n/vi.tsv
 new file mode 100644
-index 0000000..c325dca
+index 0000000..9d4d74a
 --- /dev/null
 +++ b/crates/ui-egui/src/i18n/vi.tsv
 @@ -0,0 +1,310 @@
 +# KIO original translations. MIT. context<TAB>source<TAB>translation.
 +# Official product names, URLs and file extensions are preserved.
-+	Launcher	Trình khởi chạy
++	Launcher	Launcher
 +	KIO App Suite	KIO App Suite
 +	Open Source Tools for Creatives, Makers, and Builders	Công cụ nguồn mở dành cho người sáng tạo, chế tác và xây dựng
 +	Settings	Cài đặt
@@ -149514,7 +149513,7 @@ index 0000000..c325dca
 +	Checked {ago}	Đã kiểm tra {ago}
 +	just now	vừa xong
 +	yesterday	ngày hôm qua
-+	{month} {day}, {year}	{day}/{month}/{year}
++	{month} {day}, {year}	{day} {month}, {year}
 +	Automatically	Tự động
 +	Every Craft app	Mọi ứng dụng Craft
 +	Apps on this computer	Ứng dụng trên máy tính này
@@ -149730,7 +149729,7 @@ index 0000000..c325dca
 +@plural	KIO Launcher · {n} update available|KIO Launcher · {n} updates available	KIO Launcher · có {n} bản cập nhật
 +	No font for this language was found on this system. Install a font for this language and restart KIO Launcher.	Không tìm thấy phông chữ cho ngôn ngữ này trên hệ thống. Hãy cài phông chữ phù hợp rồi khởi động lại KIO Launcher.
 diff --git a/crates/ui-egui/src/i18n/zh-CN.tsv b/crates/ui-egui/src/i18n/zh-CN.tsv
-index bdc9e12..b6becfc 100644
+index bdc9e12..b00c14c 100644
 --- a/crates/ui-egui/src/i18n/zh-CN.tsv
 +++ b/crates/ui-egui/src/i18n/zh-CN.tsv
 @@ -1,12 +1,12 @@
@@ -149744,9 +149743,8 @@ index bdc9e12..b6becfc 100644
  # Shown with the system's Chinese font (PingFang, Microsoft YaHei, Noto Sans CJK…): see cjk_font.rs.
  # Chinese has one plural form. Placeholders and trailing ellipses are preserved.
  
--	Launcher	Launcher
+ 	Launcher	Launcher
 -	Craft App Suite	Craft App Suite
-+	Launcher	启动器
 +	KIO App Suite	KIO App Suite
  	Open Source Tools for Creatives, Makers, and Builders	为创作者和开发者打造的开源工具
  	Settings	设置
@@ -149855,13 +149853,13 @@ index bdc9e12..b6becfc 100644
 +	No font for this language was found on this system. Install a font for this language and restart KIO Launcher.	系统找不到此语言适用的字体。请安装适用字体，然后重新启动 KIO Launcher。
 diff --git a/crates/ui-egui/src/i18n/zh-TW.tsv b/crates/ui-egui/src/i18n/zh-TW.tsv
 new file mode 100644
-index 0000000..2f9ab98
+index 0000000..b40232a
 --- /dev/null
 +++ b/crates/ui-egui/src/i18n/zh-TW.tsv
 @@ -0,0 +1,310 @@
 +# KIO original translations. MIT. context<TAB>source<TAB>translation.
 +# Official product names, URLs and file extensions are preserved.
-+	Launcher	啟動器
++	Launcher	Launcher
 +	KIO App Suite	KIO App Suite
 +	Open Source Tools for Creatives, Makers, and Builders	為創作者、製作者與開發者打造的開放原始碼工具
 +	Settings	設定

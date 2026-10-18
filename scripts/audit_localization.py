@@ -22,7 +22,7 @@ RSTRING = r'"(?:[^"\\]|\\.)*"'
 PLACEHOLDER = re.compile(r'(?<!\{)\{([A-Za-z_][\w]*(?::[^{}]*)?)\}(?!\})')
 DIRECT_UI = re.compile(r'\.(?:label|button|small_button|heading|menu_button|on_hover_text|hint_text|selectable_label|checkbox)\s*\(\s*(?:[^,\n]+,\s*)?(' + RSTRING + ')')
 LOOKUP = re.compile(r'(?:\btl!\s*\(|\b(?:i18n::)?(?:t|tr|tr_noop|trf|trn)\s*\()\s*(' + RSTRING + ')')
-OFFICIAL_NAMES = {'launcher': {('', value) for value in ('KIO App Suite', 'Discord', 'GitHub', 'KIO Launcher {version}', 'KIO Launcher', 'ArtCraft', '{name} {version}')}}
+OFFICIAL_NAMES = {'launcher': {('', value) for value in ('Launcher', 'KIO App Suite', 'Discord', 'GitHub', 'KIO Launcher {version}', 'KIO Launcher', 'ArtCraft', '{name} {version}')}}
 
 
 def canonical_language(code):
@@ -74,17 +74,17 @@ def collect_catalogs(source):
     for f in sorted((root / 'locales').glob('*.json')):
         if f.stem.endswith('-formats'):
             continue  # format patterns are audited separately; they are not interface messages
-        data = json.loads(f.read_text())
+        data = json.loads(f.read_text(encoding='utf-8'))
         put(f.stem, {('', k): v for k, v in data.items() if isinstance(v, str)}, f)
     for f in sorted((root / 'locales').glob('*.toml')):
-        data, rows = tomllib.loads(f.read_text()), {}
+        data, rows = tomllib.loads(f.read_text(encoding='utf-8')), {}
         for section in ('ui', 'commands', 'menu'):
             for k, value in data.get(section, {}).items():
                 rows[('' if section == 'ui' else '@' + section, k)] = value if isinstance(value, str) else value.get('other', '')
         put(f.stem, rows, f)
     main = root / 'src/i18n.rs'
     if main.is_file() and not list((root / 'locales').glob('*')):
-        text = main.read_text().split('#[cfg(test)]')[0]
+        text = main.read_text(encoding='utf-8').split('#[cfg(test)]')[0]
         # Design's five-language column table.
         for m in re.finditer(r'\(\s*(' + RSTRING + r')\s*,\s*\[\s*((?:' + RSTRING + r'\s*,?\s*)+)\]\s*\)', text):
             values = re.findall(RSTRING, m[2])
@@ -97,14 +97,14 @@ def collect_catalogs(source):
                 catalogs.setdefault('ja', {})[('', literal(m[1]))] = literal(m[2])
             for f in (root / 'src/i18n').glob('*.rs'):
                 code = canonical_language(f.stem)
-                rows = {('', literal(m[1])): literal(m[2]) for m in re.finditer('(' + RSTRING + r')\s*=>\s*(' + RSTRING + ')', f.read_text().split('#[cfg(test)]')[0])}
+                rows = {('', literal(m[1])): literal(m[2]) for m in re.finditer('(' + RSTRING + r')\s*=>\s*(' + RSTRING + ')', f.read_text(encoding='utf-8').split('#[cfg(test)]')[0])}
                 if rows:
                     put(code, rows, f)
         # Effect uses separate command/source/translation and plain-source tables.
         if source.parent.name == 'effect':
             names = {'JAPANESE': 'ja', 'SIMPLIFIED_CHINESE': 'zh-CN', 'TRADITIONAL_CHINESE': 'zh-TW', 'KOREAN': 'ko', 'VIETNAMESE': 'vi'}
             for f in [main, *sorted((root / 'src/i18n').glob('*.rs'))]:
-                body = f.read_text().split('#[cfg(test)]')[0]
+                body = f.read_text(encoding='utf-8').split('#[cfg(test)]')[0]
                 for m in re.finditer(r'(?:const|static)\s+(\w+)[^=]+?=\s*&\[(.*?)\n\];', body, re.S):
                     lang = next((v for k, v in names.items() if m[1].startswith(k)), None)
                     if not lang:
@@ -124,7 +124,7 @@ def source_literals(source):
     for f in sorted(root.rglob('*.rs')):
         if 'i18n' in f.parts or f.name.startswith('i18n') or f.name.endswith('_tests.rs'):
             continue
-        text = f.read_text().split('#[cfg(test)]')[0]
+        text = f.read_text(encoding='utf-8').split('#[cfg(test)]')[0]
         for m in LOOKUP.finditer(text):
             keys.add(('', literal(m[1])))
         for m in DIRECT_UI.finditer(text):
@@ -175,7 +175,7 @@ def main():
     apps = [audit_app(app, args.root / ('.work/launcher/source' if app == 'launcher' else '.work/full-native/' + app + '/source')) for app in (APPS if args.app == 'all' else (args.app,))]
     report = {'schemaVersion': 1, 'languages': list(LANGUAGES), 'method': 'catalog union plus literal lookups; direct UI calls require contextual review; static coverage does not prove screen or native execution', 'apps': apps}
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
+    args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     for app in apps:
         print(app['id'], 'keys', app.get('catalogKeyUnion', 0), 'missing', {k: v['missing'] for k, v in app.get('languages', {}).items()}, 'directUIReview', len(app.get('directUiReview', [])), 'complete', app['complete'])
     return int(args.require_complete and not all(a['complete'] for a in apps))

@@ -1,6 +1,6 @@
 # KIO-authored translations, MIT. index matches six-language-keys.json.
 # index<TAB>Vietnamese<TAB>Korean<TAB>Traditional Chinese (Taiwan)
-0	Trình khởi chạy	런처	啟動器
+0	Launcher	Launcher	Launcher
 1	KIO App Suite	KIO App Suite	KIO App Suite
 2	Công cụ nguồn mở dành cho người sáng tạo, chế tác và xây dựng	창작자와 제작자를 위한 오픈 소스 도구	為創作者、製作者與開發者打造的開放原始碼工具
 3	Cài đặt	설정	設定
@@ -93,7 +93,7 @@
 90	Đã kiểm tra {ago}	{ago} 확인	上次檢查：{ago}
 91	vừa xong	방금	剛剛
 92	ngày hôm qua	어제	昨天
-93	{day}/{month}/{year}	{year}년 {month} {day}일	{year} 年 {month} {day} 日
+93	{day} {month}, {year}	{year}년 {month} {day}일	{year} 年 {month} {day} 日
 94	Tự động	자동	自動
 95	Mọi ứng dụng Craft	모든 Craft 앱	所有 Craft 應用程式
 96	Ứng dụng trên máy tính này	이 컴퓨터의 앱	這部電腦上的應用程式
