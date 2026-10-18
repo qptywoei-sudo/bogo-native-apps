@@ -17,9 +17,9 @@
   "fonts": null,
   "branding": {
     "patch": "patches/launcher/craft-launcher-v0.4.1-kio-launcher.patch",
-    "sha256": "807cc3615529069f14af5df1152a9652eb600570844b282df9da7d5a217a18bc",
+    "sha256": "789345ceca692cad6a5e0819a424cd2e4ad94c10b2db4bb6982c428480159306",
     "manifest": "patches/launcher/manifest.json",
-    "manifestSha256": "3d34b947136d8e8d08a3a487627c8168a1e61bd893e118dee23ca778e5b31bef"
+    "manifestSha256": "78f9c7056dc45b49b5f8118bfd6a13aedf58ed7ee9a4719cc5c496cc9e7efa0f"
   },
   "cargoPackages": [
     "artcraft-launcher"

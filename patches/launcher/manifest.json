@@ -15,16 +15,16 @@
   },
   "patch": {
     "file": "craft-launcher-v0.4.1-kio-launcher.patch",
-    "sha256": "807cc3615529069f14af5df1152a9652eb600570844b282df9da7d5a217a18bc",
-    "bytes": 11815578
+    "sha256": "789345ceca692cad6a5e0819a424cd2e4ad94c10b2db4bb6982c428480159306",
+    "bytes": 11825847
   },
   "counts": {
     "upstreamFiles": 198,
-    "forkFiles": 197,
-    "changedPaths": 136,
-    "added": 22,
+    "forkFiles": 198,
+    "changedPaths": 138,
+    "added": 23,
     "removed": 23,
-    "modified": 91,
+    "modified": 92,
     "protectedFilesByteIdentical": 18
   },
   "checks": {
@@ -931,8 +931,8 @@
         "bytes": 19762
       },
       "after": {
-        "sha256": "26117f5f9009955be6163709a8ad6e8672e9858e4f123bae815a89836c84ffc3",
-        "bytes": 20252
+        "sha256": "21cbdbdf939f61d00de7a92196cb9088c755e3627cb19cc40991412213f5cb49",
+        "bytes": 20392
       }
     },
     {
@@ -1155,6 +1155,17 @@
       }
     },
     {
+      "path": "crates/ui-egui/tests/chinese.rs",
+      "before": {
+        "sha256": "4d3336e997e9ee5eee5f54277673059a2b9222fbce5d810d48cf84a340b3170b",
+        "bytes": 8669
+      },
+      "after": {
+        "sha256": "3d18318506b23f1e2f36214445b1732f7340bc995a46db77feeb0d9656d734fc",
+        "bytes": 8746
+      }
+    },
+    {
       "path": "crates/ui-egui/tests/french.rs",
       "before": {
         "sha256": "074202564fda77bb1ecfd159129575b9029fc66bf1b7f94a8479c3691dbb8f2b",
@@ -1172,8 +1183,8 @@
         "bytes": 8372
       },
       "after": {
-        "sha256": "d72e0354bbf8b08e3a5abe1516ec2d46e3112f4ab7f3003055dcf8b53f621507",
-        "bytes": 8370
+        "sha256": "0e19346e86475db10ca96ee18654250ab03d29441115a37870fb0e7f8d1e624e",
+        "bytes": 8436
       }
     },
     {
@@ -1207,6 +1218,14 @@
       "after": {
         "sha256": "60edee01ee05a85070bd1150bd61c2548b675adc91ba5415935020cfdab31599",
         "bytes": 4481
+      }
+    },
+    {
+      "path": "crates/ui-egui/tests/required_languages.rs",
+      "before": null,
+      "after": {
+        "sha256": "66971939116618f3d24834cd0081e317734bbb0bf24893d1d3fd3ff62c00cd94",
+        "bytes": 8326
       }
     },
     {

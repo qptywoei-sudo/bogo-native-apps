@@ -147370,7 +147370,7 @@ index a02e030..e34b4d8 100644
  fn chinese_candidates() -> Vec<Candidate> {
      let mut out = Vec::new();
 diff --git a/crates/ui-egui/src/dialogs.rs b/crates/ui-egui/src/dialogs.rs
-index 9c7f05e..62797f5 100644
+index 9c7f05e..b53e720 100644
 --- a/crates/ui-egui/src/dialogs.rs
 +++ b/crates/ui-egui/src/dialogs.rs
 @@ -111,7 +111,7 @@ impl LauncherUi {
@@ -147403,28 +147403,39 @@ index 9c7f05e..62797f5 100644
                  host.quit();
              }
          };
-@@ -244,10 +244,17 @@ impl LauncherUi {
+@@ -243,13 +243,24 @@ impl LauncherUi {
+ 
          let mut lang_code = self.settings.language.clone();
          let installed = self.cjk_font;
-         row(ui, tl!("Language"), 180.0, &mut |ui| {
+-        row(ui, tl!("Language"), 180.0, &mut |ui| {
 -            egui::ComboBox::from_id_salt("language").selected_text(Settings::language_label(&lang_code, installed)).width(180.0).show_ui(ui, |ui| {
+-                ui.selectable_value(&mut lang_code, Settings::LANGUAGE_AUTO.to_string(), tl!("Auto"));
+-                for lang in crate::i18n::Lang::all() {
+-                    ui.selectable_value(&mut lang_code, lang.code().to_string(), Settings::language_label(lang.code(), installed));
+-                }
+-            });
++        row(ui, tl!("Language"), 250.0, &mut |ui| {
 +            let (rect, _) = ui.allocate_exact_size(egui::vec2(18.0, 18.0), egui::Sense::hover());
 +            let stroke = egui::Stroke::new(1.2, ui.visuals().text_color());
 +            ui.painter().circle_stroke(rect.center(), 7.0, stroke);
 +            ui.painter().add(egui::Shape::ellipse_stroke(rect.center(), egui::vec2(3.5, 7.0), stroke));
 +            ui.painter().line_segment([rect.center() - egui::vec2(7.0, 0.0), rect.center() + egui::vec2(7.0, 0.0)], stroke);
-+            egui::ComboBox::from_id_salt("language").selected_text(Settings::language_label(&lang_code, installed)).width(220.0).show_ui(ui, |ui| {
-                 ui.selectable_value(&mut lang_code, Settings::LANGUAGE_AUTO.to_string(), tl!("Auto"));
--                for lang in crate::i18n::Lang::all() {
--                    ui.selectable_value(&mut lang_code, lang.code().to_string(), Settings::language_label(lang.code(), installed));
-+                for lang in crate::i18n::Lang::ordered(crate::i18n::Lang::from_pref(&lang_code)) {
-+                    let label = Settings::language_label(lang.code(), installed);
-+                    let label = if lang_code == lang.code() { format!("✓ {label}") } else { label };
-+                    ui.selectable_value(&mut lang_code, lang.code().to_string(), label);
-                 }
-             });
++            egui::ComboBox::from_id_salt("language")
++                .selected_text(Settings::language_label(&lang_code, installed))
++                .width(220.0)
++                .height(300.0)
++                .show_ui(ui, |ui| {
++                    for lang in crate::i18n::Lang::ordered(crate::i18n::Lang::from_pref(&lang_code)) {
++                        let label = Settings::language_label(lang.code(), installed);
++                        let label = if lang_code == lang.code() { format!("✓ {label}") } else { label };
++                        ui.push_id(lang.code(), |ui| ui.selectable_value(&mut lang_code, lang.code().to_string(), label));
++                    }
++                    ui.selectable_value(&mut lang_code, Settings::LANGUAGE_AUTO.to_string(), tl!("Auto"));
++                });
          });
-@@ -257,9 +264,7 @@ impl LauncherUi {
+         if lang_code != self.settings.language {
+             self.settings.language = lang_code;
+@@ -257,9 +268,7 @@ impl LauncherUi {
          }
          let pref = crate::i18n::Lang::from_pref(&self.settings.language);
          if pref.needs_cjk_font() && !theme::cjk_font_available(pref) {
@@ -147435,7 +147446,7 @@ index 9c7f05e..62797f5 100644
              ui.add(egui::Label::new(RichText::new(note).size(12.0).color(t.warn)).wrap());
          }
  
-@@ -328,7 +333,7 @@ impl LauncherUi {
+@@ -328,7 +337,7 @@ impl LauncherUi {
                      .on_hover_text(tl!("When on, opening the launcher from the menu bar brings its window to the desktop you're on. When off, macOS switches you to the desktop the window was on."));
              }
              if let Some(mut on) = host.login_item()
@@ -150244,6 +150255,19 @@ index bf844fe..004f45a 100644
                                  .family(theme::medium())
                                  .color(t.ink_strong),
                          );
+diff --git a/crates/ui-egui/tests/chinese.rs b/crates/ui-egui/tests/chinese.rs
+index ff64487..945803f 100644
+--- a/crates/ui-egui/tests/chinese.rs
++++ b/crates/ui-egui/tests/chinese.rs
+@@ -156,6 +156,8 @@ fn simplified_chinese_switches_persists_and_keeps_install_actions() {
+     h.run_steps(2);
+     // Opening Settings doesn't load the (large) Chinese font: the picker names it in English.
+     assert!(!artcraft_launcher_ui_egui::theme::cjk_font_loaded(artcraft_launcher_ui_egui::i18n::Lang::ZH_CN));
++    h.get_by_label("Simplified Chinese").scroll_to_me();
++    h.run_steps(5);
+     h.get_by_label("Simplified Chinese").click();
+     h.run_steps(3);
+     if !artcraft_launcher_ui_egui::theme::cjk_font_available(artcraft_launcher_ui_egui::i18n::Lang::ZH_CN) {
 diff --git a/crates/ui-egui/tests/french.rs b/crates/ui-egui/tests/french.rs
 index af9a9eb..4cbad74 100644
 --- a/crates/ui-egui/tests/french.rs
@@ -150273,10 +150297,19 @@ index af9a9eb..4cbad74 100644
      let mut table = harness(ViewMode::Table);
      table.run_steps(8);
 diff --git a/crates/ui-egui/tests/german.rs b/crates/ui-egui/tests/german.rs
-index eb80c39..23f872f 100644
+index eb80c39..84637bc 100644
 --- a/crates/ui-egui/tests/german.rs
 +++ b/crates/ui-egui/tests/german.rs
-@@ -190,7 +190,7 @@ fn german_switches_persists_and_keeps_install_actions() {
+@@ -153,6 +153,8 @@ fn german_switches_persists_and_keeps_install_actions() {
+     h.run_steps(3);
+     h.get_by_value("English").click();
+     h.run_steps(2);
++    h.get_by_label("Deutsch").scroll_to_me();
++    h.run_steps(5);
+     h.get_by_label("Deutsch").click();
+     h.run_steps(3);
+     h.get_by_value("Deutsch");
+@@ -190,7 +192,7 @@ fn german_switches_persists_and_keeps_install_actions() {
          for label in ["Grid", "Table", "Settings", "Check for updates"] {
              let rect = web.get_by_label(artcraft_launcher_ui_egui::i18n::t(label)).rect();
              assert!(rect.left() >= 0.0 && rect.right() <= width, "{width}: {label} {rect:?}");
@@ -150369,6 +150402,205 @@ index e3eea7e..07a14ae 100644
  
      let mut table = harness(ViewMode::Table);
      table.run_steps(8);
+diff --git a/crates/ui-egui/tests/required_languages.rs b/crates/ui-egui/tests/required_languages.rs
+new file mode 100644
+index 0000000..3c616ed
+--- /dev/null
++++ b/crates/ui-egui/tests/required_languages.rs
+@@ -0,0 +1,193 @@
++//! Required new languages: real egui pointer selection, persistence and original install commands.
++//! The backend is a local fake; no downloads, login or installer actions occur.
++
++use std::cell::{Cell, RefCell};
++use std::rc::Rc;
++
++use artcraft_launcher_core::protocol::{Backend, Capabilities, Command, Event, JobPhase, LatestRelease, Origin, PausedDownload, Source};
++use artcraft_launcher_core::release::{Asset, Release};
++use artcraft_launcher_core::status::InstallSource;
++use artcraft_launcher_core::{Arch, Installed, Os, Platform, SUITE, version};
++use artcraft_launcher_ui_egui::settings::ViewMode;
++use artcraft_launcher_ui_egui::{Host, LauncherUi, Settings};
++use egui_kittest::Harness;
++use egui_kittest::kittest::Queryable;
++
++const NOW: i64 = 1_791_500_000;
++
++struct Fake {
++    events: Vec<Event>,
++    sent: Rc<RefCell<Vec<Command>>>,
++    manage: bool,
++    clock: Rc<Cell<i64>>,
++}
++
++impl Backend for Fake {
++    fn send(&mut self, command: Command) {
++        self.sent.borrow_mut().push(command);
++    }
++    fn poll(&mut self) -> Vec<Event> {
++        std::mem::take(&mut self.events)
++    }
++    fn capabilities(&self) -> Capabilities {
++        Capabilities { manage_apps: self.manage, reveal_label: "Show in Finder", self_update: self.manage }
++    }
++    fn platform(&self) -> Option<Platform> {
++        Some(Platform { os: Os::MacOs, arch: Arch::Arm64 })
++    }
++    fn now(&self) -> i64 {
++        self.clock.get()
++    }
++}
++
++struct NoHost;
++impl Host for NoHost {}
++
++fn release(id: &str, v: &str, at: i64) -> Release {
++    let name = format!("{id}-{v}-macos-universal.dmg");
++    Release {
++        tag: format!("v{v}"),
++        version: version::parse(v),
++        name: format!("v{v}"),
++        published_at: Some(at),
++        html_url: format!("https://github.com/storytold/{id}/releases/tag/v{v}"),
++        notes: "## What's Changed\n* Faster things by @a in https://github.com/storytold/x/pull/1".into(),
++        prerelease: false,
++        assets: vec![Asset {
++            name: name.clone(),
++            size: 150 << 20,
++            url: format!("https://github.com/storytold/{id}/releases/download/v{v}/{name}"),
++            sha256: None,
++        }],
++    }
++}
++
++/// A realistic mix: updates, up-to-date apps, a download in progress, one app with no release.
++fn events() -> Vec<Event> {
++    let mut ev = Vec::new();
++    let versions = [
++        ("photocraft", "0.5.0"),
++        ("vectorcraft", "0.7.0"),
++        ("filmcraft", "0.4.0"),
++        ("lightcraft", "0.4.0"),
++        ("pdfcraft", "0.4.0"),
++        ("effectcraft", "0.6.0"),
++        ("designcraft", "0.4.0"),
++        ("wordcraft", "0.3.0"),
++        ("deckcraft", "0.3.0"),
++        ("gridcraft", "0.3.0"),
++        ("cadcraft", "0.3.0"),
++    ];
++    for (i, (id, v)) in versions.iter().enumerate() {
++        ev.push(Event::Latest {
++            app: (*id).into(),
++            latest: LatestRelease::Found(release(id, v, NOW - 86_400 - i as i64 * 600)),
++            from: Origin::ArtCraftApi,
++        });
++    }
++    ev.push(Event::Latest { app: "soundcraft".into(), latest: LatestRelease::None, from: Origin::ArtCraftApi });
++    let installed = [("photocraft", "0.4.1"), ("lightcraft", "0.4.0"), ("wordcraft", "0.3.0"), ("effectcraft", "0.5.0")];
++    for app in &SUITE {
++        let inst = installed.iter().find(|(id, _)| *id == app.id).map(|(_, v)| Installed {
++            version: version::parse(v),
++            source: InstallSource::MacApp,
++            location: format!("/Applications/{}.app", app.name),
++            package: None,
++        });
++        ev.push(Event::Detected { app: app.id.into(), installed: inst });
++    }
++    ev.push(Event::Progress { app: "filmcraft".into(), phase: JobPhase::Downloading { done: 48 << 20, total: 131 << 20 } });
++    ev.push(Event::Paused { app: "deckcraft".into(), download: Some(PausedDownload { done: 30 << 20, total: 120 << 20 }) });
++    ev.push(Event::Progress { app: "gridcraft".into(), phase: JobPhase::Reconnecting { done: 10 << 20, total: 90 << 20 } });
++    ev.push(Event::CheckFinished { at: NOW - 180, source: Source::GitHubApi, rate_limited_until: None });
++    ev
++}
++
++fn harness_language(
++    view: ViewMode,
++    theme: egui::Theme,
++    manage: bool,
++    language: &str,
++) -> (Harness<'static, Option<LauncherUi>>, Rc<RefCell<Vec<Command>>>) {
++    artcraft_launcher_ui_egui::i18n::set_test_lang(artcraft_launcher_ui_egui::i18n::Lang::EN);
++    let sent = Rc::new(RefCell::new(Vec::new()));
++    let sent2 = sent.clone();
++    let mut backend = Some(Fake { events: events(), sent: sent2, manage, clock: Rc::new(Cell::new(NOW)) });
++    let settings = Settings { view, notify: false, language: language.into(), ..Settings::default() };
++    let harness = Harness::builder().with_size(egui::vec2(1180.0, 900.0)).with_theme(theme).build_ui_state(
++        move |ui, state: &mut Option<LauncherUi>| {
++            if state.is_none()
++                && let Some(b) = backend.take()
++            {
++                let mut s = settings.clone();
++                s.theme = if theme == egui::Theme::Dark {
++                    artcraft_launcher_ui_egui::theme::ThemeChoice::Dark
++                } else {
++                    artcraft_launcher_ui_egui::theme::ThemeChoice::Light
++                };
++                *state = Some(LauncherUi::new(ui.ctx(), Box::new(b), s));
++            }
++            if let Some(l) = state.as_mut() {
++                l.logic(&ui.ctx().clone(), &mut NoHost);
++                l.ui(ui, &mut NoHost);
++            }
++        },
++        None,
++    );
++    (harness, sent)
++}
++
++fn snapshot(h: &mut Harness<'_, Option<LauncherUi>>, name: &str) {
++    let Some(dir) = std::env::var_os("ARTCRAFT_LAUNCHER_SNAPSHOTS") else { return };
++    let img = h.render().unwrap();
++    img.save(std::path::Path::new(&dir).join(format!("{name}.png"))).unwrap();
++}
++
++#[test]
++fn required_new_languages_switch_persist_and_preserve_install_actions() {
++    use artcraft_launcher_ui_egui::i18n::Lang;
++    for (code, picker, done, notification, tagline, update_all) in [
++        ("vi", "Tiếng Việt", "Xong", "Thông báo khi có bản cập nhật cho ứng dụng đã cài", "Chỉnh sửa ảnh", "Cập nhật tất cả (2)"),
++        ("ko", "Korean", "완료", "설치된 앱의 업데이트 알림", "이미지 편집", "모두 업데이트(2)"),
++        ("zh-TW", "Traditional Chinese", "完成", "已安裝的應用程式有更新時通知我", "影像編輯", "全部更新（2）"),
++    ] {
++        let (mut h, sent) = harness_language(ViewMode::Grid, egui::Theme::Dark, true, "en");
++        h.run_steps(6);
++        h.get_by_label("Settings").click();
++        h.run_steps(3);
++        h.get_by_value("English").click();
++        h.run_steps(2);
++        h.get_by_label(picker).scroll_to_me();
++        h.run_steps(5);
++        h.get_by_label(picker).click();
++        h.run_steps(5);
++        assert_eq!(h.state().as_ref().unwrap().settings.language, code);
++        let saved = serde_json::to_string(&h.state().as_ref().unwrap().settings).unwrap();
++        let restored: Settings = serde_json::from_str(&saved).unwrap();
++        assert_eq!(restored.language, code);
++        let lang = Lang::from_code(code).unwrap();
++        if lang.needs_cjk_font() && !artcraft_launcher_ui_egui::theme::cjk_font_available(lang) {
++            h.get_by_label_contains("No font for this language was found");
++            h.get_by_label("Done").click();
++            h.run_steps(3);
++            h.get_by_label("Image editing");
++            continue;
++        }
++        h.get_by_label(notification);
++        snapshot(&mut h, &format!("required-{code}-settings"));
++        h.get_by_label(done).click();
++        h.run_steps(3);
++        h.get_by_label(tagline);
++        h.get_by_label("Launcher");
++        snapshot(&mut h, &format!("required-{code}-grid"));
++        h.get_by_label(update_all).click();
++        h.run_steps(3);
++        let installs: Vec<_> = sent.borrow().iter().filter_map(|c| if let Command::Install { app } = c { Some(app.clone()) } else { None }).collect();
++        assert_eq!(installs, ["photocraft", "effectcraft"], "{code}");
++        let (mut table, _) = harness_language(ViewMode::Table, egui::Theme::Light, true, &restored.language);
++        table.run_steps(6);
++        assert_eq!(table.state().as_ref().unwrap().settings.language, code);
++        table.get_by_label(tagline);
++        snapshot(&mut table, &format!("required-{code}-table"));
++    }
++}
 diff --git a/crates/ui-egui/tests/russian.rs b/crates/ui-egui/tests/russian.rs
 index 204a84d..2650f45 100644
 --- a/crates/ui-egui/tests/russian.rs
