@@ -50,3 +50,18 @@ all-screen layout inspection, signing/notarization, or real account login.
 KIO Tools is maintained in its own Python/C++/WebView repository. Studio remains
 in its existing private owner-only distribution; never add its private installer,
 source or credentials to this public repository or the public Launcher feed.
+
+## Existing editor debt and regression gate
+
+`manifests/localization-baseline.json` records the known findings from the first
+suite-wide audit. The full native editor workflow runs `--baseline` after source
+preparation. Any newly missing translation, broken variable, empty value,
+untranslated English entry or direct UI literal fails that check. Moving a UI
+line does not bypass or falsely trigger the check. This prevents new features
+from adding localization debt while keeping the existing debt visible.
+
+Passing this regression gate is **not** passing `--require-complete`. The latter
+remains mandatory for Launcher, whose six required catalogs are complete. The
+other editors must not be labelled fully localized until their existing findings
+are resolved and their native screens are tested. Do not refresh the baseline to
+hide new findings; proposed exceptions require source/context review.

@@ -165,20 +165,54 @@ def audit_app(app, source):
     return {'id': app, 'sourceAvailable': True, 'catalogKeyUnion': len(keys), 'catalogFiles': inputs, 'parseErrors': parse_errors, 'languages': rows, 'directUiReview': direct, 'complete': complete, 'guiTested': False, 'officialNameExceptions': [list(k) for k in sorted(OFFICIAL_NAMES.get(app, set()))]}
 
 
+def finding_id(value):
+    return hashlib.sha256(json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode('utf-8')).hexdigest()
+
+
+def finding_inventory(app):
+    """Stable identities let existing debt be visible without permitting new debt."""
+    issues = {}
+    for lang, row in app.get('languages', {}).items():
+        for field in ('missingKeys', 'emptyKeys', 'placeholderKeys', 'unchangedKeys'):
+            issues[lang + ':' + field] = sorted(finding_id(key) for key in row[field])
+    issues['directUiReview'] = sorted({finding_id({'path': row['path'], 'text': row['text']}) for row in app.get('directUiReview', [])})
+    issues['parseErrors'] = sorted(finding_id(row) for row in app.get('parseErrors', []))
+    if not app.get('sourceAvailable'):
+        issues['sourceUnavailable'] = [finding_id(app['id'])]
+    return issues
+
+
+def regressions(app, baseline):
+    known = baseline.get('apps', {}).get(app['id'])
+    if known is None:
+        return {'unreviewedApplication': [app['id']]}
+    return {category: sorted(new) for category, values in finding_inventory(app).items()
+            if (new := set(values) - set(known.get(category, [])))}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', type=Path, default=Path(__file__).resolve().parents[1])
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--app', choices=(*APPS, 'all'), default='all')
     parser.add_argument('--require-complete', action='store_true')
+    parser.add_argument('--baseline', type=Path, help='Fail for new findings relative to reviewed existing debt; does not assert completeness')
     args = parser.parse_args()
     apps = [audit_app(app, args.root / ('.work/launcher/source' if app == 'launcher' else '.work/full-native/' + app + '/source')) for app in (APPS if args.app == 'all' else (args.app,))]
     report = {'schemaVersion': 1, 'languages': list(LANGUAGES), 'method': 'catalog union plus literal lookups; direct UI calls require contextual review; static coverage does not prove screen or native execution', 'apps': apps}
+    if args.baseline:
+        baseline = json.loads(args.baseline.read_text(encoding='utf-8'))
+        if baseline.get('schemaVersion') != 1 or baseline.get('languages') != list(LANGUAGES):
+            raise ValueError('Localization baseline schema or required language order changed')
+        for app in apps:
+            app['regressions'] = regressions(app, baseline)
+        report['noNewFindings'] = all(not app['regressions'] for app in apps)
+        report['baselineSha256'] = hashlib.sha256(args.baseline.read_bytes()).hexdigest()
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     for app in apps:
         print(app['id'], 'keys', app.get('catalogKeyUnion', 0), 'missing', {k: v['missing'] for k, v in app.get('languages', {}).items()}, 'directUIReview', len(app.get('directUiReview', [])), 'complete', app['complete'])
-    return int(args.require_complete and not all(a['complete'] for a in apps))
+    return int((args.require_complete and not all(a['complete'] for a in apps)) or report.get('noNewFindings') is False)
 
 
 if __name__ == '__main__':

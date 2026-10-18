@@ -97,6 +97,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'WiX extensions installation failed' }
       - name: Verify all original public source, font and branding bytes
         run: ${{ matrix.python }} scripts/full_native.py prepare --app ${{ matrix.app }}
+      - name: Reject new missing translations, placeholder errors and raw UI strings
+        run: ${{ matrix.python }} scripts/audit_localization.py --app ${{ matrix.app }} --baseline manifests/localization-baseline.json --output dist/${{ matrix.app }}-localization.json
       - name: Build full original GUI and CLI with native features, test original engine and formats
         run: ${{ matrix.python }} scripts/full_native.py build --app ${{ matrix.app }} --platform ${{ matrix.platform }}
       - name: Package real native apps, full legal material and mandatory offline resources

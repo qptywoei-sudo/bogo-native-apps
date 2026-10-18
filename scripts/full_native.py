@@ -729,6 +729,7 @@ def verify(folder, lock, kind):
 
 def public_files(lock):
     files = set(common.PUBLIC_FILES) | {'scripts/full_native.py', 'scripts/audit_windows_identity.py', 'tests/test_full_native.py', 'tests/test_windows_identity.py', 'manifests/full-native-apps.json', 'manifests/archive-inputs.json', '.github/workflows/full-native-apps.yml'}
+    files.update({'scripts/audit_localization.py', 'tests/test_localization_audit.py', 'manifests/localization-baseline.json', 'docs/localization-audit.md'})
     files.update({'.github/workflows/native-file-qa.yml', 'docs/native-file-qa.md',
                   'scripts/native_file_qa.py', 'scripts/collect_ci_artifact.py', 'scripts/smoke_word.py', 'scripts/smoke_craft.py', 'scripts/smoke_office.py',
                   'tests/test_native_file_qa.py', 'tests/test_collect_ci_artifact.py', 'tests/test_smoke_word.py', 'tests/test_smoke_craft.py',

@@ -81,6 +81,33 @@ class LocalizationFailures(unittest.TestCase):
         self.assertEqual(audit.canonical_language('zh-Hant'), 'zh-TW')
         self.assertEqual(audit.LANGUAGES, ('vi', 'en', 'ko', 'ja', 'zh-TW', 'zh-CN'))
 
+    def test_legacy_missing_translation_does_not_allow_another_missing_key(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            self.fixture(root)
+            p=root/'crates/ui-egui/src/i18n/vi.tsv'
+            p.unlink()
+            before=audit.audit_app('fixture', root)
+            baseline={'apps': {'fixture': audit.finding_inventory(before)}}
+            self.assertFalse(audit.regressions(before, baseline))
+            ko=root/'crates/ui-egui/src/i18n/ko.tsv'
+            ko.write_text(ko.read_text(encoding='utf-8')+'\tSave\t저장\n', encoding='utf-8')
+            after=audit.audit_app('fixture', root)
+            self.assertIn('vi:missingKeys', audit.regressions(after, baseline))
+            self.assertFalse(after['complete'])
+
+    def test_new_raw_ui_string_is_not_hidden_by_legacy_raw_ui_debt(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            self.fixture(root, ui='ui.button("Legacy label");')
+            before=audit.audit_app('fixture', root)
+            baseline={'apps': {'fixture': audit.finding_inventory(before)}}
+            p=root/'crates/ui-egui/src/lib.rs'
+            p.write_text('\n\n'+p.read_text(encoding='utf-8'), encoding='utf-8')
+            self.assertFalse(audit.regressions(audit.audit_app('fixture', root), baseline))
+            p.write_text(p.read_text(encoding='utf-8')+'\nui.button("Another label");', encoding='utf-8')
+            self.assertIn('directUiReview', audit.regressions(audit.audit_app('fixture', root), baseline))
+
 
 if __name__ == '__main__':
     unittest.main()
