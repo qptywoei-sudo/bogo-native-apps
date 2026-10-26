@@ -7,9 +7,11 @@ import os
 from pathlib import Path
 import stat
 import struct
+import subprocess
 import tempfile
 import unittest
 import urllib.request
+import urllib.error
 from unittest.mock import patch
 import zipfile
 
@@ -28,7 +30,8 @@ class GuardTests(unittest.TestCase):
         self.root = Path(self.temp.name).resolve()
         self.environment = {'GITHUB_ACTIONS':'true', 'RUNNER_ENVIRONMENT':'github-hosted',
             'GITHUB_REPOSITORY':m.REPOSITORY, 'RUNNER_OS':'Windows',
-            'GITHUB_SHA':'a'*40, 'RUNNER_TEMP':str(self.root)}
+            'GITHUB_SHA':'a'*40, 'RUNNER_TEMP':str(self.root),
+            'GITHUB_RUN_ID':'40378182320','GITHUB_RUN_ATTEMPT':'1'}
 
     def tearDown(self):
         self.temp.cleanup()
@@ -78,8 +81,93 @@ class GuardTests(unittest.TestCase):
         with self.assertRaises(ValueError):m.NoRedirect().redirect_request(None,None,302,'',{},'https://example.com/')
 
     def test_credential_cannot_leave_repository_api(self):
-        for url in ['https://github.com/repo','https://api.github.com/repos/other/repository/releases/1','http://api.github.com/repos/'+m.REPOSITORY+'/releases/1']:
+        for url in ['https://github.com/repo','https://api.github.com/repos/other/repository/releases/1','http://api.github.com/repos/'+m.REPOSITORY+'/releases/1',
+                    'https://api.github.com/repos/'+m.REPOSITORY+'/releases/1',
+                    f'https://api.github.com/repos/{m.REPOSITORY}/releases/{m.RELEASE_ID}?other=true']:
             with self.subTest(url=url),self.assertRaises(ValueError):m.request_url(url,'synthetic')
+
+    def test_draft_request_is_get_only_and_only_exact_endpoint(self):
+        with patch.object(m.urllib.request,'build_opener') as opener:
+            m.request_url(f'https://api.github.com/repos/{m.REPOSITORY}/releases/{m.RELEASE_ID}','synthetic')
+            request=opener.return_value.open.call_args.args[0]
+            self.assertEqual(request.get_method(),'GET')
+            self.assertEqual(request.get_header('Authorization'),'Bearer synthetic')
+
+    def test_http_diagnostic_retains_actual_status_message_not_headers_or_secrets(self):
+        raw=json.dumps({'message':'Exact server message synthetic-secret Bearer not-a-real-token',
+            'documentation_url':'https://docs.github.com/rest/releases?private=value',
+            'ignored':'synthetic-secret','headers':{'Authorization':'Bearer synthetic-secret'}}).encode()
+        error=urllib.error.HTTPError('https://api.github.com/test',403,'Forbidden',{'X-Private':'synthetic-secret'},io.BytesIO(raw))
+        value=m.safe_http_diagnostic(error,'synthetic-secret')
+        self.assertEqual(value['status'],403)
+        self.assertEqual(value['message'],'Exact server message [redacted] Bearer [redacted]')
+        self.assertEqual(value['documentationUrl'],'https://docs.github.com/rest/releases')
+        self.assertNotIn('synthetic-secret',json.dumps(value));self.assertNotIn('headers',value)
+        large=urllib.error.HTTPError('https://api.github.com/test',403,'Forbidden',{},io.BytesIO(b'x'*8193))
+        bounded=m.safe_http_diagnostic(large)
+        self.assertTrue(bounded['bodyTruncated']);self.assertEqual(bounded['message'],'HTTP Error 403: Forbidden')
+        absent=urllib.error.HTTPError('https://api.github.com/test',403,'Forbidden',{},None)
+        self.assertEqual(m.safe_http_diagnostic(absent)['message'],'HTTP Error 403: Forbidden')
+
+    def test_fetch_role_cannot_execute_accept_or_missing_role(self):
+        for role in ('fetch',None,'unknown'):
+            environment={} if role is None else {'BOGO_ACCEPTANCE_PHASE':role}
+            with self.subTest(role=role),patch.dict(m.os.environ,environment,clear=True),self.assertRaises(ValueError):
+                m.accept(self.root,'windows')
+        m.require_phase({'BOGO_ACCEPTANCE_PHASE':'gui'},'gui')
+        m.require_phase({'BOGO_ACCEPTANCE_PHASE':'fetch'},'fetch')
+
+    def receipt(self,target='windows'):
+        pins={'source':m.PINS['source'],target:m.PINS[target],target+'-update':m.PINS[target+'-update'],'envelope':m.ENVELOPE_PIN}
+        assets={key:{'id':p[0],'name':p[1],'bytes':p[2],'sha256':p[3],'releaseId':m.RELEASE_ID} for key,p in pins.items()}
+        assets['sourceBinding']={'repository':m.SOURCE_REPO,'commit':m.SOURCE_COMMIT,'byteExactFiles':438}
+        url,size,sha=m.OLD_WINDOWS if target=='windows' else m.OLD_MACOS
+        assets['prior']={'bytes':size,'sha256':sha,'url':url,'version':'4.6.21'}
+        return {'repository':m.REPOSITORY,'releaseId':m.RELEASE_ID,'draft':True,'platform':target,
+            'workflowSha':self.environment['GITHUB_SHA'],'assets':assets,'tokenPersisted':False,
+            'fetchRole':'fetch-only','workflowRunId':self.environment['GITHUB_RUN_ID'],'workflowAttempt':'1'}
+
+    def test_transfer_same_workflow_receipt_and_all_pins_required(self):
+        for target in ('windows','macos'):
+            receipt=self.receipt(target)
+            self.assertEqual(len(m.validate_receipt(receipt,target,self.environment)),5)
+            for key,bad in [('workflowRunId','2'),('workflowAttempt','2'),('workflowSha','b'*40),
+                            ('platform','other'),('draft',False),('tokenPersisted',True),('fetchRole','gui')]:
+                with self.subTest(target=target,key=key),self.assertRaises(ValueError):
+                    m.validate_receipt(dict(receipt,**{key:bad}),target,self.environment)
+            for mutate in ('source-pin','prior-pin','source-git','extra-field'):
+                value=json.loads(json.dumps(receipt))
+                if mutate=='source-pin':value['assets']['source']['sha256']='0'*64
+                elif mutate=='prior-pin':value['assets']['prior']['version']='4.6.23'
+                elif mutate=='source-git':value['assets']['sourceBinding']['byteExactFiles']=437
+                else:value['unexpectedPrivateData']='must not transfer'
+                with self.subTest(mutate=mutate),self.assertRaises(ValueError):m.validate_receipt(value,target,self.environment)
+
+    def test_transferred_root_excludes_work_profiles_and_extra_files(self):
+        receipt=self.receipt();assets=self.root/'assets';assets.mkdir();output=self.root/'output';output.mkdir()
+        m.write_json(self.root/'receipt.json',receipt);m.write_json(output/'fetch-proof.json',receipt)
+        for name in m.validate_receipt(receipt,'windows',self.environment):(assets/name).write_bytes(b'layout-only, bytes are separately rehashed by accept')
+        self.assertEqual(m.transferred_inputs(self.root,'windows',self.environment),receipt)
+        (self.root/'profile').mkdir()
+        with self.assertRaises(ValueError):m.transferred_inputs(self.root,'windows',self.environment)
+        (self.root/'profile').rmdir();(output/'private-session.json').write_text('{}')
+        with self.assertRaises(ValueError):m.transferred_inputs(self.root,'windows',self.environment)
+        (output/'private-session.json').unlink();m.write_json(output/'fetch-proof.json',dict(receipt,draft=False))
+        with self.assertRaises(ValueError):m.transferred_inputs(self.root,'windows',self.environment)
+
+    def test_workflow_separates_privileged_fetch_and_readonly_gui_vms(self):
+        workflow=HERE/'tools-ci-acceptance.yml'
+        if not workflow.is_file():workflow=HERE.parent/'.github/workflows/bogo-tools-acceptance.yml'
+        source=workflow.read_text()
+        fetch,gui=source.split('\n  fetch:\n',1)[1].split('\n  accept:\n',1)
+        self.assertIn('contents: write',fetch);self.assertNotIn('contents: write',gui)
+        self.assertIn('contents: read',gui);self.assertIn('needs: fetch',gui)
+        self.assertIn('BOGO_ACCEPTANCE_PHASE: fetch',fetch);self.assertIn('BOGO_ACCEPTANCE_PHASE: gui',gui)
+        self.assertNotIn('scripts/tools-ci-acceptance.py accept',fetch)
+        self.assertNotIn('GH_TOKEN:',gui);self.assertNotIn('scripts/tools-ci-acceptance.py fetch',gui)
+        self.assertIn('compression-level: 0',fetch)
+        self.assertIn('actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131',gui)
+        self.assertNotIn('github-token:',gui);self.assertNotIn('run-id:',gui)
 
     def test_download_is_stream_checked_and_failed_partial_removed(self):
         payload=b'actual frozen payload';sha=hashlib.sha256(payload).hexdigest()
@@ -130,6 +218,26 @@ class ArchiveTests(unittest.TestCase):
         self.assertEqual((out/'root/file').read_bytes(),b'preserved bytes')
         if os.name!='nt':self.assertEqual((out/'root/current').read_bytes(),b'preserved bytes')
         with self.assertRaises(ValueError):m.extract(archive,out,'root')
+
+    def test_real_external_ancestor_alias_is_outside_zip_boundary(self):
+        real=self.root/'real-parent';real.mkdir();alias=self.root/'external-alias'
+        if os.name=='nt':
+            # A directory junction is the ordinary Windows alias and requires no
+            # developer-mode symlink permission. No app or downloaded code runs.
+            ps=Path(os.environ.get('SystemRoot',r'C:\Windows'))/'System32/WindowsPowerShell/v1.0/powershell.exe'
+            subprocess.run([str(ps),'-NoProfile','-NonInteractive','-Command',
+                '[void](New-Item -ItemType Junction -Path $env:BOGO_TEST_ALIAS -Target $env:BOGO_TEST_TARGET -ErrorAction Stop)'],
+                env=dict(os.environ,BOGO_TEST_ALIAS=str(alias),BOGO_TEST_TARGET=str(real)),capture_output=True,check=True,timeout=30)
+        else:alias.symlink_to(real,target_is_directory=True)
+        self.assertTrue(os.path.samefile(alias,real))
+        archive=self.archive([('root/file',b'outside alias is allowed; ZIP links remain forbidden',stat.S_IFREG|0o644)])
+        m.extract(archive,alias/'out','root')
+        self.assertEqual((real/'out/root/file').read_bytes(),b'outside alias is allowed; ZIP links remain forbidden')
+        destination=alias/'out'
+        with self.assertRaises(ValueError):m.extract(archive,destination,'root')
+        if os.name!='nt':
+            direct=self.root/'direct-target';direct.symlink_to(real/'not-created',target_is_directory=True)
+            with self.assertRaises(ValueError):m.extract(archive,direct,'root')
 
     def test_wrong_root_and_duplicate_case_rejected(self):
         for entries in [[('other/file',b'x',0)], [('root/A',b'a',0),('root/a',b'b',0)]]:

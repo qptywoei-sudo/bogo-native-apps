@@ -84,6 +84,18 @@ def owned_root(root, temp):
     return root
 
 
+def require_phase(environment, expected):
+    require(expected in ('fetch','gui') and environment.get('BOGO_ACCEPTANCE_PHASE')==expected,
+            'Fetch-only and read-only GUI jobs must remain separate')
+
+
+def workflow_identity(environment):
+    run,attempt=environment.get('GITHUB_RUN_ID',''),environment.get('GITHUB_RUN_ATTEMPT','')
+    require(re.fullmatch(r'[1-9][0-9]{0,19}',run) is not None and re.fullmatch(r'[1-9][0-9]{0,5}',attempt) is not None,
+            'Missing same-workflow run/attempt identity')
+    return {'workflowRunId':run,'workflowAttempt':attempt}
+
+
 class Redirects(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         url = urllib.parse.urlparse(newurl)
@@ -99,14 +111,44 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
         raise ValueError('Loopback probe refused a redirect')
 
 
+def safe_http_diagnostic(error, token=None):
+    """Retain only bounded public GitHub JSON diagnostics, never headers/body dumps."""
+    def safe(value):
+        if not isinstance(value,str):return None
+        if token:value=value.replace(token,'[redacted]')
+        value=re.sub(r'(?i)Bearer\s+[^\s\"<>]+','Bearer [redacted]',value)
+        return ''.join(c for c in value if c>=' ' or c=='\n')[:600]
+    result={'status':int(error.code),'message':safe(str(error))}
+    try:
+        raw=error.read(8193);result['bodyTruncated']=len(raw)>8192
+        if len(raw)<=8192:
+            body=json.loads(raw)
+            if isinstance(body,dict):
+                message=safe(body.get('message'))
+                if message:result['message']=message
+                url=body.get('documentation_url');parsed=urllib.parse.urlparse(url) if isinstance(url,str) else None
+                if parsed and parsed.scheme=='https' and parsed.hostname=='docs.github.com' and not parsed.username and not parsed.password:
+                    result['documentationUrl']=urllib.parse.urlunparse((parsed.scheme,parsed.netloc,parsed.path,'','',''))
+    except (OSError,ValueError,TypeError,AttributeError):pass
+    finally:error.close()
+    return result
+
+
 def request_url(url, token=None, binary=False):
     parsed = urllib.parse.urlparse(url)
     require(parsed.scheme == 'https' and parsed.hostname in {'api.github.com', 'github.com'}, 'Unapproved initial URL')
     headers = {'User-Agent': 'bogo-tools-frozen-acceptance', 'Accept': 'application/octet-stream' if binary else 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'}
     if token:
-        require(parsed.hostname == 'api.github.com' and parsed.path.startswith('/repos/' + REPOSITORY + '/'), 'Credential cannot leave its repository API')
+        allowed={f'/repos/{REPOSITORY}/releases/{RELEASE_ID}'}
+        allowed.update(f'/repos/{REPOSITORY}/releases/assets/{pin[0]}' for pin in [*PINS.values(),ENVELOPE_PIN])
+        require(parsed.hostname == 'api.github.com' and parsed.path in allowed and not parsed.query,
+                'Credential cannot leave its exact frozen draft GET endpoints')
         headers['Authorization'] = 'Bearer ' + token
-    return urllib.request.build_opener(urllib.request.ProxyHandler({}), Redirects()).open(urllib.request.Request(url, headers=headers), timeout=120)
+    try:
+        return urllib.request.build_opener(urllib.request.ProxyHandler({}), Redirects()).open(urllib.request.Request(url, headers=headers,method='GET'), timeout=120)
+    except urllib.error.HTTPError as error:
+        error.bogo_diagnostic=safe_http_diagnostic(error,token)
+        raise
 
 
 def api(path, token=None):
@@ -158,11 +200,12 @@ def source_binding(archive):
 
 
 def fetch(root, target):
+    require_phase(os.environ,'fetch');identity=workflow_identity(os.environ)
     temp = hosted_context(os.environ, platform.system()); root = owned_root(root, temp)
     require(not root.exists(), 'CI evidence directory must be fresh')
     root.mkdir(mode=0o700); assets = root / 'assets'; assets.mkdir(); (root / 'output').mkdir()
     token = os.environ.pop('GH_TOKEN', None) or os.environ.pop('GITHUB_TOKEN', None)
-    require(token is not None, 'Missing own-repository read token for draft assets')
+    require(token is not None, 'Missing fetch-only own-repository ephemeral token for draft GETs')
     release = api(f'repos/{REPOSITORY}/releases/{RELEASE_ID}', token)
     require(release.get('id') == RELEASE_ID and release.get('draft') is True and release.get('prerelease') is True, 'Only the frozen private draft is eligible')
     rows = {a['id']: a for a in release['assets']}; got = {}
@@ -178,7 +221,7 @@ def fetch(root, target):
     download(url, assets / ('prior-' + target + '-update.zip'), size, sha)
     got['prior'] = {'bytes': size, 'sha256': sha, 'url': url, 'version': '4.6.21'}
     receipt={'repository': REPOSITORY, 'releaseId': RELEASE_ID, 'draft': True, 'platform': target,
-        'workflowSha': os.environ['GITHUB_SHA'], 'assets': got, 'tokenPersisted': False}
+        'workflowSha': os.environ['GITHUB_SHA'], 'assets': got, 'tokenPersisted': False,'fetchRole':'fetch-only',**identity}
     write_json(root/'receipt.json',receipt);write_json(root/'output/fetch-proof.json',receipt)
 
 
@@ -190,7 +233,7 @@ def member_path(name):
 
 
 def extract(archive, destination, expected_root=None):
-    destination = Path(destination); require(not destination.exists(), 'Extraction target is not fresh')
+    destination = Path(destination); require(not destination.is_symlink() and not destination.exists(), 'Extraction target is not fresh/plain')
     destination.mkdir(mode=0o700, parents=True); seen = set(); links = []
     with zipfile.ZipFile(archive) as z:
         require(len(z.infolist()) <= 60000, 'ZIP entry bound exceeded')
@@ -209,7 +252,10 @@ def extract(archive, destination, expected_root=None):
                 target = z.read(info).decode('utf-8')
                 require(target and not Path(target).is_absolute() and '\\' not in target and '\0' not in target, 'Unsafe ZIP symlink')
                 links.append((path, target)); continue
-            require(not any(parent.is_symlink() for parent in path.parents if parent != destination.parent), 'ZIP below symlink')
+            for parent in path.parents:
+                if parent==destination:break
+                require(not parent.is_symlink(),'ZIP below symlink')
+            else:raise ValueError('ZIP parent walk escaped extraction destination')
             with z.open(info) as source, path.open('xb') as output: shutil.copyfileobj(source, output)
             if mode: path.chmod(stat.S_IMODE(mode))
         for path, target in links:
@@ -559,10 +605,43 @@ def mac_upgrade(assets, work, source, output, env, observer):
     return {'fromVersion':'4.6.21','toVersion':VERSION,'oldBackend':old_health,'normalOldSignatureGateUsed':True,'canariesPreserved':True,'installedFileTreeExact':True,'actualNewExecutableSha256':EXE_SHA['macos'],'gui':gui,**provenance}
 
 
+def validate_receipt(receipt, target, environment):
+    expected_keys={'repository','releaseId','draft','platform','workflowSha','assets','tokenPersisted','fetchRole','workflowRunId','workflowAttempt'}
+    require(isinstance(receipt,dict) and set(receipt)==expected_keys,'Fetch receipt schema differs')
+    require(receipt['repository']==REPOSITORY and receipt['releaseId']==RELEASE_ID and receipt['platform']==target
+            and receipt['draft'] is True and receipt['tokenPersisted'] is False and receipt['fetchRole']=='fetch-only','Fetch receipt identity mismatch')
+    require(receipt['workflowSha']==environment.get('GITHUB_SHA'),'Fetch/GUI workflow source differs')
+    identity=workflow_identity(environment)
+    require(all(receipt[k]==v for k,v in identity.items()),'Fetch/GUI workflow run or attempt differs')
+    pins={'source':PINS['source'],target:PINS[target],target+'-update':PINS[target+'-update'],'envelope':ENVELOPE_PIN}
+    expected={key:{'id':p[0],'name':p[1],'bytes':p[2],'sha256':p[3],'releaseId':RELEASE_ID} for key,p in pins.items()}
+    expected['sourceBinding']={'repository':SOURCE_REPO,'commit':SOURCE_COMMIT,'byteExactFiles':438}
+    url,size,sha=OLD_WINDOWS if target=='windows' else OLD_MACOS
+    expected['prior']={'bytes':size,'sha256':sha,'url':url,'version':'4.6.21'}
+    require(receipt['assets']==expected,'Transferred input pins/source binding differ from frozen receipt')
+    return [p[1] for p in pins.values()]+['prior-'+target+'-update.zip']
+
+
+def transferred_inputs(root, target, environment):
+    root=Path(root)
+    require(root.is_dir() and not root.is_symlink() and {p.name for p in root.iterdir()}=={'assets','receipt.json','output'},'Transferred input root is not fresh/limited')
+    for name in ('assets','output'):
+        require((root/name).is_dir() and not (root/name).is_symlink(),'Transferred directory is not plain')
+    path=root/'receipt.json';require(path.is_file() and not path.is_symlink() and path.stat().st_size<=1024*1024,'Transferred receipt is not plain/bounded')
+    receipt=json.loads(path.read_text(encoding='utf-8'))
+    names=validate_receipt(receipt,target,environment)
+    require({p.name for p in (root/'assets').iterdir()}==set(names),'Transferred asset set differs')
+    require(all((root/'assets'/name).is_file() and not (root/'assets'/name).is_symlink() for name in names),'Transferred asset is not a plain file')
+    proof=root/'output/fetch-proof.json'
+    require({p.name for p in (root/'output').iterdir()}=={'fetch-proof.json'} and proof.is_file() and not proof.is_symlink() and proof.stat().st_size<=1024*1024,'Transferred evidence contains unexpected files')
+    require(json.loads(proof.read_text(encoding='utf-8'))==receipt,'Transferred fetch proof/receipt differ')
+    return receipt
+
+
 def accept(root, target):
+    require_phase(os.environ,'gui')
     temp=hosted_context(os.environ,platform.system());root=owned_root(root,temp)
-    receipt=json.loads((root/'receipt.json').read_text());require(receipt['repository']==REPOSITORY and receipt['releaseId']==RELEASE_ID and receipt['platform']==target,'Fetch receipt identity mismatch')
-    require(receipt['workflowSha']==os.environ['GITHUB_SHA'],'Fetch/accept workflow source differs')
+    receipt=transferred_inputs(root,target,os.environ)
     assets=root/'assets';output=root/'output';work=root/'work';work.mkdir(mode=0o700)
     for pin in (PINS['source'],PINS[target],PINS[target+'-update'],ENVELOPE_PIN):
         require((assets/pin[1]).stat().st_size==pin[2] and digest(assets/pin[1])==pin[3],'Frozen downloaded artifact changed')
@@ -627,7 +706,10 @@ def main():
         temp=Path(os.environ.get('RUNNER_TEMP',''))
         if temp.is_absolute() and temp.is_dir():
             root=owned_root(Path(args.root),temp)
-            if (root/'output').is_dir():write_json(root/'output/terminal-error.json',{'status':'failed','command':args.command,'platform':args.platform,'type':type(error).__name__,'message':str(error)[:600]})
+            if (root/'output').is_dir():
+                diagnostic={'status':'failed','command':args.command,'platform':args.platform,'type':type(error).__name__,'message':str(error)[:600]}
+                if isinstance(error,urllib.error.HTTPError) and hasattr(error,'bogo_diagnostic'):diagnostic['http']=error.bogo_diagnostic
+                write_json(root/'output/terminal-error.json',diagnostic)
         raise
 
 if __name__=='__main__':main()
