@@ -13,25 +13,27 @@ from pathlib import Path, PurePosixPath
 
 VERSION = '4.6.23'
 REPOSITORY = 'qptywoei-sudo/bogo-native-apps'
-RELEASE_ID = 424585753
+RELEASE_ID = 424757180
 SOURCE_REPO = 'qptywoei-sudo/kio-tools-releases'
-SOURCE_COMMIT = 'f328c97865951603f49dd06eb7960122e4035662'
+SOURCE_COMMIT = '0821a5aec13aeb9b6bbb3bd86bab42b482497e4e'
+SOURCE_FILES = 440
+MAC_BUNDLE_FILES = 9474
 MASTER_SHA = 'e3196a03cf3d259b5e3662c39206b36339b22986ac910b0e772fb84f7759957b'
 ICO_SHA = '6fc46773734a521752d98e113d45ea9526ce475af5500efec32dab27ca19f72e'
 ICNS_SHA = '83b8e147f108536a5e71745122dd6f57be3f2b52a2d59a57176228479dfe55cf'
 EXE_SHA = {'windows': '4a73a4ae6052804e2bb14ffe1957c447bbedff92a24e6b11c1115cc7c7682ce5',
-           'macos': '3719dff4c53deedb85db9e3c7691e856201f7b111c93fed1f7a24eac180a273a'}
+           'macos': '0cd2a606507330da1458a5a61995c73f6550bcda46b7a1d01ffb10f3bf952408'}
 EXE_BYTES = {'windows':1806336,'macos':3666928}
 # The former e1afd... implementation checkpoint preceded final packaging and
 # signing. Only the exact final executable members of the frozen ZIPs above
 # are accepted here; historical/prepackaging hashes are never a fallback.
 # Asset IDs, names, sizes and hashes were independently read back from this draft.
 PINS = {
- 'source': (678997933, 'Bogo-Tools-4.6.23-source.zip', 7431565, '4d632a284a12a41c2e3154058f7770658677380f945ccf796dddd4ae0729f8e2'),
- 'windows': (678997931, 'Bogo-Tools-4.6.23-Windows-Portable.zip', 412298109, '8d893bb45045ae39d2f3ae5ae61c139d8ecbb0b60c4ce6cb67a3248654d146ab'),
- 'macos': (678997927, 'Bogo-Tools-4.6.23-Mac-Portable.zip', 434306870, '3e61b3f23f816427a7b6b3ea82f001be4d23cdfd62b31ced54a02d53259e65c4'),
- 'windows-update': (679005553, 'Bogo-Tools-4.6.23-Windows-Update.zip', 411750639, 'a5c1038c185e3d2da0c71f1e7a32fbe4c055934c0a9fba04f3bee3a32b74ad47'),
- 'macos-update': (679005550, 'Bogo-Tools-4.6.23-Mac-Update.zip', 434610006, '3b5663edb6264c8778876f42df88e8c1f8ad0e2dbf312d4f1422327fc3083310'),
+ 'source': (679437462, 'Bogo-Tools-4.6.23-source.zip', 7442659, '2bc1e8b7faf069f5055b7a16ad656aa5fd366bdb015e0c7dd9ed267c10edf999'),
+ 'windows': (679437480, 'Bogo-Tools-4.6.23-Windows-Portable.zip', 412315535, '123e1c2afd5aa81bbe0bbe84fc256e185a4e02f6a696e2e2afb8715e0f794fbb'),
+ 'macos': (679437466, 'Bogo-Tools-4.6.23-Mac-Portable.zip', 434324416, '56ae1c7d65c5d1da475a80e9b62cd5fb852cb9f44d67f85eba3820c608617ed3'),
+ 'windows-update': (679437463, 'Bogo-Tools-4.6.23-Windows-Update.zip', 411768065, '0f4310aee34470d0400cefb1d249bf13e98e9fc8bc50484719ca628315ffe6ed'),
+ 'macos-update': (679437471, 'Bogo-Tools-4.6.23-Mac-Update.zip', 434627584, '5bd4fac708f46848851a1305b9c641c0f09a945768164b46ee3e2b308566b3ec'),
 }
 OLD_WINDOWS = ('https://github.com/qptywoei-sudo/kio-tools-releases/releases/download/tools-v4.6.21/KIO-Tools-4.6.21-Windows-Update.zip',
                414591430, 'c753337a986ef2abf4b1a38fbb99ff63ea4218f61e5ea009f3f7fc5dcc4f253b')
@@ -39,8 +41,8 @@ OLD_MACOS = ('https://github.com/qptywoei-sudo/kio-tools-releases/releases/downl
              437990335, 'c489d8ba1029155afcef587475fbb7336b8b40161fb1eb9a6b8664837f68884e')
 # Root supplies a separately pinned QA-only envelope asset after local signing.
 # Candidate URLs are held, not live; this harness never claims their availability.
-ENVELOPE_PIN = (679016269, 'Bogo-Tools-4.6.23-candidate-update-envelope.json', 2374,
-                'e7d424e0d6e5797b25f388a6322cf26f3e98d2bbc88cde53d474cc92520d4f48')
+ENVELOPE_PIN = (679437642, 'Bogo-Tools-4.6.23-candidate-update-envelope.json', 2617,
+                '8d965eadd05efe55a08b2fda5ed0bed324680f04bfb92d5831ede18a60777b48')
 PUBLIC_KEY = 'JjeL9t/8GSrh2XZ25gawQyI475nXr/rU0li4CoEnfos='
 MAC_SIGNER_LEAF_SHA1 = '72287f8a5048cd206db014ead6723c75cd459379'
 
@@ -242,13 +244,13 @@ def source_binding(archive):
     tree = api(f'repos/{SOURCE_REPO}/git/trees/{commit["tree"]["sha"]}?recursive=1')
     require(tree.get('truncated') is False, 'Published source tree is truncated')
     blobs = {r['path']: r for r in tree['tree'] if r['type'] == 'blob'}
-    require(len([p for p in blobs if p.startswith('source/')])==438,'Published source snapshot file count differs')
+    require(len([p for p in blobs if p.startswith('source/')])==SOURCE_FILES,'Published source snapshot file count differs')
     with zipfile.ZipFile(archive) as z:
-        require(len(z.infolist()) == 438, 'Frozen source entry count mismatch')
+        require(len(z.infolist()) == SOURCE_FILES, 'Frozen source entry count mismatch')
         for entry in z.infolist():
             row = blobs.get('source/' + entry.filename)
             require(row is not None and row.get('mode') in ('100644','100755') and row['sha'] == git_blob(z.read(entry)), 'Source ZIP differs from public source snapshot: ' + entry.filename)
-    return {'repository': SOURCE_REPO, 'commit': SOURCE_COMMIT, 'byteExactFiles': 438}
+    return {'repository': SOURCE_REPO, 'commit': SOURCE_COMMIT, 'byteExactFiles': SOURCE_FILES}
 
 
 def fetch(root, target):
@@ -322,6 +324,62 @@ def inventory(path):
         if p.is_symlink(): result[str(p.relative_to(path))] = 'symlink:' + str(p.readlink())
         elif p.is_file(): result[str(p.relative_to(path))] = digest(p)
     return result
+
+
+def file_identities(path):
+    """Own bundle metadata only; content is independently checked against ZIPs."""
+    path=Path(path);root=path.lstat()
+    require(stat.S_ISDIR(root.st_mode) and not stat.S_ISLNK(root.st_mode),'Bundle identity root is not plain')
+    rows={}
+    for p in path.rglob('*'):
+        info=p.lstat()
+        if stat.S_ISDIR(info.st_mode):continue
+        require(stat.S_ISREG(info.st_mode) or stat.S_ISLNK(info.st_mode),'Special file in owned bundle')
+        rows[p.relative_to(path).as_posix()]=[info.st_dev,info.st_ino,info.st_size,info.st_mode]
+    return {'device':root.st_dev,'inode':root.st_ino,'files':rows}
+
+
+def identity_binding(value):
+    return hashlib.sha256(json.dumps(sorted(value.items()),separators=(',',':')).encode('utf-8')).hexdigest()
+
+
+def migration_complete(value, prior, destination, original_receipt, before, after, content_identity_sha):
+    """The shipped production helper must prove its real controlled rename."""
+    require(value.get('phase')=='complete' and value.get('version')==VERSION and value.get('reopened') is True,
+            'Shipped Mac bundle migration did not complete: '+str(value.get('error')))
+    require(value.get('source')==str(prior) and value.get('target')==str(destination)
+            and value.get('transactionHelperId')==original_receipt.get('helperId'), 'Mac migration belongs to a different transaction')
+    require(re.fullmatch(r'name-migration-[a-f0-9]{32}',str(value.get('helperId',''))) is not None
+            and type(value.get('pid')) is int and value['pid']>1,'Mac migration helper identity is invalid')
+    require(before==after and len(after['files'])==MAC_BUNDLE_FILES
+            and value.get('fileCount')==MAC_BUNDLE_FILES and value.get('fileIdsAndBytesPreserved') is True,
+            'Mac migration changed a file ID/size/mode or bundle directory inode')
+    identity=value.get('directoryIdentity',{})
+    require(identity.get('device')==before['device'] and identity.get('inode')==before['inode'],
+            'Production migration directory identity differs from independent before-helper-exit observation')
+    require(re.fullmatch(r'[0-9a-f]{64}',str(value.get('fileTreeIdentitySha256',''))) is not None
+            and value['fileTreeIdentitySha256']==content_identity_sha,'Migration tree proof differs from independent actual bytes/file IDs')
+    require(value.get('startup') in ('absent','foreign-unchanged','owned-path-updated'),'Migration startup result missing')
+    return {'shippedProductionMigration':True,'originalTransactionHelperId':value['transactionHelperId'],
+        'beforeObservedWhileOriginalHelperAlive':True,'sameBundleDirectoryInode':True,'allFileIdsSizesAndModesPreserved':True,
+        'fileCount':len(after['files']),'fileIdentityInventorySha256':identity_binding(after['files']),
+        'productionFileTreeIdentitySha256':value['fileTreeIdentitySha256'],'startup':value['startup']}
+
+
+def content_identity_binding(app, identities):
+    rows={}
+    for name,metadata in identities['files'].items():
+        path=Path(app).joinpath(*member_path(name).parts)
+        sha=hashlib.sha256(os.fsencode(os.readlink(path))).hexdigest() if path.is_symlink() else digest(path)
+        rows[name]=metadata+[sha]
+    return identity_binding(rows)
+
+
+def pid_alive(pid):
+    require(type(pid) is int and pid>1,'Invalid owned process identity')
+    try:os.kill(pid,0);return True
+    except ProcessLookupError:return False
+    except PermissionError:return True
 
 
 def tree_difference(expected, actual, expected_root, actual_root, limit=200):
@@ -617,7 +675,17 @@ def prepare_old_helper(prior, work, source, target):
     require(helper.is_file() and runtime.is_dir(),'Actual old updater/runtime missing')
     old_config=read_json_utf8(engine/'agent/update-channel.json')
     require(old_config.get('publicKey')==PUBLIC_KEY and read_json_utf8(source/'agent/update-channel.json').get('publicKey')==PUBLIC_KEY,'Old/new original public signing identities differ')
-    detached=work/('old-'+target+'-updater');detached.mkdir();shutil.copytree(runtime,detached/'python',symlinks=True)
+    if target=='macos':
+        # Reproduce the REAL original installer's private transaction location.
+        # The normal shipped migration requires this receipt; no test-only path.
+        updates=state_root(target)/'updates'
+        for directory in (state_root(target),updates):
+            st=directory.lstat()
+            require(stat.S_ISDIR(st.st_mode) and not stat.S_ISLNK(st.st_mode) and st.st_uid==os.getuid()
+                    and st.st_mode&0o077==0,'Actual original Mac state is not private/owned')
+        detached=updates/('install-'+uuid.uuid4().hex)
+    else:detached=work/('old-'+target+'-updater')
+    detached.mkdir(mode=0o700);shutil.copytree(runtime,detached/'python',symlinks=True)
     for name in ('update_helper.py','update_security.py'):shutil.copy2(helper.with_name(name),detached/name)
     deps=detached/'deps';deps.mkdir()
     for pattern in ('cryptography','_cffi_backend*','cffi'):
@@ -627,17 +695,55 @@ def prepare_old_helper(prior, work, source, target):
     return detached,{'originalHelperSha256':digest(helper),'originalVerifierSha256':digest(helper.with_name('update_security.py')),'originalPublicKey':PUBLIC_KEY,'helperAndRuntimeCopiedFromActualPriorRelease':True}
 
 
-def run_old_helper(detached, prior, target, assets, state, output, env):
+def run_old_helper(detached, prior, target, assets, state, output, env, *, installed_observer=None):
     envelope=read_json_utf8(assets/ENVELOPE_PIN[1])
-    receipt=state/'updates'/'ci-receipt.json';receipt.parent.mkdir(exist_ok=True)
+    receipt=state/'updates'/('last-install.json' if target=='macos' else 'ci-receipt.json');receipt.parent.mkdir(exist_ok=True)
     plan={'archive':str(assets/PINS[target+'-update'][1]),'target':str(prior),'platform':'Windows' if target=='windows' else 'Mac','version':VERSION,'pids':[],'receipt':str(receipt),'publicKey':PUBLIC_KEY,'envelope':envelope}
     plan_file=detached/'plan.json';write_json(plan_file,plan)
     python=detached/('python/python.exe' if target=='windows' else 'python/bin/python3')
-    result=subprocess.run([str(python),'-I','-B','-X','utf8',str(detached/'update_helper.py'),str(plan_file)],cwd=detached,env=env,capture_output=True,timeout=240)
+    with (detached/'private-helper-process.log').open('wb') as log:
+        process=subprocess.Popen([str(python),'-I','-B','-X','utf8',str(detached/'update_helper.py'),str(plan_file)],cwd=detached,env=env,stdout=log,stderr=subprocess.STDOUT)
+        deadline=time.monotonic()+240;observed=installed_observer is None
+        while process.poll() is None:
+            require(time.monotonic()<deadline,'Original signed updater exceeded timeout')
+            if not observed and receipt.is_file():
+                value=read_json_utf8(receipt)
+                if value.get('helperId')==detached.name and value.get('pid')==process.pid and value.get('phase') in ('installed','restartingApp','complete'):
+                    installed_observer(prior,process.pid);observed=True
+            time.sleep(.05)
+        returncode=process.wait(timeout=1)
+    require(observed,'No independent installed-bundle observation before original helper exit')
     require(receipt.is_file(),'Actual old signed updater did not emit its receipt')
     value=read_json_utf8(receipt);write_json(output/(target+'-upgrade-receipt.json'),value)
-    require(result.returncode==0 and value.get('phase')=='complete' and value.get('reopened') is True,'Actual signed old-to-new update failed: '+str(value.get('error'))+' at '+str(value.get('failedStage')))
+    require(returncode==0 and value.get('phase')=='complete' and value.get('reopened') is True
+            and value.get('helperId')==detached.name and value.get('pid')==process.pid,'Actual signed old-to-new update failed: '+str(value.get('error'))+' at '+str(value.get('failedStage')))
     return value
+
+
+def windows_runtime_tool(reference, args, env, *, timeout=240):
+    # Execute only the independently authenticated, never-launched reference
+    # runtime. Installed code/cache paths never enter this verifier's sys.path.
+    reference=Path(reference);python=reference/'tools/python/python.exe'
+    script=Path(__file__).resolve().with_name('tools_runtime_products.py')
+    require(python.is_file() and not python.is_symlink() and script.is_file() and not script.is_symlink(),
+            'Authenticated reference runtime/reviewed product validator missing')
+    result=subprocess.run([str(python),'-I','-S','-B','-X','utf8',str(script),*map(str,args)],
+                          env=env,cwd=reference.parent,capture_output=True,timeout=timeout)
+    diagnostic=(result.stderr or result.stdout).decode('utf-8',errors='replace')[:600]
+    require(result.returncode==0,'Source-bound runtime product validation failed: '+diagnostic)
+    return result
+
+
+def windows_runtime_tests(reference, work, output, env):
+    test=Path(__file__).resolve().with_name('test_tools_runtime_products.py')
+    if not test.is_file():test=Path(__file__).resolve().parent.parent/'tests/test_tools_runtime_products.py'
+    require(test.is_file() and not test.is_symlink(),'Reviewed runtime validator unit tests missing')
+    result=subprocess.run([str(reference/'tools/python/python.exe'),'-I','-S','-B','-X','utf8',str(test),'-v'],
+                          env=env,cwd=work,capture_output=True,timeout=240)
+    raw=result.stdout+result.stderr
+    (output/'windows-runtime-validator-tests.log').write_text(raw.decode('utf-8',errors='replace')[:200000],encoding='utf-8')
+    require(result.returncode==0,'Actual packaged CPython runtime validator regression tests failed')
+    return {'actualAuthenticatedPackagedRuntime':True,'isolatedNoSiteNoBytecode':True,'exitCode':0}
 
 
 def windows_upgrade(assets, work, source, output, env):
@@ -651,16 +757,19 @@ def windows_upgrade(assets, work, source, output, env):
         if old_pid:stop_windows(old_pid,prior/'KIOControl.exe',env);old_process.wait(timeout=10)
     state=state_root('windows'); canary=state/'bogo-ci-profile-canary.txt'; user=prior/'bogo-ci-user-document.txt'; nonce='CI-only-'+str(uuid.uuid4())
     canary.write_text(nonce,encoding='utf-8');user.write_text(nonce,encoding='utf-8');require(digest(prior/'KIOControl.exe')==old_sha,'Old executable changed before upgrade')
+    reference=work/'independent-update/KIO-Control-Windows';preimage=work/'windows-upgrade-preimage.json'
+    windows_runtime_tool(reference,['capture','--root',prior,'--output',preimage],env)
     detached,provenance=prepare_old_helper(prior,work,source,'windows')
     try:
         run_old_helper(detached,prior,'windows',assets,state,output,env)
         require(canary.read_text(encoding='utf-8')==user.read_text(encoding='utf-8')==nonce,'Profile/user document canary changed')
         verify_executable(prior/'KIOControl.exe','windows')
         installed=inventory(prior);installed.pop('bogo-ci-user-document.txt',None)
-        reference=work/'independent-update/KIO-Control-Windows';expected=inventory(reference)
+        expected=inventory(reference)
         difference=tree_difference(expected,installed,reference,prior)
         write_json(output/'windows-upgrade-tree-difference.json',difference)
-        require(installed==expected,'Actual upgraded Windows managed tree differs from frozen update; see windows-upgrade-tree-difference.json')
+        windows_runtime_tool(reference,['verify','--root',prior,'--archive',assets/PINS['windows-update'][1],
+                                      '--preimage',preimage,'--output',output/'windows-upgrade-runtime-products.json'],env)
         pid=windows_pid(prior/'KIOControl.exe',env)
         current=health(state,pid,VERSION);gui=windows_probe(prior/'KIOControl.exe',pid,source,output,env,'windows-upgraded')
     finally:stop_windows_path(prior/'KIOControl.exe',env)
@@ -683,16 +792,42 @@ def mac_upgrade(assets, work, source, output, env, observer):
         if old_process is not None:old_process.wait(timeout=10)
     state=state_root('macos');canary=state/'bogo-ci-profile-canary.txt';user=root/'bogo-ci-user-document.txt';nonce='CI-only-'+str(uuid.uuid4())
     canary.write_text(nonce,encoding='utf-8');user.write_text(nonce,encoding='utf-8')
+    protected_ids={key:(p.stat().st_dev,p.stat().st_ino) for key,p in [('profile-canary',canary),('parent-document',user),('parent-directory',root)]}
     detached,provenance=prepare_old_helper(prior,work,source,'macos')
+    destination=prior.with_name('Bogo Tools.app');require(not os.path.lexists(destination),'Migrated target must start absent')
+    before={}
+    def installed_observer(app, helper_pid):
+        verify_executable(app/'Contents/MacOS/KIOControl','macos')
+        require(pid_alive(helper_pid),'Original updater exited before independent installed observation')
+        before.update(file_identities(app))
+        require(len(before['files'])==MAC_BUNDLE_FILES and pid_alive(helper_pid),'Installed bundle observation raced original helper exit')
     try:
-        run_old_helper(detached,prior,'macos',assets,state,output,env)
+        original=run_old_helper(detached,prior,'macos',assets,state,output,env,installed_observer=installed_observer)
+        require(not pid_alive(original['pid']),'Original updater must be dead before real name migration')
+        migration=state/'updates/bogo-name-migration.json';deadline=time.monotonic()+240;value={}
+        while time.monotonic()<deadline:
+            if migration.is_file():
+                require(not migration.is_symlink() and migration.stat().st_size<=1024*1024,'Migration receipt is not plain/bounded')
+                value=read_json_utf8(migration)
+                if value.get('transactionHelperId')==original['helperId']:
+                    write_json(output/'mac-shipped-name-migration.json',value)
+                    require(value.get('phase')!='failed','Shipped Mac name migration failed: '+str(value.get('error')))
+                    if value.get('phase')=='complete':break
+            time.sleep(.2)
+        require(value.get('phase')=='complete','Shipped normal Mac name migration timed out')
         require(canary.read_text(encoding='utf-8')==user.read_text(encoding='utf-8')==nonce,'Mac profile/user document canary changed')
-        verify_executable(prior/'Contents/MacOS/KIOControl','macos')
-        require(inventory(prior)==inventory(work/'update/KIO-Control-Mac/Bogo Tools.app'),'Actual upgraded Mac app tree differs from frozen update')
-        pid=mac_pid(prior,observer,env)
-        gui=mac_probe(prior,source,work,output,env,observer,launched_pid=pid,label='mac-upgraded')
-    finally:stop_mac(prior,observer,env)
-    return {'fromVersion':'4.6.21','toVersion':VERSION,'oldBackend':old_health,'normalOldSignatureGateUsed':True,'canariesPreserved':True,'installedFileTreeExact':True,'actualNewExecutableSha256':EXE_SHA['macos'],'gui':gui,**provenance}
+        require(protected_ids=={key:(p.stat().st_dev,p.stat().st_ino) for key,p in [('profile-canary',canary),('parent-document',user),('parent-directory',root)]},
+                'Mac name migration changed a profile/document canary or parent directory file ID')
+        require(not os.path.lexists(prior) and destination.is_dir() and not destination.is_symlink(),'Shipped migration did not commit the Bogo bundle basename')
+        verify_executable(destination/'Contents/MacOS/KIOControl','macos')
+        after=file_identities(destination)
+        migration_proof=migration_complete(value,prior,destination,original,before,after,content_identity_binding(destination,after))
+        require(inventory(destination)==inventory(work/'update/KIO-Control-Mac/Bogo Tools.app'),'Actual upgraded Mac app tree differs from frozen update')
+        pid=mac_pid(destination,observer,env)
+        gui=mac_probe(destination,source,work,output,env,observer,launched_pid=pid,label='mac-upgraded')
+    finally:
+        stop_mac(prior,observer,env);stop_mac(destination,observer,env)
+    return {'fromVersion':'4.6.21','toVersion':VERSION,'oldBackend':old_health,'normalOldSignatureGateUsed':True,'canariesPreserved':True,'installedFileTreeExact':True,'actualNewExecutableSha256':EXE_SHA['macos'],'normalShippedNameMigration':migration_proof,'gui':gui,**provenance}
 
 
 def validate_receipt(receipt, target, environment):
@@ -705,7 +840,7 @@ def validate_receipt(receipt, target, environment):
     require(all(receipt[k]==v for k,v in identity.items()),'Fetch/GUI workflow run or attempt differs')
     pins={'source':PINS['source'],target:PINS[target],target+'-update':PINS[target+'-update'],'envelope':ENVELOPE_PIN}
     expected={key:{'id':p[0],'name':p[1],'bytes':p[2],'sha256':p[3],'releaseId':RELEASE_ID} for key,p in pins.items()}
-    expected['sourceBinding']={'repository':SOURCE_REPO,'commit':SOURCE_COMMIT,'byteExactFiles':438}
+    expected['sourceBinding']={'repository':SOURCE_REPO,'commit':SOURCE_COMMIT,'byteExactFiles':SOURCE_FILES}
     url,size,sha=OLD_WINDOWS if target=='windows' else OLD_MACOS
     expected['prior']={'bytes':size,'sha256':sha,'url':url,'version':'4.6.21'}
     require(receipt['assets']==expected,'Transferred input pins/source binding differ from frozen receipt')
@@ -740,6 +875,10 @@ def accept(root, target):
     require(prior_archive.stat().st_size==prior_pin[1] and digest(prior_archive)==prior_pin[2],'Actual prior release changed after fetch')
     source=extract(assets/PINS['source'][1],work/'source');require(digest(source/'desktop-ui/src/assets/bogo-tools-icon.png')==MASTER_SHA,'Frozen original artwork changed')
     manifest=read_json_utf8(source/'SOURCE-MANIFEST.json')
+    require(isinstance(manifest.get('files'),list) and len(manifest['files'])==SOURCE_FILES-1
+            and len({r.get('path') for r in manifest['files']})==SOURCE_FILES-1,'Corresponding-source manifest closure count differs')
+    require({'agent/mac_bundle_migration.py','integration-tests/mac_bundle_migration_tests.py'}<={r.get('path') for r in manifest['files']},
+            'Shipped migration source/test missing from corresponding-source closure')
     for row in manifest['files']:
         p=source.joinpath(*member_path(row['path']).parts);require(p.is_file() and p.stat().st_size==row['bytes'] and digest(p)==row['sha256'],'Corresponding-source manifest mismatch')
     require(not state_root(target).exists(),'Refusing GUI: application profile already exists on this VM')
@@ -765,10 +904,13 @@ def accept(root, target):
             require(digest(work/'embedded-update.zip')==digest(assets/PINS['windows-update'][1]),'Portable payload and independently downloaded update differ')
             update=extract(assets/PINS['windows-update'][1],work/'independent-update','KIO-Control-Windows')/'KIO-Control-Windows'
             verify_executable(update/'KIOControl.exe','windows')
+            report['checks']['runtimeValidatorRegressionTests']=windows_runtime_tests(update,work,output,environment)
             report['checks']['portableUpdateSourceBinding']=dict(embedded,sourceArchiveSha256=PINS['source'][3],independentUpdateExact=True)
             # Genuine 4.6.21 -> signed 4.6.23 update first, on the fresh OS profile.
             report['checks']['oldToNewUpgrade']=windows_upgrade(assets,work,source,output,environment)
             cached=Path(os.environ['LOCALAPPDATA'])/'KIO Tools'/VERSION/'KIO-Control-Windows/KIOControl.exe';require(not cached.parent.exists(),'Portable cache must be fresh')
+            preimage=work/'windows-portable-preimage.json'
+            windows_runtime_tool(update,['capture','--root',cached.parent,'--output',preimage,'--fresh-portable'],environment)
             pid=None
             try:
                 with (work/'portable-private-process.log').open('wb') as log:subprocess.Popen([str(portable)],env=environment,stdout=log,stderr=subprocess.STDOUT)
@@ -776,9 +918,12 @@ def accept(root, target):
                 verify_executable(cached,'windows')
                 expected,actual=inventory(update),inventory(cached.parent)
                 write_json(output/'windows-portable-tree-difference.json',tree_difference(expected,actual,update,cached.parent))
-                require(actual==expected,'Actual SFX-extracted file tree differs from independently downloaded frozen update; see windows-portable-tree-difference.json')
-                report['checks']['portableUpdateSourceBinding']['actualSfxExtractedFileTreeExact']=True
                 report['checks']['portableBackend']=health(state_root(target),pid,VERSION)
+                windows_runtime_tool(update,['verify','--root',cached.parent,'--archive',assets/PINS['windows-update'][1],
+                    '--preimage',preimage,'--output',output/'windows-portable-runtime-products.json','--fresh-portable',
+                    '--source',assets/PINS['source'][1],'--exe',cached],environment)
+                report['checks']['portableUpdateSourceBinding']['actualSfxExtractedManagedFileTreeExact']=True
+                report['checks']['portableUpdateSourceBinding']['allExtrasSourceBoundAndFreshIniFactoryOnly']=True
                 report['checks']['portableGui']=windows_probe(cached,pid,source,output,environment,'windows-portable')
             finally:
                 stop_windows_path(cached,environment)

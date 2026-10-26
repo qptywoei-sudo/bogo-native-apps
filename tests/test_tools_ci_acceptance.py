@@ -122,7 +122,7 @@ class GuardTests(unittest.TestCase):
     def receipt(self,target='windows'):
         pins={'source':m.PINS['source'],target:m.PINS[target],target+'-update':m.PINS[target+'-update'],'envelope':m.ENVELOPE_PIN}
         assets={key:{'id':p[0],'name':p[1],'bytes':p[2],'sha256':p[3],'releaseId':m.RELEASE_ID} for key,p in pins.items()}
-        assets['sourceBinding']={'repository':m.SOURCE_REPO,'commit':m.SOURCE_COMMIT,'byteExactFiles':438}
+        assets['sourceBinding']={'repository':m.SOURCE_REPO,'commit':m.SOURCE_COMMIT,'byteExactFiles':m.SOURCE_FILES}
         url,size,sha=m.OLD_WINDOWS if target=='windows' else m.OLD_MACOS
         assets['prior']={'bytes':size,'sha256':sha,'url':url,'version':'4.6.21'}
         return {'repository':m.REPOSITORY,'releaseId':m.RELEASE_ID,'draft':True,'platform':target,
@@ -186,9 +186,9 @@ class GuardTests(unittest.TestCase):
         self.assertEqual(m.git_blob(b'hello\n'),'ce013625030ba8dba906f756967f9e9ca394464a')
 
     def test_signed_envelope_is_exact_pinned_asset(self):
-        self.assertEqual(m.ENVELOPE_PIN,(679016269,'Bogo-Tools-4.6.23-candidate-update-envelope.json',2374,'e7d424e0d6e5797b25f388a6322cf26f3e98d2bbc88cde53d474cc92520d4f48'))
+        self.assertEqual(m.ENVELOPE_PIN,(679437642,'Bogo-Tools-4.6.23-candidate-update-envelope.json',2617,'8d965eadd05efe55a08b2fda5ed0bed324680f04bfb92d5831ede18a60777b48'))
         self.assertEqual(m.VERSION,'4.6.23')
-        self.assertEqual(m.SOURCE_COMMIT,'f328c97865951603f49dd06eb7960122e4035662')
+        self.assertEqual(m.SOURCE_COMMIT,'0821a5aec13aeb9b6bbb3bd86bab42b482497e4e')
         self.assertEqual(m.PUBLIC_KEY,'JjeL9t/8GSrh2XZ25gawQyI475nXr/rU0li4CoEnfos=')
         for pin in [*m.PINS.values(),m.ENVELOPE_PIN]:
             self.assertEqual(len(pin[3]),64);self.assertGreater(pin[2],0)
@@ -205,13 +205,16 @@ class GuardTests(unittest.TestCase):
     }'''.encode('utf-8')
         self.assertEqual(hashlib.sha256(fragment).hexdigest(),'57695bfe7c1871fb7fac72a4e602855a9f33ca6df3936ada57c4f7cf4459a49b')
         with self.assertRaises(UnicodeDecodeError):fragment.decode('cp1252')
-        path=self.root/'SOURCE-MANIFEST.json';original=Path.open
-        def ansi_open(current,mode='r',buffering=-1,encoding=None,errors=None,newline=None):
-            if 'b' not in mode and encoding in (None,'locale'):encoding='cp1252'
-            return original(current,mode,buffering,encoding,errors,newline)
+        path=self.root/'SOURCE-MANIFEST.json';original=Path.read_text
+        def ansi_read_text(current,encoding=None,errors=None,**kwargs):
+            # Intercept the caller's omitted encoding BEFORE Python 3.13's
+            # pathlib/io normalizes it using this test interpreter's UTF-8 mode.
+            # Explicit UTF-8 reads still reach the real decoder unchanged.
+            if encoding in (None,'locale'):encoding='cp1252'
+            return original(current,encoding=encoding,errors=errors,**kwargs)
         for body in (fragment,b'\xef\xbb\xbf'+fragment):
             path.write_bytes(body)
-            with patch.object(Path,'open',ansi_open):
+            with patch.object(Path,'read_text',ansi_read_text):
                 with self.assertRaises(UnicodeDecodeError):path.read_text()
                 value=m.read_json_utf8(path)
             self.assertEqual(value['path'],'release-tools/KIO-Control-4.4.4-검증보고.md')
@@ -227,11 +230,11 @@ class GuardTests(unittest.TestCase):
         self.assertGreater(checked,5)
 
     def test_only_actual_postpackaging_mac_executable_pin_accepted(self):
-        current='3719dff4c53deedb85db9e3c7691e856201f7b111c93fed1f7a24eac180a273a'
+        current='0cd2a606507330da1458a5a61995c73f6550bcda46b7a1d01ffb10f3bf952408'
         historical='e1afd018ddc5915349611b0e899c7de40df0230b3b49bbb380a07e19a944c731'
         self.assertEqual(m.EXE_SHA['macos'],current);self.assertEqual(m.EXE_BYTES['macos'],3666928)
         self.assertEqual(m.executable_metadata(current,3666928,'macos'),{'sha256':current,'bytes':3666928})
-        for sha,size in [(historical,3666928),(current,3666927),('0'*64,3666928)]:
+        for sha,size in [('3719dff4c53deedb85db9e3c7691e856201f7b111c93fed1f7a24eac180a273a',3666928),(historical,3666928),(current,3666927),('0'*64,3666928)]:
             with self.subTest(sha=sha,size=size),self.assertRaises(ValueError) as caught:m.executable_metadata(sha,size,'macos')
             self.assertIn('actual sha256='+sha,str(caught.exception));self.assertIn('actual',str(caught.exception))
             self.assertIn('bytes='+str(size),str(caught.exception));self.assertNotIn(str(self.root),str(caught.exception))
@@ -258,6 +261,90 @@ class GuardTests(unittest.TestCase):
         self.assertEqual({r['runner'] for case in cases for r in case},{'windows-2022','macos-15-intel'})
         self.assertIn('default: all',source);self.assertEqual(source.count('"Invalid platform choice"'),2)
         self.assertNotIn('fromJSON(inputs.platform)',source)
+
+    def test_real_migration_receipt_requires_same_transaction_all_file_ids_and_bytes(self):
+        old=self.root/'KIO Tools.app';new=self.root/'Bogo Tools.app'
+        original={'helperId':'install-'+'a'*32,'pid':22}
+        before={'device':1,'inode':2,'files':{'Contents/code':[1,3,10,stat.S_IFREG|0o755]}}
+        value={'phase':'complete','version':m.VERSION,'reopened':True,'source':str(old),'target':str(new),
+            'transactionHelperId':original['helperId'],'helperId':'name-migration-'+'b'*32,'pid':23,
+            'fileCount':1,'fileIdsAndBytesPreserved':True,'directoryIdentity':{'device':1,'inode':2},
+            'fileTreeIdentitySha256':'c'*64,'startup':'absent'}
+        with patch.object(m,'MAC_BUNDLE_FILES',1):
+            proof=m.migration_complete(value,old,new,original,before,before,'c'*64)
+            self.assertTrue(proof['beforeObservedWhileOriginalHelperAlive'])
+            self.assertTrue(proof['allFileIdsSizesAndModesPreserved'])
+            for key,bad in [('phase','failed'),('transactionHelperId','install-'+'d'*32),('source',str(new)),
+                            ('target',str(old)),('helperId','manual-rename'),('reopened',False),
+                            ('fileCount',0),('fileIdsAndBytesPreserved',False),('fileTreeIdentitySha256','0'*64),
+                            ('directoryIdentity',{'device':1,'inode':5}),('startup','unknown')]:
+                with self.subTest(key=key),self.assertRaises(ValueError):
+                    m.migration_complete(dict(value,**{key:bad}),old,new,original,before,before,'c'*64)
+            changed=json.loads(json.dumps(before));changed['files']['Contents/code'][1]=99
+            with self.assertRaises(ValueError):m.migration_complete(value,old,new,original,before,changed,'c'*64)
+
+    def test_bundle_identity_binding_observes_real_owned_file_inode_content_and_symlink(self):
+        app=self.root/'owned.app';app.mkdir();(app/'code').write_bytes(b'public native code')
+        if os.name!='nt':(app/'link').symlink_to('code')
+        before=m.file_identities(app);self.assertEqual(before['inode'],app.stat().st_ino)
+        original=m.content_identity_binding(app,before)
+        target=self.root/'Bogo Tools.app';app.rename(target)
+        self.assertEqual(m.file_identities(target),before)
+        self.assertEqual(m.content_identity_binding(target,before),original)
+        (target/'code').write_bytes(b'changed bytes here')
+        self.assertNotEqual(m.content_identity_binding(target,m.file_identities(target)),original)
+        if os.name!='nt':
+            link=self.root/'app-alias';link.symlink_to(target,target_is_directory=True)
+            with self.assertRaises(ValueError):m.file_identities(link)
+
+    def test_harness_never_renames_bundle_or_invents_migration_receipt(self):
+        tree=ast.parse(SCRIPT.read_text(encoding='utf-8'))
+        forbidden=[]
+        for node in ast.walk(tree):
+            if isinstance(node,ast.Call) and isinstance(node.func,ast.Attribute) and node.func.attr in ('rename','replace'):
+                if isinstance(node.func.value,ast.Name) and node.func.value.id in ('os','shutil','prior','destination'):
+                    forbidden.append(node.lineno)
+        self.assertEqual(forbidden,[])
+        body=ast.get_source_segment(SCRIPT.read_text(encoding='utf-8'),next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='mac_upgrade'))
+        self.assertIn("'updates/bogo-name-migration.json'",body)
+        self.assertIn('migration_complete(',body);self.assertIn('installed_observer=installed_observer',body)
+
+    def test_owned_pid_probe_refuses_invalid_ids_and_preserves_permission_uncertainty(self):
+        for pid in (0,1,-1,True,'42'):
+            with self.subTest(pid=pid),self.assertRaises(ValueError):m.pid_alive(pid)
+        with patch.object(m.os,'kill',side_effect=ProcessLookupError):self.assertFalse(m.pid_alive(42))
+        with patch.object(m.os,'kill',side_effect=PermissionError):self.assertTrue(m.pid_alive(42))
+
+    def test_runtime_validator_uses_pristine_reference_isolation_and_failure_stays_failure(self):
+        reference=self.root/'independent-update/KIO-Control-Windows';python=reference/'tools/python/python.exe';python.parent.mkdir(parents=True);python.write_bytes(b'authenticated fixture')
+        script=self.root/'scripts/tools-ci-acceptance.py';script.parent.mkdir();validator=script.with_name('tools_runtime_products.py');validator.write_bytes(b'reviewed validator fixture')
+        result=subprocess.CompletedProcess([],0,b'public result',b'')
+        args=['verify','--root',str(self.root/'installed'),'--archive','pinned.zip','--preimage','before.json','--output','result.json']
+        env={'PATH':'normal','HOME':'ordinary VM'}
+        with patch.object(m,'__file__',str(script)),patch.object(m.subprocess,'run',return_value=result) as run:
+            m.windows_runtime_tool(reference,args,env)
+            self.assertEqual(run.call_args.args[0],[str(python),'-I','-S','-B','-X','utf8',str(validator),*args])
+            self.assertEqual(run.call_args.kwargs['env'],env);self.assertEqual(run.call_args.kwargs['cwd'],reference.parent)
+        result=subprocess.CompletedProcess([],1,b'',b'changed managed file: public-relative-path')
+        with patch.object(m,'__file__',str(script)),patch.object(m.subprocess,'run',return_value=result),self.assertRaisesRegex(ValueError,'changed managed file'):
+            m.windows_runtime_tool(reference,args,env)
+        validator.unlink()
+        with patch.object(m,'__file__',str(script)),self.assertRaisesRegex(ValueError,'missing'):
+            m.windows_runtime_tool(reference,args,env)
+
+    def test_upgrade_preimage_and_fresh_factory_gate_cannot_be_bypassed_by_tree_extras(self):
+        source=SCRIPT.read_text(encoding='utf-8');tree=ast.parse(source)
+        functions={n.name:ast.get_source_segment(source,n) for n in tree.body if isinstance(n,ast.FunctionDef)}
+        upgrade=functions['windows_upgrade'];accept=functions['accept']
+        self.assertLess(upgrade.index("['capture'"),upgrade.index('run_old_helper('))
+        self.assertLess(upgrade.index("['verify'"),upgrade.index('windows_probe('))
+        self.assertNotIn('--fresh-portable',upgrade)
+        self.assertIn("windows_runtime_tests(update,work,output,environment)",accept)
+        self.assertLess(accept.index("['capture'"),accept.index('subprocess.Popen([str(portable)]'))
+        self.assertLess(accept.index("report['checks']['portableBackend']=health("),accept.index("['verify'"))
+        self.assertLess(accept.index("['verify'"),accept.index("report['checks']['portableGui']=windows_probe("))
+        self.assertIn("'--source',assets/PINS['source'][1],'--exe',cached",accept)
+        self.assertNotIn('installed==expected',upgrade)
 
 
 class ArchiveTests(unittest.TestCase):
@@ -334,7 +421,7 @@ class ArchiveTests(unittest.TestCase):
         with self.assertRaises(ValueError):m.portable_payload(launcher,self.root/'badmagic',len(payload),sha)
 
     def test_source_binding_requires_every_actual_file_and_git_bytes(self):
-        # Production requires all 438 real entries. This deliberately short tree
+        # Production requires all 440 real entries. This deliberately short tree
         # must fail before any archive can be accepted as complete source.
         archive=self.archive([('file',b'body',0)])
         commit={'sha':m.SOURCE_COMMIT,'tree':{'sha':'a'*40}}
@@ -342,14 +429,14 @@ class ArchiveTests(unittest.TestCase):
         with patch.object(m,'api',side_effect=[commit,tree]),self.assertRaises(ValueError):m.source_binding(archive)
         with patch.object(m,'api',return_value=dict(commit,sha='b'*40)),self.assertRaises(ValueError):m.source_binding(archive)
 
-    def test_source_binding_checks_all_438_bodies_not_just_names(self):
-        entries=[('file-'+str(n),('body-'+str(n)).encode(),0) for n in range(438)]
+    def test_source_binding_checks_all_440_bodies_not_just_names(self):
+        entries=[('file-'+str(n),('body-'+str(n)).encode(),0) for n in range(m.SOURCE_FILES)]
         archive=self.archive(entries)
         commit={'sha':m.SOURCE_COMMIT,'tree':{'sha':'a'*40}}
         rows=[{'path':'source/'+name,'type':'blob','mode':'100644','sha':m.git_blob(body)} for name,body,_ in entries]
         tree={'truncated':False,'tree':rows}
         with patch.object(m,'api',side_effect=[commit,tree]):
-            self.assertEqual(m.source_binding(archive)['byteExactFiles'],438)
+            self.assertEqual(m.source_binding(archive)['byteExactFiles'],m.SOURCE_FILES)
         rows[-1]=dict(rows[-1],sha='0'*40)
         with patch.object(m,'api',side_effect=[commit,tree]),self.assertRaises(ValueError):m.source_binding(archive)
         with patch.object(m,'api',side_effect=[commit,dict(tree,truncated=True)]),self.assertRaises(ValueError):m.source_binding(archive)
