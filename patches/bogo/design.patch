@@ -1,8 +1,25 @@
 diff --git a/apps/designcraft-cli/src/main.rs b/apps/designcraft-cli/src/main.rs
-index dd62cd91de3bd71d15c34c5955c9e0d65de84c34..b7a4b49361cf2f967f554cb047f2052eeb02f83e 100644
+index dd62cd91de3bd71d15c34c5955c9e0d65de84c34..7098cd54cd7a2623c1b00969483d7e09866bb92c 100644
 --- a/apps/designcraft-cli/src/main.rs
 +++ b/apps/designcraft-cli/src/main.rs
-@@ -71,12 +71,7 @@ non-zero exit when a step fails."#;
+@@ -13,7 +13,6 @@
+ //! designcraft-cli perf [--pages N] [--frames N] [--chars N] [--images N] [--runs N] [--strict]  # budgets on a synthetic stress document
+ //! designcraft-cli bench FILE [--runs N]  # the same measurements on one document
+ //! designcraft-cli validate-pdf FILE.pdf    # run the built-in PDF/X-4 conformance checks
+-//! designcraft-cli links                   # Discord, website, app page and GitHub links
+ //! designcraft-cli --version               # print the version
+ //! ```
+ #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
+@@ -36,7 +35,7 @@ use designcraft_engine::Session;
+ use serde_json::{Value, json};
+ 
+ /// The usage block. Shared by `--help` (stdout, success) and an unknown command (stderr, failure).
+-const USAGE: &str = "usage: designcraft-cli run [--in FILE | --sample] [--cmd ID[=JSON]]... [--page N] [--scale S] [--pdf-options JSON] [--export OUT] [--all-pages DIR]\n         (--page, --scale and --pdf-options apply to the exports that follow them)\n       designcraft-cli commands [FILTER]\n       designcraft-cli describe COMMAND\n       designcraft-cli script [FILE|-] [--in FILE | --sample] [--connect PORT] [--save OUT] [--export OUT] [--keep-going]\n       designcraft-cli app [--port PORT] COMMAND [JSON] | --method METHOD [JSON]\n       designcraft-cli mcp [--connect PORT] [--sample]\n       designcraft-cli perf [--pages N] [--runs N] [--strict]\n       designcraft-cli bench FILE [--runs N]\n       designcraft-cli links\n       designcraft-cli --version";
++const USAGE: &str = "usage: designcraft-cli run [--in FILE | --sample] [--cmd ID[=JSON]]... [--page N] [--scale S] [--pdf-options JSON] [--export OUT] [--all-pages DIR]\n         (--page, --scale and --pdf-options apply to the exports that follow them)\n       designcraft-cli commands [FILTER]\n       designcraft-cli describe COMMAND\n       designcraft-cli script [FILE|-] [--in FILE | --sample] [--connect PORT] [--save OUT] [--export OUT] [--keep-going]\n       designcraft-cli app [--port PORT] COMMAND [JSON] | --method METHOD [JSON]\n       designcraft-cli mcp [--connect PORT] [--sample]\n       designcraft-cli perf [--pages N] [--runs N] [--strict]\n       designcraft-cli bench FILE [--runs N]\n       designcraft-cli --version";
+ 
+ /// `script --help`: the script syntax, otherwise only in `describe script.run` and docs/agents.md.
+ const SCRIPT_HELP: &str = r#"usage: designcraft-cli script [FILE|-] [--in FILE | --sample] [--connect PORT] [--save OUT] [--export OUT] [--keep-going]
+@@ -71,12 +70,7 @@ non-zero exit when a step fails."#;
  
  /// The links line under the usage block.
  fn usage_footer() -> String {
@@ -16,6 +33,18 @@ index dd62cd91de3bd71d15c34c5955c9e0d65de84c34..b7a4b49361cf2f967f554cb047f2052e
  }
  
  /// stdout went away. A reader that stopped early (a closed pipe) ends the program quietly, as
+@@ -117,11 +111,6 @@ fn main() -> ExitCode {
+         Some("perf") => report(perf::perf(&args[1..])),
+         Some("bench") => report(perf::bench(&args[1..])),
+         Some("validate-pdf") => report(validate_pdf(args.get(1).map(String::as_str))),
+-        Some("links") => {
+-            use designcraft_engine::links::*;
+-            outln!("Discord   {DISCORD}\nWebsite   {WEBSITE}\nApp page  {APP_PAGE}\nGitHub    {GITHUB}\nIssues    {ISSUES}");
+-            ExitCode::SUCCESS
+-        }
+         // Asking for help is not an error: it goes to stdout and succeeds. An unknown command
+         // still prints the same usage to stderr and fails.
+         Some("--help" | "-h" | "help") => {
 diff --git a/apps/designcraft-web/index.html b/apps/designcraft-web/index.html
 index 9fa4d1a47bbca8dcd66855a69d63dfc3679ca9a2..927dd15a4bbdb3d02d65b3f61883bc0af3cc36b8 100644
 --- a/apps/designcraft-web/index.html

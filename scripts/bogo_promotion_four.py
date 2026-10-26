@@ -235,7 +235,10 @@ def design_cli(text):
     start = text.index('fn usage_footer() -> String')
     end = brace_end(text, text.index('{', start))
     require(text[start:end].count('designcraft_engine::links::') == 3, 'Design CLI promotion footer changed')
-    return text[:start] + 'fn usage_footer() -> String {\n    String::new()\n}' + text[end:]
+    text = text[:start] + 'fn usage_footer() -> String {\n    String::new()\n}' + text[end:]
+    text = remove_block(text, 'Some("links") =>')
+    text = once(text, r'\n       designcraft-cli links')
+    return drop_lines(text, r'^//! designcraft-cli links\s+# Discord, website, app page and GitHub links$', 1)
 
 
 def design_mcp(text):

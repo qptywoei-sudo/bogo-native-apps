@@ -63371,6 +63371,19 @@ z891$ge4{mn$%9k5KjpF7$%$mrjD|Gh>OurR_t~l#P1I%$V$*(A8jipJ1arf&cGBPo
 z&tOVl?DL>&)7}|TQF*x|Q~!T~hyR03`TuACCv@ol#XHeK`T;(n*vR>krMm)v9CA|1
 Kl2sDMLH`R7c0K?A
 
+diff --git a/crates/engine/src/sample.rs b/crates/engine/src/sample.rs
+index 85a222f64b7e063f0710a4d35084ca3fb7ca34e6..4003f51b215947cee7e46d0771eb741c341bca87 100644
+--- a/crates/engine/src/sample.rs
++++ b/crates/engine/src/sample.rs
+@@ -219,7 +219,7 @@ pub fn bracket() -> Drawing {
+     add(on("Title"), line(tb0 + Vec2::new(0.0, 0.6), tb0 + Vec2::new(4.0, 0.6)));
+     add(on("Title"), line(tb0 + Vec2::new(2.0, 0.0), tb0 + Vec2::new(2.0, 0.6)));
+     add(on("Title"), text(tb0 + Vec2::new(0.15, 1.5), 0.22, "MOUNTING BRACKET"));
+-    add(on("Title"), text(tb0 + Vec2::new(0.15, 0.82), 0.12, "CADCRAFT SAMPLE  DWG NO. CC-0001"));
++    add(on("Title"), text(tb0 + Vec2::new(0.15, 0.82), 0.12, "Bogo CAD SAMPLE  DWG NO. CC-0001"));
+     add(on("Title"), text(tb0 + Vec2::new(0.15, 0.22), 0.12, "SCALE 1:1"));
+     add(on("Title"), text(tb0 + Vec2::new(2.15, 0.22), 0.12, "SHEET 1 OF 1"));
+     // Drawing border.
 diff --git a/crates/ui-egui/src/autosave.rs b/crates/ui-egui/src/autosave.rs
 index c4d996afa208097ad09c4cb74691e32a6739d0fc..bcce523eed9eb1d7cf892df69fdd854f34a2f883 100644
 --- a/crates/ui-egui/src/autosave.rs

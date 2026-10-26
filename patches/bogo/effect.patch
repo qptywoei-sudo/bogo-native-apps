@@ -53868,6 +53868,41 @@ index c6f315f30a1ee94c3f172486f5f74f77d3c6316d..57c9b3e3af48a7b7db11a8c6ba1cbc67
 +        p
 +    ))]
  }
+diff --git a/crates/engine/src/demo.rs b/crates/engine/src/demo.rs
+index df07f5204ecc87ab24266f598908ebfd576d2f49..4f4f1c5e1eaec389db0cad0d0ab1aa7c9b88d555 100644
+--- a/crates/engine/src/demo.rs
++++ b/crates/engine/src/demo.rs
+@@ -11,7 +11,7 @@ use effectcraft_project::build::{self, Ids};
+ use effectcraft_project::{Comp, ItemId, ItemKind, Layer, LayerSource, Project, PropGroup, Solid};
+ use effectcraft_time::{FrameRate, Tick};
+ 
+-pub const MAIN_COMP: &str = "EffectCraft Intro";
++pub const MAIN_COMP: &str = "Bogo Effect Intro";
+ pub const SHOWCASE_3D: &str = "3D Showcase";
+ 
+ /// Seconds → the nearest frame of the demo's 29.97 fps comps (AE keeps times frame-aligned).
+@@ -116,8 +116,8 @@ fn lower_third(p: &mut Project) -> Comp {
+     let mut title = text_layer(
+         p,
+         &c,
+-        "Built with EffectCraft",
+-        TextDoc { text: "Built with EffectCraft".into(), size: 40.0, style: "SemiBold".into(), justify: Justify::Center, ..Default::default() },
++        "Built with Bogo Effect",
++        TextDoc { text: "Built with Bogo Effect".into(), size: 40.0, style: "SemiBold".into(), justify: Justify::Center, ..Default::default() },
+         [440.0, 914.0],
+     );
+     anim(&mut title, "transform/opacity", keys(&[(0.4, Value::Scalar(0.0)), (0.9, Value::Scalar(100.0))]));
+@@ -384,8 +384,8 @@ pub fn demo_project() -> Project {
+     let mut title = text_layer(
+         &mut p,
+         &comp,
+-        "EFFECTCRAFT",
+-        TextDoc { text: "EFFECTCRAFT".into(), size: 148.0, style: "Bold".into(), tracking: 120.0, justify: Justify::Center, ..Default::default() },
++        "Bogo Effect",
++        TextDoc { text: "Bogo Effect".into(), size: 148.0, style: "Bold".into(), tracking: 120.0, justify: Justify::Center, ..Default::default() },
+         [960.0, 560.0],
+     );
+     let mut next = p.next_id;
 diff --git a/crates/engine/src/menus.rs b/crates/engine/src/menus.rs
 index bc486a0c599ec8a45e62724a57c4f6eaf9e0e406..231c27289e7d3ece41e9e06615f0ddee7015bd10 100644
 --- a/crates/engine/src/menus.rs
@@ -53900,9 +53935,18 @@ index bc486a0c599ec8a45e62724a57c4f6eaf9e0e406..231c27289e7d3ece41e9e06615f0ddee
    [!mac] ---
    [!mac] About EffectCraft... | app.about
 diff --git a/crates/engine/src/tests.rs b/crates/engine/src/tests.rs
-index 72133c5d6f36300202298a1d4b22e05d9cbe2df1..bdb7f0b165594b5554d117529327e1edff10b8c4 100644
+index 72133c5d6f36300202298a1d4b22e05d9cbe2df1..faee867c99de8db6fac890963d24206690edc64c 100644
 --- a/crates/engine/src/tests.rs
 +++ b/crates/engine/src/tests.rs
+@@ -40,7 +40,7 @@ fn demo_layer_cache_is_transparent() {
+     }
+     assert!(s.layer_cache.stats().hits > 0);
+     // Edit the title's glow through the command layer, then scrub again.
+-    let title = s.project.comp(cid).unwrap().layers.iter().find(|l| l.name == "EFFECTCRAFT").map(|l| l.id.0).unwrap();
++    let title = s.project.comp(cid).unwrap().layers.iter().find(|l| l.name == "Bogo Effect").map(|l| l.id.0).unwrap();
+     s.execute("prop.set", json!({"layer": title, "path": "effects/#1/radius", "value": 5.0})).unwrap();
+     for t in [3.0, 0.5] {
+         check(&s, t);
 @@ -379,10 +379,10 @@ fn save_and_open_roundtrip() {
  #[test]
  fn help_links_emit_urls() {
@@ -55762,6 +55806,23 @@ index c005224d0aafeacbe1fa94282df792118a39079f..668761117d6feae55907e55451d27cdc
      }
      resp
  }
+diff --git a/crates/ui-egui/tests/ui_agent_audit.rs b/crates/ui-egui/tests/ui_agent_audit.rs
+index a14f77838f0317e6de171d9873a988e88913dd1a..b3efdea65ac58db1be57908150df9e1a6b9c1c81 100644
+--- a/crates/ui-egui/tests/ui_agent_audit.rs
++++ b/crates/ui-egui/tests/ui_agent_audit.rs
+@@ -128,10 +128,10 @@ fn every_panel_registers_automation_ids_for_its_widgets() {
+     let mut s = session();
+     // Content for the selection-driven panels: the title (text with effects), a Render Queue
+     // item, a comp marker.
+-    s.execute("layer.select", json!({"layers": ["EFFECTCRAFT"]})).unwrap();
++    s.execute("layer.select", json!({"layers": ["Bogo Effect"]})).unwrap();
+     s.execute("renderQueue.add", json!({"format": "png", "output": "/tmp/ec-audit-[#####].png"})).unwrap();
+     s.execute("markers.add", json!({})).ok();
+-    let title = s.active_comp().unwrap().layers.iter().find(|l| l.name == "EFFECTCRAFT").map(|l| l.id.0).unwrap();
++    let title = s.active_comp().unwrap().layers.iter().find(|l| l.name == "Bogo Effect").map(|l| l.id.0).unwrap();
+     let mut h = harness(s);
+     h.state_mut().ui.layer_panel = Some(title);
+     // egui records widget types (to tell labels from controls) with this debug option, which
 diff --git a/crates/ui-egui/tests/ui_keyframes.rs b/crates/ui-egui/tests/ui_keyframes.rs
 index 94d0a093f3d8cc77d6a37028905779cc81e08ee9..3c2b34529c484f2e1cb5db249d3de37ed910eab8 100644
 --- a/crates/ui-egui/tests/ui_keyframes.rs
@@ -56258,3 +56319,16 @@ index dba3c4ba04f753eaef8b70af06ff92f235239552..bdb603078d2898ef93dc6358dd970cd5
  
  # Repair the way the wizard's Repair button does: damage the CLI in place (a later write time, as a
  # user edit or corruption would have), repair with the wizard's REINSTALLMODE, compare contents.
+diff --git a/xtask/src/bench.rs b/xtask/src/bench.rs
+index ef7a470a14de5a8fb4f8712821d99ba8f8ccca48..1694f2b5f0e748e96d41daf8a5076f3106f376a8 100644
+--- a/xtask/src/bench.rs
++++ b/xtask/src/bench.rs
+@@ -432,7 +432,7 @@ fn generate(bin: &Path, dir: &Path, name: &str, regen: bool) -> Result<Scenario,
+         start: 0.0,
+     };
+     match name {
+-        "demo" => Ok(Scenario { name: name.into(), source: vec!["--demo".into()], comp: "EffectCraft Intro".into(), fps: 30_000.0 / 1001.0, start: 0.0 }),
++        "demo" => Ok(Scenario { name: name.into(), source: vec!["--demo".into()], comp: "Bogo Effect Intro".into(), fps: 30_000.0 / 1001.0, start: 0.0 }),
+         "layers" => {
+             build_project(bin, &layers_cmds(), &projects.join("layers.ecproj"))?;
+             Ok(project("layers.ecproj", "Layers"))

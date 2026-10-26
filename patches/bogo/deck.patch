@@ -50504,6 +50504,28 @@ zf1I?<b;HgNhC&L3GkqHL^!_8BjUt}`4gmqDMC5Ewqt+We;1Jl0tW{s?ve#>g^&X&<
 zHle3un3g{xyR9%Jba-#ym1~a<bsyT7gv)04o6R693M^KQrdSEiC(M~?QDDG>;&q_w
 u_{$u70KNW&i2eWNfeqk)HWHW5>?gP>g5F&tx@a7doLg3Rf3Cmonfz}xTliA|
 
+diff --git a/crates/engine/src/sample.rs b/crates/engine/src/sample.rs
+index 80c11ca32dda10c380c2dc3d0eaec8a12dc8aee0..0eeddcda2a0b98e64025d5b684c16fc265ebe3c4 100644
+--- a/crates/engine/src/sample.rs
++++ b/crates/engine/src/sample.rs
+@@ -21,7 +21,7 @@ pub fn open_sample(s: &mut Session) -> Result<()> {
+     let sub = st.current_slide().and_then(|x| x.shapes.get(1)).map(|x| x.id.0).unwrap_or(0);
+     run(s, "text.set", json!({"id": title, "text": "Northern Lights"}))?;
+     run(s, "text.set", json!({"id": sub, "text": "A short tour of the aurora — where it comes from, when to look, and how to photograph it"}))?;
+-    run(s, "slide.notes", json!({"text": "Welcome everyone. This deck was made in DeckCraft."}))?;
++    run(s, "slide.notes", json!({"text": "Welcome everyone. This deck was made in Bogo Deck."}))?;
+     // Decorative bands on the title slide.
+     let b = run(s, "shape.insert", json!({"preset": "rect", "rect": [0, 470, 960, 70]}))?;
+     run(s, "shape.fill", json!({"id": last_id(&b), "gradient": {"stops": [[0, "accent1"], [0.5, "accent4"], [1, "accent2"]], "angle": 0}}))?;
+@@ -114,7 +114,7 @@ pub fn open_sample(s: &mut Session) -> Result<()> {
+     run(s, "transition.set", json!({"kind": "split"}))?;
+ 
+     // Closing.
+-    run(s, "slide.new", json!({"layout": "title", "title": "Clear skies!", "body": "Made with DeckCraft — free and open source"}))?;
++    run(s, "slide.new", json!({"layout": "title", "title": "Clear skies!", "body": "Made with Bogo Deck — free and open source"}))?;
+     let moon = run(s, "shape.insert", json!({"preset": "moon", "rect": [820, 40, 80, 120]}))?;
+     run(s, "shape.fill", json!({"id": last_id(&moon), "color": "accent6"}))?;
+     run(s, "shape.line", json!({"id": last_id(&moon), "none": true}))?;
 diff --git a/crates/mcp/src/server.rs b/crates/mcp/src/server.rs
 index 576e0b4a8aaf2edae4104ec8a8ab515162d09efd..fc3a32a8714d52e034ab92287bb05d0e5ad170cc 100644
 --- a/crates/mcp/src/server.rs

@@ -15,6 +15,21 @@ APPS = {'cad','design','vector','film','light','pdf','effect','ui','word','sound
 PROMOTION = re.compile(r'discord|getartcraft|aircraft|artcraft(?:\s+(?:website|family|apps|community|team))|github\.com/storytold',re.I)
 LEGAL = re.compile(r'copyright|©|license|licensed|licence|MIT OR Apache|Apache-2',re.I)
 
+# Only compiled-in public demonstrations and their exact test/benchmark
+# references. Existing documents, model operations and technical theme IDs are
+# never scanned or rewritten by these contracts.
+SAMPLE_LITERAL_REPLACEMENTS = {
+    ('film','crates/engine/src/demo.rs'): [('"FilmCraft Demo"','"Bogo Film Demo"',2)],
+    ('film','crates/project/src/gtemplate.rs'): [('Made with FilmCraft','Made with Bogo Film',1)],
+    ('light','crates/engine/src/demo.rs'): [('creator: "LightCraft Demo".into(),','creator: "Bogo Light Demo".into(),',1)],
+    ('effect','crates/engine/src/demo.rs'): [('"EffectCraft Intro"','"Bogo Effect Intro"',1),('"Built with EffectCraft"','"Built with Bogo Effect"',2),('"EFFECTCRAFT"','"Bogo Effect"',2)],
+    ('effect','crates/engine/src/tests.rs'): [('"EFFECTCRAFT"','"Bogo Effect"',1)],
+    ('effect','crates/ui-egui/tests/ui_agent_audit.rs'): [('"EFFECTCRAFT"','"Bogo Effect"',2)],
+    ('effect','xtask/src/bench.rs'): [('"EffectCraft Intro"','"Bogo Effect Intro"',1)],
+    ('word','crates/engine/src/sample.rs'): [('d.core.creator = "WordCraft".into();','d.core.creator = "Bogo Word".into();',1)],
+    ('deck','crates/engine/src/sample.rs'): [('Welcome everyone. This deck was made in DeckCraft.','Welcome everyone. This deck was made in Bogo Deck.',1),('Made with DeckCraft — free and open source','Made with Bogo Deck — free and open source',1)],
+}
+
 
 def replace_exact(text, before, after='', count=1):
     if text.count(before) != count:
@@ -155,6 +170,10 @@ def transform(app,relative,text):
 
 def app_text(app, relative, text):
     text = transform(app, relative, text)
+    for before,after,count in SAMPLE_LITERAL_REPLACEMENTS.get((app,relative),[]):
+        text=replace_exact(text,before,after,count)
+    if app=='cad'and relative=='crates/engine/src/sample.rs':
+        return replace_exact(text,'CADCRAFT SAMPLE','Bogo CAD SAMPLE')
     if app == 'film':
         if relative == 'crates/ui-egui/src/links.rs':
             text = between(text, 'pub const ALL:', '\n/// A link the web browser', 'pub const ALL: [(&str, &str, &str); 0] = [];\n')
@@ -363,6 +382,7 @@ pub fn specs() -> Vec<CommandSpec> {
 
 
 PROTECTED_PATHS = {
+    ('cad', 'crates/engine/src/sample.rs'),
     ('pdf', 'crates/engine/src/links.rs'),
     ('pdf', 'crates/engine/src/commands.rs'),
     ('effect', 'crates/engine/src/commands/help.rs'),
@@ -370,24 +390,44 @@ PROTECTED_PATHS = {
     ('effect', 'crates/engine/src/tests.rs'),
     ('effect', 'crates/engine/src/tests_m137.rs'),
     ('word', 'crates/engine/src/sample.rs'),
+    ('film','crates/engine/src/demo.rs'),
+    ('film','crates/project/src/gtemplate.rs'),
+    ('light','crates/engine/src/demo.rs'),
+    ('effect','crates/engine/src/demo.rs'),
+    ('effect','xtask/src/bench.rs'),
+    ('deck','crates/engine/src/sample.rs'),
 }
 PROTECTED_BEFORE = {
-    ('effect','crates/engine/src/tests_m137.rs'): ('d19041cc223e223562eb9de5ac92e4c01eaf915ace2875f6d011687443682b2e',9193),
+    ('cad', 'crates/engine/src/sample.rs'): ('91c8538dc95fd03cd37a1f5cc135e2c3128991ef6a277e87f8934df62ab7d64d', 11918),
+    ('deck', 'crates/engine/src/sample.rs'): ('b2d8e6e9bc4078839c8a84825b582fea63a002f1efe92d43d86a1140b5e32908', 7796),
     ('effect', 'crates/engine/src/commands/help.rs'): ('c5ff3919266f4ba7a6bdce09e7e23a5b2001808cfdf80a101a444ff9316b9c66', 2517),
+    ('effect', 'crates/engine/src/demo.rs'): ('cc63ccafc559e4acee29d9be99bf54279f02d1a99301d4fb58e9836dfd84c2a1', 20779),
     ('effect', 'crates/engine/src/menus.rs'): ('668abf4c3986d1841a34d5471c11c178ae2c8665e8363312de92dfa26a28cfad', 53697),
     ('effect', 'crates/engine/src/tests.rs'): ('407dce18ac68a400438d1cd442a1bb3ffcf117c872c8de6e77e2f36acf3f1d7e', 38720),
+    ('effect', 'crates/engine/src/tests_m137.rs'): ('d19041cc223e223562eb9de5ac92e4c01eaf915ace2875f6d011687443682b2e', 9193),
+    ('effect', 'xtask/src/bench.rs'): ('2ddfe5238783585c32075c3ad72a2a4edbfe9cedc03b337e3af1aa9f7f820136', 44466),
+    ('film', 'crates/engine/src/demo.rs'): ('80161af8c5e2a30920b61e7763adfd1f66fdb4cc92082768f0581b4cf783ef26', 9521),
+    ('film', 'crates/project/src/gtemplate.rs'): ('a8d21eeb398760aa0b17783199ca092b0502eb1c2d96a667e4bd4198bb78cf9d', 32149),
+    ('light', 'crates/engine/src/demo.rs'): ('b2c5377de97504647cf28fa90f418b29704679f52ac952d016b9f4b151252e85', 30742),
     ('pdf', 'crates/engine/src/commands.rs'): ('e99e9c0d201f66b3b1d2390c165b87eb4a9079f930d12a1ab680aba364b8d690', 28340),
     ('pdf', 'crates/engine/src/links.rs'): ('3e872d1cab6c6255dbbd496512009162f7faeecb41fcabe89b2fcbe18049b398', 36972),
     ('word', 'crates/engine/src/sample.rs'): ('73fce0485c70d7508facb488f5c9f281cb74fd19567f7392d8b530e40ca29f9f', 9948),
 }
 PROTECTED_AFTER = {
-    ('effect','crates/engine/src/tests_m137.rs'): ('cd16d30e2854975940ffc2245be4b3f0afee305672602eb2f4e8b57edd981802',9172),
+    ('cad', 'crates/engine/src/sample.rs'): ('eb7e5738e8bea8dbb6a0435919c9397f74a6c5b6943df49683c2518fc8fb9767', 11918),
+    ('deck', 'crates/engine/src/sample.rs'): ('d4ae5df4cfda1cb55822ce7ef05d4895d3a77ff4effac9b0fd0291eebcc28ffe', 7796),
     ('effect', 'crates/engine/src/commands/help.rs'): ('c55553616c6f7363f0431a38b1c1e8267eb8a66081789c0459e77d4c8f2e3d4e', 385),
+    ('effect', 'crates/engine/src/demo.rs'): ('0a94e22625d31b710d0a08d684b67e8667d03ddb2fb6e45a2e199566aab04c50', 20779),
     ('effect', 'crates/engine/src/menus.rs'): ('52d52ec0d8e5fd25827c5987195eae3de956416cccf0ab2c350b8321755e3c71', 53232),
-    ('effect', 'crates/engine/src/tests.rs'): ('861b6a9ce063871b3496e87f664d12d8f27291e3ef7c63324db8f3f9079fcbcf', 38694),
+    ('effect', 'crates/engine/src/tests.rs'): ('fcc15119f2eeb1512501c079dd009354ac51dff3f78aed7964654fa8458ab5b9', 38694),
+    ('effect', 'crates/engine/src/tests_m137.rs'): ('cd16d30e2854975940ffc2245be4b3f0afee305672602eb2f4e8b57edd981802', 9172),
+    ('effect', 'xtask/src/bench.rs'): ('6bba69d6aaa6d7bb9a147b47086d6d799e699aa1e4edf4cb8daaebcfdfd2784d', 44466),
+    ('film', 'crates/engine/src/demo.rs'): ('2814172cbdc92d37f75311bde87cab351550620b10fbb8bfd285d99d9896ec34', 9521),
+    ('film', 'crates/project/src/gtemplate.rs'): ('b32c3f9c1c7aa892e7ab3d7400f4bc867cb400e667f0bef35b68f1945f6e1d92', 32149),
+    ('light', 'crates/engine/src/demo.rs'): ('5de5933b889f756c4bfb8e1637421c4edca06bd3d58fb3002f66b602a0d21576', 30742),
     ('pdf', 'crates/engine/src/commands.rs'): ('e715e8621f291d1f0aef5858c9333e58716ad3f4560e726991cc14cc6410018e', 28015),
     ('pdf', 'crates/engine/src/links.rs'): ('aef0b7a128c30b404dab05ff59b5ab4b678010312c97e800ee8a2ebc8998056d', 36562),
-    ('word', 'crates/engine/src/sample.rs'): ('d56afdb642465682f693f36c930283cd2ae19b851754b85213b1caf1b5ce4290', 9944),
+    ('word', 'crates/engine/src/sample.rs'): ('64619d78139361d588ce0c0db499c4dddbefa3403e8cf19695ea73f26d58cda6', 9944),
 }
 
 

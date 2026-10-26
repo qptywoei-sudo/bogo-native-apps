@@ -20,10 +20,10 @@
       "baseLock": "manifests/full-native-apps.json",
       "baseLockSha256": "0c71246652db45818401d22d1267c79f84e01294c4e18f12ac83f536c6ed2a58",
       "baseSourceTreeSha256": "611e020369e25c1427ef3bdb3b2794cbae070d373dd66dcbd28a5a691e2380d7",
-      "sourceTreeSha256": "4548a85abb71daec49dd9ba9f3a0824ee54c7f023174fbde1d9921b5890a2795",
+      "sourceTreeSha256": "b76d81c990bb43ad77ebc31a5be84a36d327bb3b24c5feb7a0cfc8a8d4ce683a",
       "patch": "patches/bogo/cad.patch",
-      "patchSha256": "be62b9bcecc5989fc6721d9763034dec258dee8ff7d68ed8a7e9d7b2b761211a",
-      "patchBytes": 4943427,
+      "patchSha256": "52d13a00cf77710f5670cd568d8f0e33d988117dd49d5f86af1517e3eb60a6bf",
+      "patchBytes": 4944342,
       "files": [
         {
           "path": "apps/cadcraft-web/index.html",
@@ -281,6 +281,17 @@
           "after": {
             "sha256": "659bcdfff9860e825e3a452289cd183fda78f994eab7c180fdb58024bef0353c",
             "bytes": 37166
+          }
+        },
+        {
+          "path": "crates/engine/src/sample.rs",
+          "before": {
+            "sha256": "91c8538dc95fd03cd37a1f5cc135e2c3128991ef6a277e87f8934df62ab7d64d",
+            "bytes": 11918
+          },
+          "after": {
+            "sha256": "eb7e5738e8bea8dbb6a0435919c9397f74a6c5b6943df49683c2518fc8fb9767",
+            "bytes": 11918
           }
         },
         {
@@ -680,14 +691,27 @@
           }
         }
       ],
-      "retiredPromotionSourceTransitions": [],
+      "retiredPromotionSourceTransitions": [
+        {
+          "path": "crates/engine/src/sample.rs",
+          "before": {
+            "sha256": "91c8538dc95fd03cd37a1f5cc135e2c3128991ef6a277e87f8934df62ab7d64d",
+            "bytes": 11918
+          },
+          "after": {
+            "sha256": "eb7e5738e8bea8dbb6a0435919c9397f74a6c5b6943df49683c2518fc8fb9767",
+            "bytes": 11918
+          },
+          "scope": "user-requested retired promotion metadata or built-in sample URL; document/media functions and legal notices preserved"
+        }
+      ],
       "compatibility": {
         "bundleIdRetained": true,
         "msiUpgradeCodeRetained": true,
         "profileAndPortableStorageRetained": true,
         "originalEngineDependenciesLicensesRetained": true,
-        "engineSourceByteIdentical": true,
-        "reviewedAuxiliaryEngineSourceChanges": 0
+        "engineSourceByteIdentical": false,
+        "reviewedAuxiliaryEngineSourceChanges": 1
       },
       "nativeBuild": "not-yet-executed",
       "windowsInstallerIdentity": {
@@ -722,10 +746,10 @@
       "baseLock": "manifests/full-native-apps.json",
       "baseLockSha256": "0c71246652db45818401d22d1267c79f84e01294c4e18f12ac83f536c6ed2a58",
       "baseSourceTreeSha256": "a4de1e98deeaa920ce93c4696452da16377b7badb1a086fd3e2616e8eeb3e897",
-      "sourceTreeSha256": "120208dc3cfa6f3f7a24264deba136f84d433b10258d22d25974c3fe40bccd75",
+      "sourceTreeSha256": "f4b53d116c88cbef5ace41736405707e844ff5b83758a0832fc38ca1fd927e6d",
       "patch": "patches/bogo/design.patch",
-      "patchSha256": "d78b606592928e8bf7f69d530494078e23cc92b51afdd741aac6618bd2921bd3",
-      "patchBytes": 5216916,
+      "patchSha256": "40b167e6e0cb23a7f01a6d081ebffdf1a2ee36a3525b6a9d90dd3108a43bc558",
+      "patchBytes": 5220192,
       "files": [
         {
           "path": "apps/designcraft-cli/src/main.rs",
@@ -734,8 +758,8 @@
             "bytes": 21932
           },
           "after": {
-            "sha256": "e83576b74a1cd22c08e25f34208651781f5144b90cd7c677d6adebae0baf5d48",
-            "bytes": 21757
+            "sha256": "d603e96d8a1c919d208039f8a677f89b7395b7fb7781d6cb5e5f86d50790ef3e",
+            "bytes": 21398
           }
         },
         {
@@ -2148,10 +2172,10 @@
       "baseLock": "manifests/full-native-apps.json",
       "baseLockSha256": "0c71246652db45818401d22d1267c79f84e01294c4e18f12ac83f536c6ed2a58",
       "baseSourceTreeSha256": "ca4bd84dca182c4a7580d41d90c5593804c6302e60c7cce315586d61ed053bac",
-      "sourceTreeSha256": "2631d91e6d67760a58c5904211d4b20c8c364e1cb0cdb52596cd1ac193374d3f",
+      "sourceTreeSha256": "9db744bbee1d4a1bfb07ae27b83ce3e6d0ecfd3645d9a05a5b2905f915ffed14",
       "patch": "patches/bogo/film.patch",
-      "patchSha256": "7e0e00767d1b02676d533138e27da4050f2d77e28978ccf13abe92e729df60f3",
-      "patchBytes": 5401907,
+      "patchSha256": "f64f8e35e7054920a7aa18357aa1e8f129f0266946f38c19463ef135347e8533",
+      "patchBytes": 5404026,
       "files": [
         {
           "path": "apps/filmcraft-cli/src/main.rs",
@@ -2467,6 +2491,28 @@
           "after": {
             "sha256": "03226e783dd56e157c41ceec1457f19cf49830d7476b1b9200e2fb2989471197",
             "bytes": 35248
+          }
+        },
+        {
+          "path": "crates/engine/src/demo.rs",
+          "before": {
+            "sha256": "80161af8c5e2a30920b61e7763adfd1f66fdb4cc92082768f0581b4cf783ef26",
+            "bytes": 9521
+          },
+          "after": {
+            "sha256": "2814172cbdc92d37f75311bde87cab351550620b10fbb8bfd285d99d9896ec34",
+            "bytes": 9521
+          }
+        },
+        {
+          "path": "crates/project/src/gtemplate.rs",
+          "before": {
+            "sha256": "a8d21eeb398760aa0b17783199ca092b0502eb1c2d96a667e4bd4198bb78cf9d",
+            "bytes": 32149
+          },
+          "after": {
+            "sha256": "b32c3f9c1c7aa892e7ab3d7400f4bc867cb400e667f0bef35b68f1945f6e1d92",
+            "bytes": 32149
           }
         },
         {
@@ -2965,14 +3011,39 @@
           }
         }
       ],
-      "retiredPromotionSourceTransitions": [],
+      "retiredPromotionSourceTransitions": [
+        {
+          "path": "crates/engine/src/demo.rs",
+          "before": {
+            "sha256": "80161af8c5e2a30920b61e7763adfd1f66fdb4cc92082768f0581b4cf783ef26",
+            "bytes": 9521
+          },
+          "after": {
+            "sha256": "2814172cbdc92d37f75311bde87cab351550620b10fbb8bfd285d99d9896ec34",
+            "bytes": 9521
+          },
+          "scope": "user-requested retired promotion metadata or built-in sample URL; document/media functions and legal notices preserved"
+        },
+        {
+          "path": "crates/project/src/gtemplate.rs",
+          "before": {
+            "sha256": "a8d21eeb398760aa0b17783199ca092b0502eb1c2d96a667e4bd4198bb78cf9d",
+            "bytes": 32149
+          },
+          "after": {
+            "sha256": "b32c3f9c1c7aa892e7ab3d7400f4bc867cb400e667f0bef35b68f1945f6e1d92",
+            "bytes": 32149
+          },
+          "scope": "user-requested retired promotion metadata or built-in sample URL; document/media functions and legal notices preserved"
+        }
+      ],
       "compatibility": {
         "bundleIdRetained": true,
         "msiUpgradeCodeRetained": true,
         "profileAndPortableStorageRetained": true,
         "originalEngineDependenciesLicensesRetained": true,
-        "engineSourceByteIdentical": true,
-        "reviewedAuxiliaryEngineSourceChanges": 0
+        "engineSourceByteIdentical": false,
+        "reviewedAuxiliaryEngineSourceChanges": 2
       },
       "nativeBuild": "not-yet-executed",
       "windowsInstallerIdentity": {
@@ -3007,10 +3078,10 @@
       "baseLock": "manifests/full-native-apps.json",
       "baseLockSha256": "0c71246652db45818401d22d1267c79f84e01294c4e18f12ac83f536c6ed2a58",
       "baseSourceTreeSha256": "37b75e4199495ab0cc5366682f38dbb599fbe798dba65f961f14a582027b1776",
-      "sourceTreeSha256": "5c267d08778b8a0ce2633bbfac789aadcce5152365bbe2d108c06977f0be4fe3",
+      "sourceTreeSha256": "db3518024ec233457ab86ad6bbbe35b7a3c772cc66f95d6f4830166cde54a205",
       "patch": "patches/bogo/light.patch",
-      "patchSha256": "02a91a03f7f127fb2f203a1f315a145af353fc090d2bfa69041c27b6bf0820bd",
-      "patchBytes": 5617476,
+      "patchSha256": "fe6c41660b54cb0b7dc57956e9d5f819f68e840f28c31aefa7811ff361414664",
+      "patchBytes": 5618126,
       "files": [
         {
           "path": "apps/lightcraft-cli/src/main.rs",
@@ -3282,6 +3353,17 @@
           "after": {
             "sha256": "65710ac24929183d42f698c2c90dee702d73305a319153f7d0a20a521de01e10",
             "bytes": 44180
+          }
+        },
+        {
+          "path": "crates/engine/src/demo.rs",
+          "before": {
+            "sha256": "b2c5377de97504647cf28fa90f418b29704679f52ac952d016b9f4b151252e85",
+            "bytes": 30742
+          },
+          "after": {
+            "sha256": "5de5933b889f756c4bfb8e1637421c4edca06bd3d58fb3002f66b602a0d21576",
+            "bytes": 30742
           }
         },
         {
@@ -3901,14 +3983,27 @@
           }
         }
       ],
-      "retiredPromotionSourceTransitions": [],
+      "retiredPromotionSourceTransitions": [
+        {
+          "path": "crates/engine/src/demo.rs",
+          "before": {
+            "sha256": "b2c5377de97504647cf28fa90f418b29704679f52ac952d016b9f4b151252e85",
+            "bytes": 30742
+          },
+          "after": {
+            "sha256": "5de5933b889f756c4bfb8e1637421c4edca06bd3d58fb3002f66b602a0d21576",
+            "bytes": 30742
+          },
+          "scope": "user-requested retired promotion metadata or built-in sample URL; document/media functions and legal notices preserved"
+        }
+      ],
       "compatibility": {
         "bundleIdRetained": true,
         "msiUpgradeCodeRetained": true,
         "profileAndPortableStorageRetained": true,
         "originalEngineDependenciesLicensesRetained": true,
-        "engineSourceByteIdentical": true,
-        "reviewedAuxiliaryEngineSourceChanges": 0
+        "engineSourceByteIdentical": false,
+        "reviewedAuxiliaryEngineSourceChanges": 1
       },
       "nativeBuild": "not-yet-executed",
       "windowsInstallerIdentity": {
@@ -5075,10 +5170,10 @@
       "baseLock": "manifests/full-native-apps.json",
       "baseLockSha256": "0c71246652db45818401d22d1267c79f84e01294c4e18f12ac83f536c6ed2a58",
       "baseSourceTreeSha256": "fc0e0751cc7402fb069d5e914440fa4506b7e2e057ac4a93de1f5a651493ac3f",
-      "sourceTreeSha256": "75e23fc3d41b87eca73de9bcdbd0e60a752fc68af49f66ea2e2d652c2f3be01a",
+      "sourceTreeSha256": "20186777644cfac107673c8bc2bed25421764b120d36e70f53fca8b927382542",
       "patch": "patches/bogo/effect.patch",
-      "patchSha256": "eb11348edfa7aa48fb4e606385a4baa84cf5816a75eea24c6c7016c96f36e980",
-      "patchBytes": 5418204,
+      "patchSha256": "6e7b0a7c44bab346dcacbf4a465c27c8e26319619c5b03cf2907dfd9c5f0e999",
+      "patchBytes": 5422662,
       "files": [
         {
           "path": "apps/effectcraft-web/web/index.html",
@@ -5342,6 +5437,17 @@
           }
         },
         {
+          "path": "crates/engine/src/demo.rs",
+          "before": {
+            "sha256": "cc63ccafc559e4acee29d9be99bf54279f02d1a99301d4fb58e9836dfd84c2a1",
+            "bytes": 20779
+          },
+          "after": {
+            "sha256": "0a94e22625d31b710d0a08d684b67e8667d03ddb2fb6e45a2e199566aab04c50",
+            "bytes": 20779
+          }
+        },
+        {
           "path": "crates/engine/src/menus.rs",
           "before": {
             "sha256": "668abf4c3986d1841a34d5471c11c178ae2c8665e8363312de92dfa26a28cfad",
@@ -5359,7 +5465,7 @@
             "bytes": 38720
           },
           "after": {
-            "sha256": "861b6a9ce063871b3496e87f664d12d8f27291e3ef7c63324db8f3f9079fcbcf",
+            "sha256": "fcc15119f2eeb1512501c079dd009354ac51dff3f78aed7964654fa8458ab5b9",
             "bytes": 38694
           }
         },
@@ -5573,6 +5679,17 @@
           }
         },
         {
+          "path": "crates/ui-egui/tests/ui_agent_audit.rs",
+          "before": {
+            "sha256": "5ea3e7a1ca533cfab10f4210d1c885d6a7b312cf34ee80c10dbe7df5c1fffb54",
+            "bytes": 7634
+          },
+          "after": {
+            "sha256": "49421284adffd6bdc1a845db6ff6ef1ceb6b8ab50c13857ff37c4a68007f5173",
+            "bytes": 7634
+          }
+        },
+        {
           "path": "crates/ui-egui/tests/ui_keyframes.rs",
           "before": {
             "sha256": "bb9b9b393ee37c45deb94d43148dc6d0c0afd324d4a988188701deacc15f5ef7",
@@ -5747,6 +5864,17 @@
             "sha256": "8a8e4d72b7227f12c992f29a243f6a98881a233498bfe7adc3780bdbd4cc7004",
             "bytes": 7860
           }
+        },
+        {
+          "path": "xtask/src/bench.rs",
+          "before": {
+            "sha256": "2ddfe5238783585c32075c3ad72a2a4edbfe9cedc03b337e3af1aa9f7f820136",
+            "bytes": 44466
+          },
+          "after": {
+            "sha256": "6bba69d6aaa6d7bb9a147b47086d6d799e699aa1e4edf4cb8daaebcfdfd2784d",
+            "bytes": 44466
+          }
         }
       ],
       "retiredPromotionSourceTransitions": [
@@ -5759,6 +5887,18 @@
           "after": {
             "sha256": "c55553616c6f7363f0431a38b1c1e8267eb8a66081789c0459e77d4c8f2e3d4e",
             "bytes": 385
+          },
+          "scope": "user-requested retired promotion metadata or built-in sample URL; document/media functions and legal notices preserved"
+        },
+        {
+          "path": "crates/engine/src/demo.rs",
+          "before": {
+            "sha256": "cc63ccafc559e4acee29d9be99bf54279f02d1a99301d4fb58e9836dfd84c2a1",
+            "bytes": 20779
+          },
+          "after": {
+            "sha256": "0a94e22625d31b710d0a08d684b67e8667d03ddb2fb6e45a2e199566aab04c50",
+            "bytes": 20779
           },
           "scope": "user-requested retired promotion metadata or built-in sample URL; document/media functions and legal notices preserved"
         },
@@ -5781,7 +5921,7 @@
             "bytes": 38720
           },
           "after": {
-            "sha256": "861b6a9ce063871b3496e87f664d12d8f27291e3ef7c63324db8f3f9079fcbcf",
+            "sha256": "fcc15119f2eeb1512501c079dd009354ac51dff3f78aed7964654fa8458ab5b9",
             "bytes": 38694
           },
           "scope": "user-requested retired promotion metadata or built-in sample URL; document/media functions and legal notices preserved"
@@ -5797,6 +5937,18 @@
             "bytes": 9172
           },
           "scope": "user-requested retired promotion metadata or built-in sample URL; document/media functions and legal notices preserved"
+        },
+        {
+          "path": "xtask/src/bench.rs",
+          "before": {
+            "sha256": "2ddfe5238783585c32075c3ad72a2a4edbfe9cedc03b337e3af1aa9f7f820136",
+            "bytes": 44466
+          },
+          "after": {
+            "sha256": "6bba69d6aaa6d7bb9a147b47086d6d799e699aa1e4edf4cb8daaebcfdfd2784d",
+            "bytes": 44466
+          },
+          "scope": "user-requested retired promotion metadata or built-in sample URL; document/media functions and legal notices preserved"
         }
       ],
       "compatibility": {
@@ -5805,7 +5957,7 @@
         "profileAndPortableStorageRetained": true,
         "originalEngineDependenciesLicensesRetained": true,
         "engineSourceByteIdentical": false,
-        "reviewedAuxiliaryEngineSourceChanges": 4
+        "reviewedAuxiliaryEngineSourceChanges": 6
       },
       "nativeBuild": "not-yet-executed",
       "windowsInstallerIdentity": {
@@ -6465,10 +6617,10 @@
       "baseLock": "manifests/full-native-apps.json",
       "baseLockSha256": "0c71246652db45818401d22d1267c79f84e01294c4e18f12ac83f536c6ed2a58",
       "baseSourceTreeSha256": "58d8ab31fb2c18e3201ca3feb19a808ccc75b8e551709c0569138c8d0282f507",
-      "sourceTreeSha256": "17460d65604444780f3580a36d08f97a247282108753a07daa0b54c70441e2c3",
+      "sourceTreeSha256": "bae16d1ba203dcc53cb8d60ad3a0a325ab2db97fd22fc0f7ef46ee3ad983d04a",
       "patch": "patches/bogo/word.patch",
-      "patchSha256": "86412268fa40ec3aa5eabb57cc7daa00dcbf6031175ef2f4bce11cc223b49545",
-      "patchBytes": 4610838,
+      "patchSha256": "7808ca022445474cc0a471264d436293dd84d97c7d5562697c86ddea737018af",
+      "patchBytes": 4611318,
       "files": [
         {
           "path": "apps/wordcraft/build.rs",
@@ -6705,7 +6857,7 @@
             "bytes": 9948
           },
           "after": {
-            "sha256": "d56afdb642465682f693f36c930283cd2ae19b851754b85213b1caf1b5ce4290",
+            "sha256": "64619d78139361d588ce0c0db499c4dddbefa3403e8cf19695ea73f26d58cda6",
             "bytes": 9944
           }
         },
@@ -7158,7 +7310,7 @@
             "bytes": 9948
           },
           "after": {
-            "sha256": "d56afdb642465682f693f36c930283cd2ae19b851754b85213b1caf1b5ce4290",
+            "sha256": "64619d78139361d588ce0c0db499c4dddbefa3403e8cf19695ea73f26d58cda6",
             "bytes": 9944
           },
           "scope": "user-requested retired promotion metadata or built-in sample URL; document/media functions and legal notices preserved"
@@ -7668,10 +7820,10 @@
       "baseLock": "manifests/full-native-apps.json",
       "baseLockSha256": "0c71246652db45818401d22d1267c79f84e01294c4e18f12ac83f536c6ed2a58",
       "baseSourceTreeSha256": "f75f76714c6bfecd468cd4cdd8a03d2a693dcef438762bd8fa987839336d001c",
-      "sourceTreeSha256": "0f5e082c4163b6bafc0cfc032cf863190b545ecfd452f70512bbfea65d521430",
+      "sourceTreeSha256": "00f53014bb005f7af8b750192e54b9b3d1a92142e860b0cc3387e4ff888e5c1c",
       "patch": "patches/bogo/deck.patch",
-      "patchSha256": "b5fac943e6d1a8c64d2c6179b683369b243dcf3a94576af016e924a7a937ce90",
-      "patchBytes": 4435044,
+      "patchSha256": "3029962047c4b1bb9547383431b6e51f2b0e01814f08550ec784007229540ea0",
+      "patchBytes": 4436815,
       "files": [
         {
           "path": "apps/deckcraft-cli/src/main.rs",
@@ -7896,6 +8048,17 @@
           "after": {
             "sha256": "e2726ea53495c93fb98a3153c1711a744eb520b0dbdf962b161c9c916893a632",
             "bytes": 27312
+          }
+        },
+        {
+          "path": "crates/engine/src/sample.rs",
+          "before": {
+            "sha256": "b2d8e6e9bc4078839c8a84825b582fea63a002f1efe92d43d86a1140b5e32908",
+            "bytes": 7796
+          },
+          "after": {
+            "sha256": "d4ae5df4cfda1cb55822ce7ef05d4895d3a77ff4effac9b0fd0291eebcc28ffe",
+            "bytes": 7796
           }
         },
         {
@@ -8141,14 +8304,27 @@
           }
         }
       ],
-      "retiredPromotionSourceTransitions": [],
+      "retiredPromotionSourceTransitions": [
+        {
+          "path": "crates/engine/src/sample.rs",
+          "before": {
+            "sha256": "b2d8e6e9bc4078839c8a84825b582fea63a002f1efe92d43d86a1140b5e32908",
+            "bytes": 7796
+          },
+          "after": {
+            "sha256": "d4ae5df4cfda1cb55822ce7ef05d4895d3a77ff4effac9b0fd0291eebcc28ffe",
+            "bytes": 7796
+          },
+          "scope": "user-requested retired promotion metadata or built-in sample URL; document/media functions and legal notices preserved"
+        }
+      ],
       "compatibility": {
         "bundleIdRetained": true,
         "msiUpgradeCodeRetained": true,
         "profileAndPortableStorageRetained": true,
         "originalEngineDependenciesLicensesRetained": true,
-        "engineSourceByteIdentical": true,
-        "reviewedAuxiliaryEngineSourceChanges": 0
+        "engineSourceByteIdentical": false,
+        "reviewedAuxiliaryEngineSourceChanges": 1
       },
       "nativeBuild": "not-yet-executed",
       "windowsInstallerIdentity": {

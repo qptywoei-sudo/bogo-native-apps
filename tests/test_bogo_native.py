@@ -159,7 +159,9 @@ class BogoNativeIdentity(unittest.TestCase):
                 path = source / relative
                 path.parent.mkdir(parents=True)
                 path.write_text(original, encoding='utf-8')
-                with mock.patch.object(brand, 'icon_assets'):
+                # This fixture contains only one colour file. Complete-source
+                # promotion contracts have separate authenticated archive tests.
+                with mock.patch.object(brand, 'icon_assets'), mock.patch.object(brand, 'remove_promotions'):
                     brand.transform_source(source, app)
                 after = path.read_text(encoding='utf-8')
                 baseline = brand.rust_display(original)

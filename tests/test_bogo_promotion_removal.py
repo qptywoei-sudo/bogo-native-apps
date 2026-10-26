@@ -19,7 +19,7 @@ from test_bogo_promotion_four import apply_text_hunks
 APPS = ('cad','film','light','pdf','effect','ui','word','sound','deck','launcher')
 EXTRA = {'word': ('crates/mcp/src/server.rs',), 'deck': ('crates/mcp/src/server.rs',)}
 # Exact input classes edited by the source transformer. Media/document engines
-# outside the seven closed complete-file exceptions are never handed to it.
+# outside the fourteen closed complete-file exceptions are never handed to it.
 def selected(app, relative):
     return (relative.startswith(('apps/', 'crates/ui-egui/', 'crates/native/', 'crates/core/')) and relative.endswith(('.rs','.json','.tsv'))) or (app,relative) in promo.PROTECTED_PATHS or relative in EXTRA.get(app,())
 
@@ -88,7 +88,8 @@ class PromotionRemoval(unittest.TestCase):
                     self.assertEqual(promo.identity((source/row['path']).read_bytes()),row['after'])
                 if app=='word':
                     before=contents['crates/engine/src/sample.rs'];after=(source/'crates/engine/src/sample.rs').read_bytes()
-                    self.assertEqual(after.replace(b'https://example.com/',b'https://getartcraft.com/'),before)
+                    restored=after.replace(b'https://example.com/',b'https://getartcraft.com/').replace(b'd.core.creator = "Bogo Word".into();',b'd.core.creator = "WordCraft".into();')
+                    self.assertEqual(restored,before)
                     self.assertEqual(before.count(b'https://getartcraft.com/'),1)
                     lib=(source/'crates/ui-egui/src/lib.rs').read_text(encoding='utf-8')
                     self.assertIn('pub show_discord: bool',lib) # old serialized preferences survive
@@ -132,8 +133,8 @@ class PromotionRemoval(unittest.TestCase):
                     self.assertIn('let right = wr.min.x - 12.0;',header)
                     self.assertIn('let popup_id =',header)
 
-    def test_protected_guard_is_closed_to_seven_exact_whole_file_pairs(self):
-        self.assertEqual(len(promo.PROTECTED_PATHS),7)
+    def test_protected_guard_is_closed_to_fourteen_exact_whole_file_pairs(self):
+        self.assertEqual(len(promo.PROTECTED_PATHS),14)
         for app,(_,_,contents) in self.inputs.items():
             for selected,relative in promo.PROTECTED_PATHS:
                 if selected!=app:continue
@@ -157,6 +158,74 @@ class PromotionRemoval(unittest.TestCase):
         self.assertEqual(promo.app_text('word','crates/engine/src/edit.rs','https://getartcraft.com/'), 'https://getartcraft.com/')
         tuples='pub const TABLE: &[(&str,&str)] = &[\n    ("Join our Discord", "Discord に参加"),\n    ("Copyright © ArtCraft Team", "Copyright © ArtCraft Team"),\n    ("Open", "開く"),\n];\n'
         self.assertEqual(promo.localization('crates/ui-egui/src/i18n/ja.rs',tuples),tuples.replace('    ("Join our Discord", "Discord に参加"),\n',''))
+
+
+class BuiltinSampleBrandBatchProof(unittest.TestCase):
+    BASELINES = {
+        ('deck','crates/engine/src/sample.rs'): ('b2d8e6e9bc4078839c8a84825b582fea63a002f1efe92d43d86a1140b5e32908',7796),
+        ('effect','crates/engine/src/demo.rs'): ('cc63ccafc559e4acee29d9be99bf54279f02d1a99301d4fb58e9836dfd84c2a1',20779),
+        ('effect','crates/engine/src/tests.rs'): ('861b6a9ce063871b3496e87f664d12d8f27291e3ef7c63324db8f3f9079fcbcf',38694),
+        ('effect','crates/ui-egui/tests/ui_agent_audit.rs'): ('5ea3e7a1ca533cfab10f4210d1c885d6a7b312cf34ee80c10dbe7df5c1fffb54',7634),
+        ('effect','xtask/src/bench.rs'): ('2ddfe5238783585c32075c3ad72a2a4edbfe9cedc03b337e3af1aa9f7f820136',44466),
+        ('film','crates/engine/src/demo.rs'): ('80161af8c5e2a30920b61e7763adfd1f66fdb4cc92082768f0581b4cf783ef26',9521),
+        ('film','crates/project/src/gtemplate.rs'): ('a8d21eeb398760aa0b17783199ca092b0502eb1c2d96a667e4bd4198bb78cf9d',32149),
+        ('light','crates/engine/src/demo.rs'): ('b2c5377de97504647cf28fa90f418b29704679f52ac952d016b9f4b151252e85',30742),
+        ('word','crates/engine/src/sample.rs'): ('d56afdb642465682f693f36c930283cd2ae19b851754b85213b1caf1b5ce4290',9944),
+    }
+
+    @classmethod
+    def setUpClass(cls):
+        cls.inputs={app:fixture(app)[2]for app in ('deck','effect','film','light','word')}
+
+    def test_exact_public_sample_literals_restore_every_other_original_output_byte(self):
+        self.assertEqual(set(self.BASELINES),set(promo.SAMPLE_LITERAL_REPLACEMENTS))
+        for (app,relative),baseline in self.BASELINES.items():
+            with self.subTest(app=app,path=relative):
+                before=self.inputs[app][relative].decode('utf-8')
+                after=promo.app_text(app,relative,before)
+                restored=after
+                for old,new,count in reversed(promo.SAMPLE_LITERAL_REPLACEMENTS[app,relative]):
+                    self.assertEqual(restored.count(new),count)
+                    restored=restored.replace(new,old)
+                self.assertEqual(promo.identity(restored),{'sha256':baseline[0],'bytes':baseline[1]})
+                if (app,relative)in promo.PROTECTED_PATHS:
+                    self.assertTrue(promo.protected_transition_allowed(app,relative,promo.identity(before),promo.identity(after)))
+                if app=='deck':self.assertIn('json!({"theme": "DeckCraft"})',after)
+                if relative.endswith('gtemplate.rs'):
+                    self.assertIn('author: "FilmCraft contributors".into(),',after)
+                    for name in ('Jordan Lee','Priya Natarajan','Marco Bianchi','Hana Kobayashi'):
+                        self.assertIn(name,after)
+
+    def test_collateral_or_unknown_sample_and_benchmark_bytes_are_refused(self):
+        for app,relative in self.BASELINES:
+            if (app,relative)not in promo.PROTECTED_PATHS:continue
+            before=self.inputs[app][relative].decode('utf-8');after=promo.app_text(app,relative,before)
+            self.assertFalse(promo.protected_transition_allowed(app,relative,promo.identity(before+'\n'),promo.identity(after)))
+            self.assertFalse(promo.protected_transition_allowed(app,relative,promo.identity(before),promo.identity(after+'\n')))
+            self.assertFalse(promo.protected_transition_allowed(app,relative+'.unreviewed',promo.identity(before),promo.identity(after)))
+
+
+class CadBuiltinSampleBrandProof(unittest.TestCase):
+    def test_exact_label_transition_preserves_whole_drawing_and_rejects_collateral_changes(self):
+        relative='crates/engine/src/sample.rs'
+        before=fixture('cad')[2][relative].decode('utf-8')
+        after=promo.app_text('cad',relative,before)
+        self.assertEqual(before.count('CADCRAFT SAMPLE'),1)
+        self.assertEqual(after.count('Bogo CAD SAMPLE'),1)
+        self.assertEqual(after.replace('Bogo CAD SAMPLE','CADCRAFT SAMPLE'),before)
+        self.assertEqual(len(before.encode()),len(after.encode()))
+        self.assertIn('DWG NO. CC-0001',after)
+        self.assertTrue(promo.protected_transition_allowed('cad',relative,promo.identity(before),promo.identity(after)))
+        for invalid in (before+'\n',before.replace('CC-0001','CC-9000'),before.replace('MOUNTING BRACKET','MOUNTING BRACKETS')):
+            with self.subTest(sha=promo.identity(invalid)['sha256']),tempfile.TemporaryDirectory()as folder:
+                root=Path(folder);path=root/relative;path.parent.mkdir(parents=True);path.write_text(invalid,encoding='utf-8',newline='')
+                with self.assertRaisesRegex(ValueError,'Unreviewed protected promotion transition'):
+                    promo.apply(root,'cad')
+                self.assertEqual(path.read_text(encoding='utf-8'),invalid)
+        with tempfile.TemporaryDirectory()as folder:
+            root=Path(folder);path=root/relative;path.parent.mkdir(parents=True);path.write_text(before,encoding='utf-8',newline='')
+            self.assertEqual(promo.apply(root,'cad'),[relative])
+            self.assertEqual(path.read_text(encoding='utf-8'),after)
 
 
 class EffectPromotionFormatterProof(unittest.TestCase):

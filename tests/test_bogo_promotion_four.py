@@ -147,6 +147,29 @@ class FourPromotionRemovals(unittest.TestCase):
                     for name in ('documents', 'document_area'):
                         self.assertEqual(function_text((root / 'crates/ui-egui/src/canvas.rs').read_text(encoding='utf-8'), name), function_text(contents['crates/ui-egui/src/canvas.rs'], name))
 
+    def test_design_cli_removes_retired_arm_usage_and_restores_every_other_byte(self):
+        relative = 'apps/designcraft-cli/src/main.rs'
+        before = self.fixtures['design'][1][relative]
+        after = promo.design_cli(before)
+        self.assertNotIn('Some("links") =>', after)
+        self.assertNotIn('designcraft-cli links', after)
+        self.assertNotIn('designcraft_engine::links::', after)
+        self.assertNotRegex(after, r'\b(?:DISCORD|WEBSITE|APP_PAGE|GITHUB|ISSUES)\b')
+        for name in ('run', 'describe', 'script', 'app', 'mcp', 'validate_pdf', 'stdout_failed'):
+            self.assertEqual(function_text(after, name), function_text(before, name), name)
+        start = before.index('        Some("links") => {')
+        end = promo.brace_end(before, before.index('{', start))
+        arm = before[start:end] + '\n'
+        footer = function_text(before, 'usage_footer')
+        restored = after.replace(function_text(after, 'usage_footer'), footer, 1)
+        help_comment = '        // Asking for help is not an error:'
+        self.assertEqual(restored.count(help_comment), 1)
+        restored = restored.replace(help_comment, arm + help_comment, 1)
+        restored = restored.replace(r'\n       designcraft-cli --version', r'\n       designcraft-cli links\n       designcraft-cli --version', 1)
+        doc = '//! designcraft-cli links                   # Discord, website, app page and GitHub links\n'
+        restored = restored.replace('//! designcraft-cli --version', doc + '//! designcraft-cli --version', 1)
+        self.assertEqual(restored, before)
+
     def test_engine_exceptions_are_exact_three_file_whole_byte_contracts(self):
         self.assertEqual(set(promo.PROTECTED_BEFORE), {('design', 'crates/engine/src/links.rs'), ('design', 'crates/engine/src/cmd/inspect.rs'), ('vector', 'crates/engine/src/cmd/help.rs')})
         for app, relative in promo.PROTECTED_BEFORE:

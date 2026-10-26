@@ -1,0 +1,182 @@
+"""Pure evidence/isolation tests; no native launch, CI dispatch or credential read."""
+import hashlib
+import importlib.util
+import io
+import json
+import os
+from pathlib import Path
+import stat
+import struct
+import tempfile
+import unittest
+import urllib.request
+from unittest.mock import patch
+import zipfile
+
+HERE = Path(__file__).resolve().parent
+SCRIPT = HERE / 'tools-ci-acceptance.py'
+if not SCRIPT.is_file():
+    SCRIPT = HERE.parent / 'scripts/tools-ci-acceptance.py'
+spec = importlib.util.spec_from_file_location('bogo_tools_ci_acceptance', SCRIPT)
+m = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(m)
+
+
+class GuardTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.root = Path(self.temp.name).resolve()
+        self.environment = {'GITHUB_ACTIONS':'true', 'RUNNER_ENVIRONMENT':'github-hosted',
+            'GITHUB_REPOSITORY':m.REPOSITORY, 'RUNNER_OS':'Windows',
+            'GITHUB_SHA':'a'*40, 'RUNNER_TEMP':str(self.root)}
+
+    def tearDown(self):
+        self.temp.cleanup()
+
+    def test_fresh_hosted_context(self):
+        self.assertEqual(m.hosted_context(self.environment,'Windows'), self.root)
+        self.assertEqual(m.owned_root(self.root/'bogo-tools-acceptance',self.root),self.root/'bogo-tools-acceptance')
+
+    def test_owner_or_wrong_host_context_refused(self):
+        for key, value in [('GITHUB_ACTIONS','false'),('RUNNER_ENVIRONMENT','self-hosted'),
+            ('GITHUB_REPOSITORY','unrelated/repo'),('RUNNER_OS','macOS'),
+            ('GITHUB_SHA','main'),('RUNNER_TEMP','relative')]:
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                m.hosted_context(dict(self.environment,**{key:value}),'Windows')
+        with self.assertRaises(ValueError):m.hosted_context(self.environment,'Linux')
+
+    def test_owned_root_cannot_escape_or_use_symlink(self):
+        for value in [self.root/'different',self.root/'child/bogo-tools-acceptance',Path('bogo-tools-acceptance')]:
+            with self.subTest(path=value), self.assertRaises(ValueError):m.owned_root(value,self.root)
+        if os.name != 'nt':
+            (self.root/'bogo-tools-acceptance').symlink_to(self.root,target_is_directory=True)
+            with self.assertRaises(ValueError):m.owned_root(self.root/'bogo-tools-acceptance',self.root)
+
+    def test_credentials_and_library_injection_removed_home_untouched(self):
+        value={'HOME':'/fresh-vm-user','USERPROFILE':'C:\\Users\\runner','PATH':'/bin','SystemRoot':'C:\\Windows',
+            'GH_TOKEN':'credential','GITHUB_TOKEN':'credential','ACTIONS_RUNTIME_TOKEN':'credential',
+            'SOME_PASSWORD':'credential','AWS_ACCESS_KEY_ID':'credential','SSH_AUTH_SOCK':'credential',
+            'AZURE_CLIENT_ID':'credential','DYLD_INSERT_LIBRARIES':'hook','INPUT_TOKEN':'credential'}
+        self.assertEqual(m.clean_environment(value),{k:value[k] for k in ('HOME','USERPROFILE','PATH','SystemRoot')})
+
+    def test_exact_asset_pin_and_api_digest_required(self):
+        pin=m.PINS['windows'];ident,name,size,sha=pin
+        asset={'id':ident,'name':name,'size':size,'digest':'sha256:'+sha,'state':'uploaded',
+            'url':f'https://api.github.com/repos/{m.REPOSITORY}/releases/assets/{ident}'}
+        self.assertEqual(m.validate_asset(asset,pin,m.RELEASE_ID)['sha256'],sha)
+        for key,value in [('id',ident+1),('name','renamed.zip'),('size',size+1),('digest','sha256:'+'0'*64),('state','new'),('url','https://example.com/file')]:
+            with self.subTest(key=key), self.assertRaises(ValueError):m.validate_asset(dict(asset,**{key:value}),pin,m.RELEASE_ID)
+
+    def test_redirect_strips_bearer_and_refuses_other_hosts(self):
+        request=urllib.request.Request('https://api.github.com/repos/'+m.REPOSITORY+'/releases/assets/1',headers={'Authorization':'Bearer synthetic-test-value'})
+        result=m.Redirects().redirect_request(request,None,302,'Found',{},'https://release-assets.githubusercontent.com/example')
+        self.assertIsNone(result.get_header('Authorization'))
+        for target in ['http://github.com/file','https://example.com/file','https://github.com.evil.invalid/file']:
+            with self.subTest(url=target),self.assertRaises(ValueError):m.Redirects().redirect_request(request,None,302,'Found',{},target)
+
+    def test_no_redirect_for_authenticated_loopback_health(self):
+        with self.assertRaises(ValueError):m.NoRedirect().redirect_request(None,None,302,'',{},'https://example.com/')
+
+    def test_credential_cannot_leave_repository_api(self):
+        for url in ['https://github.com/repo','https://api.github.com/repos/other/repository/releases/1','http://api.github.com/repos/'+m.REPOSITORY+'/releases/1']:
+            with self.subTest(url=url),self.assertRaises(ValueError):m.request_url(url,'synthetic')
+
+    def test_download_is_stream_checked_and_failed_partial_removed(self):
+        payload=b'actual frozen payload';sha=hashlib.sha256(payload).hexdigest()
+        with patch.object(m,'request_url',return_value=io.BytesIO(payload)):
+            m.download('https://github.com/test',self.root/'good',len(payload),sha)
+        self.assertEqual((self.root/'good').read_bytes(),payload)
+        for size,digest in [(len(payload)-1,sha),(len(payload)+1,sha),(len(payload),'0'*64)]:
+            with self.subTest(size=size,digest=digest),patch.object(m,'request_url',return_value=io.BytesIO(payload)),self.assertRaises(ValueError):
+                m.download('https://github.com/test',self.root/'bad',size,digest)
+            self.assertFalse((self.root/'bad').exists())
+        with self.assertRaises(ValueError):m.download('https://github.com/test',self.root/'good',len(payload),sha)
+
+    def test_public_git_blob_hash(self):
+        self.assertEqual(m.git_blob(b'hello\n'),'ce013625030ba8dba906f756967f9e9ca394464a')
+
+    def test_signed_envelope_is_exact_pinned_asset(self):
+        self.assertEqual(m.ENVELOPE_PIN,(679016269,'Bogo-Tools-4.6.23-candidate-update-envelope.json',2374,'e7d424e0d6e5797b25f388a6322cf26f3e98d2bbc88cde53d474cc92520d4f48'))
+        self.assertEqual(m.VERSION,'4.6.23')
+        self.assertEqual(m.SOURCE_COMMIT,'f328c97865951603f49dd06eb7960122e4035662')
+        self.assertEqual(m.PUBLIC_KEY,'JjeL9t/8GSrh2XZ25gawQyI475nXr/rU0li4CoEnfos=')
+        for pin in [*m.PINS.values(),m.ENVELOPE_PIN]:
+            self.assertEqual(len(pin[3]),64);self.assertGreater(pin[2],0)
+
+
+class ArchiveTests(unittest.TestCase):
+    def setUp(self):
+        self.temp=tempfile.TemporaryDirectory();self.root=Path(self.temp.name)
+
+    def tearDown(self):self.temp.cleanup()
+
+    def archive(self,entries):
+        path=self.root/('archive-'+str(len(list(self.root.iterdir())))+'.zip')
+        with zipfile.ZipFile(path,'w') as z:
+            for name,data,mode in entries:
+                info=zipfile.ZipInfo(name);info.external_attr=mode<<16;z.writestr(info,data)
+        return path
+
+    def test_zip_path_components_are_bounded(self):
+        self.assertEqual(str(m.member_path('Bogo Tools.app/Contents/Info.plist')),'Bogo Tools.app/Contents/Info.plist')
+        for path in ['','/absolute','../escape','a/../escape','./a','a//b','a\\b','C:/file','a/./b','a\0b']:
+            with self.subTest(path=path),self.assertRaises(ValueError):m.member_path(path)
+
+    def test_extract_actual_file_and_link_structure(self):
+        entries=[('root/file',b'preserved bytes',stat.S_IFREG|0o644)]
+        # Windows ordinary hosted users need no symlink privilege for the core tests.
+        if os.name!='nt':entries += [('root/current',b'file',stat.S_IFLNK|0o777)]
+        archive=self.archive(entries);out=m.extract(archive,self.root/'out','root')
+        self.assertEqual((out/'root/file').read_bytes(),b'preserved bytes')
+        if os.name!='nt':self.assertEqual((out/'root/current').read_bytes(),b'preserved bytes')
+        with self.assertRaises(ValueError):m.extract(archive,out,'root')
+
+    def test_wrong_root_and_duplicate_case_rejected(self):
+        for entries in [[('other/file',b'x',0)], [('root/A',b'a',0),('root/a',b'b',0)]]:
+            archive=self.archive(entries)
+            with self.assertRaises(ValueError):m.extract(archive,self.root/('out-'+archive.stem),'root')
+
+    def test_symlink_escape_and_descendant_write_refused(self):
+        # These fail before symlink creation, also on ordinary Windows users.
+        for entries in [
+            [('root/link',b'../../escape',stat.S_IFLNK|0o777)],
+            [('root/link',b'dir',stat.S_IFLNK|0o777),('root/link/file',b'bad',0)],
+            [('root/link/file',b'bad',0),('root/link',b'dir',stat.S_IFLNK|0o777)],
+        ]:
+            archive=self.archive(entries)
+            with self.assertRaises(ValueError):m.extract(archive,self.root/('out-'+archive.stem),'root')
+
+    def test_sfx_requires_actual_embedded_payload_size_hash_and_magic(self):
+        payload=b'PK'+b'frozen update archive'*100;sha=hashlib.sha256(payload).hexdigest()
+        launcher=self.root/'portable.exe';launcher.write_bytes(b'MZ'+b'prefix'*40+payload+struct.pack('<Q8s',len(payload),b'KIOTOOLS'))
+        result=m.portable_payload(launcher,self.root/'embedded.zip',len(payload),sha)
+        self.assertEqual(result,{'bytes':len(payload),'sha256':sha})
+        self.assertEqual((self.root/'embedded.zip').read_bytes(),payload)
+        for label,size,expected in [('wrong-size',len(payload)+1,sha),('wrong-sha',len(payload),'0'*64)]:
+            with self.subTest(label=label),self.assertRaises(ValueError):m.portable_payload(launcher,self.root/label,size,expected)
+        launcher.write_bytes(b'MZ'+payload+struct.pack('<Q8s',len(payload),b'BADMAGIC'))
+        with self.assertRaises(ValueError):m.portable_payload(launcher,self.root/'badmagic',len(payload),sha)
+
+    def test_source_binding_requires_every_actual_file_and_git_bytes(self):
+        # Production requires all 438 real entries. This deliberately short tree
+        # must fail before any archive can be accepted as complete source.
+        archive=self.archive([('file',b'body',0)])
+        commit={'sha':m.SOURCE_COMMIT,'tree':{'sha':'a'*40}}
+        tree={'truncated':False,'tree':[{'path':'source/file','type':'blob','mode':'100644','sha':m.git_blob(b'body')}]}
+        with patch.object(m,'api',side_effect=[commit,tree]),self.assertRaises(ValueError):m.source_binding(archive)
+        with patch.object(m,'api',return_value=dict(commit,sha='b'*40)),self.assertRaises(ValueError):m.source_binding(archive)
+
+    def test_source_binding_checks_all_438_bodies_not_just_names(self):
+        entries=[('file-'+str(n),('body-'+str(n)).encode(),0) for n in range(438)]
+        archive=self.archive(entries)
+        commit={'sha':m.SOURCE_COMMIT,'tree':{'sha':'a'*40}}
+        rows=[{'path':'source/'+name,'type':'blob','mode':'100644','sha':m.git_blob(body)} for name,body,_ in entries]
+        tree={'truncated':False,'tree':rows}
+        with patch.object(m,'api',side_effect=[commit,tree]):
+            self.assertEqual(m.source_binding(archive)['byteExactFiles'],438)
+        rows[-1]=dict(rows[-1],sha='0'*40)
+        with patch.object(m,'api',side_effect=[commit,tree]),self.assertRaises(ValueError):m.source_binding(archive)
+        with patch.object(m,'api',side_effect=[commit,dict(tree,truncated=True)]),self.assertRaises(ValueError):m.source_binding(archive)
+
+
+if __name__=='__main__':unittest.main()
