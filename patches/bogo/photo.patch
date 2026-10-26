@@ -49891,10 +49891,20 @@ index caf88785a78dd90f25f62254d0d813d2702acb43..6adaf4b4a7b34f3cac7f6002ebaee6a8
          let template = "{message} ({note})";
          crate::i18n::fmt(tl!(template), &[("message", &loaded), ("note", &note)])
 diff --git a/crates/ui-egui/src/canvas.rs b/crates/ui-egui/src/canvas.rs
-index 81e6c84685ddd1789995883cc8e9fe4d8e74a72e..56040deacfabb07814ca3790b2256473e1ede15b 100644
+index 81e6c84685ddd1789995883cc8e9fe4d8e74a72e..69dde3a396d896a5f466a81520406b07495cec20 100644
 --- a/crates/ui-egui/src/canvas.rs
 +++ b/crates/ui-egui/src/canvas.rs
-@@ -2639,7 +2639,7 @@ fn start_screen(app: &mut PhotocraftApp, ui: &mut egui::Ui) {
+@@ -2629,6 +2629,9 @@ pub fn mode_label(doc: &Document) -> &'static str {
+ fn start_screen(app: &mut PhotocraftApp, ui: &mut egui::Ui) {
+     let t = crate::theme::Tokens::get(ui.ctx());
+     let area = ui.available_rect_before_wrap();
++    // Home is application chrome; actual document pasteboards retain their
++    // existing preferences and media colors in the separate canvas path.
++    ui.painter().rect_filled(area, 0.0, t.card);
+     paint_dots(ui, area, app.session.prefs().interface.show_canvas_dots);
+     // File › Open Recent, newest first (on the web there are no paths to reopen).
+     let recent: Vec<String> = if cfg!(target_arch = "wasm32") { Vec::new() } else { app.ui.recent_files.iter().take(HOME_RECENT).cloned().collect() };
+@@ -2639,7 +2642,7 @@ fn start_screen(app: &mut PhotocraftApp, ui: &mut egui::Ui) {
      ui.scope_builder(egui::UiBuilder::new().max_rect(card), |ui| {
          ui.vertical_centered(|ui| {
              ui.horizontal(|ui| {
@@ -49903,7 +49913,7 @@ index 81e6c84685ddd1789995883cc8e9fe4d8e74a72e..56040deacfabb07814ca3790b2256473
                  let by = ui.painter().layout_no_wrap(tl!("open source").into(), egui::FontId::proportional(13.0), t.text_faint);
                  let total = title.size().x + by.size().x + 10.0;
                  ui.add_space(((card.width() - total) / 2.0).max(0.0));
-@@ -5594,7 +5594,7 @@ pub fn extra_windows(app: &mut PhotocraftApp, ctx: &egui::Context) {
+@@ -5594,7 +5597,7 @@ pub fn extra_windows(app: &mut PhotocraftApp, ctx: &egui::Context) {
      let wins = app.ui.windows.clone();
      for w in wins.into_iter().filter(|w| w.open) {
          let Some(st) = app.session.documents().get(w.document) else { continue };
@@ -52821,6 +52831,28 @@ index df677462c26f8321309eb50d736c753d7fce5e51..dc8eea0a827609e35e299ace95909078
  @plural	Saved {n} action to {file}|Saved {n} actions to {file}	已將 {n} 個動作儲存到 {file}
  @plural	{n} step with no Photoshop equivalent left out|{n} steps with no Photoshop equivalent left out	已略過 {n} 個沒有 Photoshop 對應功能的步驟
  
+diff --git a/crates/ui-egui/src/icons.rs b/crates/ui-egui/src/icons.rs
+index 215e5994e8ce7e00ce79469d930e24f6729bfc63..f33855abee1e6b2ec07c22268471106a7b6611ca 100644
+--- a/crates/ui-egui/src/icons.rs
++++ b/crates/ui-egui/src/icons.rs
+@@ -157,7 +157,7 @@ pub fn button_chrome(ui: &egui::Ui, rect: Rect, selected: bool, hovered: bool) -
+     let t = Tokens::get(ui.ctx());
+     if selected {
+         ui.painter().rect_filled(rect, t.radius_sm, t.accent_soft);
+-        ui.painter().rect_stroke(rect, t.radius_sm, egui::Stroke::new(1.0, t.accent_border), egui::StrokeKind::Inside);
++        ui.painter().rect_stroke(rect, t.radius_sm, egui::Stroke::new(1.0, t.field_border), egui::StrokeKind::Inside);
+     } else if hovered {
+         ui.painter().rect_filled(rect, t.radius_sm, t.hover);
+     }
+@@ -188,7 +188,7 @@ pub fn button_with_icon_size_tip(ui: &mut egui::Ui, name: &str, box_size: f32, i
+         normal: ButtonVisuals { fill: Color32::TRANSPARENT, stroke: egui::Stroke::NONE, icon: t.icon },
+         hovered: ButtonVisuals { fill: t.hover, stroke: egui::Stroke::NONE, icon: t.text },
+         pressed: None,
+-        selected: ButtonVisuals { fill: t.accent_soft, stroke: egui::Stroke::new(1.0, t.accent_border), icon: t.accent_text },
++        selected: ButtonVisuals { fill: t.accent_soft, stroke: egui::Stroke::new(1.0, t.field_border), icon: t.accent_text },
+         corner_radius: t.radius_sm.into(),
+         focus_stroke: egui::Stroke::new(1.0, t.accent),
+     };
 diff --git a/crates/ui-egui/src/kys_import.rs b/crates/ui-egui/src/kys_import.rs
 index aaf961bb5fbce9359bf832cc50982b8a6e1c0942..f721541cdfefc2d6218232d09b77a0a088e31948 100644
 --- a/crates/ui-egui/src/kys_import.rs

@@ -230,6 +230,9 @@ def _repository_feed(text):
 
 def _repository_backend(text):
     text = replace_once(text, 'let outcome = match http.get_feed(url) {', 'let outcome = match bogo_registry_body(http, url) {')
+    production, tests = text.split('#[cfg(test)]', 1)
+    tests = replace_once(tests, '"photocraft": {"repo": "' + LEGACY_REPOSITORY + '", "latest_release": {"tag": "v0.6.0"}', '"photocraft": {"repo": "' + BOGO_REPOSITORY + '", "latest_release": {"tag": "v0.6.0"}')
+    text = production + '#[cfg(test)]' + tests
     return text + '''
 /// Only the exact new catalog or the exact historical KIO catalog are trusted.
 /// An unpublished/empty Bogo catalog may show genuine legacy availability.

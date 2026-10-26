@@ -149859,7 +149859,7 @@ index 9785c19bccde6ee8ca3730c26e1c2b0ab9a2c0ff..fea05e54a0843208e898b4d6304e028f
 +    }
 +}
 diff --git a/crates/native/src/backend.rs b/crates/native/src/backend.rs
-index e038fe00d113c5b24b11805bd5509c0f18dd64a2..b7e39ccf47a1fc77589c17de417a5bdb2f58c914 100644
+index e038fe00d113c5b24b11805bd5509c0f18dd64a2..f7ad98ed2955d59bf8782f344e84cc107bf92d90 100644
 --- a/crates/native/src/backend.rs
 +++ b/crates/native/src/backend.rs
 @@ -64,7 +64,7 @@ struct Shared {
@@ -149916,6 +149916,15 @@ index e038fe00d113c5b24b11805bd5509c0f18dd64a2..b7e39ccf47a1fc77589c17de417a5bdb
              Ok(body) => match Feed::parse(&body) {
                  Some(feed) if feed.kio_registry => {
                      if let Err(e) = crate::paths::write_atomic(&paths.feed_cache(), body.as_bytes()) {
+@@ -1129,7 +1129,7 @@ mod tests {
+     fn feed() -> Feed {
+         Feed::parse(
+             r#"{"release_info": {"apps": {
+-            "photocraft": {"repo": "qptywoei777-rgb/kio-native-apps", "latest_release": {"tag": "v0.6.0"}, "app_last_fetched": "2026-10-09T13:00:00Z"}
++            "photocraft": {"repo": "qptywoei-sudo/bogo-native-apps", "latest_release": {"tag": "v0.6.0"}, "app_last_fetched": "2026-10-09T13:00:00Z"}
+         }}}"#,
+         )
+         .unwrap()
 @@ -1204,13 +1204,13 @@ mod tests {
          let word = CraftApp::by_id("wordcraft").unwrap();
          let feed = feed();

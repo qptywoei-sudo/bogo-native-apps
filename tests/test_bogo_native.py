@@ -1,12 +1,15 @@
 import hashlib
 import io
 import json
+import os
 from pathlib import Path
 import struct
 import sys
 import tempfile
 import unittest
+from unittest import mock
 import xml.etree.ElementTree as ET
+import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
@@ -124,6 +127,68 @@ class BogoNativeIdentity(unittest.TestCase):
         for background in ('FC7501', 'FFE7D4', 'FFF3E8', 'FFFAF6'):
             contrast = (luminance(background) + .05) / (luminance('342B26') + .05)
             self.assertGreaterEqual(contrast, 4.5, background)
+
+    def test_cad_control_fix_is_bounded_and_dark_canvas_is_preserved(self):
+        original = ('control: Color32::from_rgb(0x50, 0x5a, 0x6d),\n'
+                    'canvas: Color32::from_rgb(0x22, 0x28, 0x2f),\n'
+                    'control: Color32::from_rgb(0xdc, 0xe0, 0xe6),\n')
+        updated = brand.cad_control_contrast(original)
+        self.assertEqual(updated.count('control: Color32::from_rgb(0xFF, 0xFA, 0xF6),'), 2)
+        self.assertIn('canvas: Color32::from_rgb(0x22, 0x28, 0x2f),', updated)
+        for changed in (original.replace('0x50', '0x51'), original + original, updated):
+            with self.assertRaises(ValueError):
+                brand.cad_control_contrast(changed)
+
+    def test_film_meter_unknown_or_duplicate_contracts_refuse(self):
+        for changed in ('', 'db.to_string(), Tokens::ui(SCALE_FONT), t.text_dim);\n' * 2):
+            with self.assertRaises(ValueError):
+                brand.film_meter_contrast(changed)
+
+    @unittest.skipUnless(os.environ.get('BOGO_NATIVE_ARCHIVES'), 'set BOGO_NATIVE_ARCHIVES for exact published contrast checks')
+    def test_actual_cad_and_film_sources_keep_functional_geometry_and_semantic_colours(self):
+        files = {'cad': 'crates/ui-egui/src/theme.rs', 'film': 'crates/ui-egui/src/panels/meters.rs'}
+        for app, relative in files.items():
+            with self.subTest(app=app), tempfile.TemporaryDirectory() as temporary:
+                source = Path(temporary)
+                archive = next((Path(os.environ['BOGO_NATIVE_ARCHIVES']) / app).glob('*-source.zip'))
+                with zipfile.ZipFile(archive) as zipped:
+                    names = [name for name in zipped.namelist() if name.endswith('/' + relative)
+                             and '/orchestrator/' not in name and not name.startswith('orchestrator/')]
+                    self.assertEqual(len(names), 1)
+                    original = zipped.read(names[0]).decode('utf-8')
+                path = source / relative
+                path.parent.mkdir(parents=True)
+                path.write_text(original, encoding='utf-8')
+                with mock.patch.object(brand, 'icon_assets'):
+                    brand.transform_source(source, app)
+                after = path.read_text(encoding='utf-8')
+                baseline = brand.rust_display(original)
+                if app == 'cad':
+                    baseline = brand.theme(baseline)
+                    self.assertEqual(after.count('control: Color32::from_rgb(0xFF, 0xFA, 0xF6),'), 2)
+                    # Reverse just the two reviewed fills: every other canvas,
+                    # semantic colour, metric and function must remain identical.
+                    restored = after.replace('control: Color32::from_rgb(0xFF, 0xFA, 0xF6),',
+                                             'control: Color32::from_rgb(0x50, 0x5a, 0x6d),', 1)
+                    restored = restored.replace('control: Color32::from_rgb(0xFF, 0xFA, 0xF6),',
+                                                'control: Color32::from_rgb(0xdc, 0xe0, 0xe6),', 1)
+                    self.assertEqual(restored, baseline)
+                else:
+                    self.assertEqual(after.count('egui::Color32::from_rgb(0xF4, 0xF4, 0xF4)'), 3)
+                    self.assertIn('"dB", Tokens::ui(SCALE_FONT), t.text_dim);', after)
+                    self.assertIn('Align2::CENTER_CENTER, text, font, t.text_dim);', after)
+                    self.assertIn('egui::Color32::from_rgb(0xe0, 0x50, 0x40)', after)
+                    self.assertIn('} else if hot {\n                t.hot_text', after)
+                    restored = after.replace('*label, Tokens::ui(READOUT_FONT), if t.meter_readout_bg.r() < 128 { egui::Color32::from_rgb(0xF4, 0xF4, 0xF4) } else { t.text_dim });',
+                                             '*label, Tokens::ui(READOUT_FONT), t.text_dim);')
+                    restored = restored.replace('db.to_string(), Tokens::ui(SCALE_FONT), if t.meter_bg.r() < 128 { egui::Color32::from_rgb(0xF4, 0xF4, 0xF4) } else { t.text_dim });',
+                                                'db.to_string(), Tokens::ui(SCALE_FONT), t.text_dim);')
+                    restored = restored.replace('                if t.meter_readout_bg.r() < 128 { egui::Color32::from_rgb(0xF4, 0xF4, 0xF4) } else { t.text }\n            };',
+                                                '                t.text\n            };')
+                    self.assertEqual(restored, baseline)
+                    for changed in (baseline.replace('db.to_string()', 'db.to_string().clone()'), baseline + baseline, after):
+                        with self.assertRaises(ValueError):
+                            brand.film_meter_contrast(changed)
 
 
 if __name__ == '__main__':

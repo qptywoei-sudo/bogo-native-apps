@@ -53801,7 +53801,7 @@ zvqV`4-1`4HAwSUhsbP@h!lQ;fxqPtkWglzTY6GnFhpMlY^$lx~4fFrT|I!M8Oktv*
 X6i_5=eu44<?~mL&@3ro`Nyz^IXhO9Q
 
 diff --git a/crates/ui-egui/src/header.rs b/crates/ui-egui/src/header.rs
-index a8516468497435ca81a5dd4ae28146b50cbd7435..d2c5023ef26db0f8ce3127bbf183116c986dc395 100644
+index a8516468497435ca81a5dd4ae28146b50cbd7435..5c13033e483b0d8fd756f42174946f76209ed04c 100644
 --- a/crates/ui-egui/src/header.rs
 +++ b/crates/ui-egui/src/header.rs
 @@ -27,9 +27,9 @@ pub fn show(app: &mut EffectcraftApp, ui: &mut egui::Ui, rect: Rect) {
@@ -53825,6 +53825,27 @@ index a8516468497435ca81a5dd4ae28146b50cbd7435..d2c5023ef26db0f8ce3127bbf183116c
      {
          let r = Rect::from_min_max(pos2(rx - 26.0, cy - 13.0), pos2(rx, cy + 13.0));
          if widgets::icon_button(ui, r, icon, false, &t, egui::Id::new(id)).on_hover_text(tip).clicked() {
+@@ -283,15 +283,18 @@ pub fn show(app: &mut EffectcraftApp, ui: &mut egui::Ui, rect: Rect) {
+         let active = app.ui.workspace == name;
+         let resp = ui.interact(r, egui::Id::new(("ws", name)), Sense::click());
+         let col = if active {
+-            t.hot_text
++            t.text
+         } else if resp.hovered() {
+             t.text
+         } else {
+             t.text_dim
+         };
++        if active || resp.hovered() {
++            p.rect_filled(r, 2.0, t.hover);
++        }
+         p.galley_with_override_text_color(pos2(r.min.x + 8.0, cy - g.size().y / 2.0), g, col);
+         if active {
+-            p.line_segment([pos2(r.min.x + 8.0, r.max.y - 3.0), pos2(r.max.x - 8.0, r.max.y - 3.0)], Stroke::new(2.0, t.hot_text));
++            p.line_segment([pos2(r.min.x + 8.0, r.max.y - 3.0), pos2(r.max.x - 8.0, r.max.y - 3.0)], Stroke::new(2.0, t.accent));
+         }
+         app.auto.add(&format!("header.workspace.{name}"), r, name);
+         if resp.clicked() {
 diff --git a/crates/ui-egui/src/i18n.rs b/crates/ui-egui/src/i18n.rs
 index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad2092137b21e6cd 100644
 --- a/crates/ui-egui/src/i18n.rs
@@ -55007,8 +55028,27 @@ index 8ac9560d37d571d4941c7d36df6d43f4af051f71..7e062c858ad9bb11f799754471506400
  }
  
  /// Whether the prompt is Revert Project (Revert / Cancel) instead of Unsaved Changes.
+diff --git a/crates/ui-egui/src/panels/viewer.rs b/crates/ui-egui/src/panels/viewer.rs
+index f4bb5a881b5b780ff9cf59d396b72dc354ab61cd..4ad5989f14949ac63e73438c21081c1ba77b0a5e 100644
+--- a/crates/ui-egui/src/panels/viewer.rs
++++ b/crates/ui-egui/src/panels/viewer.rs
+@@ -2502,7 +2502,13 @@ fn empty_state(app: &mut EffectcraftApp, ui: &mut egui::Ui, rect: Rect) {
+     let p = ui.painter().clone();
+     p.rect_filled(rect, 0.0, t.pasteboard);
+     let c = rect.center();
+-    p.text(c - vec2(0.0, 40.0), Align2::CENTER_CENTER, crate::i18n::tr("Composition"), Tokens::semibold(16.0), t.text);
++    p.text(
++        c - vec2(0.0, 40.0),
++        Align2::CENTER_CENTER,
++        crate::i18n::tr("Composition"),
++        Tokens::semibold(16.0),
++        if t.kind.is_light() { t.text } else { egui::Color32::from_gray(244) },
++    );
+     let b1 = Rect::from_center_size(c + vec2(0.0, 0.0), vec2(220.0, 30.0));
+     if widgets::text_button(ui, b1, "New Composition", true, &t, egui::Id::new("empty-newcomp")).clicked() {
+         crate::panels::dialogs::open_new_comp(app);
 diff --git a/crates/ui-egui/src/theme.rs b/crates/ui-egui/src/theme.rs
-index f5a0664c25a807ea8bda6ed1d7c07bab3ccd9627..e7f82e0d1a9e3e4f81a03484402edb1ec8d57c8d 100644
+index f5a0664c25a807ea8bda6ed1d7c07bab3ccd9627..13a149d0d75f6f74ecc39baf2f5c427320ef93b9 100644
 --- a/crates/ui-egui/src/theme.rs
 +++ b/crates/ui-egui/src/theme.rs
 @@ -131,27 +131,27 @@ impl Tokens {
@@ -55137,15 +55177,69 @@ index f5a0664c25a807ea8bda6ed1d7c07bab3ccd9627..e7f82e0d1a9e3e4f81a03484402edb1e
                  tl_nav_bar: Color32::from_rgb(0x9a, 0x9a, 0x9a),
                  tl_work_area_bar: Color32::from_rgb(0x94, 0x94, 0x94),
                  expr_bg: Color32::from_rgb(0xf2, 0xf2, 0xf2),
-@@ -479,7 +479,7 @@ pub fn apply_visuals(ctx: &egui::Context, t: &Tokens) {
+@@ -477,9 +477,9 @@ pub fn apply_visuals(ctx: &egui::Context, t: &Tokens) {
+     v.extreme_bg_color = t.field_bg;
+     v.faint_bg_color = t.row_alt;
      v.override_text_color = Some(t.text);
-     v.selection.bg_fill = t.accent;
-     v.selection.stroke = Stroke::new(1.0, Color32::WHITE);
+-    v.selection.bg_fill = t.accent;
+-    v.selection.stroke = Stroke::new(1.0, Color32::WHITE);
 -    v.hyperlink_color = t.accent;
++    v.selection.bg_fill = t.hover;
++    v.selection.stroke = Stroke::new(1.0, t.text);
 +    v.hyperlink_color = Color32::from_rgb(0x93, 0x44, 0x00);
      v.window_stroke = Stroke::new(1.0, t.field_border);
      v.window_corner_radius = egui::CornerRadius::same(8);
      v.menu_corner_radius = egui::CornerRadius::same(6);
+diff --git a/crates/ui-egui/src/widgets.rs b/crates/ui-egui/src/widgets.rs
+index c005224d0aafeacbe1fa94282df792118a39079f..668761117d6feae55907e55451d27cdc61cb841a 100644
+--- a/crates/ui-egui/src/widgets.rs
++++ b/crates/ui-egui/src/widgets.rs
+@@ -265,12 +265,12 @@ pub fn icon_toggle(ui: &mut Ui, rect: Rect, icon: Icon, on: bool, t: &Tokens, id
+ pub fn icon_button(ui: &mut Ui, rect: Rect, icon: Icon, active: bool, t: &Tokens, id: egui::Id) -> Response {
+     let resp = ui.interact(rect, id, Sense::click());
+     if active {
+-        ui.painter().rect_filled(rect, 4.0, t.accent);
++        ui.painter().rect_filled(rect, 4.0, t.hover);
+     } else if resp.hovered() {
+         ui.painter().rect_filled(rect, 4.0, t.hover);
+     }
+     let col = if active {
+-        Color32::WHITE
++        t.text
+     } else if resp.hovered() {
+         t.icon_active
+     } else {
+@@ -371,14 +371,14 @@ pub fn dropdown_tip(ui: &mut Ui, rect: Rect, text: &str, tip: Option<&str>, t: &
+ pub fn text_button(ui: &mut Ui, rect: Rect, text: &str, primary: bool, t: &Tokens, id: egui::Id) -> Response {
+     let resp = ui.interact(rect, id, Sense::click());
+     let bg = if primary {
+-        if resp.hovered() { t.accent_hover } else { t.accent }
++        if resp.hovered() { t.pressed } else { t.hover }
+     } else if resp.hovered() {
+         t.pressed
+     } else {
+         t.hover
+     };
+     ui.painter().rect_filled(rect, rect.height() / 2.0, bg);
+-    ui.painter().text(rect.center(), Align2::CENTER_CENTER, text, Tokens::medium(12.0), if primary { Color32::WHITE } else { t.text });
++    ui.painter().text(rect.center(), Align2::CENTER_CENTER, text, Tokens::medium(12.0), t.text);
+     resp
+ }
+ 
+@@ -386,11 +386,11 @@ pub fn text_button(ui: &mut Ui, rect: Rect, text: &str, primary: bool, t: &Token
+ pub fn checkbox(ui: &mut Ui, rect: Rect, on: bool, t: &Tokens, id: egui::Id) -> Response {
+     let resp = ui.interact(rect, id, Sense::click());
+     let b = Rect::from_center_size(rect.center(), vec2(12.0, 12.0));
+-    ui.painter().rect_filled(b, 2.0, if on { t.accent } else { t.field_bg });
++    ui.painter().rect_filled(b, 2.0, if on { t.hover } else { t.field_bg });
+     ui.painter().rect_stroke(b, 2.0, Stroke::new(1.0, if on { t.accent } else { t.field_border }), StrokeKind::Inside);
+     if on {
+         let p = |x: f32, y: f32| pos2(b.min.x + x * b.width(), b.min.y + y * b.height());
+-        ui.painter().line(vec![p(0.2, 0.52), p(0.42, 0.74), p(0.8, 0.28)], Stroke::new(1.6, Color32::WHITE));
++        ui.painter().line(vec![p(0.2, 0.52), p(0.42, 0.74), p(0.8, 0.28)], Stroke::new(1.6, t.text));
+     }
+     resp
+ }
 diff --git a/crates/ui-egui/tests/ui_keyframes.rs b/crates/ui-egui/tests/ui_keyframes.rs
 index 94d0a093f3d8cc77d6a37028905779cc81e08ee9..3c2b34529c484f2e1cb5db249d3de37ed910eab8 100644
 --- a/crates/ui-egui/tests/ui_keyframes.rs

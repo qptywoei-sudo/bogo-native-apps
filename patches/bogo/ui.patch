@@ -59451,7 +59451,7 @@ index e7017c231454954dceab17dac098f947bd804cac..bf11f56f06727cc9319cf20906123f94
          );
          ui.add_space(4.0);
 diff --git a/crates/ui-egui/src/theme.rs b/crates/ui-egui/src/theme.rs
-index 080bce43d822a4bb057104cf94fcdfba4006ab19..149d267b0cca061244c4ecdcc1b5be62228c2f63 100644
+index 080bce43d822a4bb057104cf94fcdfba4006ab19..c0b1ad525c4326ca97ff642061aac24ec788bb22 100644
 --- a/crates/ui-egui/src/theme.rs
 +++ b/crates/ui-egui/src/theme.rs
 @@ -44,7 +44,7 @@ pub struct Tokens {
@@ -59463,7 +59463,7 @@ index 080bce43d822a4bb057104cf94fcdfba4006ab19..149d267b0cca061244c4ecdcc1b5be62
  pub const COMPONENT: Color32 = Color32::from_rgb(0x97, 0x47, 0xFF);
  /// Handoff status badges (white text on these, in both themes).
  pub const DEV_READY: Color32 = Color32::from_rgb(0x14, 0xAE, 0x5C);
-@@ -55,25 +55,25 @@ impl Tokens {
+@@ -55,35 +55,35 @@ impl Tokens {
      pub fn light() -> Self {
          Self {
              dark: false,
@@ -59494,14 +59494,18 @@ index 080bce43d822a4bb057104cf94fcdfba4006ab19..149d267b0cca061244c4ecdcc1b5be62
 +            field: Color32::from_rgb(0xFF, 0xFA, 0xF6),
              field_hover_border: Color32::from_rgb(0xE6, 0xE6, 0xE6),
              accent: ACCENT,
-             accent_hover: Color32::from_rgb(0x00, 0x7B, 0xE5),
+-            accent_hover: Color32::from_rgb(0x00, 0x7B, 0xE5),
++            accent_hover: Color32::from_rgb(0xFF, 0xE7, 0xD4),
              // 5.2:1 on white, 4.6:1 on selected rows: WCAG AA for text.
 -            accent_text: Color32::from_rgb(0x00, 0x6B, 0xD1),
+-            selected_row: Color32::from_rgb(0xE5, 0xF4, 0xFF),
+-            selected_row_child: Color32::from_rgb(0xF2, 0xF9, 0xFF),
 +            accent_text: Color32::from_rgb(0x34, 0x2B, 0x26),
-             selected_row: Color32::from_rgb(0xE5, 0xF4, 0xFF),
-             selected_row_child: Color32::from_rgb(0xF2, 0xF9, 0xFF),
++            selected_row: Color32::from_rgb(0xFF, 0xE7, 0xD4),
++            selected_row_child: Color32::from_rgb(0xFF, 0xE7, 0xD4),
              component: COMPONENT,
-@@ -82,8 +82,8 @@ impl Tokens {
+             component_row: Color32::from_rgb(0xF1, 0xE9, 0xFF),
+             danger: Color32::from_rgb(0xF2, 0x48, 0x22),
              success: Color32::from_rgb(0x14, 0xAE, 0x5C),
              warning: Color32::from_rgb(0xFF, 0xCD, 0x29),
              guide: Color32::from_rgb(0xF2, 0x48, 0x22),
@@ -59512,7 +59516,7 @@ index 080bce43d822a4bb057104cf94fcdfba4006ab19..149d267b0cca061244c4ecdcc1b5be62
              shadow: Color32::from_black_alpha(40),
              menu: Color32::from_rgb(0x1E, 0x1E, 0x1E),
              menu_text: Color32::from_rgb(0xFF, 0xFF, 0xFF),
-@@ -96,23 +96,23 @@ impl Tokens {
+@@ -96,33 +96,33 @@ impl Tokens {
      pub fn dark() -> Self {
          Self {
              dark: true,
@@ -59542,13 +59546,17 @@ index 080bce43d822a4bb057104cf94fcdfba4006ab19..149d267b0cca061244c4ecdcc1b5be62
 +            field: Color32::from_rgb(0xFF, 0xFA, 0xF6),
              field_hover_border: Color32::from_rgb(0x4D, 0x4D, 0x4D),
              accent: ACCENT,
-             accent_hover: Color32::from_rgb(0x3D, 0xAD, 0xFF),
+-            accent_hover: Color32::from_rgb(0x3D, 0xAD, 0xFF),
 -            accent_text: Color32::from_rgb(0x7C, 0xC4, 0xF8),
+-            selected_row: Color32::from_rgb(0x2A, 0x45, 0x5C),
+-            selected_row_child: Color32::from_rgb(0x2D, 0x37, 0x41),
++            accent_hover: Color32::from_rgb(0xFF, 0xE7, 0xD4),
 +            accent_text: Color32::from_rgb(0x34, 0x2B, 0x26),
-             selected_row: Color32::from_rgb(0x2A, 0x45, 0x5C),
-             selected_row_child: Color32::from_rgb(0x2D, 0x37, 0x41),
++            selected_row: Color32::from_rgb(0xFF, 0xE7, 0xD4),
++            selected_row_child: Color32::from_rgb(0xFF, 0xE7, 0xD4),
              component: Color32::from_rgb(0xD2, 0x7C, 0xFF),
-@@ -121,8 +121,8 @@ impl Tokens {
+             component_row: Color32::from_rgb(0x3E, 0x30, 0x52),
+             danger: Color32::from_rgb(0xF2, 0x48, 0x22),
              success: Color32::from_rgb(0x14, 0xAE, 0x5C),
              warning: Color32::from_rgb(0xFF, 0xCD, 0x29),
              guide: Color32::from_rgb(0xF2, 0x48, 0x22),

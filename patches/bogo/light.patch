@@ -51652,6 +51652,19 @@ index 6b3976a22fbb18331cdafc8b2e12a1e2c64974de..375411887c25f33d1d057abe13a8162e
    "On NixOS, start it from `nix develop`.": "在 NixOS 上，請從 `nix develop` 啟動。",
    "Files with the same content as another file in this import: only the first is imported.": "與本次匯入中另一個檔案內容相同的檔案：只匯入第一個。"
  }
+diff --git a/crates/ui-egui/src/docking.rs b/crates/ui-egui/src/docking.rs
+index 364fac08f937d30029c763f2829d3253f87e2d8e..7c596eb8e104b093967005d9a7708df8497e9a1c 100644
+--- a/crates/ui-egui/src/docking.rs
++++ b/crates/ui-egui/src/docking.rs
+@@ -416,7 +416,7 @@ pub fn show(app: &mut crate::LightcraftApp, ui: &mut egui::Ui) {
+     style.resize_window_label = crate::i18n::tr("Resize panel window").into();
+     style.background = t.chrome;
+     style.tab_background = t.chrome;
+-    style.active_background = t.canvas;
++    style.active_background = t.hover;
+     style.text = t.text;
+     style.inactive_text = t.text_dim;
+     style.border = egui::Stroke::new(1.0, t.divider);
 diff --git a/crates/ui-egui/src/export_task.rs b/crates/ui-egui/src/export_task.rs
 index 937b8ed5c2c00a99580f5d2a4a7f41ea1d691850..a377ea32ae9f7892c3a614dc8eadda411d3c6857 100644
 --- a/crates/ui-egui/src/export_task.rs
@@ -51871,6 +51884,46 @@ index 18274f53ddbc1274a968cf8390c81331be9e5e8e..9ad4b2235b247effe694c06173c0e665
                      host = host,
                      after = tr(after)
                  ))
+diff --git a/crates/ui-egui/src/panels/detail.rs b/crates/ui-egui/src/panels/detail.rs
+index 151d4a57a2ea2b51bb1a4444f6409d8d9afb6c2f..8dfe624ca130ba92911bc16151ef3f4264128e9d 100644
+--- a/crates/ui-egui/src/panels/detail.rs
++++ b/crates/ui-egui/src/panels/detail.rs
+@@ -2301,12 +2301,32 @@ pub(crate) fn filmstrip(app: &mut LightcraftApp, ui: &mut egui::Ui, r: Rect) {
+             } else {
+                 t.canvas
+             };
+-            p.rect_filled(cr, 0.0, crate::theme::label_background(base, label, selected));
++            let label_background = crate::theme::label_background(base, label, selected);
++            // Catalog labels retain their semantic colors; choose readable ink
++            // from the actual composed background, including hover/selection.
++            let luminance = |color: Color32| {
++                let linear = |value: u8| {
++                    let c = f32::from(value) / 255.0;
++                    if c <= 0.04045 { c / 12.92 } else { ((c + 0.055) / 1.055).powf(2.4) }
++                };
++                0.2126 * linear(color.r()) + 0.7152 * linear(color.g()) + 0.0722 * linear(color.b())
++            };
++            let background_luminance = luminance(label_background);
++            let primary_luminance = luminance(t.text_dim);
++            let primary_contrast = (background_luminance.max(primary_luminance) + 0.05) / (background_luminance.min(primary_luminance) + 0.05);
++            let label_ink = if primary_contrast >= 4.5 {
++                t.text_dim
++            } else if 1.05 / (background_luminance + 0.05) >= 4.5 {
++                Color32::WHITE
++            } else {
++                Color32::BLACK
++            };
++            p.rect_filled(cr, 0.0, label_background);
+             let names = app.ui.settings.film_names;
+             if let Some(ph) = app.session.catalog.photo(*id).filter(|_| names) {
+                 let name = ph.file_name.rsplit_once('.').map(|(n, _)| n).unwrap_or(&ph.file_name);
+-                p.text(pos2(cr.left() + 8.0, cr.top() + 10.0), Align2::LEFT_CENTER, film_label(name), t.font(10.0), t.text_dim);
+-                p.text(pos2(cr.right() - 8.0, cr.top() + 10.0), Align2::RIGHT_CENTER, &ph.format, t.semibold(8.5), t.text_dim);
++                p.text(pos2(cr.left() + 8.0, cr.top() + 10.0), Align2::LEFT_CENTER, film_label(name), t.font(10.0), label_ink);
++                p.text(pos2(cr.right() - 8.0, cr.top() + 10.0), Align2::RIGHT_CENTER, &ph.format, t.semibold(8.5), label_ink);
+             }
+             let img_area = Rect::from_min_max(cr.min + vec2(10.0, 22.0), cr.max - vec2(10.0, 8.0));
+             super::grid::request_thumb(app, *id, (256.0 * ppp.min(2.0) / 2.0) as usize * 2, 8);
 diff --git a/crates/ui-egui/src/panels/dialogs.rs b/crates/ui-egui/src/panels/dialogs.rs
 index 20bade39054f04f5334743b5badbe5396f20f333..1fa535729f466f3f14597fa37bfd4248a68514b5 100644
 --- a/crates/ui-egui/src/panels/dialogs.rs

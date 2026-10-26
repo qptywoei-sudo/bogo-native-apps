@@ -52729,7 +52729,7 @@ index 469178863106dfb2581fb931c31de4e50070e5f3..62e8133039c3cbe5139d6fe2d7df358c
  New-Item -ItemType Directory -Force -Path $tmp | Out-Null
  
 diff --git a/packaging/windows/test-msi.ps1 b/packaging/windows/test-msi.ps1
-index ba20b36ce942d8fe0cfe7bcdfeb9ee35e80869a0..d8a17c0891827859734c21baf620647384712538 100644
+index ba20b36ce942d8fe0cfe7bcdfeb9ee35e80869a0..7ebaf819d1846b8dc362bf3d9527ad2851b355fa 100644
 --- a/packaging/windows/test-msi.ps1
 +++ b/packaging/windows/test-msi.ps1
 @@ -35,7 +35,7 @@ function Assert-NoRow([string] $Sql, [string] $What) {
@@ -52746,7 +52746,7 @@ index ba20b36ce942d8fe0cfe7bcdfeb9ee35e80869a0..d8a17c0891827859734c21baf6206473
  }
  $manufacturer = Read-Row 'SELECT `Value` FROM `Property` WHERE `Property` = ''Manufacturer''' 1
 -Assert-Equal $manufacturer[0] 'Learning Machines LLC' 'MSI manufacturer'
-+Assert-Equal $manufacturer[0] 'KIO' 'MSI manufacturer'
++Assert-Equal $manufacturer[0] 'Bogo' 'MSI manufacturer'
  $status = Read-Row 'SELECT `Text` FROM `Control` WHERE `Dialog_` = ''InstallProgress'' AND `Control` = ''Status''' 1
  Assert-Equal $status[0] 'Please wait while setup completes.' 'Persistent progress message'
  Assert-NoRow 'SELECT `Event` FROM `EventMapping` WHERE `Dialog_` = ''InstallProgress'' AND `Control_` = ''Status''' 'progress text subscription'

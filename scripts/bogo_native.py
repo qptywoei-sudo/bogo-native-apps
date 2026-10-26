@@ -114,6 +114,7 @@ def public_files(lock):
     extra += ['scripts/bogo_windows_upgrade.py', 'tests/test_bogo_windows_upgrade.py', 'docs/legacy-native-readme.md', 'manifests/bogo-native-downloads.json']
     extra += ['scripts/bogo_packaging.py', 'tests/test_bogo_packaging.py']
     extra += ['docs/bogo-ci-verification.md']
+    extra += ['scripts/bogo_chrome_contrast.py', 'tests/test_bogo_chrome_contrast.py']
     extra += ['scripts/bogo_runtime_icons.py', 'tests/test_bogo_runtime_icons.py', 'scripts/bogo_ci_artifact.py', 'tests/test_bogo_ci_artifact.py', 'scripts/bogo_msi_art.py', 'tests/test_bogo_msi_art.py', '.github/workflows/bogo-windows-acceptance.yml']
     extra += ['tools/runtime-icon-reference/' + name for name in ('Cargo.toml', 'Cargo.lock', 'src/main.rs', 'reference-contract.json')]
     extra += ['tools/runtime-icon-reference/application-locks/' + app + '.Cargo.lock' for app in NAMES]

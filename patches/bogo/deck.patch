@@ -50468,7 +50468,7 @@ zHle3un3g{xyR9%Jba-#ym1~a<bsyT7gv)04o6R693M^KQrdSEiC(M~?QDDG>;&q_w
 u_{$u70KNW&i2eWNfeqk)HWHW5>?gP>g5F&tx@a7doLg3Rf3Cmonfz}xTliA|
 
 diff --git a/crates/ui-egui/src/backstage.rs b/crates/ui-egui/src/backstage.rs
-index b5ed06306963b7e3b74710655c7c52c3300f29db..b30228580d8b37677311f9d00f2b5e686283dc29 100644
+index b5ed06306963b7e3b74710655c7c52c3300f29db..bc49929127322ddeac961eafc04c1be8f5a00cd8 100644
 --- a/crates/ui-egui/src/backstage.rs
 +++ b/crates/ui-egui/src/backstage.rs
 @@ -208,7 +208,7 @@ impl Backstage {
@@ -50480,6 +50480,24 @@ index b5ed06306963b7e3b74710655c7c52c3300f29db..b30228580d8b37677311f9d00f2b5e68
      ("pdf", "PDF (*.pdf)", "A fixed copy that keeps its layout on any device"),
      ("outline", "Outline (*.txt)", "The slide titles and bullet text as plain text"),
      ("png", "PNG Picture (*.png)", "The current slide as a picture"),
+@@ -424,7 +424,7 @@ fn nav_item(ui: &mut Ui, nav: Nav, bs: &Backstage, index: usize, t: &Tokens) ->
+     resp.widget_info(|| egui::WidgetInfo::selected(egui::WidgetType::Button, true, selected, label));
+     let p = ui.painter();
+     let row = rect.shrink2(vec2(6.0, 1.0));
+-    if resp.hovered() {
++    if selected || resp.hovered() {
+         p.rect_filled(row, CornerRadius::same(2), t.hover);
+     }
+     if bs.focus == Some(index) || selected {
+@@ -432,7 +432,7 @@ fn nav_item(ui: &mut Ui, nav: Nav, bs: &Backstage, index: usize, t: &Tokens) ->
+         let ink = if bs.focus == Some(index) { t.text } else { t.border };
+         p.rect_stroke(row, CornerRadius::same(2), Stroke::new(1.0, ink), StrokeKind::Inside);
+     }
+-    let ink = if selected { t.accent } else { t.text };
++    let ink = t.text;
+     icons::paint(p, Rect::from_center_size(pos2(rect.left() + 26.0, rect.center().y), vec2(16.0, 16.0)), nav.icon(), ink, false);
+     p.text(pos2(rect.left() + 44.0, rect.center().y), Align2::LEFT_CENTER, label, theme::font(13.0), ink);
+     resp
 @@ -460,7 +460,7 @@ fn dim(ui: &mut Ui, text: &str) {
  /// A link with an arrow (More themes →): true when clicked.
  fn arrow_link(ui: &mut Ui, text: &str) -> bool {

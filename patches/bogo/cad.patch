@@ -63640,7 +63640,7 @@ index e8102679346b3cfbe21d26864a6ca88cefb835cb..bf6eb57e73bbe94f3882fad85d413fb6
                          st.input.push_str(&st.conv_result);
                      }
 diff --git a/crates/ui-egui/src/theme.rs b/crates/ui-egui/src/theme.rs
-index 9064b92e42b0ff0fa70f08a6d9c43e9222d85adc..1516946f12066c392067f7a052ad2ff1fbe5dd20 100644
+index 9064b92e42b0ff0fa70f08a6d9c43e9222d85adc..6d4c3fd1063ec98bc773b13a0bf753022ac1cacb 100644
 --- a/crates/ui-egui/src/theme.rs
 +++ b/crates/ui-egui/src/theme.rs
 @@ -128,27 +128,27 @@ pub struct Tokens {
@@ -63651,13 +63651,14 @@ index 9064b92e42b0ff0fa70f08a6d9c43e9222d85adc..1516946f12066c392067f7a052ad2ff1
 -        chrome_dark: Color32::from_rgb(0x31, 0x38, 0x44),
 -        panel: Color32::from_rgb(0x3c, 0x44, 0x52),
 -        tab_active: Color32::from_rgb(0x4e, 0x5a, 0x6e),
+-        control: Color32::from_rgb(0x50, 0x5a, 0x6d),
+-        control_hover: Color32::from_rgb(0x5c, 0x67, 0x7c),
+-        border: Color32::from_rgb(0x23, 0x29, 0x30),
 +        chrome: Color32::from_rgb(0xFF, 0xF3, 0xE8),
 +        chrome_dark: Color32::from_rgb(0xFF, 0xFA, 0xF6),
 +        panel: Color32::from_rgb(0xFF, 0xFA, 0xF6),
 +        tab_active: Color32::from_rgb(0xFF, 0xFA, 0xF6),
-         control: Color32::from_rgb(0x50, 0x5a, 0x6d),
--        control_hover: Color32::from_rgb(0x5c, 0x67, 0x7c),
--        border: Color32::from_rgb(0x23, 0x29, 0x30),
++        control: Color32::from_rgb(0xFF, 0xFA, 0xF6),
 +        control_hover: Color32::from_rgb(0xFF, 0xE7, 0xD4),
 +        border: Color32::from_rgb(0xF1, 0xD3, 0xBD),
          canvas: Color32::from_rgb(0x22, 0x28, 0x2f),
@@ -63712,11 +63713,7 @@ index 9064b92e42b0ff0fa70f08a6d9c43e9222d85adc..1516946f12066c392067f7a052ad2ff1
 -        chrome_dark: Color32::from_rgb(0xd5, 0xd9, 0xdf),
 -        panel: Color32::from_rgb(0xee, 0xf0, 0xf3),
 -        tab_active: Color32::from_rgb(0xc8, 0xd3, 0xe2),
-+        chrome: Color32::from_rgb(0xFF, 0xF3, 0xE8),
-+        chrome_dark: Color32::from_rgb(0xFF, 0xFA, 0xF6),
-+        panel: Color32::from_rgb(0xFF, 0xFA, 0xF6),
-+        tab_active: Color32::from_rgb(0xFF, 0xFA, 0xF6),
-         control: Color32::from_rgb(0xdc, 0xe0, 0xe6),
+-        control: Color32::from_rgb(0xdc, 0xe0, 0xe6),
 -        control_hover: Color32::from_rgb(0xcb, 0xd2, 0xdc),
 -        border: Color32::from_rgb(0xb3, 0xba, 0xc4),
 -        text: Color32::from_rgb(0x1d, 0x23, 0x2b),
@@ -63724,6 +63721,11 @@ index 9064b92e42b0ff0fa70f08a6d9c43e9222d85adc..1516946f12066c392067f7a052ad2ff1
 -        text_faint: Color32::from_rgb(0x62, 0x6a, 0x76),
 -        icon: Color32::from_rgb(0x34, 0x3c, 0x48),
 -        icon_accent: Color32::from_rgb(0x1b, 0x6f, 0xd6),
++        chrome: Color32::from_rgb(0xFF, 0xF3, 0xE8),
++        chrome_dark: Color32::from_rgb(0xFF, 0xFA, 0xF6),
++        panel: Color32::from_rgb(0xFF, 0xFA, 0xF6),
++        tab_active: Color32::from_rgb(0xFF, 0xFA, 0xF6),
++        control: Color32::from_rgb(0xFF, 0xFA, 0xF6),
 +        control_hover: Color32::from_rgb(0xFF, 0xE7, 0xD4),
 +        border: Color32::from_rgb(0xF1, 0xD3, 0xBD),
 +        text: Color32::from_rgb(0x34, 0x2B, 0x26),

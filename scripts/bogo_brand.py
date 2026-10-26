@@ -8,6 +8,7 @@ import shutil
 from pathlib import Path
 
 from bogo_assets import ASSETS, originals
+from bogo_chrome_contrast import transform as chrome_contrast
 
 NAMES = {'cad': 'CAD', 'design': 'Design', 'vector': 'Vector', 'film': 'Film', 'light': 'Light', 'pdf': 'PDF', 'effect': 'Effect', 'ui': 'UI', 'word': 'Word', 'sound': 'Sound', 'deck': 'Deck', 'grid': 'Grid', 'launcher': 'Launcher', 'photo': 'Photo'}
 PALETTE = {'brand': 'FC7501', 'header': 'FFF3E8', 'background': 'FFFAF6', 'hover': 'FFE7D4', 'border': 'F1D3BD', 'text': '342B26'}
@@ -77,6 +78,41 @@ def theme(text):
     return text
 
 
+def cad_control_contrast(text):
+    # The canvas keeps its technical dark palette; inactive chrome controls
+    # must use a pale fill under the shared dark chrome text in both modes.
+    for before in ('control: Color32::from_rgb(0x50, 0x5a, 0x6d),',
+                   'control: Color32::from_rgb(0xdc, 0xe0, 0xe6),'):
+        if text.count(before) != 1:
+            raise ValueError('Unreviewed CAD inactive-control contrast contract')
+    for before in ('control: Color32::from_rgb(0x50, 0x5a, 0x6d),',
+                   'control: Color32::from_rgb(0xdc, 0xe0, 0xe6),'):
+        text = text.replace(before, 'control: Color32::from_rgb(0xFF, 0xFA, 0xF6),', 1)
+    return text
+
+
+def film_meter_contrast(text):
+    # These three foregrounds sit on the deliberately dark meter/readout.
+    # Names and the dB footer below the bars remain dark on the pale panel.
+    light = 'egui::Color32::from_rgb(0xF4, 0xF4, 0xF4)'
+    # The upstream Light mode uses pale grey meters. Keep its original dark
+    # foreground, while the unchanged black/dark mode gets explicit light ink.
+    readout_dim = 'if t.meter_readout_bg.r() < 128 { ' + light + ' } else { t.text_dim }'
+    readout_text = 'if t.meter_readout_bg.r() < 128 { ' + light + ' } else { t.text }'
+    scale_dim = 'if t.meter_bg.r() < 128 { ' + light + ' } else { t.text_dim }'
+    replacements = (
+        ('*label, Tokens::ui(READOUT_FONT), t.text_dim);', '*label, Tokens::ui(READOUT_FONT), ' + readout_dim + ');'),
+        ('} else if hot {\n                t.hot_text\n            } else {\n                t.text\n            };',
+         '} else if hot {\n                t.hot_text\n            } else {\n                ' + readout_text + '\n            };'),
+        ('db.to_string(), Tokens::ui(SCALE_FONT), t.text_dim);', 'db.to_string(), Tokens::ui(SCALE_FONT), ' + scale_dim + ');'),
+    )
+    if any(text.count(before) != 1 for before, _ in replacements):
+        raise ValueError('Unreviewed Film dark-meter contrast contract')
+    for before, after in replacements:
+        text = text.replace(before, after, 1)
+    return text
+
+
 def icon_assets(source, app):
     from PIL import Image
     row, original, image = next(r for r in originals() if r[0]['id'] == app)
@@ -143,7 +179,11 @@ def transform_source(source, app):
         if relative.startswith('crates/ui-egui/') and path.suffix == '.rs':
             foreground = 'ink' if app == 'launcher' else 'text'
             new = re.sub(r'\.color\((t|tokens)\.accent\)', lambda m: '.color(' + m[1] + '.' + foreground + ')', new)
-        if app == 'grid':
+        if app == 'cad' and relative == 'crates/ui-egui/src/theme.rs':
+            new = cad_control_contrast(new)
+        elif app == 'film' and relative == 'crates/ui-egui/src/panels/meters.rs':
+            new = film_meter_contrast(new)
+        elif app == 'grid':
             if relative == 'crates/ui-egui/src/ribbon.rs':
                 new = new.replace('frame(egui::Frame::NONE.fill(t.window))', 'frame(egui::Frame::NONE.fill(t.header_bg))')
             elif relative == 'crates/ui-egui/src/tabs.rs':
@@ -173,6 +213,7 @@ def transform_source(source, app):
             new = new.replace('"triangle_down", t.text_dim', '"triangle_down", t.counter_label').replace('format!("{st} · {dev}"), regular(10.0), t.text_dim', 'format!("{st} · {dev}"), regular(10.0), t.counter_label')
         elif app == 'launcher' and relative == 'crates/ui-egui/src/views.rs':
             new = new.replace('.alt_text(tl!("ArtCraft"))', '.alt_text("Bogo")')
+        new = chrome_contrast(app, relative, new)
         if new != old:
             path.write_text(new, encoding='utf-8')
     icon_assets(source, app)

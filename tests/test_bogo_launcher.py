@@ -114,6 +114,8 @@ class PublishedSourceOverlayTests(unittest.TestCase):
             self.assertIn('registry::catalog_family(&body, true)', backend)
             self.assertIn('registry::catalog_family(&body, false)', backend)
             self.assertIn('http.get_feed(registry::LEGACY_REGISTRY_URL)', backend)
+            self.assertIn('"photocraft": {"repo": "' + bogo.BOGO_REPOSITORY + '", "latest_release": {"tag": "v0.6.0"}', backend)
+            self.assertNotIn('"photocraft": {"repo": "' + bogo.LEGACY_REPOSITORY + '", "latest_release": {"tag": "v0.6.0"}', backend)
             self.assertIn('text.to_uppercase().replace("BOGO", "Bogo")', (root / 'crates/ui-egui/src/widgets.rs').read_text(encoding='utf-8'))
 
 

@@ -13,6 +13,19 @@ def once(text, before, after):
 
 
 def transform_packaging_source(source, app):
+    if app == 'pdf':
+        path = Path(source) / 'packaging/windows/test-msi.ps1'
+        if path.is_symlink() or not path.is_file():
+            raise ValueError('Missing regular PDF MSI publisher test source')
+        before = b"Assert-Equal $manufacturer[0] 'KIO' 'MSI manufacturer'"
+        after = b"Assert-Equal $manufacturer[0] 'Bogo' 'MSI manufacturer'"
+        data = path.read_bytes()
+        if data.splitlines().count(before) != 1 or data.count(before) != 1:
+            raise ValueError('Unreviewed PDF MSI publisher assertion contract')
+        # The original evaluator, scope cases, registry keys and legacy shortcut
+        # fixtures remain byte-exact; only its displayed publisher expectation changes.
+        path.write_bytes(data.replace(before, after, 1))
+        return ['packaging/windows/test-msi.ps1']
     if app not in APPS:
         return []
     path = Path(source) / 'packaging/windows/package.ps1'

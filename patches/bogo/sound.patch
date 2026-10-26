@@ -50936,10 +50936,25 @@ index 5aacbbd56bf3f37e67ab7531a478ea5855a94aef..88ef8c946458431d00c68b6cd0998ee7
                      }
                      if ui.button("Session Info").clicked() {
 diff --git a/crates/ui-egui/src/panels.rs b/crates/ui-egui/src/panels.rs
-index 8506df4590df12606c98952f26b67a3bf4ffd0ce..e48023906eb40522e2f5a7cf532873aedc255788 100644
+index 8506df4590df12606c98952f26b67a3bf4ffd0ce..3421f2f1b00c5b12959d7618845236351b1447c7 100644
 --- a/crates/ui-egui/src/panels.rs
 +++ b/crates/ui-egui/src/panels.rs
-@@ -594,7 +594,7 @@ fn about(app: &mut SoundApp, ctx: &egui::Context) {
+@@ -196,7 +196,13 @@ pub fn clip_list(app: &mut SoundApp, ui: &mut Ui) {
+     };
+     let fkey = egui::Id::new("clip_filter");
+     let mut filter: String = ui.ctx().memory(|m| m.data.get_temp(fkey)).unwrap_or_default();
+-    ui.add(egui::TextEdit::singleline(&mut filter).hint_text("🔍 Find clips").desired_width(f32::INFINITY));
++    ui.add(
++        egui::TextEdit::singleline(&mut filter)
++            .background_color(t.panel_bg2)
++            .text_color(t.text)
++            .hint_text(egui::RichText::new("🔍 Find clips").color(t.text))
++            .desired_width(f32::INFINITY),
++    );
+     ui.ctx().memory_mut(|m| m.data.insert_temp(fkey, filter.clone()));
+     let needle = filter.to_lowercase();
+     let items: Vec<_> = items.into_iter().filter(|(_, n, _, _, _)| needle.is_empty() || n.to_lowercase().contains(&needle)).collect();
+@@ -594,7 +600,7 @@ fn about(app: &mut SoundApp, ctx: &egui::Context) {
          return;
      }
      let tab_id = egui::Id::new("about_tab");
@@ -50948,7 +50963,7 @@ index 8506df4590df12606c98952f26b67a3bf4ffd0ce..e48023906eb40522e2f5a7cf532873ae
          let mut tab = ui.data_mut(|d| d.get_temp::<u8>(tab_id)).unwrap_or(0);
          ui.horizontal(|ui| {
              for (i, l) in (0u8..).zip(["About", "Contributors", "Models"]) {
-@@ -609,9 +609,9 @@ fn about(app: &mut SoundApp, ctx: &egui::Context) {
+@@ -609,9 +615,9 @@ fn about(app: &mut SoundApp, ctx: &egui::Context) {
              1 => crate::credits::contributors_ui(ui),
              2 => crate::credits::models_ui(ui),
              _ => {
@@ -51212,6 +51227,24 @@ index 41d83ac4db2668e736ad7435fe154540b8df66d2..51ce5c04a43154059bf686826f942ba1
      }
  }
  
+diff --git a/crates/ui-egui/src/widgets.rs b/crates/ui-egui/src/widgets.rs
+index d785c995c887cede47a251bf7a3b851cf71dab79..46b5d2d1e7aa4c6cba182b838cbcf81cc6b2cbb7 100644
+--- a/crates/ui-egui/src/widgets.rs
++++ b/crates/ui-egui/src/widgets.rs
+@@ -101,10 +101,11 @@ fn button_style(selected_fill: Color32, normal_icon: Color32, radius: u8) -> Ico
+     }
+ }
+ 
+-/// A toolbar button with an icon; `on` draws the blue selected state.
++/// A toolbar button with an icon; `on` draws the pale orange selected state.
+ pub fn icon_button(ui: &mut Ui, size: egui::Vec2, icon: &str, on: bool, tip: &str) -> Response {
+     let t = Tokens::current();
+-    let style = button_style(t.accent, t.text, 3);
++    let mut style = button_style(t.button_hi, t.text, 3);
++    style.selected.icon = t.text;
+     let resp = IconButton::new(tip, size, &style).selected(on).single_shape_frame().show(ui, |ui, r, tint| {
+         key_light(ui.painter(), r.shrink(1.0));
+         let s = r.height().min(r.width()) * 0.78;
 diff --git a/packaging/freebsd/package.sh b/packaging/freebsd/package.sh
 index c9e611a1504cac2699bc6b9730d4e6719918edf1..5f6e60f675194b486ff43cc5c153cc9d9353da12 100755
 --- a/packaging/freebsd/package.sh
