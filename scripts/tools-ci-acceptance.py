@@ -42,6 +42,7 @@ OLD_MACOS = ('https://github.com/qptywoei-sudo/kio-tools-releases/releases/downl
 ENVELOPE_PIN = (679016269, 'Bogo-Tools-4.6.23-candidate-update-envelope.json', 2374,
                 'e7d424e0d6e5797b25f388a6322cf26f3e98d2bbc88cde53d474cc92520d4f48')
 PUBLIC_KEY = 'JjeL9t/8GSrh2XZ25gawQyI475nXr/rU0li4CoEnfos='
+MAC_SIGNER_LEAF_SHA1 = '72287f8a5048cd206db014ead6723c75cd459379'
 
 
 def require(ok, message):
@@ -75,6 +76,18 @@ def executable_metadata(sha, size, target):
 def verify_executable(path, target):
     path=Path(path);require(path.is_file() and not path.is_symlink(),'Executable is not a plain file')
     return executable_metadata(digest(path),path.stat().st_size,target)
+
+
+def designated_requirement(returncode, stdout):
+    # codesign -d -r- writes its requirement to stdout, while Executable= goes
+    # to stderr. Match the actual stable source-policy requirement, not paths.
+    require(returncode==0 and isinstance(stdout,str) and len(stdout)<=16384,'codesign requirement command failed or exceeded bound')
+    lines=[line.strip() for line in stdout.splitlines() if line.strip().startswith('designated')]
+    require(len(lines)==1,'Missing/ambiguous designated requirement stdout')
+    match=re.fullmatch(r'designated\s*=>\s*identifier\s+"([^"\r\n]+)"\s+and\s+certificate\s+leaf\s*=\s*H"([a-fA-F0-9]{40})"',lines[0])
+    require(match is not None and match.group(1)=='local.galaxycontrol.portable'
+            and match.group(2).lower()==MAC_SIGNER_LEAF_SHA1,'Designated identifier or stable signing certificate differs')
+    return {'identifier':match.group(1),'certificateLeafSha1':match.group(2).lower(),'sourceStream':'stdout'}
 
 
 def macos_archive_executable_members(assets):
@@ -311,6 +324,31 @@ def inventory(path):
     return result
 
 
+def tree_difference(expected, actual, expected_root, actual_root, limit=200):
+    """Bounded code-only diagnostics. Never read or include profile/content data."""
+    require(type(limit) is int and 1<=limit<=200,'Invalid tree diagnostic bound')
+    def row(path, values, root, prefix):
+        normalized=str(path).replace('\\','/');parts=member_path(normalized).parts
+        file=Path(root).joinpath(*parts);value=values[path]
+        sha=value if re.fullmatch(r'[0-9a-f]{64}',value) else hashlib.sha256(value.encode('utf-8')).hexdigest()
+        size=file.lstat().st_size if file.exists() or file.is_symlink() else None
+        return {'path':normalized,prefix+'Sha256':sha,prefix+'Bytes':size}
+    missing=sorted(set(expected)-set(actual));added=sorted(set(actual)-set(expected))
+    changed=[p for p in sorted(set(expected)&set(actual)) if expected[p]!=actual[p]]
+    rows=[]
+    for kind,paths in [('missing',missing),('added',added),('changed',changed)]:
+        for path in paths:
+            if len(rows)>=limit:break
+            data={'kind':kind}
+            if kind!='added':data.update(row(path,expected,expected_root,'expected'))
+            if kind!='missing':data.update(row(path,actual,actual_root,'actual'))
+            rows.append(data)
+    def binding(values):return hashlib.sha256(json.dumps(sorted(values.items()),ensure_ascii=False,separators=(',',':')).encode('utf-8')).hexdigest()
+    return {'matches':expected==actual,'missingCount':len(missing),'addedCount':len(added),'changedCount':len(changed),
+        'expectedFileCount':len(expected),'actualFileCount':len(actual),'expectedInventorySha256':binding(expected),
+        'actualInventorySha256':binding(actual),'entryLimit':limit,'truncated':len(missing)+len(added)+len(changed)>len(rows),'differences':rows}
+
+
 def pe_resources(path):
     data = Path(path).read_bytes(); u16 = lambda at: struct.unpack_from('<H', data, at)[0]; u32 = lambda at: struct.unpack_from('<I', data, at)[0]
     require(data[:2] == b'MZ', 'Not a PE file'); pe = u32(60); require(data[pe:pe+4] == b'PE\0\0', 'Not a PE signature')
@@ -527,15 +565,25 @@ def stop_mac(app, observer, env):
         else:raise RuntimeError('Owned Mac application did not terminate')
 
 
-def mac_probe(app, source, work, output, env, observer, *, launched_pid=None, label='mac'):
+def mac_bundle_metadata(app, output, env, label):
     import plistlib
     meta=plistlib.loads((app/'Contents/Info.plist').read_bytes())
+    observed={key:meta.get(key) for key in ['CFBundleName','CFBundleDisplayName','CFBundleIdentifier','CFBundleShortVersionString','CFBundleVersion','CFBundleIconFile','CFBundleExecutable']}
+    write_json(output/(label+'-bundle-info.json'),observed)
     require(meta.get('CFBundleName')==meta.get('CFBundleDisplayName')=='Bogo Tools' and meta.get('CFBundleIdentifier')=='local.galaxycontrol.portable' and meta.get('CFBundleShortVersionString')==VERSION,'Actual bundle metadata mismatch')
-    verify_executable(app/'Contents/MacOS/KIOControl','macos')
+    executable=verify_executable(app/'Contents/MacOS/KIOControl','macos')
     require(digest(app/'Contents/Resources/KIOTools.icns')==ICNS_SHA,'Actual Mac ICNS differs')
-    subprocess.run(['/usr/bin/codesign','--verify','--deep','--strict',str(app)],check=True,capture_output=True,env=env)
+    strict=subprocess.run(['/usr/bin/codesign','--verify','--deep','--strict',str(app)],capture_output=True,text=True,env=env)
     signature=subprocess.run(['/usr/bin/codesign','-d','-r-',str(app)],capture_output=True,text=True,env=env)
-    require(signature.returncode==0 and 'local.galaxycontrol.portable' in signature.stderr,'Designated requirement absent')
+    write_json(output/(label+'-codesign.json'),{'strictVerifyReturnCode':strict.returncode,'strictVerifyStdout':strict.stdout[:16384],
+        'strictVerifyStderr':strict.stderr[:16384],'requirementReturnCode':signature.returncode,'requirementStdout':signature.stdout[:16384],'requirementStderr':signature.stderr[:16384]})
+    require(strict.returncode==0,'Actual codesign --verify --deep --strict failed')
+    requirement=designated_requirement(signature.returncode,signature.stdout)
+    return {'bundleInfo':observed,'executable':executable,'icnsSha256':ICNS_SHA,'strictSignatureVerified':True,'designatedRequirement':requirement}
+
+
+def mac_probe(app, source, work, output, env, observer, *, launched_pid=None, label='mac'):
+    metadata=mac_bundle_metadata(app,output,env,label)
     # A pure preexisting self-check supplements, never replaces, normal GUI launch.
     pure=subprocess.run([str(app/'Contents/MacOS/KIOControl'),'--self-check'],capture_output=True,env=env,timeout=45)
     require(pure.returncode==0,'Frozen Mac pure self-check failed')
@@ -554,7 +602,7 @@ def mac_probe(app, source, work, output, env, observer, *, launched_pid=None, la
         require('Bogo Tools' in result.get('finderDisplayName','') and result.get('infoBundleDisplayName')=='Bogo Tools','Actual OS Finder/Info display name still differs: '+str(result.get('finderDisplayName')))
         require('Bogo Tools' in result.get('windowTitle',''),'Own actual Mac title is not Bogo Tools')
         require(result['paletteCounts']['FFF3E8']>20 and result['paletteCounts']['FFFAF6']>100,'Actual Mac window lacks pale Tools chrome')
-        result.update(backend=backend,signatureVerified=True,pureSelfCheckSupplement=True,iconSourceComparison='OS NSRunningApplication/NSWorkspace PNGs retained for visual review; not claimed exact if OS representation differs',visualReviewRequired=True)
+        result.update(backend=backend,signatureVerified=True,bundleMetadata=metadata,pureSelfCheckSupplement=True,iconSourceComparison='OS NSRunningApplication/NSWorkspace PNGs retained for visual review; not claimed exact if OS representation differs',visualReviewRequired=True)
         return result
     finally:
         stop_mac(app,observer,env)
@@ -609,7 +657,10 @@ def windows_upgrade(assets, work, source, output, env):
         require(canary.read_text(encoding='utf-8')==user.read_text(encoding='utf-8')==nonce,'Profile/user document canary changed')
         verify_executable(prior/'KIOControl.exe','windows')
         installed=inventory(prior);installed.pop('bogo-ci-user-document.txt',None)
-        require(installed==inventory(work/'independent-update/KIO-Control-Windows'),'Actual upgraded Windows managed tree differs from frozen update')
+        reference=work/'independent-update/KIO-Control-Windows';expected=inventory(reference)
+        difference=tree_difference(expected,installed,reference,prior)
+        write_json(output/'windows-upgrade-tree-difference.json',difference)
+        require(installed==expected,'Actual upgraded Windows managed tree differs from frozen update; see windows-upgrade-tree-difference.json')
         pid=windows_pid(prior/'KIOControl.exe',env)
         current=health(state,pid,VERSION);gui=windows_probe(prior/'KIOControl.exe',pid,source,output,env,'windows-upgraded')
     finally:stop_windows_path(prior/'KIOControl.exe',env)
@@ -723,7 +774,9 @@ def accept(root, target):
                 with (work/'portable-private-process.log').open('wb') as log:subprocess.Popen([str(portable)],env=environment,stdout=log,stderr=subprocess.STDOUT)
                 pid=windows_pid(cached,environment)
                 verify_executable(cached,'windows')
-                require(inventory(cached.parent)==inventory(update),'Actual SFX-extracted file tree differs from independently downloaded frozen update')
+                expected,actual=inventory(update),inventory(cached.parent)
+                write_json(output/'windows-portable-tree-difference.json',tree_difference(expected,actual,update,cached.parent))
+                require(actual==expected,'Actual SFX-extracted file tree differs from independently downloaded frozen update; see windows-portable-tree-difference.json')
                 report['checks']['portableUpdateSourceBinding']['actualSfxExtractedFileTreeExact']=True
                 report['checks']['portableBackend']=health(state_root(target),pid,VERSION)
                 report['checks']['portableGui']=windows_probe(cached,pid,source,output,environment,'windows-portable')

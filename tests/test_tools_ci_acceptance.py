@@ -236,6 +236,17 @@ class GuardTests(unittest.TestCase):
             self.assertIn('actual sha256='+sha,str(caught.exception));self.assertIn('actual',str(caught.exception))
             self.assertIn('bytes='+str(size),str(caught.exception));self.assertNotIn(str(self.root),str(caught.exception))
 
+    def test_designated_requirement_uses_actual_frozen_stdout_not_executable_stderr(self):
+        # Exact stdout/stderr captured read-only from the frozen signed bundle.
+        stdout='designated => identifier "local.galaxycontrol.portable" and certificate leaf = H"72287f8a5048cd206db014ead6723c75cd459379"\n'
+        stderr='Executable=/Volumes/KIO_SSD/KIO/Build/Bogo-Tools-20261026/4.6.23/stage/Bogo Tools.app/Contents/MacOS/KIOControl\n'
+        value=m.designated_requirement(0,stdout)
+        self.assertEqual(value,{'identifier':'local.galaxycontrol.portable','certificateLeafSha1':'72287f8a5048cd206db014ead6723c75cd459379','sourceStream':'stdout'})
+        for code,body in [(1,stdout),(0,''),(0,stderr),(0,stdout.replace('local.galaxycontrol.portable','other.identifier')),
+                          (0,stdout.replace('72287f8a5048cd206db014ead6723c75cd459379','0'*40)),
+                          (0,stdout+stdout),(0,stdout.rstrip()+' or true\n'),(0,'x'*16385)]:
+            with self.subTest(code=code,body=body[:60]),self.assertRaises(ValueError):m.designated_requirement(code,body)
+
     def test_platform_matrix_is_closed_identical_and_default_all(self):
         workflow=HERE/'tools-ci-acceptance.yml'
         if not workflow.is_file():workflow=HERE.parent/'.github/workflows/bogo-tools-acceptance.yml'
@@ -359,6 +370,32 @@ class ArchiveTests(unittest.TestCase):
             with patch.dict(m.EXE_SHA,{'macos':'0'*64}),self.assertRaises(ValueError):m.macos_archive_executable_members(self.root)
             with (self.root/'macos-update.zip').open('ab') as f:f.write(b'tampered outer archive')
             with self.assertRaises(ValueError):m.macos_archive_executable_members(self.root)
+
+    def test_exact_tree_difference_reports_changed_missing_added_without_waiver(self):
+        expected=self.root/'expected';actual=self.root/'actual';expected.mkdir();actual.mkdir()
+        for root in (expected,actual):(root/'same.exe').write_bytes(b'same public code')
+        (expected/'changed.exe').write_bytes(b'expected signed code');(actual/'changed.exe').write_bytes(b'changed code')
+        (expected/'missing.dll').write_bytes(b'missing signed code');(actual/'added.tmp').write_bytes(b'unknown runtime file')
+        left,right=m.inventory(expected),m.inventory(actual)
+        result=m.tree_difference(left,right,expected,actual)
+        self.assertFalse(result['matches']);self.assertEqual((result['missingCount'],result['addedCount'],result['changedCount']),(1,1,1))
+        rows={r['path']:r for r in result['differences']}
+        self.assertEqual(rows['changed.exe']['expectedSha256'],hashlib.sha256(b'expected signed code').hexdigest())
+        self.assertEqual(rows['changed.exe']['actualSha256'],hashlib.sha256(b'changed code').hexdigest())
+        self.assertEqual(rows['changed.exe']['actualBytes'],len(b'changed code'))
+        self.assertEqual(rows['added.tmp']['kind'],'added');self.assertEqual(rows['missing.dll']['kind'],'missing')
+        text=json.dumps(result)
+        self.assertNotIn('unknown runtime file',text);self.assertNotIn(str(self.root),text)
+        self.assertTrue(m.tree_difference(left,left,expected,expected)['matches'])
+
+    def test_tree_diagnostic_bound_never_hides_a_failure_or_traverses_profile(self):
+        actual=self.root/'actual';actual.mkdir()
+        for n in range(205):(actual/('added-'+str(n))).write_bytes(b'public fixture')
+        result=m.tree_difference({},m.inventory(actual),self.root,actual)
+        self.assertFalse(result['matches']);self.assertEqual(result['addedCount'],205)
+        self.assertTrue(result['truncated']);self.assertEqual(len(result['differences']),200)
+        with self.assertRaises(ValueError):m.tree_difference({}, {'../profile/session.json':'0'*64},self.root,actual)
+        with self.assertRaises(ValueError):m.tree_difference({}, {},self.root,actual,limit=201)
 
 
 if __name__=='__main__':unittest.main()
