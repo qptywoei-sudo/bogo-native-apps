@@ -45,6 +45,7 @@ ENVELOPE_PIN = (679634075, 'Bogo-Tools-4.6.23-candidate-update-envelope.json', 2
                 '04210060a4ec938bdb31d23e8b4219be80207e9e150e94fb0da9cb7033c2b9f1')
 PUBLIC_KEY = 'JjeL9t/8GSrh2XZ25gawQyI475nXr/rU0li4CoEnfos='
 MAC_SIGNER_LEAF_SHA1 = '72287f8a5048cd206db014ead6723c75cd459379'
+PORTABLE_SOURCE_SHA = '4c9dbc3c63da77f8ce77555ded0d2fcd9e0e8aab8c4141305ca2d85d0cdabab2'
 
 
 def require(ok, message):
@@ -500,6 +501,155 @@ def windows_pid(executable, env, timeout=120):
         if len(value['pids'])==1:return int(value['pids'][0])
         require(len(value['pids'])<=1,'Multiple own exact-path native processes');time.sleep(.3)
     raise RuntimeError('Exact-path native Windows process did not start')
+
+
+SFX_PROBE=r'''
+Add-Type @'
+using System;using System.Text;using System.Collections.Generic;using System.Runtime.InteropServices;
+public class BogoSfxProbe {
+ delegate bool E(IntPtr h,IntPtr p);
+ [DllImport("user32.dll")]static extern bool EnumWindows(E e,IntPtr p);
+ [DllImport("user32.dll")]static extern bool EnumChildWindows(IntPtr h,E e,IntPtr p);
+ [DllImport("user32.dll")]static extern uint GetWindowThreadProcessId(IntPtr h,out uint p);
+ [DllImport("user32.dll",CharSet=CharSet.Unicode)]static extern int GetClassName(IntPtr h,StringBuilder b,int n);
+ [DllImport("user32.dll",CharSet=CharSet.Unicode)]static extern int GetWindowText(IntPtr h,StringBuilder b,int n);
+ [DllImport("user32.dll",CharSet=CharSet.Unicode)]static extern IntPtr SendMessageTimeout(IntPtr h,uint m,UIntPtr w,StringBuilder b,uint f,uint ms,out UIntPtr r);
+ public static string[] KnownErrors(uint own,string[] allowed) {
+  var found=new List<string>();var known=new HashSet<string>(allowed,StringComparer.Ordinal);
+  EnumWindows((h,p)=>{uint pid;GetWindowThreadProcessId(h,out pid);if(pid!=own)return true;
+   var c=new StringBuilder(64);var title=new StringBuilder(128);GetClassName(h,c,c.Capacity);GetWindowText(h,title,title.Capacity);
+   if(c.ToString()!="#32770"||title.ToString()!="Bogo Tools")return true;
+   EnumChildWindows(h,(child,q)=>{uint owner;GetWindowThreadProcessId(child,out owner);if(owner!=own)return true;
+    var text=new StringBuilder(1024);UIntPtr result;SendMessageTimeout(child,13,(UIntPtr)1024,text,0x23,200,out result);
+    var value=text.ToString();if(known.Contains(value)&&!found.Contains(value))found.Add(value);return true;},IntPtr.Zero);
+   return true;},IntPtr.Zero);return found.ToArray();
+ }
+}
+'@
+function Summary($p) {
+ if ($null -eq $p) { return $null }
+ return @{pid=[int]$p.ProcessId;parentPid=[int]$p.ParentProcessId;kernelTime=[long]$p.KernelModeTime;userTime=[long]$p.UserModeTime;readBytes=[long]$p.ReadTransferCount;writeBytes=[long]$p.WriteTransferCount}
+}
+$parent=Get-CimInstance Win32_Process -Filter ('ProcessId='+$env:BOGO_SFX_PID)
+$parentExact=$null -ne $parent -and $parent.ExecutablePath -eq $env:BOGO_SFX_EXE
+$children=@(Get-CimInstance Win32_Process -Filter ('ParentProcessId='+$env:BOGO_SFX_PID))
+$tar=@($children|Where-Object {$_.ExecutablePath -eq $env:BOGO_SYSTEM_TAR}|ForEach-Object {Summary $_})
+$native=@(Get-CimInstance Win32_Process -Filter "Name='KIOControl.exe'"|Where-Object {$_.ExecutablePath -eq $env:BOGO_NATIVE_EXE}|ForEach-Object {[int]$_.ProcessId})
+$allowed=[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($env:BOGO_SFX_ERRORS))|ConvertFrom-Json
+@{launcher=if($parentExact){Summary $parent}else{$null};launcherImageExact=[bool]$parentExact;tarChildren=@($tar);otherDirectChildCount=($children.Count-$tar.Count);nativePids=@($native);knownErrorDialogs=@([BogoSfxProbe]::KnownErrors([uint32]$env:BOGO_SFX_PID,[string[]]$allowed))}|ConvertTo-Json -Depth 8 -Compress
+'''
+
+
+def portable_failure_texts(source):
+    file=Path(source)/'windows/PortableLauncher.cpp'
+    require(file.is_file() and not file.is_symlink() and digest(file)==PORTABLE_SOURCE_SHA,'Frozen SFX public error-source binding differs')
+    text=file.read_text(encoding='utf-8');fail=text.split('static void fail() {',1)[1].split('static bool plainDirectory',1)[0]
+    values=re.findall(r'L"([^"\\]{30,1023})"',fail)
+    require(len(values)==len(set(values))==6 and all('Bogo Tools'in v for v in values),'Frozen SFX fixed-error whitelist differs')
+    return values
+
+
+def portable_cache_status(cached):
+    cached=Path(cached);local=Path(os.environ['LOCALAPPDATA']);root=local/'KIO Tools'/VERSION
+    require(cached==root/'KIO-Control-Windows/KIOControl.exe','SFX telemetry escaped the exact source-bound cache path')
+    for ancestor in [root,*root.parents]:
+        if ancestor.exists() or ancestor.is_symlink():
+            st=ancestor.lstat();require(stat.S_ISDIR(st.st_mode) and not stat.S_ISLNK(st.st_mode)
+                and not(getattr(st,'st_file_attributes',0)&0x400),'SFX cache has linked/reparse ancestry')
+        if ancestor==local:break
+    result={'rootExists':root.is_dir(),'files':0,'bytes':0,'directories':0,'markerExists':False,'nativeExists':False}
+    if not root.exists():return result
+    for folder,dirs,files in os.walk(root,followlinks=False):
+        require(len(Path(folder).relative_to(root).parts)<=32,'SFX cache depth exceeds bound')
+        result['directories']+=len(dirs);require(result['directories']<=10000,'SFX cache directory bound exceeded')
+        for name in dirs:
+            p=Path(folder)/name;st=p.lstat();require(stat.S_ISDIR(st.st_mode) and not stat.S_ISLNK(st.st_mode)
+                and not(getattr(st,'st_file_attributes',0)&0x400),'SFX cache linked directory refused')
+        for name in files:
+            p=Path(folder)/name
+            try:st=p.lstat()
+            except FileNotFoundError:
+                result['transientVanishedFiles']=result.get('transientVanishedFiles',0)+1;continue
+            require(stat.S_ISREG(st.st_mode) and not stat.S_ISLNK(st.st_mode)
+                and not(getattr(st,'st_file_attributes',0)&0x400),'SFX cache special/linked file refused')
+            result['files']+=1;result['bytes']+=st.st_size
+            require(result['files']<=5000 and result['bytes']<=8*1024**3,'SFX cache file/byte bound exceeded')
+    marker=root/'ready';result['markerExists']=marker.is_file();result['nativeExists']=cached.is_file()
+    if result['markerExists']:result['markerBytes']=marker.stat().st_size
+    if result['nativeExists']:result['nativeBytes']=cached.stat().st_size
+    payload=root/'payload.zip';result['payloadZipExists']=payload.is_file()
+    if payload.is_file():result['payloadZipBytes']=payload.stat().st_size
+    return result
+
+
+def portable_wait_decision(elapsed,last_progress,verified_alive,native_pids,exit_code,known_errors):
+    require(type(verified_alive)is bool and type(native_pids)is list and len(native_pids)<=1
+            and all(type(pid)is int and pid>1 for pid in native_pids),'Invalid exact-process SFX telemetry')
+    require(type(elapsed)in(int,float) and type(last_progress)in(int,float) and 0<=last_progress<=elapsed,'Invalid SFX progress clock')
+    if elapsed>=600:return 'finite-extraction-bound'
+    if known_errors:return 'fixed-source-error-dialog'
+    if exit_code is not None and exit_code!=0:return 'launcher-nonzero-exit'
+    if native_pids:return 'native-observed'
+    if elapsed>120 and(not verified_alive or elapsed-last_progress>45):return 'no-verified-extraction-progress'
+    return 'continue'
+
+
+def sfx_progress_key(snapshot,cache):
+    def counters(p):return tuple(p.get(k)for k in('pid','kernelTime','userTime','readBytes','writeBytes'))if p else None
+    return (cache['files'],cache['bytes'],cache['markerExists'],cache['nativeExists'],
+            counters(snapshot.get('launcher')),tuple(counters(row)for row in snapshot['tarChildren']))
+
+
+def portable_process_snapshot(environment):
+    exe=Path(os.environ.get('SystemRoot',r'C:\Windows'))/'System32/WindowsPowerShell/v1.0/powershell.exe'
+    run=subprocess.run([str(exe),'-NoProfile','-NonInteractive','-Command',SFX_PROBE],env=environment,
+        capture_output=True,text=True,encoding='utf-8',errors='replace',timeout=30)
+    require(run.returncode==0,'SFX public metadata probe failed; code='+str(run.returncode)+'; '+run.stderr[:2000])
+    require(len(run.stdout)<=65536,'SFX metadata output exceeds bound')
+    return json.loads(run.stdout.strip().lstrip('\ufeff'))
+
+
+def wait_portable_launcher(process,launcher,cached,source,output,env):
+    launcher,cached=Path(launcher),Path(cached);errors=portable_failure_texts(source)
+    tar=Path(os.environ.get('SystemRoot',r'C:\Windows'))/'System32/tar.exe'
+    require(tar.is_file() and not tar.is_symlink() and not(tar.lstat().st_file_attributes&0x400),'System tar is not the plain source-selected executable')
+    tar_sha=digest(tar);launcher_sha=digest(launcher)
+    report={'status':'observing','launcherPid':process.pid,'launcherPath':str(launcher),'launcherSha256':launcher_sha,
+        'launcherBytes':launcher.stat().st_size,'systemTarPath':str(tar),'systemTarSha256':tar_sha,'nativeExpectedPath':str(cached),
+        'originalUnconditionalWaitSeconds':120,'finiteMaximumSeconds':600,'extensionRequiresOwnVerifiedAliveAndProgressWithinSeconds':45,
+        'profileOrPrivateLogsRead':False,'telemetryClickedDialogsOrStoppedProcesses':False,'samples':[]}
+    path=output/'windows-portable-launcher-telemetry.json';start=time.monotonic();last_progress=0;previous=None
+    environment=dict(env,BOGO_SFX_PID=str(process.pid),BOGO_SFX_EXE=str(launcher.resolve()),BOGO_SYSTEM_TAR=str(tar.resolve()),
+        BOGO_NATIVE_EXE=str(cached.resolve()),BOGO_SFX_ERRORS=base64.b64encode(json.dumps(errors,ensure_ascii=False).encode('utf-8')).decode('ascii'))
+    try:
+        while True:
+            snapshot=portable_process_snapshot(environment);cache=portable_cache_status(cached);elapsed=time.monotonic()-start
+            require(len(snapshot['tarChildren'])<=1 and all(row.get('parentPid')==process.pid and type(row.get('pid'))is int and row['pid']>1 for row in snapshot['tarChildren']),
+                    'SFX direct system-tar child identity differs')
+            require(all(text in errors for text in snapshot['knownErrorDialogs']),'SFX public-error whitelist escaped')
+            parent=snapshot.get('launcher');require(not parent or(parent.get('pid')==process.pid and snapshot['launcherImageExact']is True),'SFX parent identity differs')
+            exit_code=process.poll();alive=(exit_code is None and parent is not None)or bool(snapshot['tarChildren'])
+            key=sfx_progress_key(snapshot,cache)
+            if previous is not None and key!=previous:last_progress=elapsed
+            previous=key
+            sample={'elapsedSeconds':round(elapsed,3),'lastProgressSeconds':round(last_progress,3),'launcherExitCode':exit_code,
+                'verifiedSourceLauncherOrTarAlive':alive,'processes':snapshot,'cache':cache}
+            report['samples'].append(sample);require(len(report['samples'])<=122,'SFX sample bound exceeded')
+            report['diskFreeBytes']={'cacheDrive':shutil.disk_usage(Path(os.environ['LOCALAPPDATA'])).free,
+                                     'workDrive':shutil.disk_usage(output).free}
+            decision=portable_wait_decision(elapsed,last_progress,alive,snapshot['nativePids'],exit_code,snapshot['knownErrorDialogs'])
+            sample['decision']=decision;report['status']=decision;write_json(path,report)
+            if decision=='native-observed':
+                require(digest(launcher)==launcher_sha and digest(tar)==tar_sha,'Frozen launcher/system tar changed during launch')
+                return {'actualSfxPid':process.pid,'nativePidObserved':snapshot['nativePids'][0],'elapsedSeconds':round(elapsed,3),
+                    'telemetry':path.name,'normalSfxExecutedUnmodified':True,'boundedProgressPolicyUsed':elapsed>120}
+            if decision!='continue':
+                raise RuntimeError('Frozen SFX launch failed: '+decision+'; '+('; '.join(snapshot['knownErrorDialogs'])if snapshot['knownErrorDialogs']else' see windows-portable-launcher-telemetry.json'))
+            time.sleep(5)
+    finally:
+        # Keep only bounded, task-owned code/process metadata. Never upload the
+        # private process log/profile or stop an extractor/dialog/security UI.
+        write_json(path,report)
 
 
 def windows_window(pid, env, timeout=120, title='Bogo Tools'):
@@ -1040,7 +1190,8 @@ def accept(root, target):
             windows_runtime_tool(update,['capture','--root',cached.parent,'--output',preimage,'--fresh-portable'],environment)
             pid=None
             try:
-                with (work/'portable-private-process.log').open('wb') as log:subprocess.Popen([str(portable)],env=environment,stdout=log,stderr=subprocess.STDOUT)
+                with (work/'portable-private-process.log').open('wb') as log:launcher_process=subprocess.Popen([str(portable)],env=environment,stdout=log,stderr=subprocess.STDOUT)
+                report['checks']['portableLauncher']=wait_portable_launcher(launcher_process,portable,cached,source,output,environment)
                 pid=windows_pid(cached,environment)
                 verify_executable(cached,'windows')
                 expected,actual=inventory(update),inventory(cached.parent)

@@ -348,6 +348,87 @@ class GuardTests(unittest.TestCase):
         self.assertNotIn('installed==expected',upgrade)
 
 
+class PortableTelemetryTests(unittest.TestCase):
+    def setUp(self):
+        self.temp=tempfile.TemporaryDirectory();self.root=Path(self.temp.name).resolve()
+
+    def tearDown(self):self.temp.cleanup()
+
+    def test_finite_extension_requires_verified_alive_and_recent_own_progress(self):
+        self.assertEqual(m.portable_wait_decision(119,0,False,[],None,[]),'continue')
+        self.assertEqual(m.portable_wait_decision(121,119,True,[],None,[]),'continue')
+        for elapsed,last,alive in[(121,119,False),(121,1,True),(599,550,True)]:
+            with self.subTest(elapsed=elapsed,last=last,alive=alive):
+                self.assertEqual(m.portable_wait_decision(elapsed,last,alive,[],None,[]),'no-verified-extraction-progress')
+        for pids in([], [42]):
+            self.assertEqual(m.portable_wait_decision(600,599,True,pids,None,[]),'finite-extraction-bound')
+
+    def test_dialog_and_nonzero_exit_fail_even_if_a_pid_appeared(self):
+        self.assertEqual(m.portable_wait_decision(5,4,True,[],None,['known source message']),'fixed-source-error-dialog')
+        self.assertEqual(m.portable_wait_decision(5,4,False,[42],1,[]),'launcher-nonzero-exit')
+        self.assertEqual(m.portable_wait_decision(5,4,False,[42],0,[]),'native-observed')
+
+    def test_progress_clock_pid_shape_and_multiple_native_processes_fail_closed(self):
+        for args in[(10,11,True,[],None,[]),(10,-1,True,[],None,[]),(10,9,'yes',[],None,[]),
+                     (10,9,True,[0],None,[]),(10,9,True,[True],None,[]),(10,9,True,[42,43],None,[])]:
+            with self.subTest(args=args),self.assertRaises(ValueError):m.portable_wait_decision(*args)
+
+    def test_progress_uses_only_owned_counters_and_cache_not_wall_clock_or_disk_space(self):
+        p={'pid':42,'kernelTime':1,'userTime':2,'readBytes':3,'writeBytes':4}
+        snapshot={'launcher':p,'tarChildren':[],'unrelatedProcess':'ignored'}
+        cache={'files':1,'bytes':12,'markerExists':False,'nativeExists':False,'diskFree':999,'elapsed':0}
+        key=m.sfx_progress_key(snapshot,cache)
+        self.assertEqual(key,m.sfx_progress_key(dict(snapshot,unrelatedProcess='different'),dict(cache,diskFree=1,elapsed=999)))
+        self.assertNotEqual(key,m.sfx_progress_key(dict(snapshot,launcher=dict(p,readBytes=4)),cache))
+        self.assertNotEqual(key,m.sfx_progress_key(snapshot,dict(cache,files=2)))
+
+    def test_cache_status_fences_exact_owned_root_and_never_reads_file_contents(self):
+        local=self.root/'local';local.mkdir();parent=local/'KIO Tools'/m.VERSION;target=parent/'KIO-Control-Windows/KIOControl.exe'
+        with patch.dict(m.os.environ,{'LOCALAPPDATA':str(local)}):
+            self.assertFalse(m.portable_cache_status(target)['rootExists'])
+            target.parent.mkdir(parents=True);target.write_bytes(b'MZ owned public code');(parent/'ready').write_bytes(b'')
+            (local/'private-not-in-cache.txt').write_bytes(b'synthetic private data never read')
+            with patch.object(Path,'read_bytes',side_effect=AssertionError('cache content read forbidden')):
+                v=m.portable_cache_status(target)
+            self.assertEqual(v['files'],2);self.assertTrue(v['nativeExists']);self.assertEqual(v['markerBytes'],0)
+            self.assertNotIn('synthetic private',json.dumps(v));self.assertNotIn('private-not-in-cache',json.dumps(v))
+            with self.assertRaises(ValueError):m.portable_cache_status(self.root/'elsewhere/KIOControl.exe')
+            if os.name!='nt':
+                (target.parent/'linked-file').symlink_to(local/'private-not-in-cache.txt')
+                with self.assertRaisesRegex(ValueError,'linked'):m.portable_cache_status(target)
+
+    def test_only_six_source_hash_bound_public_error_messages_are_whitelisted(self):
+        source=self.root/'source/windows';source.mkdir(parents=True)
+        texts=['Bogo Tools fixed public failure message number '+str(i)for i in range(6)]
+        raw=('static void fail() {\n'+'\n'.join('L"'+s+'";'for s in texts)+'\n}\nstatic bool plainDirectory').encode()
+        file=source/'PortableLauncher.cpp';file.write_bytes(raw)
+        with patch.object(m,'PORTABLE_SOURCE_SHA',hashlib.sha256(raw).hexdigest()):
+            self.assertEqual(m.portable_failure_texts(source.parent),texts)
+        with self.assertRaises(ValueError):m.portable_failure_texts(source.parent)
+        file.write_bytes(raw.replace(texts[0].encode(),texts[1].encode()))
+        with patch.object(m,'PORTABLE_SOURCE_SHA',hashlib.sha256(file.read_bytes()).hexdigest()),self.assertRaises(ValueError):
+            m.portable_failure_texts(source.parent)
+
+    def test_telemetry_does_not_stop_processes_click_security_ui_or_upload_private_logs(self):
+        source=SCRIPT.read_text(encoding='utf-8');tree=ast.parse(source)
+        names=('wait_portable_launcher','portable_process_snapshot','portable_cache_status')
+        blocks='\n'.join(ast.get_source_segment(source,n)for n in tree.body if isinstance(n,ast.FunctionDef)and n.name in names)
+        for forbidden in('terminate(','kill(','Stop-Process','read_bytes(','private-process.log','SetForegroundWindow','SendKeys'):
+            self.assertNotIn(forbidden,blocks)
+        self.assertIn('pid!=own',m.SFX_PROBE);self.assertIn('owner!=own',m.SFX_PROBE)
+        self.assertIn('c.ToString()!="#32770"',m.SFX_PROBE);self.assertIn('title.ToString()!="Bogo Tools"',m.SFX_PROBE)
+        self.assertIn('known.Contains(value)',m.SFX_PROBE);self.assertNotIn('CommandLine',m.SFX_PROBE)
+
+    def test_original_real_native_hash_gui_icon_health_ini_gates_follow_telemetry(self):
+        source=SCRIPT.read_text(encoding='utf-8');tree=ast.parse(source)
+        body=ast.get_source_segment(source,next(n for n in tree.body if isinstance(n,ast.FunctionDef)and n.name=='accept'))
+        start=body.index("report['checks']['portableLauncher']=wait_portable_launcher(")
+        for token in('pid=windows_pid(cached,environment)',"verify_executable(cached,'windows')",
+                      "report['checks']['portableBackend']=health(","'--source',assets/PINS['source'][1],'--exe',cached",
+                      "report['checks']['portableGui']=windows_probe("):
+            self.assertGreater(body.index(token),start)
+
+
 class ToolsIcoFrameTests(unittest.TestCase):
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory();self.root=Path(self.temp.name)
