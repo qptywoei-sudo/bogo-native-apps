@@ -110,6 +110,22 @@ def _file_identity(st):
     return st.st_dev, st.st_ino, st.st_size, st.st_mtime_ns, st.st_ctime_ns
 
 
+def _require_same_file(before, after, message, relative, phase):
+    # Diagnostic derivative ONLY. Keep every original identity comparison;
+    # observe raw Windows lstat/fstat values before deciding any repair policy.
+    if _file_identity(before) != _file_identity(after):
+        fields=('st_dev','st_ino','st_size','st_mtime_ns','st_ctime_ns','st_mode','st_nlink','st_file_attributes')
+        diagnostic={'phase':phase,'relativePath':safe_relative(relative)[:120],
+                    'before':{key:getattr(before,key,None) for key in fields},
+                    'after':{key:getattr(after,key,None) for key in fields},
+                    'identityGateUnchanged':True}
+        text=json.dumps(diagnostic,separators=(',',':'),sort_keys=True)
+        require(len(text)<=1536,'File identity diagnostic bound exceeded')
+        error=Rejected(message+'; rawFileIdentity='+text)
+        error.file_identity_diagnostic=diagnostic
+        raise error
+
+
 def _regular_unlinked(path):
     st = path.lstat()
     require(stat.S_ISREG(st.st_mode) and not stat.S_ISLNK(st.st_mode)
@@ -132,11 +148,11 @@ def read_owned(root, relative, maximum):
     require(before.st_size <= maximum, 'File exceeds read bound')
     flags = os.O_RDONLY | getattr(os, 'O_BINARY', 0) | getattr(os, 'O_NOFOLLOW', 0)
     with os.fdopen(os.open(path, flags), 'rb') as stream:
-        require(_file_identity(os.fstat(stream.fileno())) == _file_identity(before), 'File changed while opening')
+        _require_same_file(before,os.fstat(stream.fileno()),'File changed while opening',relative,'after-open-fstat')
         data = stream.read(maximum + 1)
         require(len(data) <= maximum, 'File exceeds read bound')
-        require(_file_identity(os.fstat(stream.fileno())) == _file_identity(before), 'File changed during read')
-    require(_file_identity(_regular_unlinked(path)) == _file_identity(before), 'File replaced during read')
+        _require_same_file(before,os.fstat(stream.fileno()),'File changed during read',relative,'after-read-fstat')
+    _require_same_file(before,_regular_unlinked(path),'File replaced during read',relative,'after-read-lstat')
     return data, before
 
 
@@ -409,6 +425,8 @@ def cli(argv=None):
         message=str(error)[:400]if isinstance(error,Rejected)else'Filesystem/source validation failed'
         failure={'schemaVersion':1,'status':'failed','errorType':type(error).__name__,'message':message,
                  'nativeOsExecutionPerformedByValidator':False}
+        if isinstance(error,Rejected) and hasattr(error,'file_identity_diagnostic'):
+            failure['fileIdentityDiagnostic']=error.file_identity_diagnostic
         try:_write_output(args.output,failure,args.root)
         except Exception:pass
         print(json.dumps(failure));return 1

@@ -140,6 +140,7 @@ class ExactManagedTreeAndPreferences(unittest.TestCase):
     def setUpClass(cls):
         cls.temp = tempfile.TemporaryDirectory(prefix='owned-managed-tree-', dir=HERE)
         cls.root = Path(cls.temp.name)
+        cls.windows_root = str(cls.root.resolve()) if os.name == 'nt' else WINDOWS_ROOT
         cls.source = cls.root / 'tools/engine/engine.py'; cls.source.parent.mkdir(parents=True)
         cls.source.write_bytes(SOURCE); os.utime(cls.source, (1793000000, 1793000000))
         cls.inventory = {'tools/engine/engine.py': {'bytes': len(SOURCE), 'sha256': v.sha256(SOURCE)}}
@@ -156,13 +157,13 @@ class ExactManagedTreeAndPreferences(unittest.TestCase):
         ini = self.root / v.INI; canary = self.root / v.CANARY
         ini.write_bytes(b'[input]\r\nkeyboard=sdk\r\nmouse=uhid\r\n')
         canary.write_bytes(b'owned synthetic user-data sentinel')
-        pre = v.capture_preimage(self.root, WINDOWS_ROOT)
-        sentinel = v.capture_preimage(self.root, WINDOWS_ROOT, v.CANARY)
+        pre = v.capture_preimage(self.root, self.windows_root)
+        sentinel = v.capture_preimage(self.root, self.windows_root, v.CANARY)
         cache = self.root / CACHE; cache.parent.mkdir()
         py_compile.compile(str(self.source), cfile=str(cache),
-                           dfile=v.windows_filename(WINDOWS_ROOT, 'tools/engine/engine.py'), doraise=True, optimize=0)
+                           dfile=v.windows_filename(self.windows_root, 'tools/engine/engine.py'), doraise=True, optimize=0)
         try:
-            result = v.verify_installation(self.root, WINDOWS_ROOT, self.inventory, pre, canary_before=sentinel)
+            result = v.verify_installation(self.root, self.windows_root, self.inventory, pre, canary_before=sentinel)
             self.assertEqual(result['managedFilesExact'], 3905)
             self.assertEqual(result['runtimeCachesSourceVerified'], 1)
             self.assertTrue(result['preferences']['unchanged'])
@@ -172,7 +173,7 @@ class ExactManagedTreeAndPreferences(unittest.TestCase):
             cache.unlink(); cache.parent.rmdir(); ini.unlink(); canary.unlink()
 
     def test_signed_source_or_executable_change_and_missing_file_are_never_runtime_waivers(self):
-        pre = v.capture_preimage(self.root, WINDOWS_ROOT)
+        pre = v.capture_preimage(self.root, self.windows_root)
         path = self.root / 'managed/0000.bin'
         for mutation in ('changed', 'missing'):
             with self.subTest(mutation=mutation):
@@ -180,37 +181,37 @@ class ExactManagedTreeAndPreferences(unittest.TestCase):
                 else: path.unlink()
                 try:
                     with self.assertRaisesRegex(v.Rejected, 'Signed managed'):
-                        v.verify_installation(self.root, WINDOWS_ROOT, self.inventory, pre)
+                        v.verify_installation(self.root, self.windows_root, self.inventory, pre)
                 finally:
                     path.write_bytes(b'S')
         with self.assertRaisesRegex(v.Rejected, '3905'):
-            v.verify_installation(self.root, WINDOWS_ROOT, {}, pre)
+            v.verify_installation(self.root, self.windows_root, {}, pre)
 
     def test_unknown_extra_and_cache_without_signed_source_fail_closed(self):
-        pre = v.capture_preimage(self.root, WINDOWS_ROOT)
+        pre = v.capture_preimage(self.root, self.windows_root)
         for relative in ('arbitrary.exe', 'tools/engine/__pycache__/unknown.cpython-313.pyc'):
             path = self.root / relative; path.parent.mkdir(parents=True, exist_ok=True); path.write_bytes(b'no')
             try:
                 with self.assertRaises(v.Rejected):
-                    v.verify_installation(self.root, WINDOWS_ROOT, self.inventory, pre)
+                    v.verify_installation(self.root, self.windows_root, self.inventory, pre)
             finally:
                 path.unlink()
                 if path.parent.name == '__pycache__': path.parent.rmdir()
 
     def test_ini_new_missing_changed_and_wrong_installation_are_rejected(self):
-        path = self.root / v.INI; absent = v.capture_preimage(self.root, WINDOWS_ROOT)
-        self.assertTrue(v.verify_preimage(self.root, WINDOWS_ROOT, absent)['unchanged'])
+        path = self.root / v.INI; absent = v.capture_preimage(self.root, self.windows_root)
+        self.assertTrue(v.verify_preimage(self.root, self.windows_root, absent)['unchanged'])
         path.write_bytes(b'[input]\r\nkeyboard=uhid\r\nmouse=uhid\r\n')
         try:
             with self.assertRaisesRegex(v.Rejected, 'no captured preimage'):
-                v.verify_preimage(self.root, WINDOWS_ROOT, absent)
-            pre = v.capture_preimage(self.root, WINDOWS_ROOT)
+                v.verify_preimage(self.root, self.windows_root, absent)
+            pre = v.capture_preimage(self.root, self.windows_root)
             path.write_bytes(b'changed synthetic preferences')
             with self.assertRaisesRegex(v.Rejected, 'bytes changed'):
-                v.verify_preimage(self.root, WINDOWS_ROOT, pre)
+                v.verify_preimage(self.root, self.windows_root, pre)
             path.unlink()
             with self.assertRaisesRegex(v.Rejected, 'missing'):
-                v.verify_preimage(self.root, WINDOWS_ROOT, pre)
+                v.verify_preimage(self.root, self.windows_root, pre)
             with self.assertRaisesRegex(v.Rejected, 'another installation'):
                 v.verify_preimage(self.root, r'C:\another-install', absent)
         finally:
@@ -237,6 +238,31 @@ class ExactManagedTreeAndPreferences(unittest.TestCase):
             st_mode=real.st_mode, st_file_attributes=0x400, st_nlink=1)
         with self.assertRaisesRegex(v.Rejected, 'Linked/nonregular'):
             v._regular_unlinked(fake)
+
+    def test_raw_identity_diagnostic_retains_every_guard_and_only_relative_metadata(self):
+        from types import SimpleNamespace
+        file=self.root/'managed/0001.bin';before=file.lstat()
+        fields=('st_dev','st_ino','st_size','st_mtime_ns','st_ctime_ns','st_mode','st_nlink','st_file_attributes')
+        values={key:getattr(before,key,None)for key in fields}
+        after=SimpleNamespace(**dict(values,st_ino=before.st_ino+1))
+        with mock.patch.object(v.os,'fstat',return_value=after),self.assertRaisesRegex(v.Rejected,'File changed while opening')as caught:
+            v.read_owned(self.root,'managed/0001.bin',8)
+        proof=caught.exception.file_identity_diagnostic
+        self.assertEqual(proof['phase'],'after-open-fstat');self.assertEqual(proof['before']['st_ino'],before.st_ino)
+        self.assertEqual(proof['after']['st_ino'],before.st_ino+1);self.assertTrue(proof['identityGateUnchanged'])
+        self.assertEqual(proof['relativePath'],'managed/0001.bin');self.assertNotIn(str(self.root),json.dumps(proof))
+        self.assertLessEqual(len(json.dumps(proof,separators=(',',':'))),1536)
+
+    def test_wrong_actual_windows_root_remains_rejected(self):
+        if os.name=='nt':
+            pre=v.capture_preimage(self.root,self.windows_root)
+            with self.assertRaisesRegex(v.Rejected,'Actual Windows installation root differs'):
+                v.verify_installation(self.root,r'C:\another-install',self.inventory,pre)
+        else:
+            # Cross-platform preimage identity is always installation-specific.
+            absent=v.capture_preimage(self.root,self.windows_root)
+            with self.assertRaisesRegex(v.Rejected,'another installation'):
+                v.verify_preimage(self.root,r'C:\another-install',absent)
 
 
 class CliPreimageAndFactory(unittest.TestCase):
