@@ -198,6 +198,31 @@ def runtime_source_png(app, output):
     return path, expected['sha256']
 
 
+def wait_for_native_window(process, scan, diagnostic, *, clock=time.monotonic, pause=time.sleep):
+    # Software rendering may compile pipelines before eframe's first visible
+    # frame. Keep a fixed deadline and retain own-PID hidden windows on failure.
+    started = clock()
+    deadline = started + 120.0
+    windows = []
+    while True:
+        returncode = process.poll()
+        windows = scan()
+        elapsed = clock() - started
+        visible = [row for row in windows if row['visible']]
+        own = next((row for row in visible if 'Bogo' in row['title']), None)
+        status = 'visible-bogo-window' if own is not None and returncode is None else ('process-exited' if returncode is not None else 'waiting')
+        expired = clock() >= deadline
+        if status != 'waiting' or expired:
+            Path(diagnostic).write_text(json.dumps({'status': 'deadline-expired' if status == 'waiting' else status,
+                'pid': process.pid, 'processAlive': returncode is None, 'returnCode': returncode,
+                'elapsedSeconds': round(elapsed, 3), 'deadlineSeconds': 120,
+                'ownProcessWindows': windows}, indent=2) + '\n', encoding='utf-8')
+            require(returncode is None, 'GUI exited before a visible native window: ' + str(returncode))
+            require(own is not None, 'No visible Bogo native window title was observed within 120 seconds; own-process startup diagnostics: ' + str(diagnostic))
+            return own, visible
+        pause(min(.2, max(0, deadline - clock())))
+
+
 def gui_startup(executable, environment, log, app, runtime_png, runtime_png_sha256):
     from ctypes import wintypes
     user = ctypes.WinDLL('user32', use_last_error=True)
@@ -219,30 +244,29 @@ def gui_startup(executable, environment, log, app, runtime_png, runtime_png_sha2
         process = subprocess.Popen([str(executable)], env=environment, stdout=output, stderr=subprocess.STDOUT)
         windows = []
         try:
-            for _ in range(150):
-                if process.poll() is not None:
-                    raise ValueError('GUI exited before a visible native window: ' + str(process.returncode))
-                windows.clear()
+            def scan():
+                observed = []
                 def window(hwnd, _value):
                     pid = wintypes.DWORD()
                     user.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
-                    if pid.value == process.pid and user.IsWindowVisible(hwnd):
-                        text = ctypes.create_unicode_buffer(user.GetWindowTextLengthW(hwnd) + 1)
+                    if pid.value == process.pid:
+                        if len(observed) >= 128:
+                            return False
+                        text = ctypes.create_unicode_buffer(min(user.GetWindowTextLengthW(hwnd), 2048) + 1)
                         user.GetWindowTextW(hwnd, text, len(text))
-                        icon = ctypes.c_size_t()
-                        for kind in (0, 1):
-                            if user.SendMessageTimeoutW(hwnd, 0x7F, kind, 0, 0x2, 1000, ctypes.byref(icon)) and icon.value:
-                                break
-                        windows.append({'title': text.value, 'windowHandle': int(hwnd), 'windowIconHandle': icon.value})
+                        observed.append({'title': text.value, 'windowHandle': int(hwnd), 'visible': bool(user.IsWindowVisible(hwnd))})
                     return True
                 callback = callback_type(window)
                 user.EnumWindows.argtypes = [callback_type, wintypes.LPARAM]
                 user.EnumWindows(callback, 0)
-                if any('Bogo' in row['title'] for row in windows):
+                require(len(observed) < 128, 'Own native-window diagnostic bound exceeded')
+                return observed
+            own, windows = wait_for_native_window(process, scan, Path(log).with_suffix('.startup.json'))
+            icon = ctypes.c_size_t()
+            for kind in (0, 1):
+                if user.SendMessageTimeoutW(own['windowHandle'], 0x7F, kind, 0, 0x2, 1000, ctypes.byref(icon)) and icon.value:
                     break
-                time.sleep(.2)
-            require(any('Bogo' in row['title'] for row in windows), 'No visible Bogo native window title was observed')
-            own = next(row for row in windows if 'Bogo' in row['title'])
+            own['windowIconHandle'] = icon.value
             user.SetForegroundWindow(own['windowHandle'])
             time.sleep(1)
             require(user.GetForegroundWindow() == own['windowHandle'], 'Own GUI did not become foreground; refusing to capture unrelated/occluded screen pixels')

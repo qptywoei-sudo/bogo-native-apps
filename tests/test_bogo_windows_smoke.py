@@ -7,6 +7,7 @@ import sys
 import tempfile
 import unittest
 from unittest.mock import patch
+from types import SimpleNamespace
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
@@ -15,6 +16,52 @@ import smoke_bogo_windows as smoke
 
 
 class WindowsSmokeInputs(unittest.TestCase):
+    def test_native_startup_waits_for_actual_visible_bogo_window_after_slow_first_frame(self):
+        elapsed = [0.0]
+        hidden = {'title': 'Bogo Effect', 'windowHandle': 123, 'visible': False}
+        def scan():
+            return [{**hidden, 'visible': elapsed[0] >= 35}]
+        def pause(seconds):
+            elapsed[0] += seconds
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'startup.json'
+            own, windows = smoke.wait_for_native_window(SimpleNamespace(pid=42, poll=lambda: None), scan, path,
+                clock=lambda: elapsed[0], pause=pause)
+            self.assertTrue(own['visible'])
+            self.assertGreaterEqual(elapsed[0], 35)
+            self.assertLess(elapsed[0], 36)
+            receipt = json.loads(path.read_text())
+            self.assertEqual(receipt['status'], 'visible-bogo-window')
+            self.assertEqual(receipt['ownProcessWindows'], windows)
+
+    def test_native_startup_deadline_never_accepts_hidden_bogo_or_visible_old_title(self):
+        elapsed = [0.0]
+        rows = [{'title': 'Bogo Effect', 'windowHandle': 123, 'visible': False},
+                {'title': 'KIO Effect', 'windowHandle': 124, 'visible': True}]
+        def pause(seconds):
+            elapsed[0] += seconds
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'startup.json'
+            with self.assertRaisesRegex(ValueError, 'within 120 seconds'):
+                smoke.wait_for_native_window(SimpleNamespace(pid=42, poll=lambda: None), lambda: rows, path,
+                    clock=lambda: elapsed[0], pause=pause)
+            receipt = json.loads(path.read_text())
+            self.assertEqual(receipt['status'], 'deadline-expired')
+            self.assertEqual(receipt['elapsedSeconds'], 120)
+            self.assertTrue(receipt['processAlive'])
+            self.assertEqual(receipt['ownProcessWindows'], rows)
+
+    def test_native_startup_process_exit_is_failure_even_if_window_title_remains(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'startup.json'
+            with self.assertRaisesRegex(ValueError, 'GUI exited'):
+                smoke.wait_for_native_window(SimpleNamespace(pid=42, poll=lambda: 9),
+                    lambda: [{'title': 'Bogo Effect', 'windowHandle': 123, 'visible': True}], path,
+                    clock=lambda: 0, pause=lambda seconds: self.fail('exited process must not wait'))
+            receipt = json.loads(path.read_text())
+            self.assertEqual(receipt['returnCode'], 9)
+            self.assertFalse(receipt['processAlive'])
+
     def test_msi_guids_compare_exact_uuid_identity_with_balanced_optional_braces(self):
         guid = 'F98E3616-1291-59D9-AEFD-8E055186CBD4'
         self.assertEqual(smoke.canonical_guid(guid), smoke.canonical_guid('{' + guid.lower() + '}'))
