@@ -151,7 +151,8 @@ def build(args, lock):
 
 def notices(lock, source, fonts, destination, record, env, target):
     full.notices(lock, source, fonts, destination, record, env, target)
-    (destination / 'KIO-README.txt').write_text('KIO Launcher ' + lock['version'] + '\nFull original native Rust desktop Launcher; no companion CLI exists upstream.\nKIO fork of ArtCraft Launcher v0.4.1; original MIT OR Apache-2.0 licenses, notices, font licenses and credits are retained.\nOriginal install, update, verified download, launch, tray, remove and developer local-mirror source are retained. Production builds use only the exact KIO app registry.\nStudio is private and absent from the public registry. No embedded owner tokens.\nDevelopment release: ad-hoc Apple signature; no notarization or Windows publisher certificate.\nUse the matching full source asset, immutable input lock, branding patch and Cargo.lock to rebuild.\n', encoding='utf-8')
+    brand = lock.get('publisher', 'KIO')
+    (destination / (brand + '-README.txt')).write_text(lock['name'] + ' ' + lock['version'] + '\nFull original native Rust desktop Launcher; no companion CLI exists upstream.\n' + brand + ' fork of ArtCraft Launcher v0.4.1; original MIT OR Apache-2.0 licenses, notices, font licenses and credits are retained.\nOriginal install, update, verified download, launch, tray, remove and developer local-mirror source are retained. Production builds use only the exact app registry.\nStudio is private and absent from the public registry. No embedded owner tokens.\nDevelopment release: ad-hoc Apple signature; no notarization or Windows publisher certificate.\nUse the matching full source asset, immutable input lock, branding patch and Cargo.lock to rebuild.\n', encoding='utf-8')
 
 
 def validate_msi(lock, msi):
@@ -160,7 +161,7 @@ def validate_msi(lock, msi):
     env['KIO_LAUNCHER_MSI'] = str(msi.resolve())
     code = "$ErrorActionPreference='Stop'; $w=New-Object -ComObject WindowsInstaller.Installer; $d=$w.OpenDatabase($env:KIO_LAUNCHER_MSI,0); $o=@{}; foreach($k in @('ProductName','Manufacturer','ProductVersion')) {$v=$d.OpenView(\"SELECT Value FROM Property WHERE Property='$k'\"); $v.Execute(); $r=$v.Fetch(); $o[$k]=$r.StringData(1); $v.Close()}; $o | ConvertTo-Json -Compress"
     props = json.loads(run(['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', code], env=env, capture=True, timeout=60))
-    require(props == {'ProductName': lock['name'], 'Manufacturer': 'KIO', 'ProductVersion': lock['upstreamVersion']}, 'Actual MSI identity differs from the native registry contract')
+    require(props == {'ProductName': lock['name'], 'Manufacturer': lock.get('publisher', 'KIO'), 'ProductVersion': lock['upstreamVersion']}, 'Actual MSI identity differs from the native registry contract')
     return props
 
 
@@ -182,14 +183,14 @@ def package(args, lock):
     output.mkdir(parents=True)
     base = full.artifact_base(lock, args.platform)
     if args.platform == 'macos-arm64':
-        app = stage / 'KIO Launcher.app'
+        app = stage / (lock['name'] + '.app')
         macos, resources = app / 'Contents/MacOS', app / 'Contents/Resources'
         macos.mkdir(parents=True)
         resources.mkdir()
         executable = macos / lock['name']
         shutil.copy2(binaries['app'], executable)
         executable.chmod(0o755)
-        shutil.copyfile(source / lock['icon'], resources / 'KIO Launcher.icns')
+        shutil.copyfile(source / lock['icon'], resources / (lock['name'] + '.icns'))
         template = (source / 'packaging/macos/Info.plist.in').read_text(encoding='utf-8')
         text = template.replace('@VERSION@', lock['version']).replace('@SHORT_VERSION@', lock['upstreamVersion']).replace('@BUILD_SHA@', SOURCE_COMMIT)
         info = plistlib.loads(text.encode('utf-8'))

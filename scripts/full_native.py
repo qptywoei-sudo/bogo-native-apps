@@ -459,7 +459,8 @@ def notices(lock, source, fonts, destination, record, env, target):
             out.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(p, out)
     write_json(destination / 'BUILD-PROVENANCE.json', record)
-    (destination / 'KIO-README.txt').write_text(lock['name'] + ' ' + lock['version'] + '\nComplete original native GUI and CLI, with KIO branding.\nOriginal default features and official native additions are retained.\nRead the original README/ROADMAP/gaps; this is not a claim of full commercial-product compatibility.\nDevelopment release: no Apple notarization or Windows publisher certificate.\nUse the exact matching full-source release asset and Cargo.lock for rebuilding.\n', encoding='utf-8')
+    brand = lock.get('publisher', 'KIO')
+    (destination / (brand + '-README.txt')).write_text(lock['name'] + ' ' + lock['version'] + '\nComplete original native GUI and CLI, with ' + brand + ' branding.\nOriginal default features and official native additions are retained.\nRead the original README/ROADMAP/gaps; this is not a claim of full commercial-product compatibility.\nDevelopment release: no Apple notarization or Windows publisher certificate.\nUse the exact matching full-source release asset and Cargo.lock for rebuilding.\n', encoding='utf-8')
 
 
 def stage_extras(lock, source, destination, env):
@@ -696,7 +697,10 @@ def artifact_base(lock, kind):
 def finalize(output, lock, kind):
     base = artifact_base(lock, kind)
     files = [{'path': r, 'sha256': digest(p), 'bytes': p.stat().st_size} for r, p in common.regular_files(output, public=True)]
-    write_json(output / (base + '-manifest.json'), {'schema': 1, 'app': lock['id'], 'version': lock['version'], 'kind': kind, 'upstreamCommit': lock['source']['commit'], 'brandingPatchSha256': lock['branding']['sha256'], 'files': files})
+    identity = {'schema': 1, 'app': lock['id'], 'version': lock['version'], 'kind': kind, 'upstreamCommit': lock['source']['commit'], 'brandingPatchSha256': lock['branding']['sha256'], 'files': files}
+    if lock.get('bogoOverlay'):
+        identity['bogoOverlaySha256'] = lock['bogoOverlay']['patchSha256']
+    write_json(output / (base + '-manifest.json'), identity)
     manifest = output / (base + '-manifest.json')
     entries = files + [{'path': manifest.name, 'sha256': digest(manifest), 'bytes': manifest.stat().st_size}]
     (output / (base + '-SHA256SUMS.txt')).write_text(''.join(x['sha256'] + '  ' + x['path'] + '\n' for x in entries), encoding='utf-8')
@@ -711,6 +715,8 @@ def verify(folder, lock, kind):
     value = json.loads(manifest.read_text(encoding='utf-8'))
     require(value['schema'] == 1 and value['app'] == lock['id'] and value['version'] == lock['version'] and value['kind'] == kind, 'Release identity mismatch')
     require(value['upstreamCommit'] == lock['source']['commit'] and value['brandingPatchSha256'] == lock['branding']['sha256'], 'Release source/patch identity mismatch')
+    if lock.get('bogoOverlay'):
+        require(value.get('bogoOverlaySha256') == lock['bogoOverlay']['patchSha256'], 'Bogo release overlay identity mismatch')
     suffixes = ['.zip', '-provenance.json'] + (['.dmg'] if kind == 'macos-arm64' else ['.msi'] if kind == 'windows-x64' else [])
     require(len(value['files']) == len(suffixes) and {x['path'] for x in value['files']} == {base + s for s in suffixes}, 'Release artifact allowlist mismatch')
     expected = {manifest.name, base + '-SHA256SUMS.txt'}

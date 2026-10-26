@@ -1,0 +1,96 @@
+name: Bogo native applications (manual verification)
+
+on:
+  workflow_dispatch:
+    inputs:
+      app:
+        description: Verified full native application
+        type: choice
+        options: [all, cad, design, vector, film, light, pdf, effect, ui, word, sound, deck, grid, launcher, photo]
+        default: all
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bogo-native-${{ inputs.app }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  select:
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.matrix.outputs.value }}
+      source: ${{ steps.matrix.outputs.source }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+      - run: python3 -m unittest discover -s tests -v
+      - id: matrix
+        env:
+          BOGO_APP: ${{ inputs.app }}
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess
+          result = subprocess.check_output(['python3','scripts/bogo_native.py','matrix','--app',os.environ['BOGO_APP']], text=True).strip()
+          rows = json.loads(result)['include']
+          with open(os.environ['GITHUB_OUTPUT'],'a') as out:
+              out.write('value=' + result + '\n')
+              out.write('source=' + json.dumps({'app':list(dict.fromkeys(row['app'] for row in rows))}) + '\n')
+          PY
+  native:
+    needs: select
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix: ${{ fromJSON(needs.select.outputs.matrix) }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 180
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+      - run: rustup toolchain install 1.95.0 --profile minimal --component rustfmt --target ${{ matrix.target }}
+      - if: matrix.platform == 'windows-x64'
+        shell: pwsh
+        run: |
+          dotnet tool install --global wix --version 5.0.2
+          if ($LASTEXITCODE -ne 0) { throw 'WiX installation failed' }
+          wix extension add -g WixToolset.UI.wixext/5.0.2 WixToolset.Util.wixext/5.0.2
+          if ($LASTEXITCODE -ne 0) { throw 'WiX extension installation failed' }
+      - run: ${{ matrix.python }} scripts/bogo_native.py prepare --app ${{ matrix.app }}
+      - run: ${{ matrix.python }} scripts/bogo_native.py build --app ${{ matrix.app }} --platform ${{ matrix.platform }}
+      - run: ${{ matrix.python }} scripts/bogo_native.py package --app ${{ matrix.app }} --platform ${{ matrix.platform }}
+      - run: ${{ matrix.python }} scripts/bogo_native.py verify --app ${{ matrix.app }} --platform ${{ matrix.platform }} --directory dist/${{ matrix.app }}-${{ matrix.platform }}
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: bogo-${{ matrix.app }}-${{ matrix.platform }}
+          path: dist/${{ matrix.app }}-${{ matrix.platform }}/
+          if-no-files-found: error
+          retention-days: 14
+  source:
+    needs: select
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix: ${{ fromJSON(needs.select.outputs.source) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+      - run: python3 scripts/bogo_native.py prepare --app ${{ matrix.app }}
+      - run: python3 scripts/bogo_native.py source --app ${{ matrix.app }}
+      - run: python3 scripts/bogo_native.py verify --app ${{ matrix.app }} --platform source --directory dist/${{ matrix.app }}-source
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: bogo-${{ matrix.app }}-source
+          path: dist/${{ matrix.app }}-source/
+          if-no-files-found: error
+          retention-days: 14

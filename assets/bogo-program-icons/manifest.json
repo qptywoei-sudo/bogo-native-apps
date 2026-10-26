@@ -1,0 +1,120 @@
+{
+  "brand": "Bogo",
+  "orange": "#FC7501",
+  "background": "transparent outside orange tile",
+  "resolution": 1024,
+  "items": [
+    {
+      "number": 1,
+      "id": "cad",
+      "title": "Bogo 3D CAD",
+      "korean": "3D 설계",
+      "filename": "01-bogo-cad.png",
+      "sha256": "659bcdfff9860e825e3a452289cd183fda78f994eab7c180fdb58024bef0353c"
+    },
+    {
+      "number": 2,
+      "id": "design",
+      "title": "Bogo Design",
+      "korean": "페이지 디자인",
+      "filename": "02-bogo-design.png",
+      "sha256": "14993ecc20bd16055bfe20d0a22630f46cf3b7011d668dd5c274fb99162add6e"
+    },
+    {
+      "number": 3,
+      "id": "vector",
+      "title": "Bogo Vector",
+      "korean": "벡터 디자인",
+      "filename": "03-bogo-vector.png",
+      "sha256": "b0fa6d0b96fffb8aa10e940710a1132c7ef4ab6c610e11ca7ebb09bdc4966cb0"
+    },
+    {
+      "number": 4,
+      "id": "film",
+      "title": "Bogo Film",
+      "korean": "영상 편집",
+      "filename": "04-bogo-film.png",
+      "sha256": "1c3167a314b4b14455ef87bdadb638efeb2d6d85fc92b9cc4006010d4c9850f1"
+    },
+    {
+      "number": 5,
+      "id": "light",
+      "title": "Bogo Light",
+      "korean": "사진 현상",
+      "filename": "05-bogo-light.png",
+      "sha256": "e3ade38a7ff6ee2286d373f7484b16045200659ef66531bfe7497c0d0f08d135"
+    },
+    {
+      "number": 6,
+      "id": "pdf",
+      "title": "Bogo PDF",
+      "korean": "PDF 편집",
+      "filename": "06-bogo-pdf.png",
+      "sha256": "20f89a65bd06462e2d6b84531f7da521dbacc9f1de209970bac67c6324d49535"
+    },
+    {
+      "number": 7,
+      "id": "effect",
+      "title": "Bogo Effect",
+      "korean": "영상 효과",
+      "filename": "07-bogo-effect.png",
+      "sha256": "8c9e2114be9472c8f3c2024c4ee60255fd4496970ef83dce5c90540894627b22"
+    },
+    {
+      "number": 8,
+      "id": "ui",
+      "title": "Bogo UI",
+      "korean": "화면 디자인",
+      "filename": "08-bogo-ui.png",
+      "sha256": "86a8301feceea41b3385121724e5009a172ec63bc6728dcf7c1b54dca7f62515"
+    },
+    {
+      "number": 9,
+      "id": "word",
+      "title": "Bogo Word",
+      "korean": "문서 작성",
+      "filename": "09-bogo-word.png",
+      "sha256": "e2747f172828ec7a8bc0c53a732ae4ba1879d6b25d5f88d190327dc9a78676c0"
+    },
+    {
+      "number": 10,
+      "id": "sound",
+      "title": "Bogo Sound",
+      "korean": "오디오 편집",
+      "filename": "10-bogo-sound.png",
+      "sha256": "5f3d19afe868f37d6c55653b7fdd8d7686d7f552885e0f7c9ba835f78537c310"
+    },
+    {
+      "number": 11,
+      "id": "deck",
+      "title": "Bogo Deck",
+      "korean": "프레젠테이션",
+      "filename": "11-bogo-deck.png",
+      "sha256": "e2726ea53495c93fb98a3153c1711a744eb520b0dbdf962b161c9c916893a632"
+    },
+    {
+      "number": 12,
+      "id": "grid",
+      "title": "Bogo Grid",
+      "korean": "스프레드시트",
+      "filename": "12-bogo-grid.png",
+      "sha256": "b7f77e246bc1fe1fc815fe4cee15e65b0976301d2383212c7d3da5b7205dc97f"
+    },
+    {
+      "number": 13,
+      "id": "launcher",
+      "title": "Bogo Launcher",
+      "korean": "프로그램 관리",
+      "filename": "13-bogo-launcher.png",
+      "sha256": "d0a5b77f763ffd2b7afb85e3bf04f34f196a0ca71e9d8d0e27c5f3d728ae3273"
+    },
+    {
+      "number": 14,
+      "id": "photo",
+      "title": "Bogo Photo",
+      "korean": "사진 편집",
+      "filename": "14-bogo-photo.png",
+      "sha256": "3387afad4187035641c84d78aba24d07a41714de76dbec8dfb6f62ee3207c20d"
+    }
+  ]
+}

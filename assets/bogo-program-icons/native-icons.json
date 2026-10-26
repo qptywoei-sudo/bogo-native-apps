@@ -1,0 +1,440 @@
+{
+  "schema": 1,
+  "brand": "Bogo",
+  "items": [
+    {
+      "id": "cad",
+      "original": "01-bogo-cad.png",
+      "originalSha256": "659bcdfff9860e825e3a452289cd183fda78f994eab7c180fdb58024bef0353c",
+      "ico": {
+        "path": "cad.ico",
+        "sha256": "7a6fb8e448b9bf8f855382b9f97a5131bba09435506c831776a99549d13cef89",
+        "sizes": [
+          16,
+          24,
+          32,
+          48,
+          64,
+          128,
+          256
+        ]
+      },
+      "icns": {
+        "path": "cad.icns",
+        "sha256": "490cb23ad038a2522dc7ed929d3257437f274a50f706a10e608a3d91d6f0ac46",
+        "sizes": [
+          16,
+          32,
+          64,
+          128,
+          256,
+          512,
+          1024
+        ]
+      }
+    },
+    {
+      "id": "design",
+      "original": "02-bogo-design.png",
+      "originalSha256": "14993ecc20bd16055bfe20d0a22630f46cf3b7011d668dd5c274fb99162add6e",
+      "ico": {
+        "path": "design.ico",
+        "sha256": "d2baa79a3a9069318d78fb2bb36a1716629028bd1b3512bf2e64ed2f2592a0a3",
+        "sizes": [
+          16,
+          24,
+          32,
+          48,
+          64,
+          128,
+          256
+        ]
+      },
+      "icns": {
+        "path": "design.icns",
+        "sha256": "2368584836ea9541c14720276e941da1da55f0b197889c7417b9bb2e7f45bdcb",
+        "sizes": [
+          16,
+          32,
+          64,
+          128,
+          256,
+          512,
+          1024
+        ]
+      }
+    },
+    {
+      "id": "vector",
+      "original": "03-bogo-vector.png",
+      "originalSha256": "b0fa6d0b96fffb8aa10e940710a1132c7ef4ab6c610e11ca7ebb09bdc4966cb0",
+      "ico": {
+        "path": "vector.ico",
+        "sha256": "73d186a3385531f00cdc470544b07e25d6cbd75393fdcfe191d74164ad60a4eb",
+        "sizes": [
+          16,
+          24,
+          32,
+          48,
+          64,
+          128,
+          256
+        ]
+      },
+      "icns": {
+        "path": "vector.icns",
+        "sha256": "a99c4cd0160d9d43365ee338425d442a3bc1344e8999970e4d58bb8d636e4152",
+        "sizes": [
+          16,
+          32,
+          64,
+          128,
+          256,
+          512,
+          1024
+        ]
+      }
+    },
+    {
+      "id": "film",
+      "original": "04-bogo-film.png",
+      "originalSha256": "1c3167a314b4b14455ef87bdadb638efeb2d6d85fc92b9cc4006010d4c9850f1",
+      "ico": {
+        "path": "film.ico",
+        "sha256": "4c03ace8bf7400bde2b0c9ac180e2bc070c19ae887ac42f89add423831bddd39",
+        "sizes": [
+          16,
+          24,
+          32,
+          48,
+          64,
+          128,
+          256
+        ]
+      },
+      "icns": {
+        "path": "film.icns",
+        "sha256": "33c7f936226b3975478ca437e087367707568240d57cd3634f6dff5ca539156b",
+        "sizes": [
+          16,
+          32,
+          64,
+          128,
+          256,
+          512,
+          1024
+        ]
+      }
+    },
+    {
+      "id": "light",
+      "original": "05-bogo-light.png",
+      "originalSha256": "e3ade38a7ff6ee2286d373f7484b16045200659ef66531bfe7497c0d0f08d135",
+      "ico": {
+        "path": "light.ico",
+        "sha256": "1cfdb819dd25573babf774c3f8b4e83a3a2fb44d88b916f6f97fd05c0d817327",
+        "sizes": [
+          16,
+          24,
+          32,
+          48,
+          64,
+          128,
+          256
+        ]
+      },
+      "icns": {
+        "path": "light.icns",
+        "sha256": "771968588403f31c3299205c931dad6602925067a56a1da82aeedd7b55693d63",
+        "sizes": [
+          16,
+          32,
+          64,
+          128,
+          256,
+          512,
+          1024
+        ]
+      }
+    },
+    {
+      "id": "pdf",
+      "original": "06-bogo-pdf.png",
+      "originalSha256": "20f89a65bd06462e2d6b84531f7da521dbacc9f1de209970bac67c6324d49535",
+      "ico": {
+        "path": "pdf.ico",
+        "sha256": "38b828f86f0af292a226536c774deebc24d462564d5cb43a8f79a8ee9d743c01",
+        "sizes": [
+          16,
+          24,
+          32,
+          48,
+          64,
+          128,
+          256
+        ]
+      },
+      "icns": {
+        "path": "pdf.icns",
+        "sha256": "5349a3214137f418dfbb4adc281a2ce92178ab5d761690af349b557aa917f914",
+        "sizes": [
+          16,
+          32,
+          64,
+          128,
+          256,
+          512,
+          1024
+        ]
+      }
+    },
+    {
+      "id": "effect",
+      "original": "07-bogo-effect.png",
+      "originalSha256": "8c9e2114be9472c8f3c2024c4ee60255fd4496970ef83dce5c90540894627b22",
+      "ico": {
+        "path": "effect.ico",
+        "sha256": "3e7ec7259388b7b4429c5b940695303e2749c77c48fdb76df18ba3ba0ff1f421",
+        "sizes": [
+          16,
+          24,
+          32,
+          48,
+          64,
+          128,
+          256
+        ]
+      },
+      "icns": {
+        "path": "effect.icns",
+        "sha256": "bc98ef9ba25de89ee615c1ff4aeb5dc398fa738c258c88ae643d86ce82ad8645",
+        "sizes": [
+          16,
+          32,
+          64,
+          128,
+          256,
+          512,
+          1024
+        ]
+      }
+    },
+    {
+      "id": "ui",
+      "original": "08-bogo-ui.png",
+      "originalSha256": "86a8301feceea41b3385121724e5009a172ec63bc6728dcf7c1b54dca7f62515",
+      "ico": {
+        "path": "ui.ico",
+        "sha256": "210a45077913711dbbe43bb240cc00e9c901acd45737fdfa2ecf6fbc2ad02f7f",
+        "sizes": [
+          16,
+          24,
+          32,
+          48,
+          64,
+          128,
+          256
+        ]
+      },
+      "icns": {
+        "path": "ui.icns",
+        "sha256": "6403b154985c2a2d65dd7693d5272daa376e68e6cacd4307d06c11c3dcac41f2",
+        "sizes": [
+          16,
+          32,
+          64,
+          128,
+          256,
+          512,
+          1024
+        ]
+      }
+    },
+    {
+      "id": "word",
+      "original": "09-bogo-word.png",
+      "originalSha256": "e2747f172828ec7a8bc0c53a732ae4ba1879d6b25d5f88d190327dc9a78676c0",
+      "ico": {
+        "path": "word.ico",
+        "sha256": "b9ec5825ce1a80731767b7a03a60bc0027ece87765b969b8cb85ddf2d779126f",
+        "sizes": [
+          16,
+          24,
+          32,
+          48,
+          64,
+          128,
+          256
+        ]
+      },
+      "icns": {
+        "path": "word.icns",
+        "sha256": "ba1dbb929101a76dfa35b8b512e96503ee19fa7bce1486831f2ec751f28a2f6c",
+        "sizes": [
+          16,
+          32,
+          64,
+          128,
+          256,
+          512,
+          1024
+        ]
+      }
+    },
+    {
+      "id": "sound",
+      "original": "10-bogo-sound.png",
+      "originalSha256": "5f3d19afe868f37d6c55653b7fdd8d7686d7f552885e0f7c9ba835f78537c310",
+      "ico": {
+        "path": "sound.ico",
+        "sha256": "73f4d5ccd66881c0415a224e000ce7ba3d959f6fdf4056b557aa597158c3cbf4",
+        "sizes": [
+          16,
+          24,
+          32,
+          48,
+          64,
+          128,
+          256
+        ]
+      },
+      "icns": {
+        "path": "sound.icns",
+        "sha256": "72e4b9fdcfdc75345c643e444bc03d37560551df61b391f8f6694a9bd598d66a",
+        "sizes": [
+          16,
+          32,
+          64,
+          128,
+          256,
+          512,
+          1024
+        ]
+      }
+    },
+    {
+      "id": "deck",
+      "original": "11-bogo-deck.png",
+      "originalSha256": "e2726ea53495c93fb98a3153c1711a744eb520b0dbdf962b161c9c916893a632",
+      "ico": {
+        "path": "deck.ico",
+        "sha256": "1f47b01ae03fb020b41e49dec710f2bf74b3ff8fdd7b93ee1ad0ccdae5a619d3",
+        "sizes": [
+          16,
+          24,
+          32,
+          48,
+          64,
+          128,
+          256
+        ]
+      },
+      "icns": {
+        "path": "deck.icns",
+        "sha256": "2a616a59e0f372ded110d3eb0be2d54386afe1bfeb56d7156e5c3bbaf8e38da5",
+        "sizes": [
+          16,
+          32,
+          64,
+          128,
+          256,
+          512,
+          1024
+        ]
+      }
+    },
+    {
+      "id": "grid",
+      "original": "12-bogo-grid.png",
+      "originalSha256": "b7f77e246bc1fe1fc815fe4cee15e65b0976301d2383212c7d3da5b7205dc97f",
+      "ico": {
+        "path": "grid.ico",
+        "sha256": "a615a1c43ec523ddcaad79019196751e20077081a21095962819e8fc70c31050",
+        "sizes": [
+          16,
+          24,
+          32,
+          48,
+          64,
+          128,
+          256
+        ]
+      },
+      "icns": {
+        "path": "grid.icns",
+        "sha256": "8c6ed97de7bbee66dbeda696126998178975d1dd716267af985a26b31f84a1df",
+        "sizes": [
+          16,
+          32,
+          64,
+          128,
+          256,
+          512,
+          1024
+        ]
+      }
+    },
+    {
+      "id": "launcher",
+      "original": "13-bogo-launcher.png",
+      "originalSha256": "d0a5b77f763ffd2b7afb85e3bf04f34f196a0ca71e9d8d0e27c5f3d728ae3273",
+      "ico": {
+        "path": "launcher.ico",
+        "sha256": "c7b003131bfa2df816a45dd94acd595a6ccfd613dd2468d2387b7612cb666e86",
+        "sizes": [
+          16,
+          24,
+          32,
+          48,
+          64,
+          128,
+          256
+        ]
+      },
+      "icns": {
+        "path": "launcher.icns",
+        "sha256": "6a9b0817ea2626e698b1d5426f898779b01fe5676a048121e544dcf4f00347bb",
+        "sizes": [
+          16,
+          32,
+          64,
+          128,
+          256,
+          512,
+          1024
+        ]
+      }
+    },
+    {
+      "id": "photo",
+      "original": "14-bogo-photo.png",
+      "originalSha256": "3387afad4187035641c84d78aba24d07a41714de76dbec8dfb6f62ee3207c20d",
+      "ico": {
+        "path": "photo.ico",
+        "sha256": "3a1b3afc00f3d08f98fb6a5c0b385b1cf93647ef43c6af0b874c0ce65f1005e6",
+        "sizes": [
+          16,
+          24,
+          32,
+          48,
+          64,
+          128,
+          256
+        ]
+      },
+      "icns": {
+        "path": "photo.icns",
+        "sha256": "a8ead84e2d7cafb963f3b373516055947c3dd736515c1ed9f5b8f71bbc3beade",
+        "sizes": [
+          16,
+          32,
+          64,
+          128,
+          256,
+          512,
+          1024
+        ]
+      }
+    }
+  ]
+}
