@@ -50020,7 +50020,7 @@ index 21473ce1201d1c5b189262bd7d04bee5a35f3c00..4e4fbc3456119b82864dca4a1ddf514d
                          if eyedropper {
                              let armed = f.get(COLOR_EYEDROPPER).and_then(Value::as_bool).unwrap_or(false);
 diff --git a/crates/ui-egui/src/gpu_status.rs b/crates/ui-egui/src/gpu_status.rs
-index 2f770977cd25e26f1993bb36cafe724c3ead06db..d7c34b6d84eed90f795013d2e39ef1ddbc53fe42 100644
+index 2f770977cd25e26f1993bb36cafe724c3ead06db..936f5950f90d9a0eef889526e57009d4f71787b9 100644
 --- a/crates/ui-egui/src/gpu_status.rs
 +++ b/crates/ui-egui/src/gpu_status.rs
 @@ -65,7 +65,7 @@ pub fn system_info(app: &PhotocraftApp) -> Vec<String> {
@@ -50041,11 +50041,13 @@ index 2f770977cd25e26f1993bb36cafe724c3ead06db..d7c34b6d84eed90f795013d2e39ef1dd
              false,
              None,
          );
-@@ -129,7 +129,7 @@ pub fn show_fallback(app: &mut PhotocraftApp, ctx: &egui::Context) {
+@@ -128,8 +128,8 @@ pub fn show_fallback(app: &mut PhotocraftApp, ctx: &egui::Context) {
+         .default_width(440.0)
          .anchor(egui::Align2::CENTER_CENTER, egui::Vec2::ZERO)
          .show(ctx, |ui| {
-             ui.label(egui::RichText::new(tl!("GPU acceleration could not continue. Your documents are unchanged.")).color(t.warning));
+-            ui.label(egui::RichText::new(tl!("GPU acceleration could not continue. Your documents are unchanged.")).color(t.warning));
 -            ui.label(tl!("KIO Photo is using the CPU image compositor. The window may still use your graphics adapter."));
++            ui.label(egui::RichText::new(tl!("GPU acceleration could not continue. Your documents are unchanged.")).color(t.text));
 +            ui.label(tl!("Bogo Photo is using the CPU image compositor. The window may still use your graphics adapter."));
              ui.collapsing(tl!("Details"), |ui| {
                  ui.label(&reason);

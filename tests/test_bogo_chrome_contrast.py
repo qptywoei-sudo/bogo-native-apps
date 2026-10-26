@@ -245,9 +245,32 @@ fn contrast(a:Color32,b:Color32)->f64 {let(a,b)=(lum(a),lum(b)); (a.max(b)+0.05)
         self.assertIn('rect_filled(ui.max_rect(), 0.0, t.panel)', home[0][1])
         self.assertIn('press.fill(t.card, t.hover, t.pressed)', home[1][1])
         test = chrome.PDF_ROLE_REPLACEMENTS['crates/ui-egui/tests/ui.rs'][0][1]
-        for evidence in ['h.output().shapes', 'clip_rect.contains(point)', 'painted_text(h)', 'canvases.iter().rev()', 'rect.contains(welcome)', 'Mode::AllTools', 'Mode::Read', 'Action::Float', 'open_bytes("fixture.pdf", None, FIXTURE.to_vec())', 'open_combine_tab()']:
+        for evidence in ['h.output().shapes', 'clip_rect.contains(point)', 'painted_text(h)', 'canvases.iter().rev()', 'rect.contains(heading)', 'view.viewport_rect()', 'visible_page_rects()', 'panel: Panel::Tools', 'the document Canvas remains protected', 'a refused docking action cannot mutate layout', 'Mode::AllTools', 'Mode::Read', 'Action::Float', 'open_bytes("fixture.pdf", None, FIXTURE.to_vec())', 'open_combine_tab()']:
             self.assertIn(evidence, test)
         self.assertEqual(test.count('#[test]'), 2)
+
+    @unittest.skipUnless(os.environ.get('BOGO_NATIVE_ARCHIVES') or os.environ.get('BOGO_NATIVE_SOURCE_ARCHIVE_CACHE'), 'exact original source archives required')
+    def test_photo_recovery_warning_uses_readable_ink_without_changing_renderer_state_or_semantic_warning(self):
+        relative = 'crates/ui-egui/src/gpu_status.rs'
+        before = archived_sources('photo', (relative,))[relative]
+        rows = chrome.replacements('photo', relative)
+        self.assertEqual(len(rows), 1)
+        old, new, count = rows[0]
+        self.assertEqual(count, 1)
+        self.assertIn('GPU acceleration could not continue. Your documents are unchanged.', old)
+        self.assertEqual(new, old.replace('.color(t.warning)', '.color(t.text)'))
+        after = chrome.transform('photo', relative, before)
+        self.assertEqual(after.replace(new, old), before)
+        self.assertEqual(before[before.index('#[cfg(test)]'):], after[after.index('#[cfg(test)]'):])
+        def lum(rgb):
+            values = [x / 255 for x in rgb]
+            values = [x / 12.92 if x <= .04045 else ((x + .055) / 1.055) ** 2.4 for x in values]
+            return sum(x * w for x, w in zip(values, (.2126, .7152, .0722)))
+        background, ink, old_ink = lum((255,250,246)), lum((52,43,38)), lum((232,176,70))
+        self.assertGreaterEqual((background + .05) / (ink + .05), 4.5)
+        self.assertLess((background + .05) / (old_ink + .05), 4.5)
+        for changed in ('crates/ui-egui/src/renderer.rs', 'crates/engine/src/gpu_status.rs'):
+            self.assertEqual(chrome.transform('photo', changed, before), before)
 
     @unittest.skipUnless(os.environ.get('BOGO_NATIVE_ARCHIVES') or os.environ.get('BOGO_NATIVE_SOURCE_ARCHIVE_CACHE'), 'exact original source archives required')
     def test_film_chrome_focus_does_not_modify_media_tokens_or_user_preferences(self):

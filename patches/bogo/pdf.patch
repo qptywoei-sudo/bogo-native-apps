@@ -52498,10 +52498,10 @@ index b99e2bfba2d4448231fd00291c807da50ce9ffd4..50db8aa1a75c3196fd55d9919a02cb04
      h.run_steps(3);
      assert_eq!(h.state().dialog, Some(Dialog::Sign));
 diff --git a/crates/ui-egui/tests/ui.rs b/crates/ui-egui/tests/ui.rs
-index 67d80a0c81211308770ecbb0d2e25f8c84b325af..099901b893e8f3420bcc675444ad85d1a2fccc90 100644
+index 67d80a0c81211308770ecbb0d2e25f8c84b325af..7a2ca5754d38914bc76c21cf74468579221a9ed5 100644
 --- a/crates/ui-egui/tests/ui.rs
 +++ b/crates/ui-egui/tests/ui.rs
-@@ -6,6 +6,93 @@ use egui_kittest::Harness;
+@@ -6,6 +6,111 @@ use egui_kittest::Harness;
  use egui_kittest::kittest::{NodeT, Queryable};
  use pdfcraft_ui_egui::PdfCraftApp;
  
@@ -52528,9 +52528,26 @@ index 67d80a0c81211308770ecbb0d2e25f8c84b325af..099901b893e8f3420bcc675444ad85d1
 +}
 +
 +fn bogo_canvas_blank_margin(h: &Harness<'static, PdfCraftApp>) -> egui::Pos2 {
-+    // Use the real Canvas backdrop's bounds, not a guessed position or a home card.
++    // A document exposes its actual viewport; never sample a sidebar from the outer CentralPanel.
++    if let Some(index) = h.state().active {
++        let view = &h.state().views[index];
++        let viewport = view.viewport_rect();
++        assert!(viewport.is_positive(), "document viewport is painted");
++        let point = egui::pos2(viewport.left() + 8.0, viewport.bottom() - 16.0);
++        assert!(viewport.contains(point));
++        assert!(view.visible_page_rects().iter().all(|(_, rect)| !rect.contains(point)), "probe must be document margin, not page content");
++        return point;
++    }
++    // Home and Combine use their real heading to bind the topmost enclosing Canvas backdrop.
 +    let pasteboard = egui::Color32::from_rgb(0xF1, 0xF1, 0xF3);
-+    let welcome = painted_text(h).into_iter().find(|(text, _, _)| text.contains("Welcome to Bogo PDF")).map(|(_, _, rect)| rect.center());
++    let text = painted_text(h);
++    let heading = text
++        .iter()
++        .find(|(text, _, _)| text.contains("Welcome to Bogo PDF"))
++        .or_else(|| text.iter().filter(|(text, _, _)| text == "Combine files").max_by(|a, b| a.2.height().total_cmp(&b.2.height())))
++        .expect("Home or Combine heading is actually painted")
++        .2
++        .center();
 +    let canvases: Vec<_> = h
 +        .output()
 +        .shapes
@@ -52545,14 +52562,8 @@ index 67d80a0c81211308770ecbb0d2e25f8c84b325af..099901b893e8f3420bcc675444ad85d1
 +            None
 +        })
 +        .collect();
-+    let canvas = if let Some(welcome) = welcome {
-+        // A floating Canvas is painted after the vacated main dock; bind the
-+        // probe to the actual welcome node and choose that topmost backdrop.
-+        canvases.iter().rev().find(|rect| rect.contains(welcome)).copied().expect("welcome belongs to a real Canvas")
-+    } else {
-+        canvases.into_iter().max_by(|a, b| a.area().total_cmp(&b.area())).expect("real Canvas pasteboard exists")
-+    };
-+    // Home's36px left content margin, document margin and Combine's padding are free of content here.
++    let canvas = canvases.iter().rev().find(|rect| rect.contains(heading)).copied().expect("heading belongs to a real Canvas");
++    // The Home/Combine content inset leaves this left-bottom margin free of controls.
 +    egui::pos2(canvas.left() + 8.0, canvas.bottom() - 16.0)
 +}
 +
@@ -52571,8 +52582,15 @@ index 67d80a0c81211308770ecbb0d2e25f8c84b325af..099901b893e8f3420bcc675444ad85d1
 +    read.get_by_label_contains("Welcome to Bogo PDF");
 +    assert_eq!(bogo_last_opaque_fill(&read, bogo_canvas_blank_margin(&read)), Some(expected));
 +    let floating = harness(|app| {
-+        app.docking.apply(craft_ui::docking::Action::Float { panel: Panel::Canvas, rect: [360.0, 140.0, 900.0, 620.0] }).unwrap();
++        let protected = serde_json::to_value(&app.docking).unwrap();
++        assert!(
++            app.docking.apply(craft_ui::docking::Action::Float { panel: Panel::Canvas, rect: [360.0, 140.0, 900.0, 620.0] }).is_err(),
++            "the document Canvas remains protected"
++        );
++        assert_eq!(serde_json::to_value(&app.docking).unwrap(), protected, "a refused docking action cannot mutate layout");
++        app.docking.apply(craft_ui::docking::Action::Float { panel: Panel::Tools, rect: [1040.0, 140.0, 300.0, 360.0] }).unwrap();
 +    });
++    assert!(floating.state().docking.layout.floating.iter().any(|group| group.panels.contains(&Panel::Tools)));
 +    floating.get_by_label_contains("Welcome to Bogo PDF");
 +    assert_eq!(bogo_last_opaque_fill(&floating, bogo_canvas_blank_margin(&floating)), Some(expected));
 +}
@@ -52595,7 +52613,7 @@ index 67d80a0c81211308770ecbb0d2e25f8c84b325af..099901b893e8f3420bcc675444ad85d1
  /// A tiny PDF with two pages, two bookmarks and one sticky note.
  const FIXTURE: &[u8] = b"%PDF-1.7
  1 0 obj << /Type /Catalog /Pages 2 0 R /Outlines 6 0 R >> endobj
-@@ -34,7 +121,7 @@ fn harness(setup: impl FnOnce(&mut PdfCraftApp) + 'static) -> Harness<'static, P
+@@ -34,7 +139,7 @@ fn harness(setup: impl FnOnce(&mut PdfCraftApp) + 'static) -> Harness<'static, P
  #[test]
  fn home_shows_welcome_and_tools() {
      let h = harness(|_| {});
@@ -52604,7 +52622,7 @@ index 67d80a0c81211308770ecbb0d2e25f8c84b325af..099901b893e8f3420bcc675444ad85d1
      assert!(h.query_all_by_label("Organize pages").count() >= 2, "tool list + home card");
      h.get_by_label("Open file");
  }
-@@ -111,7 +198,7 @@ fn home_removes_one_recent_file_or_clears_them_all() {
+@@ -111,7 +216,7 @@ fn home_removes_one_recent_file_or_clears_them_all() {
      h.get_by_label("Clear Recent Files").click();
      h.run_steps(2);
      assert!(h.state().recent.is_empty(), "Clear empties the list");
@@ -52613,7 +52631,7 @@ index 67d80a0c81211308770ecbb0d2e25f8c84b325af..099901b893e8f3420bcc675444ad85d1
      assert!(h.query_by_label("Clear Recent Files").is_none(), "and goes away with nothing left to clear");
  }
  
-@@ -330,8 +417,8 @@ fn tabs_shrink_to_fit_then_arrows_step_through_them_and_open_stays_in_sight() {
+@@ -330,8 +435,8 @@ fn tabs_shrink_to_fit_then_arrows_step_through_them_and_open_stays_in_sight() {
          }
      });
      let open = h.get_by_label("Open").rect();
@@ -52624,7 +52642,7 @@ index 67d80a0c81211308770ecbb0d2e25f8c84b325af..099901b893e8f3420bcc675444ad85d1
      let mut previous_right = f32::MIN;
      for i in 0..5 {
          let tab = h.get_by_label(&name(i)).rect();
-@@ -355,15 +442,15 @@ fn tabs_shrink_to_fit_then_arrows_step_through_them_and_open_stays_in_sight() {
+@@ -355,15 +460,15 @@ fn tabs_shrink_to_fit_then_arrows_step_through_them_and_open_stays_in_sight() {
      assert_eq!(enabled(&h, "Scroll tabs right"), Some(true), "and then there is more to the right");
      let open = h.get_by_label("Open").rect();
      let right = h.get_by_label("Scroll tabs right").rect();
@@ -52643,7 +52661,7 @@ index 67d80a0c81211308770ecbb0d2e25f8c84b325af..099901b893e8f3420bcc675444ad85d1
  }
  
  /// macOS (#789): with the integrated title bar, the strip is the 28 pt band AppKit centres the
-@@ -376,7 +463,7 @@ fn the_integrated_title_bar_is_the_traffic_light_band() {
+@@ -376,7 +481,7 @@ fn the_integrated_title_bar_is_the_traffic_light_band() {
          app.open_bytes("band.pdf", None, FIXTURE.to_vec()).unwrap();
      });
      let band = 28.0;
@@ -52652,7 +52670,7 @@ index 67d80a0c81211308770ecbb0d2e25f8c84b325af..099901b893e8f3420bcc675444ad85d1
          let r = h.get_by_label(label).rect();
          assert!(r.top() >= 0.0 && r.bottom() <= band, "{label}: {r:?} inside the {band} pt title bar");
          assert!(r.height() >= 24.0, "{label}: {r:?} stays clickable");
-@@ -1064,7 +1151,7 @@ fn closing_the_last_active_tab_selects_the_previous_one_then_home() {
+@@ -1064,7 +1169,7 @@ fn closing_the_last_active_tab_selects_the_previous_one_then_home() {
          assert!(app.session.get(ids[removed]).is_none());
      }
      assert_eq!(h.state().active, None);

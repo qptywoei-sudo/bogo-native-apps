@@ -4223,10 +4223,10 @@
       "baseLock": "manifests/full-native-apps.json",
       "baseLockSha256": "0c71246652db45818401d22d1267c79f84e01294c4e18f12ac83f536c6ed2a58",
       "baseSourceTreeSha256": "50c345f28ac941ae8d4e7dfa7ecc41dc4b1642d4dd57319b7ddf020ce8db8bfe",
-      "sourceTreeSha256": "2a2137a1935ff6fde8943a03eb27a1c0f9f874f61e060d2f3d581b50ac13eb1c",
+      "sourceTreeSha256": "544a087adba01dd8c41a2d4104aafe31a2be5a60c234624e66d53b0be79168ae",
       "patch": "patches/bogo/pdf.patch",
-      "patchSha256": "e73479c54e3593254cf473ddfd24d3086a27d0221480ebaeb02ee7c90b4d8676",
-      "patchBytes": 6206775,
+      "patchSha256": "2e59d904659fca687ef52eee47cbdda41d1bfa315c7fcd8eb8937d744f6d5f55",
+      "patchBytes": 6207801,
       "files": [
         {
           "path": "apps/pdfcraft-cli/build.rs",
@@ -5109,8 +5109,8 @@
             "bytes": 57209
           },
           "after": {
-            "sha256": "c47e61965c9957a2d7ecf198287dddbde1ce5f2d9c441b2e00d68447d64a7733",
-            "bytes": 61247
+            "sha256": "7d0a71b4ecfd9104f6951897ebc1bd9ba7fadf5f94d4c564dd2a458537d255e0",
+            "bytes": 62254
           }
         },
         {
@@ -10371,10 +10371,10 @@
       "baseLock": "manifests/full-native-apps.json",
       "baseLockSha256": "0c71246652db45818401d22d1267c79f84e01294c4e18f12ac83f536c6ed2a58",
       "baseSourceTreeSha256": "8269234e10fabbd02128ca1139b12ec3998abdf1598fa2ce5371a463daea90b7",
-      "sourceTreeSha256": "80baf7823313b5f31268fcf90c5bff236cc42c6c9539f6edfa114e20e9208ff0",
+      "sourceTreeSha256": "abd3fc98fd4aa190cd96ff64f66e4b37a52e8135963a7df03b59d58fb0419d2b",
       "patch": "patches/bogo/photo.patch",
-      "patchSha256": "144559e6d45454ad99e8ef3f1b7f9e45fa77c0b65a2372fcbc723f4fd325a848",
-      "patchBytes": 5945208,
+      "patchSha256": "9c712aa959d077705176b1db445e56dad71d5ad6a54eaa4a8478f80636b02901",
+      "patchBytes": 5945372,
       "files": [
         {
           "path": "apps/photocraft-cli/build.rs",
@@ -10765,8 +10765,8 @@
             "bytes": 11326
           },
           "after": {
-            "sha256": "d4b576ed5af17257b9cbbde15d4f4df5d983cb3ee55bb1e613434242f22bdc6f",
-            "bytes": 11329
+            "sha256": "6f94a4b1241427d9d8ee016deb50ceeba34120b915be8a1169dc0889a0347aa8",
+            "bytes": 11326
           }
         },
         {

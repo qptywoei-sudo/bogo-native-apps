@@ -1,9 +1,11 @@
 """Exercise extra native UI gate failures and its source-bound package proof."""
 import copy
 import hashlib
+import io
 import json
 from pathlib import Path
 import sys
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -81,6 +83,22 @@ class PdfHomeGateTests(unittest.TestCase):
     def test_package_refuses_missing_extra_evidence(self):
         with self.assertRaisesRegex(ValueError, 'required before packaging'):
             gate.require_complete(self.lock, self.platform)
+
+    def test_actual_rust_failure_keeps_its_exit_status_and_bounded_diagnostics(self):
+        with patch.object(gate.full, 'run', return_value=self.output):
+            gate.complete(self.lock, self.platform)
+        error = subprocess.CalledProcessError(101, ['cargo'], output=b'running 2 tests\n',
+                                              stderr=b'x' * 70000 + b'actual Rust assertion failure\n')
+        captured = io.StringIO()
+        with patch.object(gate.full, 'run', side_effect=error), patch.object(sys, 'stderr', captured):
+            with self.assertRaises(subprocess.CalledProcessError) as raised:
+                gate.complete(self.lock, self.platform)
+        self.assertIs(raised.exception, error)
+        self.assertEqual(raised.exception.returncode, 101)
+        self.assertIn('running 2 tests', captured.getvalue())
+        self.assertIn('actual Rust assertion failure', captured.getvalue())
+        self.assertLess(len(captured.getvalue().encode('utf-8')), 66000)
+        self.assertNotIn(gate.KEY, json.loads(self.path.read_text(encoding='utf-8'))['checks'])
 
     def test_failed_retry_cannot_reuse_an_older_positive_marker(self):
         with patch.object(gate.full, 'run', return_value=self.output):

@@ -2,6 +2,8 @@
 import hashlib
 import json
 import re
+import subprocess
+import sys
 
 import full_native as full
 
@@ -67,7 +69,18 @@ def complete(lock, platform):
     env = full.build_env(lock, fonts, work / ('target-' + platform), target)
     env['CARGO_TERM_COLOR'] = 'never'
     args = command(lock, platform)
-    output = full.run(args, cwd=source, env=env, capture=True)
+    try:
+        output = full.run(args, cwd=source, env=env, capture=True)
+    except subprocess.CalledProcessError as error:
+        # Keep actual Rust failures visible in hosted/local logs while refusing
+        # the package and retaining the original exit status and source gates.
+        for label, raw in (('stdout', error.stdout), ('stderr', error.stderr)):
+            if isinstance(raw, str):
+                raw = raw.encode('utf-8', errors='replace')
+            if isinstance(raw, bytes) and raw:
+                print('PDF UI regression ' + label + ' (last 65536 bytes):\n'
+                      + raw[-65536:].decode('utf-8', errors='replace'), file=sys.stderr)
+        raise
     validate_output(output)
     _, _, _, after = full.prepared(lock)
     full.require(after == inputs and source_contract(source) == sources,
