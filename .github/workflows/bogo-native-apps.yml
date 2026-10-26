@@ -35,6 +35,7 @@ concurrency:
 
 jobs:
   select:
+    name: Verify public source and select exact Bogo native targets
     if: github.repository == 'qptywoei-sudo/bogo-native-apps'
     runs-on: ubuntu-24.04
     outputs:
@@ -64,6 +65,7 @@ jobs:
               out.write('source=' + json.dumps({'app':list(dict.fromkeys(row['app'] for row in rows))}) + '\n')
           PY
   native:
+    name: ${{ matrix.app }} on ${{ matrix.platform }} with installer acceptance
     if: inputs.platform != 'source'
     needs: select
     strategy:
@@ -79,6 +81,8 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
+      - name: Verify owner-derived icons and all source overlay identities on the target OS
+        run: ${{ matrix.python }} -m unittest discover -s tests -p test_bogo_native.py -v
       - run: rustup toolchain install 1.95.0 --profile minimal --component rustfmt --target ${{ matrix.target }}
       - if: matrix.platform == 'windows-x64'
         shell: pwsh
@@ -106,6 +110,7 @@ jobs:
           if-no-files-found: error
           retention-days: 14
   source:
+    name: Complete corresponding source for ${{ matrix.app }}
     needs: select
     strategy:
       fail-fast: false
