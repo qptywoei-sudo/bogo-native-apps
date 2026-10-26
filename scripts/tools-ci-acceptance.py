@@ -20,7 +20,11 @@ MASTER_SHA = 'e3196a03cf3d259b5e3662c39206b36339b22986ac910b0e772fb84f7759957b'
 ICO_SHA = '6fc46773734a521752d98e113d45ea9526ce475af5500efec32dab27ca19f72e'
 ICNS_SHA = '83b8e147f108536a5e71745122dd6f57be3f2b52a2d59a57176228479dfe55cf'
 EXE_SHA = {'windows': '4a73a4ae6052804e2bb14ffe1957c447bbedff92a24e6b11c1115cc7c7682ce5',
-           'macos': 'e1afd018ddc5915349611b0e899c7de40df0230b3b49bbb380a07e19a944c731'}
+           'macos': '3719dff4c53deedb85db9e3c7691e856201f7b111c93fed1f7a24eac180a273a'}
+EXE_BYTES = {'windows':1806336,'macos':3666928}
+# The former e1afd... implementation checkpoint preceded final packaging and
+# signing. Only the exact final executable members of the frozen ZIPs above
+# are accepted here; historical/prepackaging hashes are never a fallback.
 # Asset IDs, names, sizes and hashes were independently read back from this draft.
 PINS = {
  'source': (678997933, 'Bogo-Tools-4.6.23-source.zip', 7431565, '4d632a284a12a41c2e3154058f7770658677380f945ccf796dddd4ae0729f8e2'),
@@ -53,6 +57,41 @@ def digest(path):
 
 def write_json(path, value):
     Path(path).write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+
+def read_json_utf8(path):
+    # Source manifests and native/helper JSON are UTF-8 even when the Windows
+    # host's default ANSI code page is CP1252/CP949. Accept a UTF-8 BOM as well.
+    return json.loads(Path(path).read_text(encoding='utf-8-sig'))
+
+
+def executable_metadata(sha, size, target):
+    expected_sha,expected_size=EXE_SHA[target],EXE_BYTES[target]
+    require(sha==expected_sha and size==expected_size,
+            f'Frozen executable mismatch: expected sha256={expected_sha} bytes={expected_size}; actual sha256={sha} bytes={size}')
+    return {'sha256':sha,'bytes':size}
+
+
+def verify_executable(path, target):
+    path=Path(path);require(path.is_file() and not path.is_symlink(),'Executable is not a plain file')
+    return executable_metadata(digest(path),path.stat().st_size,target)
+
+
+def macos_archive_executable_members(assets):
+    """Bind the postpackaging pin to both exact frozen outer ZIPs before launch."""
+    assets=Path(assets);rows=[]
+    for key,member in [('macos','Bogo Tools.app/Contents/MacOS/KIOControl'),
+                       ('macos-update','KIO-Control-Mac/Bogo Tools.app/Contents/MacOS/KIOControl')]:
+        pin=PINS[key];archive=assets/pin[1]
+        require(archive.is_file() and not archive.is_symlink() and archive.stat().st_size==pin[2]
+                and digest(archive)==pin[3],'Frozen Mac outer archive changed')
+        with zipfile.ZipFile(archive) as z:
+            require(z.namelist().count(member)==1,'Frozen Mac executable member is missing/duplicated')
+            info=z.getinfo(member);require(not info.is_dir() and 0<info.file_size<=16*1024*1024,'Frozen Mac executable member exceeds bound')
+            raw=z.read(info);metadata=executable_metadata(hashlib.sha256(raw).hexdigest(),len(raw),'macos')
+        rows.append({'archive':pin[1],'archiveSha256':pin[3],'member':member,**metadata})
+    require(rows[0]['sha256']==rows[1]['sha256'] and rows[0]['bytes']==rows[1]['bytes'],'Frozen Mac executable members differ')
+    return {'bothFrozenOuterZipsVerified':True,'exactPostpackagingMembers':True,'members':rows}
 
 
 def clean_environment(environment):
@@ -335,12 +374,12 @@ def health(state, pid, version, timeout=120):
     while time.monotonic()<deadline:
         try:
             path=state/'desktop-session.json';require(path.is_file() and not path.is_symlink(),'Own session not ready')
-            session=json.loads(path.read_text(encoding='utf-8-sig'));url=urllib.parse.urlparse(session.get('origin',''))
+            session=read_json_utf8(path);url=urllib.parse.urlparse(session.get('origin',''))
             require(url.scheme=='http' and url.hostname=='127.0.0.1' and url.port in (4323,4324,4325,4321) and not url.username and not url.password,'Own backend origin mismatch')
             require(session.get('version')==version and session.get('clientName')=='GalaxyControl' and session.get('ownerId')=='desktop','Own backend version/identity mismatch')
             token=session.get('token');require(isinstance(token,str) and re.fullmatch(r'[A-Za-z0-9_-]{32,256}',token),'Own backend token invalid')
             status_paths=[state/'bridge'/f'native-{pid}'/'status.json',state/'bridge/status.json']
-            statuses=[json.loads(p.read_text()) for p in status_paths if p.is_file() and not p.is_symlink()]
+            statuses=[read_json_utf8(p) for p in status_paths if p.is_file() and not p.is_symlink()]
             require(any(s.get('pid')==pid for s in statuses),'Native heartbeat is not from known PID')
             req=urllib.request.Request(session['origin']+'/health',headers={'Origin':session['origin'],'X-Local-Agent-Token':token})
             with urllib.request.build_opener(urllib.request.ProxyHandler({}),NoRedirect()).open(req,timeout=2) as response: value=json.load(response)
@@ -454,7 +493,7 @@ import Foundation
 
 
 def mac_observer(work, output, env):
-    helper=work/'mac-own-window.swift';helper.write_text(MAC_PROBE);binary=work/'mac-own-window'
+    helper=work/'mac-own-window.swift';helper.write_text(MAC_PROBE,encoding='utf-8');binary=work/'mac-own-window'
     run=subprocess.run(['swiftc','-parse-as-library',str(helper),'-framework','AppKit','-framework','ScreenCaptureKit','-o',str(binary)],capture_output=True,text=True,env=env,timeout=120)
     (output/'mac-observer-build.log').write_text(run.stdout+run.stderr,encoding='utf-8')
     require(run.returncode==0,'Mac observer compiler failed; see mac-observer-build.log')
@@ -492,7 +531,7 @@ def mac_probe(app, source, work, output, env, observer, *, launched_pid=None, la
     import plistlib
     meta=plistlib.loads((app/'Contents/Info.plist').read_bytes())
     require(meta.get('CFBundleName')==meta.get('CFBundleDisplayName')=='Bogo Tools' and meta.get('CFBundleIdentifier')=='local.galaxycontrol.portable' and meta.get('CFBundleShortVersionString')==VERSION,'Actual bundle metadata mismatch')
-    require(digest(app/'Contents/MacOS/KIOControl')==EXE_SHA['macos'],'Actual Mac executable differs')
+    verify_executable(app/'Contents/MacOS/KIOControl','macos')
     require(digest(app/'Contents/Resources/KIOTools.icns')==ICNS_SHA,'Actual Mac ICNS differs')
     subprocess.run(['/usr/bin/codesign','--verify','--deep','--strict',str(app)],check=True,capture_output=True,env=env)
     signature=subprocess.run(['/usr/bin/codesign','-d','-r-',str(app)],capture_output=True,text=True,env=env)
@@ -528,8 +567,8 @@ def prepare_old_helper(prior, work, source, target):
     runtime=prior/'tools/python' if target=='windows' else prior/'Contents/Resources/tools/python/x86_64'
     helper=engine/'agent/update_helper.py'
     require(helper.is_file() and runtime.is_dir(),'Actual old updater/runtime missing')
-    old_config=json.loads((engine/'agent/update-channel.json').read_text())
-    require(old_config.get('publicKey')==PUBLIC_KEY and json.loads((source/'agent/update-channel.json').read_text()).get('publicKey')==PUBLIC_KEY,'Old/new original public signing identities differ')
+    old_config=read_json_utf8(engine/'agent/update-channel.json')
+    require(old_config.get('publicKey')==PUBLIC_KEY and read_json_utf8(source/'agent/update-channel.json').get('publicKey')==PUBLIC_KEY,'Old/new original public signing identities differ')
     detached=work/('old-'+target+'-updater');detached.mkdir();shutil.copytree(runtime,detached/'python',symlinks=True)
     for name in ('update_helper.py','update_security.py'):shutil.copy2(helper.with_name(name),detached/name)
     deps=detached/'deps';deps.mkdir()
@@ -541,14 +580,14 @@ def prepare_old_helper(prior, work, source, target):
 
 
 def run_old_helper(detached, prior, target, assets, state, output, env):
-    envelope=json.loads((assets/ENVELOPE_PIN[1]).read_text())
+    envelope=read_json_utf8(assets/ENVELOPE_PIN[1])
     receipt=state/'updates'/'ci-receipt.json';receipt.parent.mkdir(exist_ok=True)
     plan={'archive':str(assets/PINS[target+'-update'][1]),'target':str(prior),'platform':'Windows' if target=='windows' else 'Mac','version':VERSION,'pids':[],'receipt':str(receipt),'publicKey':PUBLIC_KEY,'envelope':envelope}
     plan_file=detached/'plan.json';write_json(plan_file,plan)
     python=detached/('python/python.exe' if target=='windows' else 'python/bin/python3')
     result=subprocess.run([str(python),'-I','-B','-X','utf8',str(detached/'update_helper.py'),str(plan_file)],cwd=detached,env=env,capture_output=True,timeout=240)
     require(receipt.is_file(),'Actual old signed updater did not emit its receipt')
-    value=json.loads(receipt.read_text());write_json(output/(target+'-upgrade-receipt.json'),value)
+    value=read_json_utf8(receipt);write_json(output/(target+'-upgrade-receipt.json'),value)
     require(result.returncode==0 and value.get('phase')=='complete' and value.get('reopened') is True,'Actual signed old-to-new update failed: '+str(value.get('error'))+' at '+str(value.get('failedStage')))
     return value
 
@@ -563,12 +602,12 @@ def windows_upgrade(assets, work, source, output, env):
     finally:
         if old_pid:stop_windows(old_pid,prior/'KIOControl.exe',env);old_process.wait(timeout=10)
     state=state_root('windows'); canary=state/'bogo-ci-profile-canary.txt'; user=prior/'bogo-ci-user-document.txt'; nonce='CI-only-'+str(uuid.uuid4())
-    canary.write_text(nonce);user.write_text(nonce);require(digest(prior/'KIOControl.exe')==old_sha,'Old executable changed before upgrade')
+    canary.write_text(nonce,encoding='utf-8');user.write_text(nonce,encoding='utf-8');require(digest(prior/'KIOControl.exe')==old_sha,'Old executable changed before upgrade')
     detached,provenance=prepare_old_helper(prior,work,source,'windows')
     try:
         run_old_helper(detached,prior,'windows',assets,state,output,env)
-        require(canary.read_text()==user.read_text()==nonce,'Profile/user document canary changed')
-        require(digest(prior/'KIOControl.exe')==EXE_SHA['windows'],'Actual upgraded executable is not frozen new source')
+        require(canary.read_text(encoding='utf-8')==user.read_text(encoding='utf-8')==nonce,'Profile/user document canary changed')
+        verify_executable(prior/'KIOControl.exe','windows')
         installed=inventory(prior);installed.pop('bogo-ci-user-document.txt',None)
         require(installed==inventory(work/'independent-update/KIO-Control-Windows'),'Actual upgraded Windows managed tree differs from frozen update')
         pid=windows_pid(prior/'KIOControl.exe',env)
@@ -592,12 +631,12 @@ def mac_upgrade(assets, work, source, output, env, observer):
         stop_mac(prior,observer,env)
         if old_process is not None:old_process.wait(timeout=10)
     state=state_root('macos');canary=state/'bogo-ci-profile-canary.txt';user=root/'bogo-ci-user-document.txt';nonce='CI-only-'+str(uuid.uuid4())
-    canary.write_text(nonce);user.write_text(nonce)
+    canary.write_text(nonce,encoding='utf-8');user.write_text(nonce,encoding='utf-8')
     detached,provenance=prepare_old_helper(prior,work,source,'macos')
     try:
         run_old_helper(detached,prior,'macos',assets,state,output,env)
-        require(canary.read_text()==user.read_text()==nonce,'Mac profile/user document canary changed')
-        require(digest(prior/'Contents/MacOS/KIOControl')==EXE_SHA['macos'],'Actual upgraded Mac executable differs')
+        require(canary.read_text(encoding='utf-8')==user.read_text(encoding='utf-8')==nonce,'Mac profile/user document canary changed')
+        verify_executable(prior/'Contents/MacOS/KIOControl','macos')
         require(inventory(prior)==inventory(work/'update/KIO-Control-Mac/Bogo Tools.app'),'Actual upgraded Mac app tree differs from frozen update')
         pid=mac_pid(prior,observer,env)
         gui=mac_probe(prior,source,work,output,env,observer,launched_pid=pid,label='mac-upgraded')
@@ -628,13 +667,13 @@ def transferred_inputs(root, target, environment):
     for name in ('assets','output'):
         require((root/name).is_dir() and not (root/name).is_symlink(),'Transferred directory is not plain')
     path=root/'receipt.json';require(path.is_file() and not path.is_symlink() and path.stat().st_size<=1024*1024,'Transferred receipt is not plain/bounded')
-    receipt=json.loads(path.read_text(encoding='utf-8'))
+    receipt=read_json_utf8(path)
     names=validate_receipt(receipt,target,environment)
     require({p.name for p in (root/'assets').iterdir()}==set(names),'Transferred asset set differs')
     require(all((root/'assets'/name).is_file() and not (root/'assets'/name).is_symlink() for name in names),'Transferred asset is not a plain file')
     proof=root/'output/fetch-proof.json'
     require({p.name for p in (root/'output').iterdir()}=={'fetch-proof.json'} and proof.is_file() and not proof.is_symlink() and proof.stat().st_size<=1024*1024,'Transferred evidence contains unexpected files')
-    require(json.loads(proof.read_text(encoding='utf-8'))==receipt,'Transferred fetch proof/receipt differ')
+    require(read_json_utf8(proof)==receipt,'Transferred fetch proof/receipt differ')
     return receipt
 
 
@@ -649,7 +688,7 @@ def accept(root, target):
     prior_archive=assets/('prior-'+target+'-update.zip')
     require(prior_archive.stat().st_size==prior_pin[1] and digest(prior_archive)==prior_pin[2],'Actual prior release changed after fetch')
     source=extract(assets/PINS['source'][1],work/'source');require(digest(source/'desktop-ui/src/assets/bogo-tools-icon.png')==MASTER_SHA,'Frozen original artwork changed')
-    manifest=json.loads((source/'SOURCE-MANIFEST.json').read_text())
+    manifest=read_json_utf8(source/'SOURCE-MANIFEST.json')
     for row in manifest['files']:
         p=source.joinpath(*member_path(row['path']).parts);require(p.is_file() and p.stat().st_size==row['bytes'] and digest(p)==row['sha256'],'Corresponding-source manifest mismatch')
     require(not state_root(target).exists(),'Refusing GUI: application profile already exists on this VM')
@@ -660,6 +699,7 @@ def accept(root, target):
     report={'status':'running','version':VERSION,'platform':target,'repository':REPOSITORY,'draftReleaseId':RELEASE_ID,'workflowSha':receipt['workflowSha'],'sourceGitBinding':receipt['assets']['sourceBinding'],'normalFrozenApplication':True,'homeOverridden':False,'credentialsStrippedBeforeProcess':True,'checks':{},'limitations':['OS icon-source images are not screenshots of existing user Dock/taskbar pins.','Captured palette pixels require human visual review and do not prove every UI state.','The signed update uses the actual prior helper with a predownloaded candidate package; future public candidate URLs are not live or tested.','No publisher certificate/notarization policy is added by this test.']}
     try:
         if target=='macos':
+            report['checks']['postpackagingExecutableMembers']=macos_archive_executable_members(assets)
             portable=extract(assets/PINS[target][1],work/'portable','Bogo Tools.app')/'Bogo Tools.app'
             update=extract(assets/PINS[target+'-update'][1],work/'update','KIO-Control-Mac')/'KIO-Control-Mac/Bogo Tools.app'
             require(inventory(portable)==inventory(update),'Portable/update Mac app file trees differ')
@@ -673,7 +713,7 @@ def accept(root, target):
             embedded=portable_payload(portable,work/'embedded-update.zip',PINS['windows-update'][2],PINS['windows-update'][3])
             require(digest(work/'embedded-update.zip')==digest(assets/PINS['windows-update'][1]),'Portable payload and independently downloaded update differ')
             update=extract(assets/PINS['windows-update'][1],work/'independent-update','KIO-Control-Windows')/'KIO-Control-Windows'
-            require(digest(update/'KIOControl.exe')==EXE_SHA['windows'],'Independent update executable changed')
+            verify_executable(update/'KIOControl.exe','windows')
             report['checks']['portableUpdateSourceBinding']=dict(embedded,sourceArchiveSha256=PINS['source'][3],independentUpdateExact=True)
             # Genuine 4.6.21 -> signed 4.6.23 update first, on the fresh OS profile.
             report['checks']['oldToNewUpgrade']=windows_upgrade(assets,work,source,output,environment)
@@ -682,7 +722,7 @@ def accept(root, target):
             try:
                 with (work/'portable-private-process.log').open('wb') as log:subprocess.Popen([str(portable)],env=environment,stdout=log,stderr=subprocess.STDOUT)
                 pid=windows_pid(cached,environment)
-                require(digest(cached)==EXE_SHA['windows'],'Actual SFX-extracted native program differs from independent update')
+                verify_executable(cached,'windows')
                 require(inventory(cached.parent)==inventory(update),'Actual SFX-extracted file tree differs from independently downloaded frozen update')
                 report['checks']['portableUpdateSourceBinding']['actualSfxExtractedFileTreeExact']=True
                 report['checks']['portableBackend']=health(state_root(target),pid,VERSION)

@@ -1,9 +1,11 @@
 """Pure evidence/isolation tests; no native launch, CI dispatch or credential read."""
 import hashlib
+import ast
 import importlib.util
 import io
 import json
 import os
+import re
 from pathlib import Path
 import stat
 import struct
@@ -191,6 +193,61 @@ class GuardTests(unittest.TestCase):
         for pin in [*m.PINS.values(),m.ENVELOPE_PIN]:
             self.assertEqual(len(pin[3]),64);self.assertGreater(pin[2],0)
 
+    def test_real_manifest_fragment_ignores_cp1252_default_and_accepts_utf8_bom(self):
+        # Exact raw row from the frozen SOURCE-MANIFEST.json (full manifest SHA
+        # d0db864e227cbfa464bc2bcf2f3bb5878103b296e491c832165681b4d9bf2c41).
+        fragment='''    {
+      "path": "release-tools/KIO-Control-4.4.4-검증보고.md",
+      "bytes": 6708,
+      "sha256": "256a754b5b3505707ac684a781dbe8a3235de865af23e4a76430eec15f04b7d8",
+      "source": "release-tools/KIO-Control-4.4.4-검증보고.md",
+      "sourceSHA256": "256a754b5b3505707ac684a781dbe8a3235de865af23e4a76430eec15f04b7d8"
+    }'''.encode('utf-8')
+        self.assertEqual(hashlib.sha256(fragment).hexdigest(),'57695bfe7c1871fb7fac72a4e602855a9f33ca6df3936ada57c4f7cf4459a49b')
+        with self.assertRaises(UnicodeDecodeError):fragment.decode('cp1252')
+        path=self.root/'SOURCE-MANIFEST.json';original=Path.open
+        def ansi_open(current,mode='r',buffering=-1,encoding=None,errors=None,newline=None):
+            if 'b' not in mode and encoding in (None,'locale'):encoding='cp1252'
+            return original(current,mode,buffering,encoding,errors,newline)
+        for body in (fragment,b'\xef\xbb\xbf'+fragment):
+            path.write_bytes(body)
+            with patch.object(Path,'open',ansi_open):
+                with self.assertRaises(UnicodeDecodeError):path.read_text()
+                value=m.read_json_utf8(path)
+            self.assertEqual(value['path'],'release-tools/KIO-Control-4.4.4-검증보고.md')
+
+    def test_every_known_text_read_and_write_declares_utf8(self):
+        tree=ast.parse(SCRIPT.read_text(encoding='utf-8'));checked=0
+        for node in ast.walk(tree):
+            if isinstance(node,ast.Call) and isinstance(node.func,ast.Attribute) and node.func.attr in ('read_text','write_text'):
+                values=[k.value for k in node.keywords if k.arg=='encoding']
+                self.assertEqual(len(values),1,'Implicit locale text I/O at line '+str(node.lineno))
+                self.assertIsInstance(values[0],ast.Constant)
+                self.assertIn(values[0].value,('utf-8','utf-8-sig'));checked+=1
+        self.assertGreater(checked,5)
+
+    def test_only_actual_postpackaging_mac_executable_pin_accepted(self):
+        current='3719dff4c53deedb85db9e3c7691e856201f7b111c93fed1f7a24eac180a273a'
+        historical='e1afd018ddc5915349611b0e899c7de40df0230b3b49bbb380a07e19a944c731'
+        self.assertEqual(m.EXE_SHA['macos'],current);self.assertEqual(m.EXE_BYTES['macos'],3666928)
+        self.assertEqual(m.executable_metadata(current,3666928,'macos'),{'sha256':current,'bytes':3666928})
+        for sha,size in [(historical,3666928),(current,3666927),('0'*64,3666928)]:
+            with self.subTest(sha=sha,size=size),self.assertRaises(ValueError) as caught:m.executable_metadata(sha,size,'macos')
+            self.assertIn('actual sha256='+sha,str(caught.exception));self.assertIn('actual',str(caught.exception))
+            self.assertIn('bytes='+str(size),str(caught.exception));self.assertNotIn(str(self.root),str(caught.exception))
+
+    def test_platform_matrix_is_closed_identical_and_default_all(self):
+        workflow=HERE/'tools-ci-acceptance.yml'
+        if not workflow.is_file():workflow=HERE.parent/'.github/workflows/bogo-tools-acceptance.yml'
+        source=workflow.read_text(encoding='utf-8')
+        matrices=re.findall(r'^        include: (.+)$',source,re.M)
+        self.assertEqual(len(matrices),2);self.assertEqual(matrices[0],matrices[1])
+        cases=[json.loads(x) for x in re.findall(r"'(\[.*?\])'",matrices[0])]
+        self.assertEqual([[r['platform'] for r in case] for case in cases],[['windows'],['macos'],['windows','macos']])
+        self.assertEqual({r['runner'] for case in cases for r in case},{'windows-2022','macos-15-intel'})
+        self.assertIn('default: all',source);self.assertEqual(source.count('"Invalid platform choice"'),2)
+        self.assertNotIn('fromJSON(inputs.platform)',source)
+
 
 class ArchiveTests(unittest.TestCase):
     def setUp(self):
@@ -285,6 +342,23 @@ class ArchiveTests(unittest.TestCase):
         rows[-1]=dict(rows[-1],sha='0'*40)
         with patch.object(m,'api',side_effect=[commit,tree]),self.assertRaises(ValueError):m.source_binding(archive)
         with patch.object(m,'api',side_effect=[commit,dict(tree,truncated=True)]),self.assertRaises(ValueError):m.source_binding(archive)
+
+    def test_both_mac_member_bodies_and_both_outer_pins_required(self):
+        body=b'measured final signed executable fixture';sha=hashlib.sha256(body).hexdigest()
+        pins={}
+        for key,member in [('macos','Bogo Tools.app/Contents/MacOS/KIOControl'),
+                           ('macos-update','KIO-Control-Mac/Bogo Tools.app/Contents/MacOS/KIOControl')]:
+            path=self.root/(key+'.zip')
+            with zipfile.ZipFile(path,'w') as z:z.writestr(member,body)
+            pins[key]=(1,path.name,path.stat().st_size,hashlib.sha256(path.read_bytes()).hexdigest())
+        with patch.dict(m.PINS,pins),patch.dict(m.EXE_SHA,{'macos':sha}),patch.dict(m.EXE_BYTES,{'macos':len(body)}):
+            result=m.macos_archive_executable_members(self.root)
+            self.assertTrue(result['bothFrozenOuterZipsVerified']);self.assertTrue(result['exactPostpackagingMembers'])
+            self.assertEqual([r['sha256'] for r in result['members']],[sha,sha])
+            # An internally consistent but wrong member hash is never accepted.
+            with patch.dict(m.EXE_SHA,{'macos':'0'*64}),self.assertRaises(ValueError):m.macos_archive_executable_members(self.root)
+            with (self.root/'macos-update.zip').open('ab') as f:f.write(b'tampered outer archive')
+            with self.assertRaises(ValueError):m.macos_archive_executable_members(self.root)
 
 
 if __name__=='__main__':unittest.main()
