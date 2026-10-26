@@ -52776,7 +52776,7 @@ index 5a97821632544ee51c4dcbb95ed3c984b4ccd188..36faea2a84c65c109bec4132857107df
                  let galley = plain(ctx, &text, FontId::proportional(15.0), Color32::WHITE);
                  let glyphs = &galley.rows[0].glyphs;
 diff --git a/crates/ui-egui/src/theme.rs b/crates/ui-egui/src/theme.rs
-index d87d73dd023d62bd55a229d49aeb6b08eef7cf4b..6a87ce3fe6ece3d5c29771e59b8c3988bd112069 100644
+index d87d73dd023d62bd55a229d49aeb6b08eef7cf4b..a1a4f0e06e92c546cb1fbedf419de622ef5ed93b 100644
 --- a/crates/ui-egui/src/theme.rs
 +++ b/crates/ui-egui/src/theme.rs
 @@ -93,35 +93,35 @@ impl Tokens {
@@ -53053,6 +53053,15 @@ index d87d73dd023d62bd55a229d49aeb6b08eef7cf4b..6a87ce3fe6ece3d5c29771e59b8c3988
                  ..dark
              },
          }
+@@ -330,7 +330,7 @@ pub fn apply(ctx: &egui::Context, t: &Tokens) {
+     v.menu_corner_radius = CornerRadius::same(4);
+     v.selection.bg_fill = t.accent_strong;
+     v.selection.stroke = Stroke::new(1.0, t.text_strong);
+-    v.hyperlink_color = t.accent;
++    v.hyperlink_color = Color32::from_rgb(0x93, 0x44, 0x00);
+     v.override_text_color = Some(t.text);
+     craft_ui::theme::WidgetPalette { noninteractive: t.panel, inactive: t.button, hovered: t.hover, active: t.tool_active, open: t.hover }.apply_to(
+         &mut v.widgets,
 @@ -406,10 +406,10 @@ mod japanese_font_tests {
              // (egui's has_glyph reports false for characters of the face that also supplies the
              // replacement glyph, as Source Sans Semibold does in the semibold stack.)
@@ -53309,7 +53318,7 @@ index 872cffd636c469985075f4757c515ad3f0871313..b0fa9c2f1b37030968ad42dceffd2f52
    exit 1
  fi
 diff --git a/packaging/windows/designcraft.wxs b/packaging/windows/designcraft.wxs
-index 86004155bc5fada65002979e857bce1492e708a1..e5cd073d69441646e89651c32b270e9e9dd99748 100644
+index 86004155bc5fada65002979e857bce1492e708a1..cf150e1035a3507bcd5cc575ca0ee9ca5d800b18 100644
 --- a/packaging/windows/designcraft.wxs
 +++ b/packaging/windows/designcraft.wxs
 @@ -1,27 +1,27 @@
@@ -53347,9 +53356,26 @@ index 86004155bc5fada65002979e857bce1492e708a1..e5cd073d69441646e89651c32b270e9e
      <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
  
      <Icon Id="DesigncraftIcon.ico" SourceFile="$(var.IconPath)" />
-@@ -31,11 +31,11 @@
+@@ -30,12 +30,28 @@
+     <Property Id="ARPURLUPDATEINFO" Value="https://getartcraft.com/apps/designcraft" />
      <Property Id="ARPHELPLINK" Value="https://discord.gg/artcraft" />
  
++    <!-- Reuse an existing custom folder only after an exact old/new executable is found. -->
++    <Property Id="BOGOPREVIOUSAPPFOLDER" Secure="yes">
++      <RegistrySearch Id="BogoPreviousAppFolder" Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\KIO Design.exe" Type="file" Bitness="always64" />
++    </Property>
++    <Property Id="BOGOPREVIOUSAPPEXE" Secure="yes">
++      <RegistrySearch Id="BogoPreviousAppExe" Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\KIO Design.exe" Type="file" Bitness="always64">
++        <FileSearch Id="BogoPreviousAppExeFile" Name="KIO Design.exe" />
++      </RegistrySearch>
++    </Property>
++    <Property Id="BOGOCURRENTAPPEXE" Secure="yes">
++      <RegistrySearch Id="BogoCurrentAppExe" Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\KIO Design.exe" Type="file" Bitness="always64">
++        <FileSearch Id="BogoCurrentAppExeFile" Name="Bogo Design.exe" />
++      </RegistrySearch>
++    </Property>
++    <SetProperty Id="INSTALLFOLDER" Action="BogoSetExistingAppFolder" Value="[BOGOPREVIOUSAPPFOLDER]"
++        After="AppSearch" Sequence="both" Condition="NOT INSTALLFOLDER AND BOGOPREVIOUSAPPFOLDER AND (BOGOPREVIOUSAPPEXE OR BOGOCURRENTAPPEXE)" />
      <StandardDirectory Id="ProgramFiles6432Folder">
 -      <Directory Id="INSTALLFOLDER" Name="KIO Design" />
 +      <Directory Id="INSTALLFOLDER" Name="Bogo Design" />
@@ -53361,7 +53387,7 @@ index 86004155bc5fada65002979e857bce1492e708a1..e5cd073d69441646e89651c32b270e9e
        <ComponentGroupRef Id="DesigncraftFiles" />
      </Feature>
    </Package>
-@@ -43,9 +43,9 @@
+@@ -43,9 +59,9 @@
    <Fragment>
      <ComponentGroup Id="DesigncraftFiles" Directory="INSTALLFOLDER">
        <Component Id="DesigncraftApp" Guid="86B25A6A-CDDC-54CD-966D-2DE863A93B71">

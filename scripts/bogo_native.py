@@ -78,13 +78,18 @@ def audit_windows_transition(legacy, source, before_xml):
     old, new = before.find('w:Package', NS), after.find('w:Package', NS)
     require(old is not None and new is not None and new.get('Name') == 'Bogo ' + NAMES[legacy['id']] and new.get('Manufacturer') == 'Bogo', 'Bogo MSI display identity missing')
     require(old.get('UpgradeCode') == new.get('UpgradeCode') and new.get('UpgradeCode'), 'Legacy MSI UpgradeCode changed')
-    for tag, attr in [('Component', 'Guid'), ('RegistryValue', 'Key'), ('RegistrySearch', 'Key'), ('ProgId', 'Id'), ('ShortcutProperty', 'Value')]:
+    for tag, attr in [('Component', 'Guid'), ('RegistryValue', 'Key'), ('ProgId', 'Id'), ('ShortcutProperty', 'Value')]:
         old_values = sorted(e.get(attr, '') for e in before.findall('.//w:' + tag, NS))
         new_values = sorted(e.get(attr, '') for e in after.findall('.//w:' + tag, NS))
         require(old_values == new_values, 'Legacy MSI technical identity changed: ' + tag + '/' + attr)
+    from bogo_windows_upgrade import validate_additive_searches, APPS as UPGRADE_APPS
+    discovery = validate_additive_searches(before, after, legacy['id'])
     old_upgrade, new_upgrade = before.find('.//w:MajorUpgrade', NS), after.find('.//w:MajorUpgrade', NS)
     require(old_upgrade is not None and new_upgrade is not None and old_upgrade.get('AllowSameVersionUpgrades') == new_upgrade.get('AllowSameVersionUpgrades') == 'yes', 'Bogo same-numeric-version upgrade policy missing')
-    return {'path': relative, 'name': new.get('Name'), 'manufacturer': new.get('Manufacturer'), 'upgradeCode': new.get('UpgradeCode'), 'legacyRegistryComponentAndBundleIdentityRetained': True, 'sameNumericVersionUpgrade': True, 'sha256': digest(Path(source) / relative), 'actualMsiExecution': 'not-performed'}
+    result = {'path': relative, 'name': new.get('Name'), 'manufacturer': new.get('Manufacturer'), 'upgradeCode': new.get('UpgradeCode'), 'legacyRegistryComponentAndBundleIdentityRetained': True, 'sameNumericVersionUpgrade': True, 'sha256': digest(Path(source) / relative), 'actualMsiExecution': 'not-performed'}
+    if legacy['id'] in UPGRADE_APPS:
+        result['upgradeDiscovery'] = discovery
+    return result
 
 
 def public_files(lock):
@@ -93,14 +98,22 @@ def public_files(lock):
     legacy_catalog = full.CATALOG
     full.CATALOG = ROOT / 'manifests/full-native-apps.json'
     try:
-        original = list(launcher.public_files(legacy) if lock['id'] == 'launcher' else _original_public_files(legacy))
+        editor_lock = legacy if lock['id'] != 'launcher' else full.load_lock('grid')
+        original = list(_original_public_files(editor_lock)) + list(launcher.public_files(launcher.load_lock()))
     finally:
         full.CATALOG = legacy_catalog
     seen = set()
     for relative, path in original:
+        if relative in seen:
+            continue
         seen.add(relative)
         yield relative, path
-    extra = ['scripts/bogo_native.py', 'scripts/bogo_brand.py', 'scripts/bogo_assets.py', 'scripts/bogo_launcher.py', 'scripts/record_bogo_overlays.py', 'tests/test_bogo_native.py', 'tests/test_bogo_launcher.py', 'docs/bogo-rebrand.md', 'manifests/bogo-native-apps.json', lock['bogoOverlay']['patch'], '.github/workflows/bogo-native-apps.yml']
+    extra = ['scripts/bogo_native.py', 'scripts/bogo_brand.py', 'scripts/bogo_assets.py', 'scripts/bogo_launcher.py', 'scripts/record_bogo_overlays.py', 'tests/test_bogo_native.py', 'tests/test_bogo_launcher.py', 'docs/bogo-rebrand.md', 'manifests/bogo-native-apps.json', '.github/workflows/bogo-native-apps.yml']
+    extra += ['scripts/smoke_bogo_windows.py', 'manifests/bogo-legacy-upgrade-inputs.json', 'tests/test_bogo_windows_smoke.py', '.github/workflows/full-native-launcher.yml']
+    extra += ['scripts/bogo_qa_profiles.py', 'tests/test_bogo_qa_profiles.py']
+    extra += ['scripts/bogo_windows_upgrade.py', 'tests/test_bogo_windows_upgrade.py', 'docs/legacy-native-readme.md', 'manifests/bogo-native-downloads.json']
+    extra += ['scripts/bogo_packaging.py', 'tests/test_bogo_packaging.py']
+    extra += [row['patch'] for row in json.loads(CATALOG.read_text())['applications']]
     extra += [p.relative_to(ROOT).as_posix() for p in (ROOT / 'assets/bogo-program-icons').iterdir() if p.is_file()]
     for relative in sorted(set(extra) - seen):
         path = ROOT / full.common.check_public_path(relative)

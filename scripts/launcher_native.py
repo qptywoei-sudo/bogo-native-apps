@@ -209,8 +209,9 @@ def package(args, lock):
         dmg_stage.mkdir()
         run(['ditto', '--norsrc', '--noextattr', app, dmg_stage / app.name])
         (dmg_stage / 'Applications').symlink_to('/Applications')
-        run(['hdiutil', 'makehybrid', '-hfs', '-hfs-volume-name', lock['name'], '-o', stage / 'raw.dmg', dmg_stage])
-        run(['hdiutil', 'convert', stage / 'raw.dmg', '-format', 'UDZO', '-imagekey', 'zlib-level=9', '-o', output / (base + '.dmg')])
+        # Preserve executable metadata so the mounted app retains its strict signature.
+        run(['hdiutil', 'create', '-fs', 'HFS+', '-volname', lock['name'], '-srcfolder', dmg_stage,
+             '-format', 'UDZO', '-imagekey', 'zlib-level=9', output / (base + '.dmg')])
         run(sign + [output / (base + '.dmg')])
         run(['codesign', '--verify', '--strict', output / (base + '.dmg')])
         record['signing'] = {'kind': 'ad-hoc', 'notarized': False}
@@ -218,7 +219,7 @@ def package(args, lock):
         folder = stage / lock['name']
         folder.mkdir()
         # Keep the original filename: portable self-update replaces this exact executable.
-        shutil.copy2(binaries['app'], folder / 'artcraft-launcher.exe')
+        shutil.copy2(binaries['app'], folder / (lock['name'] + '.exe' if lock.get('bogoOverlay') else 'artcraft-launcher.exe'))
         shutil.copyfile(source / 'packaging/windows/portable.txt', folder / 'portable.txt')
         notices(lock, source, fonts, folder / 'OpenSourceLicenses', record, env, target)
         common.create_source_zip(output / (base + '.zip'), [(folder.name + '/' + r, p) for r, p in common.regular_files(folder, public=True)], lock['sourceDateEpoch'])

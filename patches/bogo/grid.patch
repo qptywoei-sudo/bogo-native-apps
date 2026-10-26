@@ -51326,7 +51326,7 @@ index b77524bb962bbcdeab263105d60be5e4bf68ae0e..a652a94f2b03fc1937a96d802cace077
                                  if resp.clicked() {
                                      activate_sheet(app, i);
 diff --git a/crates/ui-egui/src/theme.rs b/crates/ui-egui/src/theme.rs
-index 485b9a2f3799cb09e7e6cfb9b2cff6794a226fa5..164248b6ef3553dfbe82a9aa9cba7a4a7a6658ef 100644
+index 485b9a2f3799cb09e7e6cfb9b2cff6794a226fa5..0110607f8e69f9c34fc612153d29c10136a071b0 100644
 --- a/crates/ui-egui/src/theme.rs
 +++ b/crates/ui-egui/src/theme.rs
 @@ -56,36 +56,36 @@ impl Tokens {
@@ -51451,6 +51451,17 @@ index 485b9a2f3799cb09e7e6cfb9b2cff6794a226fa5..164248b6ef3553dfbe82a9aa9cba7a4a
              shadow: Color32::from_black_alpha(90),
              danger: Color32::from_rgb(0xF1, 0x70, 0x5F),
              notice_warn_bg: Color32::from_rgb(0x4A, 0x3F, 0x1E),
+@@ -685,8 +685,8 @@ pub fn apply(ctx: &egui::Context, dark: bool) {
+         v.window_fill = t.menu_bg;
+         v.extreme_bg_color = t.input_bg;
+         v.selection.bg_fill = t.accent_soft;
+-        v.selection.stroke = Stroke::new(1.0, t.accent);
+-        v.hyperlink_color = t.accent;
++        v.selection.stroke = Stroke::new(1.0, Color32::from_rgb(0x93, 0x44, 0x00));
++        v.hyperlink_color = Color32::from_rgb(0x93, 0x44, 0x00);
+         v.widgets.noninteractive.fg_stroke = Stroke::new(1.0, t.text);
+         v.widgets.inactive.fg_stroke = Stroke::new(1.0, t.text);
+         v.widgets.inactive.weak_bg_fill = Color32::TRANSPARENT;
 diff --git a/packaging/freebsd/package.sh b/packaging/freebsd/package.sh
 index 167e3b903d7c8341526362062ac39d7a3ff3f3aa..01e182ed14ae3bc2f10ef5a8b7e5a962ccef8ac8 100755
 --- a/packaging/freebsd/package.sh
@@ -51711,7 +51722,7 @@ index ebe5704d12dd418f2180e3421c33e5a9943167b2..0b5daedd661e44e3b17b7d50cf10af6a
          .set("LegalCopyright", "Copyright (c) the KIO Grid authors. MIT OR Apache-2.0.")
          .set("OriginalFilename", "gridcraft.exe")
 diff --git a/packaging/windows/gridcraft.wxs b/packaging/windows/gridcraft.wxs
-index fb12ff848c03b7432fc34306e2f435cc0ef18553..c2f8951d50b96f9e14814798aa58f83f8e373198 100644
+index fb12ff848c03b7432fc34306e2f435cc0ef18553..de28cdc4acb6892b95413344b93bd2c42b0f9f86 100644
 --- a/packaging/windows/gridcraft.wxs
 +++ b/packaging/windows/gridcraft.wxs
 @@ -1,31 +1,31 @@
@@ -51812,9 +51823,26 @@ index fb12ff848c03b7432fc34306e2f435cc0ef18553..c2f8951d50b96f9e14814798aa58f83f
          <Control Id="Close" Type="PushButton" X="240" Y="75" Width="65" Height="20" Default="yes" Cancel="yes" Text="Close">
            <Publish Event="EndDialog" Value="Return" />
          </Control>
-@@ -148,12 +148,12 @@
+@@ -147,13 +147,29 @@
+       <Show Dialog="SetupFailedDlg" OnExit="error" Condition="UILevel = 5" />
      </AdminUISequence>
  
++    <!-- Reuse an existing custom folder only after an exact old/new executable is found. -->
++    <Property Id="BOGOPREVIOUSAPPFOLDER" Secure="yes">
++      <RegistrySearch Id="BogoPreviousAppFolder" Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\KIO Grid.exe" Type="file" Bitness="always64" />
++    </Property>
++    <Property Id="BOGOPREVIOUSAPPEXE" Secure="yes">
++      <RegistrySearch Id="BogoPreviousAppExe" Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\KIO Grid.exe" Type="file" Bitness="always64">
++        <FileSearch Id="BogoPreviousAppExeFile" Name="KIO Grid.exe" />
++      </RegistrySearch>
++    </Property>
++    <Property Id="BOGOCURRENTAPPEXE" Secure="yes">
++      <RegistrySearch Id="BogoCurrentAppExe" Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\KIO Grid.exe" Type="file" Bitness="always64">
++        <FileSearch Id="BogoCurrentAppExeFile" Name="Bogo Grid.exe" />
++      </RegistrySearch>
++    </Property>
++    <SetProperty Id="INSTALLFOLDER" Action="BogoSetExistingAppFolder" Value="[BOGOPREVIOUSAPPFOLDER]"
++        After="AppSearch" Sequence="both" Condition="NOT INSTALLFOLDER AND BOGOPREVIOUSAPPFOLDER AND (BOGOPREVIOUSAPPEXE OR BOGOCURRENTAPPEXE)" />
      <StandardDirectory Id="ProgramFiles6432Folder">
 -      <Directory Id="INSTALLFOLDER" Name="KIO Grid" />
 +      <Directory Id="INSTALLFOLDER" Name="Bogo Grid" />
@@ -51827,7 +51855,7 @@ index fb12ff848c03b7432fc34306e2f435cc0ef18553..c2f8951d50b96f9e14814798aa58f83f
        <ComponentGroupRef Id="GridcraftFiles" />
      </Feature>
    </Package>
-@@ -161,9 +161,9 @@
+@@ -161,9 +177,9 @@
    <Fragment>
      <ComponentGroup Id="GridcraftFiles" Directory="INSTALLFOLDER">
        <Component Id="GridcraftApp" Guid="3C10C64E-5C5F-506F-A361-A8A72A8475E1">
@@ -51840,7 +51868,7 @@ index fb12ff848c03b7432fc34306e2f435cc0ef18553..c2f8951d50b96f9e14814798aa58f83f
                Icon="GridcraftIcon.ico" IconIndex="0" />
          </File>
  
-@@ -171,10 +171,10 @@
+@@ -171,10 +187,10 @@
  
          <!-- ProgIds: how Explorer opens a file with KIO.Grid. Nothing here sets HKCR\.<ext>'s
               default value, so the user's current default app is left alone. -->
@@ -51853,7 +51881,7 @@ index fb12ff848c03b7432fc34306e2f435cc0ef18553..c2f8951d50b96f9e14814798aa58f83f
          <RegistryValue Root="HKLM" Key="Software\Classes\KIO.Grid.TextData\DefaultIcon" Value="&quot;[#GridcraftExe]&quot;,0" Type="string" />
          <RegistryValue Root="HKLM" Key="Software\Classes\KIO.Grid.TextData\shell\open\command" Value="&quot;[#GridcraftExe]&quot; &quot;%1&quot;" Type="string" />
  
-@@ -188,14 +188,14 @@
+@@ -188,14 +204,14 @@
          <RegistryValue Root="HKLM" Key="Software\Classes\.csv\OpenWithProgids" Name="KIO.Grid.TextData" Value="KIO.Grid.TextData" Type="string" />
          <RegistryValue Root="HKLM" Key="Software\Classes\.tsv\OpenWithProgids" Name="KIO.Grid.TextData" Value="KIO.Grid.TextData" Type="string" />
  
@@ -51871,7 +51899,7 @@ index fb12ff848c03b7432fc34306e2f435cc0ef18553..c2f8951d50b96f9e14814798aa58f83f
        </Component>
  
        <Component Id="GridcraftCli">
-@@ -209,7 +209,7 @@
+@@ -209,7 +225,7 @@
              Value="[DESKTOPSHORTCUT]" Type="string" KeyPath="yes" />
        </Component>
        <Component Id="DesktopShortcutComponent" Directory="DesktopFolder" Condition="DESKTOPSHORTCUT = &quot;1&quot;">

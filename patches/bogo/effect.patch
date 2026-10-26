@@ -55008,7 +55008,7 @@ index 8ac9560d37d571d4941c7d36df6d43f4af051f71..7e062c858ad9bb11f799754471506400
  
  /// Whether the prompt is Revert Project (Revert / Cancel) instead of Unsaved Changes.
 diff --git a/crates/ui-egui/src/theme.rs b/crates/ui-egui/src/theme.rs
-index f5a0664c25a807ea8bda6ed1d7c07bab3ccd9627..d94ef7223ac5a10fb0fb9ccb387250e3cb1eb526 100644
+index f5a0664c25a807ea8bda6ed1d7c07bab3ccd9627..e7f82e0d1a9e3e4f81a03484402edb1ec8d57c8d 100644
 --- a/crates/ui-egui/src/theme.rs
 +++ b/crates/ui-egui/src/theme.rs
 @@ -131,27 +131,27 @@ impl Tokens {
@@ -55137,6 +55137,15 @@ index f5a0664c25a807ea8bda6ed1d7c07bab3ccd9627..d94ef7223ac5a10fb0fb9ccb387250e3
                  tl_nav_bar: Color32::from_rgb(0x9a, 0x9a, 0x9a),
                  tl_work_area_bar: Color32::from_rgb(0x94, 0x94, 0x94),
                  expr_bg: Color32::from_rgb(0xf2, 0xf2, 0xf2),
+@@ -479,7 +479,7 @@ pub fn apply_visuals(ctx: &egui::Context, t: &Tokens) {
+     v.override_text_color = Some(t.text);
+     v.selection.bg_fill = t.accent;
+     v.selection.stroke = Stroke::new(1.0, Color32::WHITE);
+-    v.hyperlink_color = t.accent;
++    v.hyperlink_color = Color32::from_rgb(0x93, 0x44, 0x00);
+     v.window_stroke = Stroke::new(1.0, t.field_border);
+     v.window_corner_radius = egui::CornerRadius::same(8);
+     v.menu_corner_radius = egui::CornerRadius::same(6);
 diff --git a/crates/ui-egui/tests/ui_keyframes.rs b/crates/ui-egui/tests/ui_keyframes.rs
 index 94d0a093f3d8cc77d6a37028905779cc81e08ee9..3c2b34529c484f2e1cb5db249d3de37ed910eab8 100644
 --- a/crates/ui-egui/tests/ui_keyframes.rs

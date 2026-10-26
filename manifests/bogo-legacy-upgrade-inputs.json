@@ -1,0 +1,175 @@
+{
+  "schema": 1,
+  "repository": "qptywoei777-rgb/kio-native-apps",
+  "purpose": "Exact published legacy MSI inputs for isolated Windows upgrade verification; never new Bogo artifacts",
+  "applications": [
+    {
+      "id": "cad",
+      "name": "KIO Cad",
+      "version": "0.7.0-kio.1",
+      "bundleId": "com.kio.cad",
+      "upgradeCode": "F98E3616-1291-59D9-AEFD-8E055186CBD4",
+      "windowsMsi": {
+        "url": "https://github.com/qptywoei777-rgb/kio-native-apps/releases/download/cad-v0.7.0-kio.1/KIO-Cad-0.7.0-kio.1-windows-x64.msi",
+        "bytes": 49332356,
+        "sha256": "f8dc565cd8f55e91077d292c5a94037f2b8c648b81c3da27cf2115d64dd72e86"
+      }
+    },
+    {
+      "id": "design",
+      "name": "KIO Design",
+      "version": "0.8.0-kio.1",
+      "bundleId": "com.kio.design",
+      "upgradeCode": "48194C34-8826-5C1A-9A37-764B83BD695E",
+      "windowsMsi": {
+        "url": "https://github.com/qptywoei777-rgb/kio-native-apps/releases/download/design-v0.8.0-kio.1/KIO-Design-0.8.0-kio.1-windows-x64.msi",
+        "bytes": 56847628,
+        "sha256": "021435a45c9ee226100ee20a8ffd1643f67468c9f1ab1cd6cea7d6cf5726550b"
+      }
+    },
+    {
+      "id": "vector",
+      "name": "KIO Vector",
+      "version": "0.11.0-kio.1",
+      "bundleId": "com.kio.vector",
+      "upgradeCode": "A75852C2-3D0B-505C-AA6A-0F145053BA04",
+      "windowsMsi": {
+        "url": "https://github.com/qptywoei777-rgb/kio-native-apps/releases/download/vector-v0.11.0-kio.1/KIO-Vector-0.11.0-kio.1-windows-x64.msi",
+        "bytes": 100324308,
+        "sha256": "fab4d5608106c766f7c518463008b81e71e5ab4214ca26fd7d0bc639d14131d5"
+      }
+    },
+    {
+      "id": "film",
+      "name": "KIO Film",
+      "version": "0.8.0-kio.1",
+      "bundleId": "com.kio.film",
+      "upgradeCode": "AF94C5D1-6A90-58B2-8321-9279B3BA20E1",
+      "windowsMsi": {
+        "url": "https://github.com/qptywoei777-rgb/kio-native-apps/releases/download/film-v0.8.0-kio.1/KIO-Film-0.8.0-kio.1-windows-x64.msi",
+        "bytes": 57864156,
+        "sha256": "fca7f456ea1b8e3536f8bac41b836673387560ae93c41f09c8420a71ea05fa24"
+      }
+    },
+    {
+      "id": "light",
+      "name": "KIO Light",
+      "version": "0.8.0-kio.1",
+      "bundleId": "com.kio.light",
+      "upgradeCode": "902BDD63-9CCC-5E2C-99E3-9D6E16DEFF54",
+      "windowsMsi": {
+        "url": "https://github.com/qptywoei777-rgb/kio-native-apps/releases/download/light-v0.8.0-kio.1/KIO-Light-0.8.0-kio.1-windows-x64.msi",
+        "bytes": 87580213,
+        "sha256": "d23fc1fade10b3119eb791ed2600ff272bd6089c367a6ee169bf8cc2a40eada7"
+      }
+    },
+    {
+      "id": "pdf",
+      "name": "KIO PDF",
+      "version": "0.8.0-kio.2",
+      "bundleId": "com.kio.pdf",
+      "upgradeCode": "918E30C4-CC6A-5813-9828-04B40482180E",
+      "windowsMsi": {
+        "url": "https://github.com/qptywoei777-rgb/kio-native-apps/releases/download/pdf-v0.8.0-kio.2/KIO-PDF-0.8.0-kio.2-windows-x64.msi",
+        "bytes": 72492132,
+        "sha256": "de92150651eafd000368dda78824a11d53dd0a52adaeac7e7db0a3c445eea03f"
+      }
+    },
+    {
+      "id": "effect",
+      "name": "KIO Effect",
+      "version": "0.10.0-kio.1",
+      "bundleId": "com.kio.effect",
+      "upgradeCode": "1EAF1F70-7FD5-5920-940E-5FA96FDEF401",
+      "windowsMsi": {
+        "url": "https://github.com/qptywoei777-rgb/kio-native-apps/releases/download/effect-v0.10.0-kio.1/KIO-Effect-0.10.0-kio.1-windows-x64.msi",
+        "bytes": 51196600,
+        "sha256": "c054209c6399f072db8bf8111b046f70e388f4ded1d86a828dd9ed1650864c70"
+      }
+    },
+    {
+      "id": "ui",
+      "name": "KIO UI",
+      "version": "0.6.0-kio.1",
+      "bundleId": "com.kio.ui",
+      "upgradeCode": "6E4725FA-15D6-5F26-ADB2-3D99757DAE8A",
+      "windowsMsi": {
+        "url": "https://github.com/qptywoei777-rgb/kio-native-apps/releases/download/ui-v0.6.0-kio.1/KIO-UI-0.6.0-kio.1-windows-x64.msi",
+        "bytes": 69908915,
+        "sha256": "389cd490c76cb50212c702ac908324d5823397c6e04b37ecaaf41bc387f9aa06"
+      }
+    },
+    {
+      "id": "word",
+      "name": "KIO Word",
+      "version": "0.7.0-kio.2",
+      "bundleId": "com.kio.word",
+      "upgradeCode": "F1E0F5E0-20C4-5A03-B699-209EF3A2B808",
+      "windowsMsi": {
+        "url": "https://github.com/qptywoei777-rgb/kio-native-apps/releases/download/word-v0.7.0-kio.2/KIO-Word-0.7.0-kio.2-windows-x64.msi",
+        "bytes": 80177375,
+        "sha256": "c6302ec88b1007f30a71609620994cb19682fd0bddd929e1ffb2e8ba99c5df9f"
+      }
+    },
+    {
+      "id": "sound",
+      "name": "KIO Sound",
+      "version": "0.7.0-kio.1",
+      "bundleId": "com.kio.sound",
+      "upgradeCode": "BA32AC1E-6DBB-5AAB-9CB5-4F2908FA62FA",
+      "windowsMsi": {
+        "url": "https://github.com/qptywoei777-rgb/kio-native-apps/releases/download/sound-v0.7.0-kio.1/KIO-Sound-0.7.0-kio.1-windows-x64.msi",
+        "bytes": 12088103,
+        "sha256": "07bf0710904909c8b657117aea95d306ed8ae1295814afa9fa8cb98f8e3ea34d"
+      }
+    },
+    {
+      "id": "deck",
+      "name": "KIO Deck",
+      "version": "0.7.0-kio.2",
+      "bundleId": "com.kio.deck",
+      "upgradeCode": "57584DF6-493A-52E2-A231-4A6A2C236EFA",
+      "windowsMsi": {
+        "url": "https://github.com/qptywoei777-rgb/kio-native-apps/releases/download/deck-v0.7.0-kio.2/KIO-Deck-0.7.0-kio.2-windows-x64.msi",
+        "bytes": 60594386,
+        "sha256": "406f822aba7b48d99f9cdb60689be20c12d5e771bb67aae35f11d6ad0041acc9"
+      }
+    },
+    {
+      "id": "grid",
+      "name": "KIO Grid",
+      "version": "0.7.0-kio.1",
+      "bundleId": "com.kio.grid",
+      "upgradeCode": "C670EFE0-1FE3-512C-84F0-9804B489A606",
+      "windowsMsi": {
+        "url": "https://github.com/qptywoei777-rgb/kio-native-apps/releases/download/grid-v0.7.0-kio.1/KIO-Grid-0.7.0-kio.1-windows-x64.msi",
+        "bytes": 14870827,
+        "sha256": "bb00c3dd68555f4454d9d64f0301e56025a596b3a5f80815cc494f5a6e33183d"
+      }
+    },
+    {
+      "id": "launcher",
+      "name": "KIO Launcher",
+      "version": "0.4.1-kio.2",
+      "bundleId": "com.kio.launcher",
+      "upgradeCode": "70E9A62B-2013-520F-AE8C-CE135D781114",
+      "windowsMsi": {
+        "url": "https://github.com/qptywoei777-rgb/kio-native-apps/releases/download/launcher-v0.4.1-kio.2/KIO-Launcher-0.4.1-kio.2-windows-x64.msi",
+        "bytes": 15349878,
+        "sha256": "eb19a1f881d612668a34be962b1c90556edd19b7e4f45f90c3bedfe5f0365899"
+      }
+    },
+    {
+      "id": "photo",
+      "name": "KIO Photo",
+      "version": "0.9.0-kio.1",
+      "bundleId": "com.kio.photo",
+      "upgradeCode": "A33FEFC7-28D4-505F-9789-C7CF8016F9B8",
+      "windowsMsi": {
+        "url": "https://github.com/qptywoei777-rgb/kio-native-apps/releases/download/photo-v0.9.0-kio.1/KIO-Photo-0.9.0-kio.1-windows-x64.msi",
+        "bytes": 70540672,
+        "sha256": "61377c0574781b93c52d737bb576744bbf0db928f593ebea5c979e87a2e4ab84"
+      }
+    }
+  ]
+}

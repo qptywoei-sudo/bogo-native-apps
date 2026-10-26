@@ -1,12 +1,28 @@
 name: Bogo native applications (manual verification)
 
 on:
+  workflow_call:
+    inputs:
+      app:
+        type: string
+        default: all
+        required: false
+      platform:
+        type: string
+        default: all
+        required: false
   workflow_dispatch:
     inputs:
       app:
         description: Verified full native application
         type: choice
         options: [all, cad, design, vector, film, light, pdf, effect, ui, word, sound, deck, grid, launcher, photo]
+        default: all
+        required: true
+      platform:
+        description: Native operating systems to build, with matching full source
+        type: choice
+        options: [all, windows-x64, macos-arm64, source]
         default: all
         required: true
 
@@ -19,6 +35,7 @@ concurrency:
 
 jobs:
   select:
+    if: github.repository == 'qptywoei-sudo/bogo-native-apps'
     runs-on: ubuntu-24.04
     outputs:
       matrix: ${{ steps.matrix.outputs.value }}
@@ -31,16 +48,23 @@ jobs:
       - id: matrix
         env:
           BOGO_APP: ${{ inputs.app }}
+          BOGO_PLATFORM: ${{ inputs.platform }}
         run: |
           python3 - <<'PY'
           import json, os, subprocess
           result = subprocess.check_output(['python3','scripts/bogo_native.py','matrix','--app',os.environ['BOGO_APP']], text=True).strip()
           rows = json.loads(result)['include']
+          platform = os.environ['BOGO_PLATFORM']
+          assert platform in ('all', 'windows-x64', 'macos-arm64', 'source'), 'Invalid Bogo native platform'
+          if platform not in ('all', 'source'):
+              rows = [row for row in rows if row['platform'] == platform]
+          assert rows, 'Bogo native matrix must not be empty'
           with open(os.environ['GITHUB_OUTPUT'],'a') as out:
-              out.write('value=' + result + '\n')
+              out.write('value=' + json.dumps({'include': rows}, separators=(',', ':')) + '\n')
               out.write('source=' + json.dumps({'app':list(dict.fromkeys(row['app'] for row in rows))}) + '\n')
           PY
   native:
+    if: inputs.platform != 'source'
     needs: select
     strategy:
       fail-fast: false
@@ -67,10 +91,18 @@ jobs:
       - run: ${{ matrix.python }} scripts/bogo_native.py build --app ${{ matrix.app }} --platform ${{ matrix.platform }}
       - run: ${{ matrix.python }} scripts/bogo_native.py package --app ${{ matrix.app }} --platform ${{ matrix.platform }}
       - run: ${{ matrix.python }} scripts/bogo_native.py verify --app ${{ matrix.app }} --platform ${{ matrix.platform }} --directory dist/${{ matrix.app }}-${{ matrix.platform }}
+      - if: matrix.platform == 'windows-x64'
+        name: Install, upgrade, inspect PE icons and launch installed and portable apps
+        env:
+          BOGO_QA_OUTPUT: ${{ runner.temp }}/bogo-windows-smoke-${{ matrix.app }}
+        run: ${{ matrix.python }} scripts/smoke_bogo_windows.py --app ${{ matrix.app }} --directory dist/${{ matrix.app }}-${{ matrix.platform }} --output "$BOGO_QA_OUTPUT" --allow-ephemeral-install
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        if: always()
         with:
           name: bogo-${{ matrix.app }}-${{ matrix.platform }}
-          path: dist/${{ matrix.app }}-${{ matrix.platform }}/
+          path: |
+            dist/${{ matrix.app }}-${{ matrix.platform }}/
+            ${{ runner.temp }}/bogo-windows-smoke-${{ matrix.app }}/
           if-no-files-found: error
           retention-days: 14
   source:

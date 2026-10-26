@@ -53171,7 +53171,7 @@ index a0b0a7653e18e35facc2b5e0f1e0257514959908..f76aa97c0b74a1a6f463e6570069950b
  
      /// Esc closes only the menu: the field (a layer rename cancels on Esc) and egui (which drops
 diff --git a/crates/ui-egui/src/theme.rs b/crates/ui-egui/src/theme.rs
-index 97d5a6f0b8160907a4462fb3a1aaabd3abcedbc6..fc8c7fdaa36d8b587ee35768a0c200ea91a536e9 100644
+index 97d5a6f0b8160907a4462fb3a1aaabd3abcedbc6..fc8ebdb6a4f69de6b7d31e6f2560f80cc9e6e64e 100644
 --- a/crates/ui-egui/src/theme.rs
 +++ b/crates/ui-egui/src/theme.rs
 @@ -207,98 +207,98 @@ impl Tokens {
@@ -53932,6 +53932,15 @@ index 97d5a6f0b8160907a4462fb3a1aaabd3abcedbc6..fc8c7fdaa36d8b587ee35768a0c200ea
                  histogram_bg: Color32::from_rgb(0, 43, 54),
                  histogram_level: 225,
                  caption_close: Color32::from_rgb(220, 50, 47),
+@@ -985,7 +985,7 @@ pub fn apply(ctx: &egui::Context, kind: ThemeKind) {
+     v.faint_bg_color = t.card;
+     v.code_bg_color = t.field;
+     v.override_text_color = Some(t.text);
+-    v.hyperlink_color = t.accent;
++    v.hyperlink_color = Color32::from_rgb(0x93, 0x44, 0x00);
+     v.warn_fg_color = t.warning;
+     v.error_fg_color = t.danger;
+     v.window_corner_radius = CornerRadius::same(t.radius_lg as u8);
 @@ -1129,7 +1129,7 @@ mod tests {
          let mut width = 0.0;
          ctx.run_ui(Default::default(), |ui| {
@@ -54307,7 +54316,7 @@ index 081349009f5cd0692d2df2912878d651f583a8e8..2f424fcc414abc5ce71eaafd4c0c87eb
  .DESCRIPTION
    ICE50 requires advertised shortcut icon identifiers to have the target file's extension.
 diff --git a/packaging/windows/package.ps1 b/packaging/windows/package.ps1
-index 4f7cd0b9019638faf308cf2626771617f83ca2d1..200ad398abcb476e5ddb1c94d9c7e590e902ec4e 100644
+index 4f7cd0b9019638faf308cf2626771617f83ca2d1..800577a617bd15ceafa661216b627828ff1d16af 100644
 --- a/packaging/windows/package.ps1
 +++ b/packaging/windows/package.ps1
 @@ -1,6 +1,6 @@
@@ -54327,7 +54336,7 @@ index 4f7cd0b9019638faf308cf2626771617f83ca2d1..200ad398abcb476e5ddb1c94d9c7e590
  
  if (-not $SkipBuild) {
    # Static CRT: no VC++ redistributable needed. Scoped to the target so host build scripts and
-@@ -92,7 +92,7 @@ Copy-Item (Join-Path $Bin 'photocraft.exe'), (Join-Path $Bin 'photocraft-cli.exe
+@@ -92,14 +92,14 @@ Copy-Item (Join-Path $Bin 'photocraft.exe'), (Join-Path $Bin 'photocraft-cli.exe
  & (Join-Path $PSScriptRoot 'sign.ps1') (Join-Path $Stage 'photocraft.exe') (Join-Path $Stage 'photocraft-cli.exe')
  
  # ---- MSI ---------------------------------------------------------------------------------------
@@ -54336,6 +54345,24 @@ index 4f7cd0b9019638faf308cf2626771617f83ca2d1..200ad398abcb476e5ddb1c94d9c7e590
  # WiX's stock bitmaps: a 493x58 banner across the top of the inner pages (the page title is drawn
  # over its left side, so that stays white) and a 493x312 backdrop for the Welcome and Finish pages
  # (their text sits on the right; the left 164 px are ours). Both must be 24-bit BMPs.
+ function New-InstallerArt([string] $IconPng, [string] $BannerOut, [string] $DialogOut) {
+   Add-Type -AssemblyName System.Drawing
+-  $paper = [System.Drawing.ColorTranslator]::FromHtml('#efe9dc')
+-  $accent = [System.Drawing.ColorTranslator]::FromHtml('#2f7bf5')
++  $paper = [System.Drawing.ColorTranslator]::FromHtml('#FFF3E8')
++  $accent = [System.Drawing.ColorTranslator]::FromHtml('#FC7501')
+   $icon = [System.Drawing.Image]::FromFile($IconPng)
+   try {
+     foreach ($spec in @(@($BannerOut, 493, 58), @($DialogOut, 493, 312))) {
+@@ -108,7 +108,7 @@ function New-InstallerArt([string] $IconPng, [string] $BannerOut, [string] $Dial
+       try {
+         $g.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
+         $g.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
+-        $g.Clear([System.Drawing.Color]::White)
++        $g.Clear([System.Drawing.ColorTranslator]::FromHtml('#FFFAF6'))
+         if ($spec[2] -eq 58) {
+           $g.DrawImage($icon, 493 - 46 - 8, 6, 46, 46)
+         } else {
 diff --git a/packaging/windows/photocraft.wxs b/packaging/windows/photocraft.wxs
 index 8e454f2a80890f601cb754d9cf2562e60c534a3d..a32128f66f732b5d4bfcdb8f2fb15d1d735bed75 100644
 --- a/packaging/windows/photocraft.wxs

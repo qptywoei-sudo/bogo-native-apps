@@ -51555,7 +51555,7 @@ index 9eb1cc01d491f3197ea5a3c497b5e0e830745ec1..eb19a35b83d7987029d834fdad91b298
  New-Item -ItemType Directory -Force -Path $tmp | Out-Null
  
 diff --git a/packaging/windows/soundcraft.wxs b/packaging/windows/soundcraft.wxs
-index f9791bf854172e3d4b3877310bf6867c437d1f14..b778f7ba42aaa11033c6eaee7a4adf407df9790d 100644
+index f9791bf854172e3d4b3877310bf6867c437d1f14..71ca0ff48b31e7deb199e17de8efe976d4be1551 100644
 --- a/packaging/windows/soundcraft.wxs
 +++ b/packaging/windows/soundcraft.wxs
 @@ -1,27 +1,27 @@
@@ -51592,9 +51592,26 @@ index f9791bf854172e3d4b3877310bf6867c437d1f14..b778f7ba42aaa11033c6eaee7a4adf40
      <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
  
      <Icon Id="SoundcraftIcon.ico" SourceFile="$(var.IconPath)" />
-@@ -31,11 +31,11 @@
+@@ -30,12 +30,28 @@
+     <Property Id="ARPURLUPDATEINFO" Value="https://kio-library.vercel.app/?program=sound" />
      <Property Id="ARPHELPLINK" Value="https://discord.gg/artcraft" />
  
++    <!-- Reuse an existing custom folder only after an exact old/new executable is found. -->
++    <Property Id="BOGOPREVIOUSAPPFOLDER" Secure="yes">
++      <RegistrySearch Id="BogoPreviousAppFolder" Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\KIO Sound.exe" Type="file" Bitness="always64" />
++    </Property>
++    <Property Id="BOGOPREVIOUSAPPEXE" Secure="yes">
++      <RegistrySearch Id="BogoPreviousAppExe" Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\KIO Sound.exe" Type="file" Bitness="always64">
++        <FileSearch Id="BogoPreviousAppExeFile" Name="KIO Sound.exe" />
++      </RegistrySearch>
++    </Property>
++    <Property Id="BOGOCURRENTAPPEXE" Secure="yes">
++      <RegistrySearch Id="BogoCurrentAppExe" Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\KIO Sound.exe" Type="file" Bitness="always64">
++        <FileSearch Id="BogoCurrentAppExeFile" Name="Bogo Sound.exe" />
++      </RegistrySearch>
++    </Property>
++    <SetProperty Id="INSTALLFOLDER" Action="BogoSetExistingAppFolder" Value="[BOGOPREVIOUSAPPFOLDER]"
++        After="AppSearch" Sequence="both" Condition="NOT INSTALLFOLDER AND BOGOPREVIOUSAPPFOLDER AND (BOGOPREVIOUSAPPEXE OR BOGOCURRENTAPPEXE)" />
      <StandardDirectory Id="ProgramFiles6432Folder">
 -      <Directory Id="INSTALLFOLDER" Name="KIO Sound" />
 +      <Directory Id="INSTALLFOLDER" Name="Bogo Sound" />
@@ -51606,7 +51623,7 @@ index f9791bf854172e3d4b3877310bf6867c437d1f14..b778f7ba42aaa11033c6eaee7a4adf40
        <ComponentGroupRef Id="SoundcraftFiles" />
      </Feature>
    </Package>
-@@ -43,14 +43,14 @@
+@@ -43,14 +59,14 @@
    <Fragment>
      <ComponentGroup Id="SoundcraftFiles" Directory="INSTALLFOLDER">
        <Component Id="SoundcraftApp" Guid="3CBC907E-7965-591B-A8E5-CCCF43A70418">
@@ -51625,7 +51642,7 @@ index f9791bf854172e3d4b3877310bf6867c437d1f14..b778f7ba42aaa11033c6eaee7a4adf40
          <RegistryValue Root="HKLM" Key="Software\Classes\KIO.Sound.Session\shell\open\command" Value="&quot;[#SoundcraftExe]&quot; &quot;%1&quot;" Type="string" />
          <RegistryValue Root="HKLM" Key="Software\Classes\.scraft\OpenWithProgids" Name="KIO.Sound.Session" Value="" Type="string" />
          <!-- Audio and MIDI files: offered under "Open with" (imported into a session), never forced
-@@ -68,7 +68,7 @@
+@@ -68,7 +84,7 @@
          <RegistryValue Root="HKLM" Key="Software\Classes\.midi\OpenWithProgids" Name="KIO.Sound.Midi" Value="" Type="string" />
  
          <!-- "Open with" app list and the Run dialog (Win+R "soundcraft"). -->

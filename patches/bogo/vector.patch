@@ -58394,7 +58394,7 @@ index 1608fa20b84f631406d8d292d8d48161335007fa..01eeb9f06b7a74aab1138c08815191cb
  
  /// Tool key `key` as the Control bar's Apply (Enter) and Cancel (Escape) send it.
 diff --git a/crates/ui-egui/src/theme.rs b/crates/ui-egui/src/theme.rs
-index 1315d3203ce09a26634fd6c95d1198cc089b276b..51f87c5000a4238a623520701db7620c0b3e1cbc 100644
+index 1315d3203ce09a26634fd6c95d1198cc089b276b..b49eac09d738f57b774f4b44d3948b4b3efc857c 100644
 --- a/crates/ui-egui/src/theme.rs
 +++ b/crates/ui-egui/src/theme.rs
 @@ -100,34 +100,34 @@ impl Tokens {
@@ -58585,6 +58585,17 @@ index 1315d3203ce09a26634fd6c95d1198cc089b276b..51f87c5000a4238a623520701db7620c
                  ..base
              },
          }
+@@ -304,8 +304,8 @@ pub fn apply(ctx: &egui::Context, b: Brightness) {
+     v.window_corner_radius = CornerRadius::same(6);
+     v.menu_corner_radius = CornerRadius::same(6);
+     v.selection.bg_fill = t.accent.gamma_multiply(0.55);
+-    v.selection.stroke = Stroke::new(1.0, t.accent);
+-    v.hyperlink_color = t.accent;
++    v.selection.stroke = Stroke::new(1.0, Color32::from_rgb(0x93, 0x44, 0x00));
++    v.hyperlink_color = Color32::from_rgb(0x93, 0x44, 0x00);
+     v.override_text_color = Some(t.text);
+     v.popup_shadow = egui::epaint::Shadow { offset: [0, 4], blur: 14, spread: 0, color: Color32::from_black_alpha(if t.dark { 120 } else { 60 }) };
+     v.window_shadow = egui::epaint::Shadow { offset: [0, 8], blur: 28, spread: 0, color: Color32::from_black_alpha(if t.dark { 140 } else { 70 }) };
 diff --git a/packaging/freebsd/package.sh b/packaging/freebsd/package.sh
 index 76c13db08953e37abb88b0880b7bcfe96877a207..9ad8404818499064ad4b83a49cda6fefa5f6ac46 100755
 --- a/packaging/freebsd/package.sh
@@ -58861,7 +58872,7 @@ index d203fcd610d29906bc0f34fb93023a531607ee11..386734c4f3231c42b6e376741cd6ecbc
    exit 1
  fi
 diff --git a/packaging/windows/package.ps1 b/packaging/windows/package.ps1
-index 00ab4e16a5e90d70e59f9928d2a1bec6e997cc95..0ac1a106f92b8fb7dd8af64f5b9a3bcfb24796b8 100644
+index 00ab4e16a5e90d70e59f9928d2a1bec6e997cc95..ddb2dd4ea0be143605aebdf0ded9bbad742c9785 100644
 --- a/packaging/windows/package.ps1
 +++ b/packaging/windows/package.ps1
 @@ -1,6 +1,6 @@
@@ -58881,7 +58892,7 @@ index 00ab4e16a5e90d70e59f9928d2a1bec6e997cc95..0ac1a106f92b8fb7dd8af64f5b9a3bcf
  
  if (-not $SkipBuild) {
    # Static CRT: no VC++ redistributable needed. Scoped to the target so host build scripts and
-@@ -92,7 +92,7 @@ Copy-Item (Join-Path $Bin 'vectorcraft.exe'), (Join-Path $Bin 'vectorcraft-cli.e
+@@ -92,14 +92,14 @@ Copy-Item (Join-Path $Bin 'vectorcraft.exe'), (Join-Path $Bin 'vectorcraft-cli.e
  & (Join-Path $PSScriptRoot 'sign.ps1') (Join-Path $Stage 'vectorcraft.exe') (Join-Path $Stage 'vectorcraft-cli.exe')
  
  # ---- MSI ---------------------------------------------------------------------------------------
@@ -58890,6 +58901,24 @@ index 00ab4e16a5e90d70e59f9928d2a1bec6e997cc95..0ac1a106f92b8fb7dd8af64f5b9a3bcf
  # WiX's stock bitmaps: a 493x58 banner across the top of the inner pages (the page title is drawn
  # over its left side, so that stays white) and a 493x312 backdrop for the Welcome and Finish pages
  # (their text sits on the right; the left 164 px are ours). Both must be 24-bit BMPs.
+ function New-InstallerArt([string] $IconPng, [string] $BannerOut, [string] $DialogOut) {
+   Add-Type -AssemblyName System.Drawing
+-  $paper = [System.Drawing.ColorTranslator]::FromHtml('#efe9dc')
+-  $accent = [System.Drawing.ColorTranslator]::FromHtml('#e8573f')
++  $paper = [System.Drawing.ColorTranslator]::FromHtml('#FFF3E8')
++  $accent = [System.Drawing.ColorTranslator]::FromHtml('#FC7501')
+   $icon = [System.Drawing.Image]::FromFile($IconPng)
+   try {
+     foreach ($spec in @(@($BannerOut, 493, 58), @($DialogOut, 493, 312))) {
+@@ -108,7 +108,7 @@ function New-InstallerArt([string] $IconPng, [string] $BannerOut, [string] $Dial
+       try {
+         $g.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
+         $g.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
+-        $g.Clear([System.Drawing.Color]::White)
++        $g.Clear([System.Drawing.ColorTranslator]::FromHtml('#FFFAF6'))
+         if ($spec[2] -eq 58) {
+           $g.DrawImage($icon, 493 - 46 - 8, 6, 46, 46)
+         } else {
 diff --git a/packaging/windows/sign.ps1 b/packaging/windows/sign.ps1
 index 6ee69bc925514c3b32dec19c48bb529fe1baaba3..38814803f94ac8b24ff96c0ed7e4e8368322596f 100644
 --- a/packaging/windows/sign.ps1

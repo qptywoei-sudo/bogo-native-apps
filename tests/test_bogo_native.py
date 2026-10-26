@@ -71,6 +71,11 @@ class BogoNativeIdentity(unittest.TestCase):
         self.assertEqual(brand.display('About\\nKIO Grid / KIO Launcher를 / KIO Effectについて / KIO Photo設定 / KIO CAD'), 'About\\nBogo Grid / Bogo Launcher를 / Bogo Effectについて / Bogo Photo設定 / Bogo CAD')
         self.assertEqual(brand.display('KIO Wordu / KIO Wordi / KIO Wordban'), 'Bogo Wordu / Bogo Wordi / Bogo Wordban')
 
+    def test_display_brand_does_not_move_existing_pdf_preferences(self):
+        storage = '    eframe::storage_dir("KIO PDF")\n'
+        self.assertEqual(brand.rust_display(storage), storage)
+        self.assertEqual(brand.rust_display('    .with_title("KIO PDF")\n'), '    .with_title("Bogo PDF")\n')
+
     def test_launcher_bundles_every_editor_original_in_its_actual_program_list(self):
         lock = bogo.load_lock('launcher')
         files = {item['path']: item['after'] for item in lock['bogoOverlay']['files']}
@@ -94,6 +99,13 @@ class BogoNativeIdentity(unittest.TestCase):
         self.assertEqual(node[0].get('Value'), 'Bogo Grid')
         self.assertEqual(node[1].get('Value'), 'Software\\KIO Grid\\Capabilities')
 
+    def test_installer_localization_changes_visible_text_and_preserves_ids_and_entities(self):
+        old = '<WixLocalization><String Id="KIO_Welcome" Value="KIO Launcher opens the KIO App Suite: KIO Photo and the KIO apps.&#13;&#10;Next." /></WixLocalization>'
+        new = brand.xml_display(old)
+        self.assertIn('Id="KIO_Welcome"', new)
+        self.assertIn('Bogo Launcher opens the Bogo App Suite: Bogo Photo and the Bogo apps.&#13;&#10;Next.', new)
+        self.assertNotIn('Value="KIO ', new)
+
     def test_chrome_colours_do_not_recolour_document_or_semantic_palette(self):
         old = '            header_bg: Color32::from_rgb(0, 0, 0),\n            text: Color32::WHITE,\n            grid_bg: Color32::WHITE,\n            danger: Color32::from_rgb(200, 0, 0),\n'
         result = brand.theme(old)
@@ -101,6 +113,17 @@ class BogoNativeIdentity(unittest.TestCase):
         self.assertIn('text: Color32::from_rgb(0x34, 0x2B, 0x26)', result)
         self.assertIn('grid_bg: Color32::WHITE', result)
         self.assertIn('danger: Color32::from_rgb(200, 0, 0)', result)
+
+    def test_chrome_text_reads_on_the_requested_orange_and_pale_hover_fills(self):
+        tokens = brand.theme('    on_accent: Color32::WHITE,\n    group_label: Color32::from_rgb(160, 160, 160),\n')
+        self.assertEqual(tokens.count('Color32::from_rgb(0x34, 0x2B, 0x26)'), 2)
+        def luminance(value):
+            channels = [int(value[index:index+2], 16) / 255 for index in (0, 2, 4)]
+            linear = [channel / 12.92 if channel <= .04045 else ((channel + .055) / 1.055) ** 2.4 for channel in channels]
+            return sum(channel * weight for channel, weight in zip(linear, (.2126, .7152, .0722)))
+        for background in ('FC7501', 'FFE7D4', 'FFF3E8', 'FFFAF6'):
+            contrast = (luminance(background) + .05) / (luminance('342B26') + .05)
+            self.assertGreaterEqual(contrast, 4.5, background)
 
 
 if __name__ == '__main__':

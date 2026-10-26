@@ -14,6 +14,11 @@ LEGACY_NAMES = {
     'gridcraft': 'KIO Grid', 'artcraft-launcher': 'KIO Launcher',
 }
 
+BOGO_REPOSITORY = 'qptywoei-sudo/bogo-native-apps'
+LEGACY_REPOSITORY = 'qptywoei777-rgb/kio-native-apps'
+BOGO_REGISTRY = 'https://raw.githubusercontent.com/qptywoei-sudo/bogo-native-apps/refs/heads/codex/bogo-native-rebrand-20261026/manifests/bogo-native-downloads.json'
+LEGACY_REGISTRY = 'https://kio-library.vercel.app/downloads/native-apps-manifest.json'
+
 
 def replace_once(text, before, after):
     if text.count(before) != 1:
@@ -48,6 +53,10 @@ def transform_launcher(source, lock):
     edit('crates/core/src/version.rs', _version)
     edit('crates/native/src/detect.rs', _detect)
     edit('crates/native/src/install.rs', _install)
+    edit('crates/core/src/feed.rs', _repository_feed)
+    edit('crates/native/src/backend.rs', _repository_backend)
+    edit('crates/native/src/source.rs', lambda text: replace_once(text, 'The verified KIO release registry is unavailable.', 'The verified Bogo release registry is unavailable.'))
+    edit('crates/ui-egui/src/widgets.rs', _brand_case)
     return changed
 
 
@@ -86,7 +95,7 @@ mod bogo_identity_tests {
     }
 }
 '''
-    return text
+    return text.replace(LEGACY_REPOSITORY, BOGO_REPOSITORY)
 
 
 def _registry(text):
@@ -166,10 +175,166 @@ mod bogo_registry_tests {
 '''
     for noun in ('registry', 'program', 'release', 'version', 'upstream', 'tag', 'artifact', 'asset'):
         text = text.replace('KIO ' + noun, 'Bogo ' + noun)
-    return text
+    return _repository_registry(text)
+
+
+def _repository_registry(text):
+    production, tests = text.split('#[cfg(test)]', 1)
+    production = replace_once(production, f'pub const REPOSITORY: &str = "{LEGACY_REPOSITORY}";', f'pub const REPOSITORY: &str = "{BOGO_REPOSITORY}";\npub const LEGACY_REPOSITORY: &str = "{LEGACY_REPOSITORY}";')
+    production = replace_once(production, f'pub const REGISTRY_URL: &str = "{LEGACY_REGISTRY}";', f'pub const REGISTRY_URL: &str = "{BOGO_REGISTRY}";\npub const LEGACY_REGISTRY_URL: &str = "{LEGACY_REGISTRY}";')
+    production = replace_once(production, '''        if row.get("repository").and_then(serde_json::Value::as_str) != Some(REPOSITORY) {
+            return Err("Bogo release repository is not allowed".into());
+        }
+''', '')
+    production = replace_once(production, '        let parsed = version::parse(upstream)', '''        let repository = if full_version.contains("-bogo.") { REPOSITORY } else { LEGACY_REPOSITORY };
+        if row.get("repository").and_then(serde_json::Value::as_str) != Some(repository) {
+            return Err("release family does not match its exact repository".into());
+        }
+        let parsed = version::parse(upstream)''')
+    production = production.replace('https://github.com/{REPOSITORY}/releases/', 'https://github.com/{repository}/releases/')
+    production = replace_once(production, 'name: format!("{} {full_version}", app.name),', 'name: format!("{} {full_version}", if full_version.contains("-bogo.") { app.name } else { app.legacy_name() }),')
+    production = replace_once(production, 'feed.apps.insert(app.id.into(), FeedApp { repo: Some(REPOSITORY.into()), fetched_at: Some(0), release });', 'feed.apps.insert(app.id.into(), FeedApp { repo: Some(repository.into()), fetched_at: Some(0), release });')
+    historical, current = tests.split('#[cfg(test)]\nmod bogo_registry_tests', 1)
+    historical = historical.replace('REPOSITORY', 'LEGACY_REPOSITORY')
+    current = replace_once(current, 'let version = format!("0.7.0-{family}.1");', 'let version = format!("0.7.0-{family}.1");\n            let repository = if family == "bogo" { REPOSITORY } else { LEGACY_REPOSITORY };')
+    current = current.replace('"repository":REPOSITORY', '"repository":repository').replace('https://github.com/{REPOSITORY}/releases/', 'https://github.com/{repository}/releases/')
+    current = replace_once(current, 'assert!(parse(&json).is_ok());', '''assert!(parse(&json).is_ok());
+            let other_repository = if family == "bogo" { LEGACY_REPOSITORY } else { REPOSITORY };
+            assert!(parse(&json.replace(repository, other_repository)).is_err());
+            assert!(catalog_family(&json, family == "bogo").is_ok());
+            assert!(catalog_family(&json, family != "bogo").is_err());''')
+    production += '''
+/// Validate a fetched catalog's family as well as every individual exact artifact.
+/// Cached historical catalogs still use parse(), which binds each family itself.
+pub fn catalog_family(body: &str, bogo: bool) -> Result<bool, String> {
+    parse(body)?;
+    let raw: serde_json::Value = serde_json::from_str(body).map_err(|_| "invalid registry")?;
+    let rows = raw["programs"].as_array().ok_or("missing programs")?;
+    let suffix = if bogo { "-bogo." } else { "-kio." };
+    if rows.iter().any(|row| !row["version"].as_str().is_some_and(|value| value.contains(suffix))) {
+        return Err("catalog contains a different release family".into());
+    }
+    Ok(rows.iter().any(|row| row["artifacts"].as_array().is_some_and(|items| !items.is_empty())))
+}
+'''
+    return production + '#[cfg(test)]' + historical + '#[cfg(test)]\nmod bogo_registry_tests' + current
+
+
+def _repository_feed(text):
+    return replace_once(text, '        let repo = self.repo_for(app);', '''        let repo = if self.kio_registry && entry.repo.as_deref() == Some(crate::kio_registry::LEGACY_REPOSITORY) {
+            crate::kio_registry::LEGACY_REPOSITORY.to_string()
+        } else {
+            self.repo_for(app)
+        };''')
+
+
+def _repository_backend(text):
+    text = replace_once(text, 'let outcome = match http.get_feed(url) {', 'let outcome = match bogo_registry_body(http, url) {')
+    return text + '''
+/// Only the exact new catalog or the exact historical KIO catalog are trusted.
+/// An unpublished/empty Bogo catalog may show genuine legacy availability.
+fn bogo_registry_body(http: &Http, url: &str) -> Result<String, http::FeedError> {
+    use artcraft_launcher_core::kio_registry as registry;
+    if url != registry::REGISTRY_URL {
+        return http.get_feed(url);
+    }
+    let primary = http.get_feed(registry::REGISTRY_URL);
+    let mut empty_primary = None;
+    match primary {
+        Ok(body) => match registry::catalog_family(&body, true) {
+            Ok(true) => return Ok(body),
+            Ok(false) => empty_primary = Some(body),
+            Err(why) => return Err(http::FeedError { why, throttled: false, retry_after: None }),
+        },
+        Err(_) => {}
+    }
+    match http.get_feed(registry::LEGACY_REGISTRY_URL) {
+        Ok(body) if registry::catalog_family(&body, false).is_ok() => Ok(body),
+        _ => empty_primary.ok_or_else(|| http::FeedError {
+            why: "neither exact Bogo catalog nor validated historical catalog is available".into(),
+            throttled: false, retry_after: None,
+        }),
+    }
+}
+'''
+
+
+def _brand_case(text):
+    if text.count('text.to_uppercase()') != 2:
+        raise ValueError('Unreviewed Launcher caps widgets')
+    return text.replace('text.to_uppercase()', 'text.to_uppercase().replace("BOGO", "Bogo")')
+
+
+def _repository_pdf(text):
+    production, tests = text.split('#[cfg(test)]', 1)
+    production = replace_once(production, f'const REPOSITORY: &str = "{LEGACY_REPOSITORY}";', f'const REPOSITORY: &str = "{BOGO_REPOSITORY}";\nconst LEGACY_REPOSITORY: &str = "{LEGACY_REPOSITORY}";')
+    production = replace_once(production, f'const MANIFEST: &str = "{LEGACY_REGISTRY}";', f'const MANIFEST: &str = "{BOGO_REGISTRY}";\nconst LEGACY_MANIFEST: &str = "{LEGACY_REGISTRY}";')
+    production = replace_once(production, '        || entry["repository"].as_str() != Some(REPOSITORY)\n', '')
+    production = replace_once(production, '    let tag = format!("pdf-v{version}");', '''    let repository = if brand == "Bogo" { REPOSITORY } else { LEGACY_REPOSITORY };
+    if entry["repository"].as_str() != Some(repository) { return Err(invalid()); }
+    let tag = format!("pdf-v{version}");''')
+    production = production.replace('https://github.com/{REPOSITORY}/releases/', 'https://github.com/{repository}/releases/')
+    start = production.index('    let mut response = agent\n')
+    end = production.index('\n/// The certificate authorities', start)
+    production = production[:start] + '''    if let Ok(body) = fetch_manifest(&agent, MANIFEST) {
+        if let Some(release) = published_bogo_manifest(&body)? {
+            return Ok(release);
+        }
+    }
+    let legacy = fetch_manifest(&agent, LEGACY_MANIFEST).and_then(|body| parse(&body))?;
+    if !legacy.version.contains("-kio.") {
+        return Err("historical PDF catalog contains a different release family".into());
+    }
+    Ok(legacy)
+}
+
+fn published_bogo_manifest(body: &str) -> Result<Option<Release>, String> {
+    let value: serde_json::Value = serde_json::from_str(body).map_err(|_| "invalid Bogo PDF catalog")?;
+    let rows = value["programs"].as_array().filter(|rows| rows.len() <= 64).ok_or("invalid Bogo PDF catalog")?;
+    if value["schemaVersion"].as_u64() != Some(1) { return Err("invalid Bogo PDF catalog".into()); }
+    if rows.iter().all(|row| row["id"].as_str() != Some("pdf")) { return Ok(None); }
+    let release = parse(body)?;
+    if !release.version.contains("-bogo.") { return Err("Bogo PDF catalog contains a different release family".into()); }
+    Ok(Some(release))
+}
+
+fn fetch_manifest(agent: &ureq::Agent, url: &str) -> Result<String, String> {
+    let mut response = agent.get(url).header("Accept", "application/json")
+        .header("User-Agent", concat!("Bogo-PDF/", env!("CARGO_PKG_VERSION")))
+        .config().http_status_as_error(false).build().call()
+        .map_err(|error| format!("couldn't reach the Bogo PDF release service ({error})"))?;
+    let status = response.status().as_u16();
+    if !(200..300).contains(&status) {
+        return Err(format!("couldn't reach the Bogo PDF release service (http status: {status})"));
+    }
+    response.body_mut().with_config().limit(1 << 20).read_to_string()
+        .map_err(|error| format!("unreadable Bogo release manifest ({error})"))
+}
+''' + production[end:]
+    historical, current = tests.split('#[cfg(test)]\nmod bogo_manifest_tests', 1)
+    historical = historical.replace('REPOSITORY', 'LEGACY_REPOSITORY')
+    current += '''
+#[cfg(test)]
+mod bogo_repository_boundary_tests {
+    use super::*;
+    #[test]
+    fn repositories_are_bound_to_version_family() {
+        let legacy = serde_json::json!({"id":"pdf","name":"KIO PDF","version":"0.8.0-kio.2","upstreamVersion":"0.8.0","releaseTag":"pdf-v0.8.0-kio.2","repository":LEGACY_REPOSITORY,"bundleId":"com.kio.pdf","artifacts":[{"platform":"macos","arch":"aarch64","kind":"dmg","url":format!("https://github.com/{LEGACY_REPOSITORY}/releases/download/pdf-v0.8.0-kio.2/KIO-PDF-0.8.0-kio.2-macos-arm64.dmg"),"sha256":"a".repeat(64),"bytes":123}]});
+        let body = serde_json::json!({"schemaVersion":1,"programs":[legacy]}).to_string();
+        assert!(parse_for_platform(&body, "macos", "aarch64").is_ok());
+        assert!(parse_for_platform(&body.replace(LEGACY_REPOSITORY, REPOSITORY), "macos", "aarch64").is_err());
+        let bogo = body.replace("KIO PDF", "Bogo PDF").replace("KIO-PDF-", "Bogo-PDF-").replace("-kio.2", "-bogo.1").replace(LEGACY_REPOSITORY, REPOSITORY);
+        assert!(parse_for_platform(&bogo, "macos", "aarch64").is_ok());
+        assert!(parse_for_platform(&bogo.replace(REPOSITORY, LEGACY_REPOSITORY), "macos", "aarch64").is_err());
+    }
+}
+'''
+    return production + '#[cfg(test)]' + historical + '#[cfg(test)]\nmod bogo_manifest_tests' + current
 
 
 def _version(text):
+    text = replace_once(text, 'pub fn is_newer(latest: &Version, installed: &Version) -> bool {', '''pub fn is_newer(latest: &Version, installed: &Version) -> bool {
+    if installed.pre.as_str().starts_with("bogo.") && latest.pre.as_str().starts_with("kio.") { return false; }''')
     text = replace_once(text, '''    a.cmp_precedence(b)''', '''    if (a.major, a.minor, a.patch) == (b.major, b.minor, b.patch)
         && let (Some(a), Some(b)) = (packaging_revision(a), packaging_revision(b))
     {
@@ -194,6 +359,7 @@ def _version(text):
 }
 
 pub fn is_update(latest: &Version, installed: &Version) -> bool {
+    if installed.pre.as_str().starts_with("bogo.") && latest.pre.as_str().starts_with("kio.") { return false; }
     if (latest.major, latest.minor, latest.patch) == (installed.major, installed.minor, installed.patch) {
         match (packaging_revision(latest), packaging_revision(installed)) {
             (Some(a), Some(b)) => return a > b,
@@ -216,6 +382,8 @@ mod bogo_version_tests {
         let v = |s| parse(s).unwrap();
         assert!(is_update(&v("0.7.0-bogo.1"), &v("0.7.0-kio.99")));
         assert!(!is_update(&v("0.7.0-kio.99"), &v("0.7.0-bogo.1")));
+        assert!(!is_update(&v("0.9.0-kio.1"), &v("0.8.0-bogo.1")));
+        assert!(!is_newer(&v("0.9.0-kio.1"), &v("0.8.0-bogo.1")));
         assert!(is_update(&v("0.7.0-bogo.1"), &v("0.7.0")));
         assert!(is_update(&v("0.7.0-bogo.2"), &v("0.7.0-bogo.1")));
         assert!(!is_update(&v("0.7.0-bogo.1"), &v("0.7.0-bogo.1")));
@@ -305,6 +473,20 @@ mod bogo_detect_tests {
 
 
 def _install(text):
+    # diskimages-helper cannot mount below an external/private application cache
+    # on macOS even when the calling process can write there. Mount at the OS
+    # volume namespace, without creating or reusing any caller-controlled entry.
+    text = replace_once(text,
+        'pub fn install_dmg(app: &CraftApp, dmg: &Path, existing: Option<&Installed>, paths: &Paths, expect: &Expect<\'_>)',
+        'pub fn install_dmg(app: &CraftApp, dmg: &Path, existing: Option<&Installed>, _paths: &Paths, expect: &Expect<\'_>)')
+    text = replace_once(text, '''        let mount = paths.cache.join(format!("mount-{}-{}-{attempt}", app.id, std::process::id()));
+        std::fs::create_dir_all(&mount).map_err(|e| format!("couldn't create a folder to open the disk image in ({e})"))?;''', '''        let mount = Path::new("/Volumes").join(format!("Bogo-{}-{}-{attempt}", app.id, std::process::id()));
+        match std::fs::symlink_metadata(&mount) {
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+            Ok(_) => return Err("the unique disk-image mount location already exists; nothing was mounted".into()),
+            Err(error) => return Err(format!("couldn't inspect the disk-image mount location ({error})")),
+        }''')
+    text = text.replace('unusual characters in the cache folder\'s path', 'unusual characters in the disk-image path')
     text = replace_once(text, '''if text("ProductName") != Some(app.name)
             || text("Manufacturer") != Some("KIO")''', '''let family = release.version.as_ref().and_then(artcraft_launcher_core::version::packaging_revision).map(|(family, _)| family);
         let expected = if family == Some(1) { (app.name, "Bogo") } else { (app.legacy_name(), "KIO") };
@@ -479,9 +661,12 @@ mod bogo_manifest_tests {
     }
 }
 '''
+    text = _repository_pdf(text)
     path.write_text(text, encoding='utf-8')
     ui = source / 'crates/ui-egui/src/updates.rs'
     text = ui.read_text(encoding='utf-8')
+    text = replace_once(text, 'pub fn is_newer(latest: &str, current: &str) -> bool {', '''pub fn is_newer(latest: &str, current: &str) -> bool {
+    if current.contains("-bogo.") && latest.contains("-kio.") { return false; }''')
     text = replace_once(text, 'Option<(u64, u64, u64, u64)>', 'Option<(u64, u64, u64, u8, u64)>')
     text = replace_once(text, 'let (core, revision) = match v.split_once("-kio.") {',
         'let family = u8::from(v.contains("-bogo."));\n    let (core, revision) = match v.split_once("-bogo.").or_else(|| v.split_once("-kio.")) {')
@@ -496,6 +681,7 @@ mod bogo_update_order_tests {
     fn bogo_is_newer_than_every_kio_revision_of_the_same_upstream() {
         assert!(is_newer("0.8.0-bogo.1", "0.8.0-kio.99"));
         assert!(!is_newer("0.8.0-kio.99", "0.8.0-bogo.1"));
+        assert!(!is_newer("0.9.0-kio.1", "0.8.0-bogo.1"));
         assert!(is_newer("0.8.0-bogo.2", "0.8.0-bogo.1"));
         assert!(!is_newer("0.8.0-bogo.1", "0.9.0-kio.1"));
     }

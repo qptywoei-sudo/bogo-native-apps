@@ -36,6 +36,172 @@ index 987c77870b8579a25ce90588ae99ea4f155be366..20727e71764efaef627700f4c4078e08
          if let Err(e) = res.compile() {
              println!("cargo::warning=winresource: {e}");
          }
+diff --git a/apps/figcraft/src/bogo_qa.rs b/apps/figcraft/src/bogo_qa.rs
+new file mode 100644
+index 0000000000000000000000000000000000000000..7edd3b3927e53a898a9ee3a11a95e6830631e4bd
+--- /dev/null
++++ b/apps/figcraft/src/bogo_qa.rs
+@@ -0,0 +1,160 @@
++//! Explicit, private QA profiles. Normal storage identities stay unchanged.
++#![allow(dead_code)]
++
++use std::ffi::OsString;
++use std::path::{Component, Path, PathBuf};
++
++const APP: &str = "ui";
++
++/// A pure parser, also used by tests: partial opt-in always fails closed.
++fn resolve(mode: Option<OsString>, base: Option<OsString>) -> Result<Option<PathBuf>, String> {
++    if mode.is_none() && base.is_none() {
++        return Ok(None);
++    }
++    if mode.as_deref() != Some(std::ffi::OsStr::new("1")) {
++        return Err("BOGO_QA_MODE must equal 1 when QA settings are supplied".into());
++    }
++    let base = base.filter(|value| !value.is_empty()).ok_or("BOGO_QA_ROOT is required in QA mode")?;
++    let base = PathBuf::from(base);
++    if !base.is_absolute()
++        || base.components().any(|part| matches!(part, Component::ParentDir))
++        || !base.components().any(|part| matches!(part, Component::Normal(_)))
++    {
++        return Err("BOGO_QA_ROOT must be an absolute task directory without parent traversal".into());
++    }
++    Ok(Some(base))
++}
++
++#[cfg(not(target_arch = "wasm32"))]
++fn private_directory(path: &Path) -> Result<(), String> {
++    match std::fs::symlink_metadata(path) {
++        Ok(metadata) if metadata.file_type().is_symlink() || !metadata.is_dir() => {
++            return Err("QA directory is a link or is not a directory".into());
++        }
++        Ok(_) => {}
++        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
++            let mut builder = std::fs::DirBuilder::new();
++            builder.recursive(true);
++            #[cfg(unix)]
++            {
++                use std::os::unix::fs::DirBuilderExt;
++                builder.mode(0o700);
++            }
++            builder.create(path).map_err(|error| format!("cannot create QA directory: {error}"))?;
++        }
++        Err(error) => return Err(format!("cannot inspect QA directory: {error}")),
++    }
++    let metadata = std::fs::symlink_metadata(path).map_err(|error| format!("cannot inspect QA directory: {error}"))?;
++    if metadata.file_type().is_symlink() || !metadata.is_dir() {
++        return Err("QA directory changed into a link or a file".into());
++    }
++    #[cfg(unix)]
++    {
++        use std::os::unix::fs::PermissionsExt;
++        if metadata.permissions().mode() & 0o077 != 0 {
++            return Err("QA directory must be private to its owner (mode 0700)".into());
++        }
++    }
++    Ok(())
++}
++
++#[cfg(not(target_arch = "wasm32"))]
++fn owned_root(base: &Path) -> Result<PathBuf, String> {
++    private_directory(base)?;
++    let base = std::fs::canonicalize(base).map_err(|error| format!("cannot resolve QA directory: {error}"))?;
++    let app = base.join(APP);
++    private_directory(&app)?;
++    Ok(app)
++}
++
++#[cfg(not(target_arch = "wasm32"))]
++fn refuse(message: &str) -> ! {
++    eprintln!("Bogo QA profile refused: {message}");
++    std::process::exit(2)
++}
++
++/// None only for a completely ordinary launch. Invalid QA settings exit before
++/// the caller can fall back to personal preferences, recovery, logs or caches.
++#[cfg(not(target_arch = "wasm32"))]
++pub fn root() -> Option<PathBuf> {
++    static ROOT: std::sync::OnceLock<Option<PathBuf>> = std::sync::OnceLock::new();
++    ROOT.get_or_init(|| match resolve(std::env::var_os("BOGO_QA_MODE"), std::env::var_os("BOGO_QA_ROOT")) {
++        Ok(Some(base)) => Some(owned_root(&base).unwrap_or_else(|error| refuse(&error))),
++        Ok(None) => None,
++        Err(error) => refuse(&error),
++    })
++    .clone()
++}
++
++/// Browser builds retain their existing browser storage and do not read native
++/// process environment variables or create host directories.
++#[cfg(target_arch = "wasm32")]
++pub fn root() -> Option<PathBuf> {
++    None
++}
++
++pub fn path(relative: &str) -> Option<PathBuf> {
++    root().map(|root| {
++        let relative = Path::new(relative);
++        if relative.as_os_str().is_empty() || relative.components().any(|part| !matches!(part, Component::Normal(_))) {
++            #[cfg(not(target_arch = "wasm32"))]
++            refuse("invalid internal QA path");
++        }
++        root.join(relative)
++    })
++}
++
++#[cfg(test)]
++mod qa_profile_tests {
++    use super::*;
++
++    #[test]
++    fn ordinary_launch_has_no_qa_profile() {
++        assert_eq!(resolve(None, None), Ok(None));
++    }
++
++    #[test]
++    fn partial_invalid_and_relative_configuration_never_fall_back() {
++        for (mode, root) in [
++            (Some("1"), None),
++            (None, Some("/private/qa")),
++            (Some("0"), Some("/private/qa")),
++            (Some("true"), Some("/private/qa")),
++            (Some("1"), Some("")),
++            (Some("1"), Some("relative")),
++            (Some("1"), Some("/")),
++            (Some("1"), Some("/private/qa/../user")),
++        ] {
++            assert!(resolve(mode.map(OsString::from), root.map(OsString::from)).is_err());
++        }
++    }
++
++    #[test]
++    fn complete_configuration_is_explicit_and_keeps_the_app_namespace() {
++        let absolute = std::env::temp_dir().join("bogo-qa-parser");
++        assert_eq!(resolve(Some("1".into()), Some(absolute.as_os_str().into())), Ok(Some(absolute.clone())));
++    }
++
++    #[cfg(not(target_arch = "wasm32"))]
++    #[test]
++    fn owned_paths_are_private_and_links_or_existing_public_roots_are_refused() {
++        let base = std::env::temp_dir().join(format!("bogo-qa-profile-{}-{}", APP, std::process::id()));
++        assert!(!base.exists());
++        let app = owned_root(&base).expect("fresh private QA root");
++        assert_eq!(app, std::fs::canonicalize(&base).expect("QA base").join(APP));
++        assert!(app.is_dir());
++        #[cfg(unix)]
++        {
++            use std::os::unix::fs::{PermissionsExt, symlink};
++            assert_eq!(std::fs::metadata(&base).expect("QA metadata").permissions().mode() & 0o777, 0o700);
++            let link = base.with_extension("link");
++            symlink(&base, &link).expect("QA link fixture");
++            assert!(owned_root(&link).is_err());
++            std::fs::remove_file(&link).expect("remove own link");
++            std::fs::set_permissions(&base, std::fs::Permissions::from_mode(0o755)).expect("public fixture");
++            assert!(owned_root(&base).is_err());
++            std::fs::set_permissions(&base, std::fs::Permissions::from_mode(0o700)).expect("restore own fixture");
++        }
++        std::fs::remove_dir_all(&base).expect("remove own fixture");
++    }
++}
 diff --git a/apps/figcraft/src/control_server.rs b/apps/figcraft/src/control_server.rs
 index b20eb1fd1ea8c4b0a366cf29d9f458aa201ad410..61fc379891dccaaa2107892387a88671068a966f 100644
 --- a/apps/figcraft/src/control_server.rs
@@ -55,10 +221,23 @@ index b20eb1fd1ea8c4b0a366cf29d9f458aa201ad410..61fc379891dccaaa2107892387a88671
          let mut workers = Vec::new();
          for stream in listener.incoming().flatten() {
 diff --git a/apps/figcraft/src/main.rs b/apps/figcraft/src/main.rs
-index 783af009887c442ff0405f07e7522d8e8b19a5a7..abfeb2ed931770f0442764d848c2b045a22a9123 100644
+index 783af009887c442ff0405f07e7522d8e8b19a5a7..234baac0607c01d84cb7695771153f8ce33d1d5c 100644
 --- a/apps/figcraft/src/main.rs
 +++ b/apps/figcraft/src/main.rs
-@@ -99,7 +99,7 @@ fn main() -> eframe::Result {
+@@ -10,6 +10,7 @@
+ #![cfg_attr(all(target_os = "windows", not(debug_assertions)), windows_subsystem = "windows")]
+ 
+ mod args;
++mod bogo_qa;
+ mod control_server;
+ mod gamepad;
+ mod graphics;
+@@ -95,11 +96,12 @@ impl eframe::App for App {
+ }
+ 
+ fn main() -> eframe::Result {
++    let _ = bogo_qa::root();
+     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("warn")).init();
      let args: Vec<String> = std::env::args().skip(1).collect();
      if args.iter().any(|a| a == "--version" || a == "-V") {
          println!(
@@ -67,7 +246,16 @@ index 783af009887c442ff0405f07e7522d8e8b19a5a7..abfeb2ed931770f0442764d848c2b045
              env!("CARGO_PKG_VERSION"),
              option_env!("FIGCRAFT_BUILD_SHA").filter(|s| !s.is_empty()).map(|s| format!(" ({s})")).unwrap_or_default()
          );
-@@ -169,7 +169,7 @@ fn main() -> eframe::Result {
+@@ -149,7 +151,7 @@ fn main() -> eframe::Result {
+     session.plugins.install_dir = services::config_dir().map(|d| d.join("Plugins"));
+     // Invite links open this app (Windows registers per user at run time; installed builds by
+     // default, never a build from source unless asked).
+-    session.live.links = figcraft_collab_net::links::system();
++    session.live.links = if bogo_qa::root().is_some() { None } else { figcraft_collab_net::links::system() };
+     session.invite_links_startup();
+     // A first run (no settings kept yet, nothing to open) starts on the home screen, with its
+     // tips and templates; later runs start in a new file.
+@@ -169,7 +171,7 @@ fn main() -> eframe::Result {
      }
      let icon = services::window_icon();
      let mut viewport = egui::ViewportBuilder::default()
@@ -76,13 +264,27 @@ index 783af009887c442ff0405f07e7522d8e8b19a5a7..abfeb2ed931770f0442764d848c2b045
          .with_app_id("com.kio.ui")
          .with_inner_size([1440.0, 900.0])
          .with_min_inner_size([800.0, 500.0])
-@@ -189,5 +189,5 @@ fn main() -> eframe::Result {
+@@ -189,5 +191,5 @@ fn main() -> eframe::Result {
      let mut options = eframe::NativeOptions { viewport, renderer: eframe::Renderer::Wgpu, ..Default::default() };
      graphics::configure(&mut options.wgpu_options);
      figcraft_ui_egui::windows::install(fig);
 -    eframe::run_native("KIO UI", options, Box::new(move |_cc| Ok(Box::new(App { queue, ctx_slot, title: String::new(), recovery }))))
 +    eframe::run_native("Bogo UI", options, Box::new(move |_cc| Ok(Box::new(App { queue, ctx_slot, title: String::new(), recovery }))))
  }
+diff --git a/apps/figcraft/src/services.rs b/apps/figcraft/src/services.rs
+index 8b13cbd444527c6a2615a4037ed930084e28c293..f808f80777f0f1a5c3523b523a9258b978f68585 100644
+--- a/apps/figcraft/src/services.rs
++++ b/apps/figcraft/src/services.rs
+@@ -22,6 +22,9 @@ pub struct Desktop {
+ }
+ 
+ pub fn config_dir() -> Option<PathBuf> {
++    if let Some(path) = crate::bogo_qa::path("profile") {
++        return Some(path);
++    }
+     #[cfg(target_os = "macos")]
+     let base = std::env::var_os("HOME").map(|h| PathBuf::from(h).join("Library/Application Support"));
+     #[cfg(target_os = "windows")]
 diff --git a/assets/app-icon/BOGO-ICON-SOURCE.txt b/assets/app-icon/BOGO-ICON-SOURCE.txt
 new file mode 100644
 index 0000000000000000000000000000000000000000..4ec53d1ed4ce1b5fe5165cf46d317f3424bf883e
@@ -59249,7 +59451,7 @@ index e7017c231454954dceab17dac098f947bd804cac..bf11f56f06727cc9319cf20906123f94
          );
          ui.add_space(4.0);
 diff --git a/crates/ui-egui/src/theme.rs b/crates/ui-egui/src/theme.rs
-index 080bce43d822a4bb057104cf94fcdfba4006ab19..eb4c5315c0bd192dc43cef5da0ce23157d2782bf 100644
+index 080bce43d822a4bb057104cf94fcdfba4006ab19..149d267b0cca061244c4ecdcc1b5be62228c2f63 100644
 --- a/crates/ui-egui/src/theme.rs
 +++ b/crates/ui-egui/src/theme.rs
 @@ -44,7 +44,7 @@ pub struct Tokens {
@@ -59357,6 +59559,15 @@ index 080bce43d822a4bb057104cf94fcdfba4006ab19..eb4c5315c0bd192dc43cef5da0ce2315
              shadow: Color32::from_black_alpha(90),
              menu: Color32::from_rgb(0x1E, 0x1E, 0x1E),
              menu_text: Color32::from_rgb(0xFF, 0xFF, 0xFF),
+@@ -186,7 +186,7 @@ fn visuals(t: Tokens) -> Visuals {
+     v.window_corner_radius = egui::CornerRadius::same(13);
+     v.menu_corner_radius = egui::CornerRadius::same(13);
+     v.selection.bg_fill = t.accent.gamma_multiply(0.3);
+-    v.selection.stroke = Stroke::new(1.0, t.accent);
++    v.selection.stroke = Stroke::new(1.0, Color32::from_rgb(0x93, 0x44, 0x00));
+     v.hyperlink_color = t.accent_text;
+     for w in [&mut v.widgets.inactive, &mut v.widgets.hovered, &mut v.widgets.active, &mut v.widgets.open, &mut v.widgets.noninteractive] {
+         w.corner_radius = egui::CornerRadius::same(5);
 diff --git a/crates/ui-egui/src/toolbar.rs b/crates/ui-egui/src/toolbar.rs
 index 8c804f6b1c82cdbd789a8fcb1d8ec27293895a43..8bb4a0ad330792529ec818bdf26cbec07e162259 100644
 --- a/crates/ui-egui/src/toolbar.rs
@@ -59834,7 +60045,7 @@ index fd835f487875c72707519bf7ce29e54db1399e31..64d58829f53fe7d662c4676e522a2494
          <RegistryValue Root="HKLM" Key="Software\Classes\Applications\KIO UI.exe\SupportedTypes" Name=".figcraft" Value="" Type="string" />
          <RegistryValue Root="HKLM" Key="Software\Classes\Applications\KIO UI.exe\SupportedTypes" Name=".svg" Value="" Type="string" />
 diff --git a/packaging/windows/package.ps1 b/packaging/windows/package.ps1
-index 85c3c97fca861c3b67980b56309f6a57abb66db3..f369594dbbda437a2b62268d6f3f1e19e35b3a2e 100644
+index 85c3c97fca861c3b67980b56309f6a57abb66db3..a662cd12714f5040c49b103dbf1d66d5ff5af137 100644
 --- a/packaging/windows/package.ps1
 +++ b/packaging/windows/package.ps1
 @@ -1,6 +1,6 @@
@@ -59854,7 +60065,7 @@ index 85c3c97fca861c3b67980b56309f6a57abb66db3..f369594dbbda437a2b62268d6f3f1e19
  
  if (-not $SkipBuild) {
    # Static CRT: no VC++ redistributable needed. Scoped to the target so host build scripts and
-@@ -99,7 +99,7 @@ foreach ($exe in $Exes) { Copy-Item (Join-Path $Bin $exe) $Stage }
+@@ -99,14 +99,14 @@ foreach ($exe in $Exes) { Copy-Item (Join-Path $Bin $exe) $Stage }
  & (Join-Path $PSScriptRoot 'sign.ps1') @($Exes | ForEach-Object { Join-Path $Stage $_ })
  
  # ---- MSI ---------------------------------------------------------------------------------------
@@ -59863,6 +60074,24 @@ index 85c3c97fca861c3b67980b56309f6a57abb66db3..f369594dbbda437a2b62268d6f3f1e19
  # WiX's stock bitmaps: a 493x58 banner across the top of the inner pages (the page title is drawn
  # over its left side, so that stays white) and a 493x312 backdrop for the Welcome and Finish pages
  # (their text sits on the right; the left 164 px are ours). Both must be 24-bit BMPs.
+ function New-InstallerArt([string] $IconPng, [string] $BannerOut, [string] $DialogOut) {
+   Add-Type -AssemblyName System.Drawing
+-  $paper = [System.Drawing.ColorTranslator]::FromHtml('#f5f5f5')
+-  $accent = [System.Drawing.ColorTranslator]::FromHtml('#0d99ff')
++  $paper = [System.Drawing.ColorTranslator]::FromHtml('#FFF3E8')
++  $accent = [System.Drawing.ColorTranslator]::FromHtml('#FC7501')
+   $icon = [System.Drawing.Image]::FromFile($IconPng)
+   try {
+     foreach ($spec in @(@($BannerOut, 493, 58), @($DialogOut, 493, 312))) {
+@@ -115,7 +115,7 @@ function New-InstallerArt([string] $IconPng, [string] $BannerOut, [string] $Dial
+       try {
+         $g.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
+         $g.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
+-        $g.Clear([System.Drawing.Color]::White)
++        $g.Clear([System.Drawing.ColorTranslator]::FromHtml('#FFFAF6'))
+         if ($spec[2] -eq 58) {
+           $g.DrawImage($icon, 493 - 46 - 8, 6, 46, 46)
+         } else {
 @@ -170,7 +170,7 @@ if ($env:CRAFT_FONTS_DIR) {
      if (Test-Path $lic) { Copy-Item $lic (Join-Path $Portable "OFL-$($_.Name).txt") }
    }

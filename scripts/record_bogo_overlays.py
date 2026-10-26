@@ -16,6 +16,9 @@ import full_native as full
 import launcher_native as launcher
 from bogo_brand import transform_source, NAMES, PALETTE
 from bogo_assets import ASSETS, originals
+from bogo_qa_profiles import transform_qa_source
+from bogo_windows_upgrade import transform_windows_upgrade
+from bogo_packaging import transform_packaging_source
 
 ROOT = full.ROOT
 
@@ -76,6 +79,9 @@ def main():
             from bogo_launcher import transform_pdf_updates
             transform_pdf_updates(source)
         transform_source(source, app)
+        transform_qa_source(source, app)
+        transform_windows_upgrade(source, app)
+        transform_packaging_source(source, app)
         intermediate = inventory(lock, source)
         rust_paths = [source / r for r in sorted(before.keys() | intermediate.keys()) if r.endswith('.rs') and before.get(r) != intermediate.get(r)]
         if rust_paths:

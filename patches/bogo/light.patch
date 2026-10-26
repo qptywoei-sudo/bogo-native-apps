@@ -52200,7 +52200,7 @@ index 5c4a730a64d1515b2239b3613f405c61bcf07ef7..268333c60681d43bc146e5b90e05018b
  }
  
 diff --git a/crates/ui-egui/src/theme.rs b/crates/ui-egui/src/theme.rs
-index 282f9c70ef21306ad5df6508b9f95c4829a26077..a9a29e809d9807a07a6d09fb55c878bed197d9d5 100644
+index 282f9c70ef21306ad5df6508b9f95c4829a26077..39dba43233dab125d14561d79bc652e9d32b3ce8 100644
 --- a/crates/ui-egui/src/theme.rs
 +++ b/crates/ui-egui/src/theme.rs
 @@ -120,29 +120,29 @@ impl ThemeKind {
@@ -52376,6 +52376,15 @@ index 282f9c70ef21306ad5df6508b9f95c4829a26077..a9a29e809d9807a07a6d09fb55c878be
                  star: rgb(0x3a3a3a),
                  pick: rgb(0x2a2a2a),
                  reject: rgb(0xc83434),
+@@ -416,7 +416,7 @@ pub fn apply_kind(ctx: &egui::Context, kind: ThemeKind) {
+     v.window_corner_radius = CornerRadius::same(6);
+     v.menu_corner_radius = CornerRadius::same(6);
+     v.selection.bg_fill = t.accent.gamma_multiply(0.6);
+-    v.selection.stroke = Stroke::new(1.0, t.accent);
++    v.selection.stroke = Stroke::new(1.0, Color32::from_rgb(0x93, 0x44, 0x00));
+     v.override_text_color = Some(t.text_label);
+     let (popup, window) = if dark { (140, 160) } else { (50, 60) };
+     v.popup_shadow = egui::epaint::Shadow { offset: [0, 4], blur: 16, spread: 0, color: Color32::from_black_alpha(popup) };
 diff --git a/crates/ui-egui/src/widgets.rs b/crates/ui-egui/src/widgets.rs
 index 1972e346f2b87ad9e74fb80ef8564cd0712f9935..dfa664b18ca9fab10fd88ec29c070aad160ddc29 100644
 --- a/crates/ui-egui/src/widgets.rs
@@ -52686,7 +52695,7 @@ index 01c5fd518638df2d36d349786191ea11c15c949e..f398edff4f78ef4b49a65497b03f2943
    if ! hdiutil_retry detach "$mount" >/dev/null; then
      echo "error: could not detach verification mount" >&2
 diff --git a/packaging/windows/lightcraft.wxs b/packaging/windows/lightcraft.wxs
-index f242dddc2d9c3632217086f3e70fdd9a76a37544..e33798a9dead28b64e54bd21b32e768e93083284 100644
+index f242dddc2d9c3632217086f3e70fdd9a76a37544..4882cbc4a9de5d0cbc93e38463ff4d438ff993dc 100644
 --- a/packaging/windows/lightcraft.wxs
 +++ b/packaging/windows/lightcraft.wxs
 @@ -13,14 +13,14 @@
@@ -52716,16 +52725,23 @@ index f242dddc2d9c3632217086f3e70fdd9a76a37544..e33798a9dead28b64e54bd21b32e768e
      </StandardDirectory>
      <!-- The folder of the installed version (written by LightcraftApp), so an upgrade installs
           where the user chose instead of moving back to Program Files (issue #399). Searched into
-@@ -58,7 +58,7 @@
-     <Property Id="LEGACYINSTALLEXE">
-       <RegistrySearch Id="LegacyInstallExe" Root="HKLM"
-           Key="Software\Microsoft\Windows\CurrentVersion\App Paths\KIO Light.exe" Type="file">
--        <FileSearch Id="LegacyInstallExeFile" Name="KIO Light.exe" />
-+        <FileSearch Id="LegacyInstallExeFile" Name="Bogo Light.exe" />
+@@ -61,9 +61,14 @@
+         <FileSearch Id="LegacyInstallExeFile" Name="KIO Light.exe" />
        </RegistrySearch>
      </Property>
++    <Property Id="BOGOCURRENTLIGHTEXE" Secure="yes">
++      <RegistrySearch Id="BogoCurrentLightExe" Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\KIO Light.exe" Type="file" Bitness="always64">
++        <FileSearch Id="BogoCurrentLightExeFile" Name="Bogo Light.exe" />
++      </RegistrySearch>
++    </Property>
      <SetProperty Id="INSTALLFOLDER" Action="SetInstallFolderFromAppPaths" Value="[LEGACYINSTALLFOLDER]"
-@@ -193,9 +193,9 @@
+         After="SetINSTALLFOLDER" Sequence="both"
+-        Condition="LEGACYINSTALLFOLDER AND LEGACYINSTALLEXE AND NOT PREVIOUSINSTALLFOLDER AND NOT INSTALLFOLDER" />
++        Condition="LEGACYINSTALLFOLDER AND (LEGACYINSTALLEXE OR BOGOCURRENTLIGHTEXE) AND NOT PREVIOUSINSTALLFOLDER AND NOT INSTALLFOLDER" />
+     <StandardDirectory Id="ProgramMenuFolder" />
+ 
+     <Feature Id="Main" Title="LightCraft" Level="1">
+@@ -193,9 +198,9 @@
    <Fragment>
      <ComponentGroup Id="LightcraftFiles" Directory="INSTALLFOLDER">
        <Component Id="LightcraftApp" Guid="0D759E83-13D7-5D2F-AA71-D927CE06AF2F">
@@ -52739,7 +52755,7 @@ index f242dddc2d9c3632217086f3e70fdd9a76a37544..e33798a9dead28b64e54bd21b32e768e
          </File>
  
 diff --git a/packaging/windows/package.ps1 b/packaging/windows/package.ps1
-index 6df2299ac290e5619ef0b8e3abedfe76221e09ca..0c7a6957886d95d60501b8972d9576725615a129 100644
+index 6df2299ac290e5619ef0b8e3abedfe76221e09ca..b240f144fab219a0bf61c708b94fa16058d99594 100644
 --- a/packaging/windows/package.ps1
 +++ b/packaging/windows/package.ps1
 @@ -1,6 +1,6 @@
@@ -52768,6 +52784,17 @@ index 6df2299ac290e5619ef0b8e3abedfe76221e09ca..0c7a6957886d95d60501b8972d957672
  
  if (-not $SkipBuild) {
    # Static CRT: no VC++ redistributable needed. Scoped to the target so host build scripts and
+@@ -128,8 +128,8 @@ $ExtArgs = foreach ($ext in $WixExtensions) { '-ext'; "$ext/$WixVersion" }
+ # a plain white banner on the inner pages. Generated here, never committed.
+ $UiDialogBmp = Join-Path $Stage 'ui-dialog.bmp'
+ $UiBannerBmp = Join-Path $Stage 'ui-banner.bmp'
+-New-PanelBitmap $UiDialogBmp 493 312 164 ([byte[]](0x4E, 0x7B, 0xFB)) ([byte[]](0xFF, 0xFF, 0xFF))
+-New-PanelBitmap $UiBannerBmp 493 58 0 ([byte[]](0xFF, 0xFF, 0xFF)) ([byte[]](0xFF, 0xFF, 0xFF))
++New-PanelBitmap $UiDialogBmp 493 312 164 ([byte[]](0xFF, 0xF3, 0xE8)) ([byte[]](0xFF, 0xFA, 0xF6))
++New-PanelBitmap $UiBannerBmp 493 58 0 ([byte[]](0xFF, 0xF3, 0xE8)) ([byte[]](0xFF, 0xF3, 0xE8))
+ 
+ $Msi = Join-Path $Dist "lightcraft-$Version-windows-$Arch.msi"
+ Invoke-Native 'wix build' {
 diff --git a/packaging/windows/sign.ps1 b/packaging/windows/sign.ps1
 index 2d36a147bdbbfcb7554fd9f3a1ad23004a5c3f9e..e59eda35674fcc8b8a6ce0315dbf0125dbda7e23 100644
 --- a/packaging/windows/sign.ps1

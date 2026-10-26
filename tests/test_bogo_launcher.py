@@ -55,7 +55,7 @@ class PublishedSourceOverlayTests(unittest.TestCase):
             storage = ['crates/native/src/paths.rs', 'crates/native/src/self_update.rs', 'crates/native/src/single_instance.rs']
             before = {name: (root / name).read_bytes() for name in storage}
             changed = bogo.transform_launcher(root, {'id': 'launcher', 'bundleId': 'com.kio.launcher'})
-            self.assertEqual(len(changed), 5)
+            self.assertEqual(len(changed), 9)
             for name, data in before.items():
                 self.assertEqual((root / name).read_bytes(), data)
             catalog = (root / changed[0]).read_text()
@@ -70,6 +70,11 @@ class PublishedSourceOverlayTests(unittest.TestCase):
             self.assertIn('previous application remains at', install)
             self.assertIn('app.legacy_name(), "KIO"', install)
             self.assertIn('app.name, "Bogo"', install)
+            self.assertIn('Path::new("/Volumes").join(format!("Bogo-', install)
+            self.assertIn('std::fs::symlink_metadata(&mount)', install)
+            self.assertIn('error.kind() == std::io::ErrorKind::NotFound', install)
+            self.assertNotIn('let mount = paths.cache.join', install)
+            self.assertNotIn('std::fs::create_dir_all(&mount)', install)
 
     def test_light_preserves_old_candidate_tests_and_adds_bogo_first(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -93,6 +98,23 @@ class PublishedSourceOverlayTests(unittest.TestCase):
             self.assertIn('/{tag}/{brand}-PDF-{version}-{suffix}', app)
             self.assertIn('kio_revisions_and_legacy_numeric_versions_keep_their_order', ui)
             self.assertIn('bogo_is_newer_than_every_kio_revision_of_the_same_upstream', ui)
+
+    def test_new_repository_has_exact_family_boundaries_and_strict_old_feed_fallback(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = self.source('launcher', temporary)
+            bogo.transform_launcher(root, {'id': 'launcher', 'bundleId': 'com.kio.launcher'})
+            catalog = (root / 'crates/core/src/catalog.rs').read_text()
+            self.assertNotIn(bogo.LEGACY_REPOSITORY, catalog)
+            self.assertIn(bogo.BOGO_REPOSITORY, catalog)
+            registry = (root / 'crates/core/src/kio_registry.rs').read_text()
+            self.assertIn(bogo.BOGO_REGISTRY, registry)
+            self.assertIn('if full_version.contains("-bogo.") { REPOSITORY } else { LEGACY_REPOSITORY }', registry)
+            self.assertIn('catalog_family', registry)
+            backend = (root / 'crates/native/src/backend.rs').read_text()
+            self.assertIn('registry::catalog_family(&body, true)', backend)
+            self.assertIn('registry::catalog_family(&body, false)', backend)
+            self.assertIn('http.get_feed(registry::LEGACY_REGISTRY_URL)', backend)
+            self.assertIn('text.to_uppercase().replace("BOGO", "Bogo")', (root / 'crates/ui-egui/src/widgets.rs').read_text())
 
 
 if __name__ == '__main__':

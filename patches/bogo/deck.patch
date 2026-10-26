@@ -15,6 +15,172 @@ index 8347156c7185be46bd91a8029ced51838776d7b2..387776ce7ff6baf9e0f1d3b71f6ebff0
          .set("LegalCopyright", "Copyright (c) the DeckCraft authors. MIT OR Apache-2.0.")
          .set("OriginalFilename", "deckcraft.exe")
          .set("InternalName", "deckcraft");
+diff --git a/apps/deckcraft/src/bogo_qa.rs b/apps/deckcraft/src/bogo_qa.rs
+new file mode 100644
+index 0000000000000000000000000000000000000000..75b1674966f5f1632f95efe8ce08fc1c3eddb529
+--- /dev/null
++++ b/apps/deckcraft/src/bogo_qa.rs
+@@ -0,0 +1,160 @@
++//! Explicit, private QA profiles. Normal storage identities stay unchanged.
++#![allow(dead_code)]
++
++use std::ffi::OsString;
++use std::path::{Component, Path, PathBuf};
++
++const APP: &str = "deck";
++
++/// A pure parser, also used by tests: partial opt-in always fails closed.
++fn resolve(mode: Option<OsString>, base: Option<OsString>) -> Result<Option<PathBuf>, String> {
++    if mode.is_none() && base.is_none() {
++        return Ok(None);
++    }
++    if mode.as_deref() != Some(std::ffi::OsStr::new("1")) {
++        return Err("BOGO_QA_MODE must equal 1 when QA settings are supplied".into());
++    }
++    let base = base.filter(|value| !value.is_empty()).ok_or("BOGO_QA_ROOT is required in QA mode")?;
++    let base = PathBuf::from(base);
++    if !base.is_absolute()
++        || base.components().any(|part| matches!(part, Component::ParentDir))
++        || !base.components().any(|part| matches!(part, Component::Normal(_)))
++    {
++        return Err("BOGO_QA_ROOT must be an absolute task directory without parent traversal".into());
++    }
++    Ok(Some(base))
++}
++
++#[cfg(not(target_arch = "wasm32"))]
++fn private_directory(path: &Path) -> Result<(), String> {
++    match std::fs::symlink_metadata(path) {
++        Ok(metadata) if metadata.file_type().is_symlink() || !metadata.is_dir() => {
++            return Err("QA directory is a link or is not a directory".into());
++        }
++        Ok(_) => {}
++        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
++            let mut builder = std::fs::DirBuilder::new();
++            builder.recursive(true);
++            #[cfg(unix)]
++            {
++                use std::os::unix::fs::DirBuilderExt;
++                builder.mode(0o700);
++            }
++            builder.create(path).map_err(|error| format!("cannot create QA directory: {error}"))?;
++        }
++        Err(error) => return Err(format!("cannot inspect QA directory: {error}")),
++    }
++    let metadata = std::fs::symlink_metadata(path).map_err(|error| format!("cannot inspect QA directory: {error}"))?;
++    if metadata.file_type().is_symlink() || !metadata.is_dir() {
++        return Err("QA directory changed into a link or a file".into());
++    }
++    #[cfg(unix)]
++    {
++        use std::os::unix::fs::PermissionsExt;
++        if metadata.permissions().mode() & 0o077 != 0 {
++            return Err("QA directory must be private to its owner (mode 0700)".into());
++        }
++    }
++    Ok(())
++}
++
++#[cfg(not(target_arch = "wasm32"))]
++fn owned_root(base: &Path) -> Result<PathBuf, String> {
++    private_directory(base)?;
++    let base = std::fs::canonicalize(base).map_err(|error| format!("cannot resolve QA directory: {error}"))?;
++    let app = base.join(APP);
++    private_directory(&app)?;
++    Ok(app)
++}
++
++#[cfg(not(target_arch = "wasm32"))]
++fn refuse(message: &str) -> ! {
++    eprintln!("Bogo QA profile refused: {message}");
++    std::process::exit(2)
++}
++
++/// None only for a completely ordinary launch. Invalid QA settings exit before
++/// the caller can fall back to personal preferences, recovery, logs or caches.
++#[cfg(not(target_arch = "wasm32"))]
++pub fn root() -> Option<PathBuf> {
++    static ROOT: std::sync::OnceLock<Option<PathBuf>> = std::sync::OnceLock::new();
++    ROOT.get_or_init(|| match resolve(std::env::var_os("BOGO_QA_MODE"), std::env::var_os("BOGO_QA_ROOT")) {
++        Ok(Some(base)) => Some(owned_root(&base).unwrap_or_else(|error| refuse(&error))),
++        Ok(None) => None,
++        Err(error) => refuse(&error),
++    })
++    .clone()
++}
++
++/// Browser builds retain their existing browser storage and do not read native
++/// process environment variables or create host directories.
++#[cfg(target_arch = "wasm32")]
++pub fn root() -> Option<PathBuf> {
++    None
++}
++
++pub fn path(relative: &str) -> Option<PathBuf> {
++    root().map(|root| {
++        let relative = Path::new(relative);
++        if relative.as_os_str().is_empty() || relative.components().any(|part| !matches!(part, Component::Normal(_))) {
++            #[cfg(not(target_arch = "wasm32"))]
++            refuse("invalid internal QA path");
++        }
++        root.join(relative)
++    })
++}
++
++#[cfg(test)]
++mod qa_profile_tests {
++    use super::*;
++
++    #[test]
++    fn ordinary_launch_has_no_qa_profile() {
++        assert_eq!(resolve(None, None), Ok(None));
++    }
++
++    #[test]
++    fn partial_invalid_and_relative_configuration_never_fall_back() {
++        for (mode, root) in [
++            (Some("1"), None),
++            (None, Some("/private/qa")),
++            (Some("0"), Some("/private/qa")),
++            (Some("true"), Some("/private/qa")),
++            (Some("1"), Some("")),
++            (Some("1"), Some("relative")),
++            (Some("1"), Some("/")),
++            (Some("1"), Some("/private/qa/../user")),
++        ] {
++            assert!(resolve(mode.map(OsString::from), root.map(OsString::from)).is_err());
++        }
++    }
++
++    #[test]
++    fn complete_configuration_is_explicit_and_keeps_the_app_namespace() {
++        let absolute = std::env::temp_dir().join("bogo-qa-parser");
++        assert_eq!(resolve(Some("1".into()), Some(absolute.as_os_str().into())), Ok(Some(absolute.clone())));
++    }
++
++    #[cfg(not(target_arch = "wasm32"))]
++    #[test]
++    fn owned_paths_are_private_and_links_or_existing_public_roots_are_refused() {
++        let base = std::env::temp_dir().join(format!("bogo-qa-profile-{}-{}", APP, std::process::id()));
++        assert!(!base.exists());
++        let app = owned_root(&base).expect("fresh private QA root");
++        assert_eq!(app, std::fs::canonicalize(&base).expect("QA base").join(APP));
++        assert!(app.is_dir());
++        #[cfg(unix)]
++        {
++            use std::os::unix::fs::{PermissionsExt, symlink};
++            assert_eq!(std::fs::metadata(&base).expect("QA metadata").permissions().mode() & 0o777, 0o700);
++            let link = base.with_extension("link");
++            symlink(&base, &link).expect("QA link fixture");
++            assert!(owned_root(&link).is_err());
++            std::fs::remove_file(&link).expect("remove own link");
++            std::fs::set_permissions(&base, std::fs::Permissions::from_mode(0o755)).expect("public fixture");
++            assert!(owned_root(&base).is_err());
++            std::fs::set_permissions(&base, std::fs::Permissions::from_mode(0o700)).expect("restore own fixture");
++        }
++        std::fs::remove_dir_all(&base).expect("remove own fixture");
++    }
++}
 diff --git a/apps/deckcraft/src/logging.rs b/apps/deckcraft/src/logging.rs
 index c135a277ad8c9014c6a67d0d07bd7cd98c74e6b4..da0c276e3ebf732749b713e4834c34b0e6e27428 100644
 --- a/apps/deckcraft/src/logging.rs
@@ -38,10 +204,28 @@ index c135a277ad8c9014c6a67d0d07bd7cd98c74e6b4..da0c276e3ebf732749b713e4834c34b0
          assert!(logger.enabled(&log::Metadata::builder().level(log::Level::Info).target("deckcraft_engine::recovery").build()));
          assert!(!logger.enabled(&log::Metadata::builder().level(log::Level::Info).target("naga").build()));
 diff --git a/apps/deckcraft/src/main.rs b/apps/deckcraft/src/main.rs
-index 1d0f1f7f3fafd1359ddc41cd7f7f2621adb9c8ff..8904344d3a5c97474acd78066ad793b8bd36a6fb 100644
+index 1d0f1f7f3fafd1359ddc41cd7f7f2621adb9c8ff..278eab045a46dcccfbe8d3f179be93b34636dba4 100644
 --- a/apps/deckcraft/src/main.rs
 +++ b/apps/deckcraft/src/main.rs
-@@ -102,7 +102,7 @@ fn services() -> Services {
+@@ -13,6 +13,7 @@
+ #![forbid(unsafe_code)]
+ 
+ mod audio;
++mod bogo_qa;
+ mod control_server;
+ #[cfg(any(target_os = "windows", test))]
+ mod graphics;
+@@ -40,6 +41,9 @@ impl eframe::App for App {
+ 
+ /// The per-user settings directory: `ui.json`, `prefs.json` and `logs/` live here.
+ fn config_dir() -> Option<std::path::PathBuf> {
++    if let Some(path) = bogo_qa::path("profile") {
++        return Some(path);
++    }
+     if cfg!(target_os = "macos") {
+         std::env::var_os("HOME").map(|h| std::path::PathBuf::from(h).join("Library/Application Support/com.kio.deck"))
+     } else if cfg!(windows) {
+@@ -102,7 +106,7 @@ fn services() -> Services {
                  "video" => d.add_filter("Video", &["mp4", "m4v", "mov", "webm", "mkv", "wmv"]),
                  _ => d
                      .add_filter("Presentations", &["deckcraft", "pptx", "potx", "ppsx"])
@@ -50,7 +234,15 @@ index 1d0f1f7f3fafd1359ddc41cd7f7f2621adb9c8ff..8904344d3a5c97474acd78066ad793b8
                      .add_filter("PowerPoint", &["pptx", "potx", "ppsx"])
                      .add_filter("Outline", &["txt", "md"]),
              };
-@@ -155,7 +155,7 @@ fn main() -> eframe::Result {
+@@ -135,6 +139,7 @@ fn app_icon() -> Option<egui::IconData> {
+ }
+ 
+ fn main() -> eframe::Result {
++    let _ = bogo_qa::root();
+     // First, so every start-up record (and the engine's panic hook, installed with the first
+     // Session) is captured; see `logging`.
+     let logger = logging::install();
+@@ -155,7 +160,7 @@ fn main() -> eframe::Result {
              _ => files.push(a),
          }
      }
@@ -59,7 +251,7 @@ index 1d0f1f7f3fafd1359ddc41cd7f7f2621adb9c8ff..8904344d3a5c97474acd78066ad793b8
      // The log file lives under the settings directory; opened after the arguments, so `--version`
      // leaves no file behind. Records logged until now are written to it first.
      if let Some(logger) = logger {
-@@ -170,7 +170,7 @@ fn main() -> eframe::Result {
+@@ -170,7 +175,7 @@ fn main() -> eframe::Result {
      }
      let mut options = eframe::NativeOptions {
          viewport: egui::ViewportBuilder::default()
@@ -68,7 +260,7 @@ index 1d0f1f7f3fafd1359ddc41cd7f7f2621adb9c8ff..8904344d3a5c97474acd78066ad793b8
              .with_inner_size([1440.0, 900.0])
              .with_min_inner_size([900.0, 560.0])
              .with_drag_and_drop(true)
-@@ -194,7 +194,7 @@ fn main() -> eframe::Result {
+@@ -194,14 +199,14 @@ fn main() -> eframe::Result {
      #[cfg(target_os = "windows")]
      graphics::configure(&mut options, eframe::wgpu::Backends::from_env());
      eframe::run_native(
@@ -77,6 +269,14 @@ index 1d0f1f7f3fafd1359ddc41cd7f7f2621adb9c8ff..8904344d3a5c97474acd78066ad793b8
          options,
          Box::new(move |cc| {
              let mut app = SlideApp::new(Session::new(), services());
+             load_prefs(&mut app);
+             // AutoRecover: reopen what a previous run left unsaved, then keep it current.
+             if std::env::var_os("DECKCRAFT_NO_RECOVERY").is_none() {
+-                app.session.recovery_dir = deckcraft_engine::recovery::default_dir();
++                app.session.recovery_dir = bogo_qa::path("recovery").or_else(deckcraft_engine::recovery::default_dir);
+                 if let Ok(v) = app.session.execute("file.recovery.open", &serde_json::json!({}))
+                     && let Some(n) = v.get("opened").and_then(|o| o.as_array()).map(Vec::len).filter(|n| *n > 0)
+                 {
 diff --git a/assets/app-icon/BOGO-ICON-SOURCE.txt b/assets/app-icon/BOGO-ICON-SOURCE.txt
 new file mode 100644
 index 0000000000000000000000000000000000000000..ed557c5a1cf78bcdb915171b4daaa87cffa8c23a
@@ -50482,7 +50682,7 @@ index 8e915b7199355279111810999aa14acee1b8c46f..7d2dc5102410aab75e72f294fc9a3517
              } else {
                  app.status = None;
 diff --git a/crates/ui-egui/src/theme.rs b/crates/ui-egui/src/theme.rs
-index 1847d47f1ef5688057920243938ba10c225463c3..fd21cc0c300228a7dab1edebac0dcd31b409c58e 100644
+index 1847d47f1ef5688057920243938ba10c225463c3..77e1e171f6500a6c20744b4dcc23d381b39d4e79 100644
 --- a/crates/ui-egui/src/theme.rs
 +++ b/crates/ui-egui/src/theme.rs
 @@ -48,56 +48,56 @@ impl Tokens {
@@ -50570,6 +50770,15 @@ index 1847d47f1ef5688057920243938ba10c225463c3..fd21cc0c300228a7dab1edebac0dcd31
              shadow: Color32::from_black_alpha(90),
          }
      }
+@@ -124,7 +124,7 @@ pub fn apply(ctx: &egui::Context, t: &Tokens) {
+     v.menu_corner_radius = CornerRadius::same(8);
+     v.selection.bg_fill = t.accent.gamma_multiply(0.85);
+     v.selection.stroke = Stroke::new(1.0, t.accent_text);
+-    v.hyperlink_color = t.accent;
++    v.hyperlink_color = Color32::from_rgb(0x93, 0x44, 0x00);
+     v.override_text_color = Some(t.text);
+     for w in [&mut v.widgets.noninteractive, &mut v.widgets.inactive, &mut v.widgets.hovered, &mut v.widgets.active, &mut v.widgets.open] {
+         w.corner_radius = CornerRadius::same(5);
 diff --git a/packaging/freebsd/package.sh b/packaging/freebsd/package.sh
 index 0612cc24698099a5c2cf2a853a7fda0d16d5a13f..b1d133fb607fed34fff974a69832e437ba07165a 100755
 --- a/packaging/freebsd/package.sh
@@ -50828,7 +51037,7 @@ index 7d8658e10556501ebf066215af1de9a84a70feb8..c947842e36ba317f7d5c254c7c6b9d55
  rm -f "$WORK/raw.dmg"
  sign "$DMG"
 diff --git a/packaging/windows/deckcraft.wxs b/packaging/windows/deckcraft.wxs
-index a885442a07af75d442a5a4f10df7583648f78134..fc5c49c93a1c00f939e4cbe8aa4345dd7339fbd7 100644
+index a885442a07af75d442a5a4f10df7583648f78134..367ac2f716cca3a4f040e8bf3a75cdf092d3c3b8 100644
 --- a/packaging/windows/deckcraft.wxs
 +++ b/packaging/windows/deckcraft.wxs
 @@ -1,29 +1,29 @@
@@ -50868,9 +51077,26 @@ index a885442a07af75d442a5a4f10df7583648f78134..fc5c49c93a1c00f939e4cbe8aa4345dd
      <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
  
      <Icon Id="DeckcraftIcon.ico" SourceFile="$(var.IconPath)" />
-@@ -33,11 +33,11 @@
+@@ -32,12 +32,28 @@
+     <Property Id="ARPURLUPDATEINFO" Value="https://kio-library.vercel.app/?program=deck" />
      <Property Id="ARPHELPLINK" Value="https://discord.gg/artcraft" />
  
++    <!-- Reuse an existing custom folder only after an exact old/new executable is found. -->
++    <Property Id="BOGOPREVIOUSAPPFOLDER" Secure="yes">
++      <RegistrySearch Id="BogoPreviousAppFolder" Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\KIO Deck.exe" Type="file" Bitness="always64" />
++    </Property>
++    <Property Id="BOGOPREVIOUSAPPEXE" Secure="yes">
++      <RegistrySearch Id="BogoPreviousAppExe" Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\KIO Deck.exe" Type="file" Bitness="always64">
++        <FileSearch Id="BogoPreviousAppExeFile" Name="KIO Deck.exe" />
++      </RegistrySearch>
++    </Property>
++    <Property Id="BOGOCURRENTAPPEXE" Secure="yes">
++      <RegistrySearch Id="BogoCurrentAppExe" Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\KIO Deck.exe" Type="file" Bitness="always64">
++        <FileSearch Id="BogoCurrentAppExeFile" Name="Bogo Deck.exe" />
++      </RegistrySearch>
++    </Property>
++    <SetProperty Id="INSTALLFOLDER" Action="BogoSetExistingAppFolder" Value="[BOGOPREVIOUSAPPFOLDER]"
++        After="AppSearch" Sequence="both" Condition="NOT INSTALLFOLDER AND BOGOPREVIOUSAPPFOLDER AND (BOGOPREVIOUSAPPEXE OR BOGOCURRENTAPPEXE)" />
      <StandardDirectory Id="ProgramFiles6432Folder">
 -      <Directory Id="INSTALLFOLDER" Name="KIO Deck" />
 +      <Directory Id="INSTALLFOLDER" Name="Bogo Deck" />
@@ -50882,7 +51108,7 @@ index a885442a07af75d442a5a4f10df7583648f78134..fc5c49c93a1c00f939e4cbe8aa4345dd
        <ComponentGroupRef Id="DeckcraftFiles" />
      </Feature>
    </Package>
-@@ -45,19 +45,19 @@
+@@ -45,19 +61,19 @@
    <Fragment>
      <ComponentGroup Id="DeckcraftFiles" Directory="INSTALLFOLDER">
        <Component Id="DeckcraftApp" Guid="D6287451-47DE-5DFD-8962-E778CFAB447A">

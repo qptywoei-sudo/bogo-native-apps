@@ -50702,7 +50702,7 @@ index 3e36f0c9f48c91d2c9a2150d28858a10de4d3fef..52330e783a3b736e0473a1d12d8391fc
          assert_eq!(visual("سنة ١٤٤٥"), [["١", "٤", "٤", "٥", " ", "سنة"]]);
      }
 diff --git a/crates/ui-egui/src/theme.rs b/crates/ui-egui/src/theme.rs
-index 21a50012a24341c6e5db61dd9efd6d175f013311..c1e45fdd8074acf7939608dd4e3dc90443b16eb1 100644
+index 21a50012a24341c6e5db61dd9efd6d175f013311..678ae4f170961160e1570131b74561df4b067bc7 100644
 --- a/crates/ui-egui/src/theme.rs
 +++ b/crates/ui-egui/src/theme.rs
 @@ -154,33 +154,33 @@ impl Tokens {
@@ -50865,6 +50865,15 @@ index 21a50012a24341c6e5db61dd9efd6d175f013311..c1e45fdd8074acf7939608dd4e3dc904
                  tl_ruler_bg: Color32::from_rgb(226, 226, 226),
                  tl_ruler_text: Color32::from_rgb(80, 80, 80),
                  ..dark
+@@ -470,7 +470,7 @@ pub fn apply_visuals(ctx: &egui::Context, t: &Tokens) {
+     v.override_text_color = Some(t.text);
+     v.selection.bg_fill = t.accent;
+     v.selection.stroke = Stroke::new(1.0, Color32::WHITE);
+-    v.hyperlink_color = t.accent;
++    v.hyperlink_color = Color32::from_rgb(0x93, 0x44, 0x00);
+     v.window_stroke = Stroke::new(1.0, t.field_border);
+     v.window_corner_radius = egui::CornerRadius::same(6);
+     v.menu_corner_radius = egui::CornerRadius::same(6);
 diff --git a/packaging/freebsd/package.sh b/packaging/freebsd/package.sh
 index dc3cc1e0ba26ccf2aade43a8c950e8e1d87114a4..1ad002d217f833dfc1810035a20dbc0ea3ef940d 100755
 --- a/packaging/freebsd/package.sh
@@ -51162,7 +51171,7 @@ index c239d14a8d30c887eed0d4af1afaeb88036834f8..d2c04a90b19c6fb1d3af646eaab9a33f
  rm -f "$WORK/raw.dmg"
  sign "$DMG"
 diff --git a/packaging/windows/filmcraft.wxs b/packaging/windows/filmcraft.wxs
-index 881dc01cb2660c076ac2aac76389e7d9e347c76e..57610553352a7cec138d153540f668a1730f0794 100644
+index 881dc01cb2660c076ac2aac76389e7d9e347c76e..b247e2f706e1caf60d30043c3491c5048adfb2cf 100644
 --- a/packaging/windows/filmcraft.wxs
 +++ b/packaging/windows/filmcraft.wxs
 @@ -8,14 +8,14 @@
@@ -51183,16 +51192,33 @@ index 881dc01cb2660c076ac2aac76389e7d9e347c76e..57610553352a7cec138d153540f668a1
      <!-- Same-version upgrades let successive pre-releases of one X.Y.Z replace each other
           (MSI versions are numeric, so 1.2.3-rc.1 and 1.2.3-rc.2 are both 1.2.3). -->
      <MajorUpgrade AllowSameVersionUpgrades="yes"
-@@ -29,7 +29,7 @@
+@@ -28,8 +28,24 @@
+     <Property Id="ARPURLUPDATEINFO" Value="https://kio-library.vercel.app/?program=film" />
      <Property Id="ARPHELPLINK" Value="https://discord.gg/artcraft" />
  
++    <!-- Reuse an existing custom folder only after an exact old/new executable is found. -->
++    <Property Id="BOGOPREVIOUSAPPFOLDER" Secure="yes">
++      <RegistrySearch Id="BogoPreviousAppFolder" Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\KIO Film.exe" Type="file" Bitness="always64" />
++    </Property>
++    <Property Id="BOGOPREVIOUSAPPEXE" Secure="yes">
++      <RegistrySearch Id="BogoPreviousAppExe" Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\KIO Film.exe" Type="file" Bitness="always64">
++        <FileSearch Id="BogoPreviousAppExeFile" Name="KIO Film.exe" />
++      </RegistrySearch>
++    </Property>
++    <Property Id="BOGOCURRENTAPPEXE" Secure="yes">
++      <RegistrySearch Id="BogoCurrentAppExe" Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\KIO Film.exe" Type="file" Bitness="always64">
++        <FileSearch Id="BogoCurrentAppExeFile" Name="Bogo Film.exe" />
++      </RegistrySearch>
++    </Property>
++    <SetProperty Id="INSTALLFOLDER" Action="BogoSetExistingAppFolder" Value="[BOGOPREVIOUSAPPFOLDER]"
++        After="AppSearch" Sequence="both" Condition="NOT INSTALLFOLDER AND BOGOPREVIOUSAPPFOLDER AND (BOGOPREVIOUSAPPEXE OR BOGOCURRENTAPPEXE)" />
      <StandardDirectory Id="ProgramFiles6432Folder">
 -      <Directory Id="INSTALLFOLDER" Name="KIO Film" />
 +      <Directory Id="INSTALLFOLDER" Name="Bogo Film" />
      </StandardDirectory>
      <StandardDirectory Id="ProgramMenuFolder" />
  
-@@ -41,9 +41,9 @@
+@@ -41,9 +57,9 @@
    <Fragment>
      <ComponentGroup Id="FilmcraftFiles" Directory="INSTALLFOLDER">
        <Component Id="FilmcraftApp" Guid="62DDFA92-F3EB-5729-9B36-828852DBD590">

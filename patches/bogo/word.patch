@@ -49648,9 +49648,18 @@ index 2a79e6b24b3260122d367d9181b91d38bfbfcfdc..28611779d781e0e571de9bf69b508436
          let mut h = egui_kittest::Harness::builder().with_size(egui::vec2(1440.0, 900.0)).build_ui_state(
              |ui, app: &mut WordApp| {
 diff --git a/crates/ui-egui/src/chrome.rs b/crates/ui-egui/src/chrome.rs
-index 83ca0a26b000825697624720abd2a83fcb20e7a6..3f6f52a72f471f1b3c796eb3030827f0aec56e3a 100644
+index 83ca0a26b000825697624720abd2a83fcb20e7a6..3ae94c37edb40d525a4c946c57b320366b3433eb 100644
 --- a/crates/ui-egui/src/chrome.rs
 +++ b/crates/ui-egui/src/chrome.rs
+@@ -265,7 +265,7 @@ pub fn title_bar(app: &mut WordApp, ui: &mut Ui) {
+                     ui.add_space(8.0);
+                     if app.ui.show_discord {
+                         let (r, resp) = ui.allocate_exact_size(vec2(84.0, 22.0), Sense::click());
+-                        ui.painter().rect_filled(r, 11.0, if resp.hovered() { t.accent_text } else { t.accent });
++                        ui.painter().rect_filled(r, 11.0, if resp.hovered() { t.hover } else { t.accent });
+                         icons::paint(
+                             ui.painter(),
+                             Rect::from_center_size(pos2(r.min.x + 13.0, r.center().y), vec2(14.0, 14.0)),
 @@ -317,7 +317,7 @@ pub fn title_bar(app: &mut WordApp, ui: &mut Ui) {
              // Centred title.
              let title = if !app.has_document() {
@@ -52012,8 +52021,21 @@ index 976d95705f2bec9187e434094ab408e9906213b0..cdfeed8f4429c887d0efac9754fe60c6
          h.run_steps(4);
          assert!(h.state().ui.start_screen, "and on again");
      }
+diff --git a/crates/ui-egui/src/ribbon.rs b/crates/ui-egui/src/ribbon.rs
+index b52d210b2bb98723a446ac684cd105a52bd28db7..f76d3d271d06217d149edec06dba962434676b83 100644
+--- a/crates/ui-egui/src/ribbon.rs
++++ b/crates/ui-egui/src/ribbon.rs
+@@ -234,7 +234,7 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
+                     let share = tl!("Share");
+                     let share_w = ui.ctx().fonts_mut(|f| f.layout_no_wrap(share.to_string(), medium(12.0), t.text).size().x);
+                     let (r, resp) = ui.allocate_exact_size(vec2((share_w + 36.0).max(74.0), 24.0), Sense::click());
+-                    ui.painter().rect_filled(r, 4.0, if resp.hovered() { t.accent_text } else { t.accent });
++                    ui.painter().rect_filled(r, 4.0, if resp.hovered() { t.hover } else { t.accent });
+                     icons::paint(
+                         ui.painter(),
+                         Rect::from_center_size(pos2(r.min.x + 14.0, r.center().y), vec2(14.0, 14.0)),
 diff --git a/crates/ui-egui/src/theme.rs b/crates/ui-egui/src/theme.rs
-index 441ff2ad946283ce7eafe13a371ce70958c0dc33..3c7da5a4b22457ce0e6e90ff3c0b3a435679b013 100644
+index 441ff2ad946283ce7eafe13a371ce70958c0dc33..5dd1ae50320957ed97c1ed96f540ada0e11ba5c9 100644
 --- a/crates/ui-egui/src/theme.rs
 +++ b/crates/ui-egui/src/theme.rs
 @@ -5,8 +5,8 @@ use std::sync::Arc;
@@ -52060,12 +52082,14 @@ index 441ff2ad946283ce7eafe13a371ce70958c0dc33..3c7da5a4b22457ce0e6e90ff3c0b3a43
 +            checked: Color32::from_rgb(0xFF, 0xE7, 0xD4),
              accent: APP_COLOR,
              accent_text: APP_INK,
-             on_accent: Color32::WHITE,
+-            on_accent: Color32::WHITE,
 -            input: Color32::WHITE,
 -            input_border: Color32::from_rgb(0x8A, 0x8A, 0x8A),
+-            group_label: Color32::from_rgb(0x70, 0x70, 0x70),
++            on_accent: Color32::from_rgb(0x34, 0x2B, 0x26),
 +            input: Color32::from_rgb(0xFF, 0xFA, 0xF6),
 +            input_border: Color32::from_rgb(0xF1, 0xD3, 0xBD),
-             group_label: Color32::from_rgb(0x70, 0x70, 0x70),
++            group_label: Color32::from_rgb(0x34, 0x2B, 0x26),
              ruler: Color32::from_rgb(0xFF, 0xFF, 0xFF),
              ruler_margin: Color32::from_rgb(0xD4, 0xD4, 0xD4),
              ruler_tick: Color32::from_rgb(0x70, 0x70, 0x70),
@@ -52112,12 +52136,14 @@ index 441ff2ad946283ce7eafe13a371ce70958c0dc33..3c7da5a4b22457ce0e6e90ff3c0b3a43
 +            accent: Color32::from_rgb(0xFC, 0x75, 0x01),
 +            accent_text: Color32::from_rgb(0x34, 0x2B, 0x26),
              // Dark text on the light dark-theme accent: white on #7a93f0 is only 2.9:1 (#655).
-             on_accent: Color32::from_rgb(0x11, 0x16, 0x2E),
+-            on_accent: Color32::from_rgb(0x11, 0x16, 0x2E),
 -            input: Color32::from_rgb(0x1E, 0x1E, 0x1E),
 -            input_border: Color32::from_rgb(0x7A, 0x7A, 0x7A),
+-            group_label: Color32::from_rgb(0xA0, 0xA0, 0xA0),
++            on_accent: Color32::from_rgb(0x34, 0x2B, 0x26),
 +            input: Color32::from_rgb(0xFF, 0xFA, 0xF6),
 +            input_border: Color32::from_rgb(0xF1, 0xD3, 0xBD),
-             group_label: Color32::from_rgb(0xA0, 0xA0, 0xA0),
++            group_label: Color32::from_rgb(0x34, 0x2B, 0x26),
              ruler: Color32::from_rgb(0x2E, 0x2E, 0x2E),
              ruler_margin: Color32::from_rgb(0x45, 0x45, 0x45),
              ruler_tick: Color32::from_rgb(0xA0, 0xA0, 0xA0),
@@ -52128,6 +52154,24 @@ index 441ff2ad946283ce7eafe13a371ce70958c0dc33..3c7da5a4b22457ce0e6e90ff3c0b3a43
              find_highlight: Color32::from_rgba_unmultiplied(0xC8, 0xA8, 0x00, 0x70),
              page_shadow: Color32::from_rgba_unmultiplied(0, 0, 0, 0x60),
              handle: Color32::from_rgb(0xF2, 0xF2, 0xF2),
+@@ -640,7 +640,7 @@ fn visuals(t: &Tokens) -> Visuals {
+     v.window_corner_radius = CornerRadius::same(8);
+     v.menu_corner_radius = CornerRadius::same(6);
+     v.selection.bg_fill = t.selection;
+-    v.selection.stroke = Stroke::new(1.0, t.accent);
++    v.selection.stroke = Stroke::new(1.0, Color32::from_rgb(0x93, 0x44, 0x00));
+     v.hyperlink_color = t.accent_text;
+     v.widgets.noninteractive.bg_stroke = Stroke::new(1.0, t.border);
+     v.widgets.noninteractive.fg_stroke = Stroke::new(1.0, t.text);
+@@ -691,7 +691,7 @@ mod tests {
+     #[test]
+     fn on_accent_reads_on_the_accent() {
+         for t in [super::Tokens::light(), super::Tokens::dark()] {
+-            for (name, bg) in [("accent", t.accent), ("hover", t.accent_text)] {
++            for (name, bg) in [("accent", t.accent), ("hover", t.hover)] {
+                 let r = contrast(t.on_accent, bg);
+                 assert!(r >= 4.5, "dark={}: on_accent on {name} is {r:.2}:1", t.dark);
+             }
 diff --git a/crates/ui-egui/src/zotero.rs b/crates/ui-egui/src/zotero.rs
 index 9aebd22a9b53839569d5a9d305d8c1b16a51a5b2..5d02c823dfe7a6e813fde4eccceea0a45054ab30 100644
 --- a/crates/ui-egui/src/zotero.rs
@@ -52424,7 +52468,7 @@ index 4f6229941e251ba22178c21581529cc611030cde..b43dc7159e480a3693e53e2b83f522f8
  New-Item -ItemType Directory -Force -Path $tmp | Out-Null
  
 diff --git a/packaging/windows/wordcraft.wxs b/packaging/windows/wordcraft.wxs
-index 8f53d4693e85f19a0fc48c4614c2936ac7d66b69..78b7585097a5ee095b327ab7d4dd9b93ffa43924 100644
+index 8f53d4693e85f19a0fc48c4614c2936ac7d66b69..2bfd3b191e8170c45f76e5d6ff138aa5243a9532 100644
 --- a/packaging/windows/wordcraft.wxs
 +++ b/packaging/windows/wordcraft.wxs
 @@ -1,6 +1,6 @@
@@ -52479,9 +52523,26 @@ index 8f53d4693e85f19a0fc48c4614c2936ac7d66b69..78b7585097a5ee095b327ab7d4dd9b93
      <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
      <Property Id="WixShellExecTarget" Value="[#WordcraftExe]" />
      <CustomAction Id="LaunchWordcraft" BinaryRef="Wix4UtilCA_$(sys.BUILDARCHSHORT)" DllEntry="WixShellExec"
-@@ -55,11 +55,11 @@
+@@ -54,12 +54,28 @@
+           Condition="WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 AND NOT Installed" />
      </UI>
  
++    <!-- Reuse an existing custom folder only after an exact old/new executable is found. -->
++    <Property Id="BOGOPREVIOUSAPPFOLDER" Secure="yes">
++      <RegistrySearch Id="BogoPreviousAppFolder" Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\KIO Word.exe" Type="file" Bitness="always64" />
++    </Property>
++    <Property Id="BOGOPREVIOUSAPPEXE" Secure="yes">
++      <RegistrySearch Id="BogoPreviousAppExe" Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\KIO Word.exe" Type="file" Bitness="always64">
++        <FileSearch Id="BogoPreviousAppExeFile" Name="KIO Word.exe" />
++      </RegistrySearch>
++    </Property>
++    <Property Id="BOGOCURRENTAPPEXE" Secure="yes">
++      <RegistrySearch Id="BogoCurrentAppExe" Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\KIO Word.exe" Type="file" Bitness="always64">
++        <FileSearch Id="BogoCurrentAppExeFile" Name="Bogo Word.exe" />
++      </RegistrySearch>
++    </Property>
++    <SetProperty Id="INSTALLFOLDER" Action="BogoSetExistingAppFolder" Value="[BOGOPREVIOUSAPPFOLDER]"
++        After="AppSearch" Sequence="both" Condition="NOT INSTALLFOLDER AND BOGOPREVIOUSAPPFOLDER AND (BOGOPREVIOUSAPPEXE OR BOGOCURRENTAPPEXE)" />
      <StandardDirectory Id="ProgramFiles6432Folder">
 -      <Directory Id="INSTALLFOLDER" Name="KIO Word" />
 +      <Directory Id="INSTALLFOLDER" Name="Bogo Word" />
@@ -52493,7 +52554,7 @@ index 8f53d4693e85f19a0fc48c4614c2936ac7d66b69..78b7585097a5ee095b327ab7d4dd9b93
        <ComponentGroupRef Id="WordcraftFiles" />
      </Feature>
    </Package>
-@@ -67,28 +67,28 @@
+@@ -67,28 +83,28 @@
    <Fragment>
      <ComponentGroup Id="WordcraftFiles" Directory="INSTALLFOLDER">
        <Component Id="WordcraftApp" Guid="5022E59B-6310-50E2-8401-52575E74EF1E">

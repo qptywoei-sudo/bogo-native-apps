@@ -63,7 +63,7 @@ index fc951b4a9faa485d4dd7cfd1537303314b06b149..4ab64e59b886d587e4392313e6460899
          .set("OriginalFilename", "artcraft-launcher.exe")
          .set("InternalName", "artcraft-launcher");
 diff --git a/apps/artcraft-launcher/src/main.rs b/apps/artcraft-launcher/src/main.rs
-index 2fd6a901353d2f9ab28aae235a3e9a463e3b426f..11351f912ee237e4ed02490b61f90efe7421a174 100644
+index 2fd6a901353d2f9ab28aae235a3e9a463e3b426f..382c59964ea6ec23dfed27765d251eb4110e3811 100644
 --- a/apps/artcraft-launcher/src/main.rs
 +++ b/apps/artcraft-launcher/src/main.rs
 @@ -1,4 +1,4 @@
@@ -72,7 +72,15 @@ index 2fd6a901353d2f9ab28aae235a3e9a463e3b426f..11351f912ee237e4ed02490b61f90efe
  //!
  //! The window can close to the tray (menu bar) and keep checking for updates, or quit entirely.
  
-@@ -58,7 +58,7 @@ fn main() -> ExitCode {
+@@ -34,6 +34,7 @@ const SETTINGS_KEY: &str = "settings";
+ type Wake = Arc<OnceLock<Box<dyn Fn() + Send + Sync>>>;
+ 
+ fn main() -> ExitCode {
++    let _ = artcraft_launcher_native::bogo_qa::root();
+     // First, so the panic report and every start-up warning are recorded (`logging`).
+     let logs = logging::install();
+     logging::install_panic_hook();
+@@ -58,7 +59,7 @@ fn main() -> ExitCode {
      if let Some(logs) = logs {
          match artcraft_launcher_native::paths::Paths::new() {
              Ok(paths) => match logs.attach_dir(&paths.logs()) {
@@ -81,7 +89,7 @@ index 2fd6a901353d2f9ab28aae235a3e9a463e3b426f..11351f912ee237e4ed02490b61f90efe
                  Err(e) => {
                      logs.no_file();
                      log::warn!("no log file: {e}");
-@@ -104,7 +104,7 @@ fn main() -> ExitCode {
+@@ -104,7 +105,7 @@ fn main() -> ExitCode {
              let result = {
                  let (waker, launcher) = (waker.clone(), &mut launcher);
                  eframe::run_native(
@@ -90,7 +98,7 @@ index 2fd6a901353d2f9ab28aae235a3e9a463e3b426f..11351f912ee237e4ed02490b61f90efe
                      native_options(hidden),
                      Box::new(move |cc| {
                          launcher.open(cc, &waker);
-@@ -132,7 +132,7 @@ fn main() -> ExitCode {
+@@ -132,7 +133,7 @@ fn main() -> ExitCode {
  fn native_options(hidden: bool) -> eframe::NativeOptions {
      let icon = eframe::icon_data::from_png_bytes(include_bytes!("../../../assets/app-icon/hicolor/256x256/apps/com.kio.launcher.png")).ok();
      let mut viewport = egui::ViewportBuilder::default()
@@ -99,7 +107,22 @@ index 2fd6a901353d2f9ab28aae235a3e9a463e3b426f..11351f912ee237e4ed02490b61f90efe
          .with_app_id(APP_ID)
          .with_inner_size([1120.0, 760.0])
          .with_min_inner_size([720.0, 500.0])
-@@ -397,7 +397,7 @@ impl Host for DesktopHost {
+@@ -151,7 +152,13 @@ fn native_options(hidden: bool) -> eframe::NativeOptions {
+     } else if let Some(icon) = icon {
+         viewport = viewport.with_icon(icon);
+     }
+-    eframe::NativeOptions { viewport, persist_window: true, wgpu_options: wgpu_options(), ..Default::default() }
++    eframe::NativeOptions {
++        viewport,
++        persistence_path: artcraft_launcher_native::bogo_qa::path("settings/app.ron"),
++        persist_window: true,
++        wgpu_options: wgpu_options(),
++        ..Default::default()
++    }
+ }
+ 
+ /// wgpu's backend list. On Windows that is Direct3D 12 with GL as the fallback, not Vulkan:
+@@ -397,7 +404,7 @@ impl Host for DesktopHost {
              #[cfg(target_os = "macos")]
              claim_notification_identity();
              let mut n = notify_rust::Notification::new();
@@ -108,6 +131,20 @@ index 2fd6a901353d2f9ab28aae235a3e9a463e3b426f..11351f912ee237e4ed02490b61f90efe
              #[cfg(windows)]
              n.app_id(APP_ID);
              #[cfg(all(unix, not(target_os = "macos")))]
+diff --git a/apps/artcraft-launcher/src/settings_file.rs b/apps/artcraft-launcher/src/settings_file.rs
+index bb7dbfe3a7c1dad4dd06d463fc9aa6eba4ddcbcb..6f1f058b14a77d0fc52036a2356922692f0acac1 100644
+--- a/apps/artcraft-launcher/src/settings_file.rs
++++ b/apps/artcraft-launcher/src/settings_file.rs
+@@ -10,6 +10,9 @@ use std::path::{Path, PathBuf};
+ 
+ /// Where eframe keeps its state for `app_id`, as it picks it for a window with that app id.
+ pub fn path(app_id: &str) -> Option<PathBuf> {
++    if let Some(path) = artcraft_launcher_native::bogo_qa::path("settings/app.ron") {
++        return Some(path);
++    }
+     eframe::storage_dir(app_id).map(|dir| dir.join("app.ron"))
+ }
+ 
 diff --git a/apps/artcraft-launcher/src/tray.rs b/apps/artcraft-launcher/src/tray.rs
 index 7f7b9b47829283df7eef1b95c0bdd36eb9970a6f..6ec3e220be8848cf543da724b438b9431d3c3d93 100644
 --- a/apps/artcraft-launcher/src/tray.rs
@@ -149013,7 +149050,7 @@ zM<^z@I`A`7KDVDzaF)`?WjmcwpA{BF1zR0{P0**^Im96#S2z9tXV3Cax#B*|bRh{r
 Qy@0EMXc}JCne8M02i=P@9RL6T
 
 diff --git a/crates/core/src/catalog.rs b/crates/core/src/catalog.rs
-index 90ec812ac0bc456bba9e3de3bb977543f80796c6..963469464f0b43a2476960ef022df9acb33b8074 100644
+index 90ec812ac0bc456bba9e3de3bb977543f80796c6..2f21cc5a6ab1c71649fa0c354782a5081b89b324 100644
 --- a/crates/core/src/catalog.rs
 +++ b/crates/core/src/catalog.rs
 @@ -55,6 +55,27 @@ impl CraftApp {
@@ -149053,7 +149090,7 @@ index 90ec812ac0bc456bba9e3de3bb977543f80796c6..963469464f0b43a2476960ef022df9ac
      }
  
      pub fn by_id(id: &str) -> Option<&'static CraftApp> {
-@@ -118,7 +139,7 @@ const fn app(
+@@ -118,111 +139,111 @@ const fn app(
  pub const SUITE: [CraftApp; 13] = [
      app(
          "photocraft",
@@ -149062,7 +149099,8 @@ index 90ec812ac0bc456bba9e3de3bb977543f80796c6..963469464f0b43a2476960ef022df9ac
          "Image editing",
          AppGroup::Classic,
          [[0x2f, 0x7b, 0xf5], [0x1a, 0x5b, 0xc4], [0x7f, 0xb0, 0xff]],
-@@ -126,7 +147,7 @@ pub const SUITE: [CraftApp; 13] = [
+-        "qptywoei777-rgb/kio-native-apps",
++        "qptywoei-sudo/bogo-native-apps",
      ),
      app(
          "vectorcraft",
@@ -149071,7 +149109,8 @@ index 90ec812ac0bc456bba9e3de3bb977543f80796c6..963469464f0b43a2476960ef022df9ac
          "Vector illustration",
          AppGroup::Classic,
          [[0xe8, 0x57, 0x3f], [0xb8, 0x3a, 0x24], [0xff, 0x8a, 0x70]],
-@@ -134,7 +155,7 @@ pub const SUITE: [CraftApp; 13] = [
+-        "qptywoei777-rgb/kio-native-apps",
++        "qptywoei-sudo/bogo-native-apps",
      ),
      app(
          "filmcraft",
@@ -149080,7 +149119,8 @@ index 90ec812ac0bc456bba9e3de3bb977543f80796c6..963469464f0b43a2476960ef022df9ac
          "Video editing, color and sound",
          AppGroup::Classic,
          [[0x8b, 0x5c, 0xf6], [0x6a, 0x3f, 0xd6], [0xb6, 0x9c, 0xff]],
-@@ -142,7 +163,7 @@ pub const SUITE: [CraftApp; 13] = [
+-        "qptywoei777-rgb/kio-native-apps",
++        "qptywoei-sudo/bogo-native-apps",
      ),
      app(
          "lightcraft",
@@ -149089,7 +149129,11 @@ index 90ec812ac0bc456bba9e3de3bb977543f80796c6..963469464f0b43a2476960ef022df9ac
          "Photo library and raw development",
          AppGroup::Classic,
          [[0xf2, 0xa5, 0x16], [0x8a, 0x58, 0x00], [0xff, 0xc1, 0x4d]],
-@@ -153,7 +174,7 @@ pub const SUITE: [CraftApp; 13] = [
+-        "qptywoei777-rgb/kio-native-apps",
++        "qptywoei-sudo/bogo-native-apps",
+     ),
+     CraftApp {
+         former_ids: &["printcraft"],
          former_names: &["PrintCraft"],
          ..app(
              "pdfcraft",
@@ -149098,7 +149142,9 @@ index 90ec812ac0bc456bba9e3de3bb977543f80796c6..963469464f0b43a2476960ef022df9ac
              "Reading, organizing and protecting PDFs",
              AppGroup::Classic,
              [[0x12, 0xa5, 0x8a], [0x0a, 0x75, 0x63], [0x3f, 0xd6, 0xb8]],
-@@ -162,7 +183,7 @@ pub const SUITE: [CraftApp; 13] = [
+-            "qptywoei777-rgb/kio-native-apps",
++            "qptywoei-sudo/bogo-native-apps",
+         )
      },
      app(
          "effectcraft",
@@ -149107,7 +149153,8 @@ index 90ec812ac0bc456bba9e3de3bb977543f80796c6..963469464f0b43a2476960ef022df9ac
          "Motion graphics and visual effects",
          AppGroup::Classic,
          [[0xe0, 0x36, 0x8f], [0xb0, 0x20, 0x6c], [0xff, 0x7a, 0xb8]],
-@@ -170,7 +191,7 @@ pub const SUITE: [CraftApp; 13] = [
+-        "qptywoei777-rgb/kio-native-apps",
++        "qptywoei-sudo/bogo-native-apps",
      ),
      app(
          "designcraft",
@@ -149116,7 +149163,8 @@ index 90ec812ac0bc456bba9e3de3bb977543f80796c6..963469464f0b43a2476960ef022df9ac
          "Page layout and publishing",
          AppGroup::Classic,
          [[0x7b, 0xb5, 0x1c], [0x45, 0x70, 0x08], [0xa6, 0xe0, 0x4a]],
-@@ -178,7 +199,7 @@ pub const SUITE: [CraftApp; 13] = [
+-        "qptywoei777-rgb/kio-native-apps",
++        "qptywoei-sudo/bogo-native-apps",
      ),
      app(
          "wordcraft",
@@ -149125,7 +149173,8 @@ index 90ec812ac0bc456bba9e3de3bb977543f80796c6..963469464f0b43a2476960ef022df9ac
          "Writing and document design",
          AppGroup::New,
          [[0x3f, 0x5f, 0xe0], [0x2a, 0x44, 0xb8], [0x8e, 0xa2, 0xff]],
-@@ -186,7 +207,7 @@ pub const SUITE: [CraftApp; 13] = [
+-        "qptywoei777-rgb/kio-native-apps",
++        "qptywoei-sudo/bogo-native-apps",
      ),
      app(
          "deckcraft",
@@ -149134,7 +149183,8 @@ index 90ec812ac0bc456bba9e3de3bb977543f80796c6..963469464f0b43a2476960ef022df9ac
          "Presentations and slide shows",
          AppGroup::New,
          [[0xf0, 0x7a, 0x1e], [0xa8, 0x4f, 0x0a], [0xff, 0xa0, 0x60]],
-@@ -194,7 +215,7 @@ pub const SUITE: [CraftApp; 13] = [
+-        "qptywoei777-rgb/kio-native-apps",
++        "qptywoei-sudo/bogo-native-apps",
      ),
      app(
          "gridcraft",
@@ -149143,7 +149193,8 @@ index 90ec812ac0bc456bba9e3de3bb977543f80796c6..963469464f0b43a2476960ef022df9ac
          "Spreadsheets and data",
          AppGroup::New,
          [[0x1f, 0x9d, 0x55], [0x12, 0x70, 0x3a], [0x4f, 0xd6, 0x8a]],
-@@ -202,7 +223,7 @@ pub const SUITE: [CraftApp; 13] = [
+-        "qptywoei777-rgb/kio-native-apps",
++        "qptywoei-sudo/bogo-native-apps",
      ),
      app(
          "cadcraft",
@@ -149152,7 +149203,8 @@ index 90ec812ac0bc456bba9e3de3bb977543f80796c6..963469464f0b43a2476960ef022df9ac
          "Computer-aided design and drafting",
          AppGroup::New,
          [[0x3e, 0xa6, 0xe8], [0x1a, 0x6f, 0xa8], [0x7c, 0xc8, 0xff]],
-@@ -210,7 +231,7 @@ pub const SUITE: [CraftApp; 13] = [
+-        "qptywoei777-rgb/kio-native-apps",
++        "qptywoei-sudo/bogo-native-apps",
      ),
      app(
          "soundcraft",
@@ -149161,7 +149213,8 @@ index 90ec812ac0bc456bba9e3de3bb977543f80796c6..963469464f0b43a2476960ef022df9ac
          "Recording, editing and mixing audio",
          AppGroup::New,
          [[0x1f, 0xa5, 0xc9], [0x0e, 0x72, 0x90], [0x5f, 0xd0, 0xee]],
-@@ -218,7 +239,7 @@ pub const SUITE: [CraftApp; 13] = [
+-        "qptywoei777-rgb/kio-native-apps",
++        "qptywoei-sudo/bogo-native-apps",
      ),
      app(
          "figcraft",
@@ -149170,7 +149223,21 @@ index 90ec812ac0bc456bba9e3de3bb977543f80796c6..963469464f0b43a2476960ef022df9ac
          "Interface design and prototyping",
          AppGroup::New,
          [[0x02, 0xda, 0x96], [0x04, 0x7a, 0x56], [0x4f, 0xe8, 0xb6]],
-@@ -251,8 +272,8 @@ pub const DISCORD_URL: &str = "https://discord.gg/artcraft";
+-        "qptywoei777-rgb/kio-native-apps",
++        "qptywoei-sudo/bogo-native-apps",
+     ),
+ ];
+ 
+@@ -233,7 +254,7 @@ pub const WEBSITE_URL: &str = "https://kio-library.vercel.app";
+ // Retained only for original developer-loopback feed migration parsing. Production uses kio_registry::REPOSITORY.
+ pub const GITHUB_OWNER: &str = "storytold";
+ /// ArtCraft on GitHub: every Craft App's source.
+-pub const GITHUB_URL: &str = "https://github.com/qptywoei777-rgb/kio-native-apps";
++pub const GITHUB_URL: &str = "https://github.com/qptywoei-sudo/bogo-native-apps";
+ /// ArtCraft's social accounts: (service, URL). Shown as small icons, less prominent than Discord.
+ pub const SOCIAL: [(&str, &str); 5] = [
+     ("X", "https://x.com/get_artcraft"),
+@@ -251,15 +272,15 @@ pub const DISCORD_URL: &str = "https://discord.gg/artcraft";
  /// `KIO Launcher.app`). Not part of [`SUITE`].
  pub const LAUNCHER: CraftApp = app(
      "artcraft-launcher",
@@ -149180,12 +149247,23 @@ index 90ec812ac0bc456bba9e3de3bb977543f80796c6..963469464f0b43a2476960ef022df9ac
 +    "Installs and updates the Bogo App Suite",
      AppGroup::New,
      [[0x0b, 0x0b, 0x0c], [0x0b, 0x0b, 0x0c], [0xf2, 0xf1, 0xee]],
-     "qptywoei777-rgb/kio-native-apps",
-@@ -277,7 +298,7 @@ mod tests {
+-    "qptywoei777-rgb/kio-native-apps",
++    "qptywoei-sudo/bogo-native-apps",
+ );
+ 
+ /// The launcher's own repo, checked so it can say when a newer launcher is out.
+-pub const LAUNCHER_REPO: &str = "qptywoei777-rgb/kio-native-apps";
++pub const LAUNCHER_REPO: &str = "qptywoei-sudo/bogo-native-apps";
+ /// The launcher's own asset stem.
+ pub const LAUNCHER_ID: &str = "artcraft-launcher";
+ 
+@@ -276,8 +297,8 @@ mod tests {
+         ids.dedup();
          assert_eq!(ids.len(), SUITE.len());
          for a in &SUITE {
-             assert_eq!(a.repo, "qptywoei777-rgb/kio-native-apps");
+-            assert_eq!(a.repo, "qptywoei777-rgb/kio-native-apps");
 -            assert!(a.name.starts_with("KIO "));
++            assert_eq!(a.repo, "qptywoei-sudo/bogo-native-apps");
 +            assert!(a.name.starts_with("Bogo "));
              assert_ne!(a.kio_id(), "unknown");
          }
@@ -149228,10 +149306,23 @@ index f5815da56b70fc7fe1d654febbf6a6c5b32373b0..9e4468de7c5fc8ac66b396abdbf3b723
          features: &[
              feature("Native GPU canvas", "No Electron and no web view: a fast native compositor."),
 diff --git a/crates/core/src/feed.rs b/crates/core/src/feed.rs
-index 542c6f624c75004429c447e47ed37e94ec2c75be..3c3fa737f50593c2829500fc8a6d5ddb4f6f0d94 100644
+index 542c6f624c75004429c447e47ed37e94ec2c75be..8d924a7ae6c76465d8d08a0d508fbdc763c966da 100644
 --- a/crates/core/src/feed.rs
 +++ b/crates/core/src/feed.rs
-@@ -454,9 +454,9 @@ mod tests {
+@@ -172,7 +172,11 @@ impl Feed {
+             return FeedAnswer::AskGitHub;
+         }
+         // The feed's repo must be the app's, or one the feed says it moved to.
+-        let repo = self.repo_for(app);
++        let repo = if self.kio_registry && entry.repo.as_deref() == Some(crate::kio_registry::LEGACY_REPOSITORY) {
++            crate::kio_registry::LEGACY_REPOSITORY.to_string()
++        } else {
++            self.repo_for(app)
++        };
+         if let Some(feed_repo) = &entry.repo
+             && !feed_repo.eq_ignore_ascii_case(&repo)
+         {
+@@ -454,9 +458,9 @@ mod tests {
          "release_info": {{
            "apps": {{
              "photocraft": {{
@@ -149243,7 +149334,7 @@ index 542c6f624c75004429c447e47ed37e94ec2c75be..3c3fa737f50593c2829500fc8a6d5ddb
                  "published_at": "2026-10-09T10:00:00Z",
                  "html_url": "https://github.com/storytold/photocraft/releases/tag/v0.6.0",
                  "prerelease": false, "notes_markdown": "Notes",
-@@ -469,9 +469,9 @@ mod tests {
+@@ -469,9 +473,9 @@ mod tests {
                }},
                "app_last_fetched": "2026-10-09T13:00:00Z"
              }},
@@ -149255,7 +149346,7 @@ index 542c6f624c75004429c447e47ed37e94ec2c75be..3c3fa737f50593c2829500fc8a6d5ddb
              "vectorcraft": {{ "repo": "storytold/vectorcraft", "app_last_fetched": "2026-10-01T00:00:00Z",
                                "latest_release": {{ "tag": "v0.7.0" }} }},
              "brandnewcraft": {{ "repo": "storytold/brandnewcraft", "app_last_fetched": "2026-10-09T13:00:00Z" }}
-@@ -540,7 +540,10 @@ mod tests {
+@@ -540,7 +544,10 @@ mod tests {
                  "\"repo_renames\": []",
                  r#""repo_renames": [{"old_name": "Storytold/photocraft", "new_name": "storytold/photocraft-app", "renamed_at": null}]"#,
              )
@@ -149267,7 +149358,7 @@ index 542c6f624c75004429c447e47ed37e94ec2c75be..3c3fa737f50593c2829500fc8a6d5ddb
              .replace("github.com/storytold/photocraft/releases", "github.com/storytold/photocraft-app/releases");
          let feed = Feed::parse(&moved).unwrap();
          assert_eq!(feed.repo_for(app("photocraft")), "storytold/photocraft-app");
-@@ -563,7 +566,7 @@ mod tests {
+@@ -563,7 +570,7 @@ mod tests {
                                    {"old_name": "art/photocraft", "new_name": "storytold/photocraft", "renamed_at": null},
                                    {"old_name": "storytold/photocraft", "new_name": "storytold.evil.example/photocraft", "renamed_at": null}]"#,
              )
@@ -149276,7 +149367,7 @@ index 542c6f624c75004429c447e47ed37e94ec2c75be..3c3fa737f50593c2829500fc8a6d5ddb
              .replace("github.com/storytold/photocraft/releases", "github.com/art/photocraft/releases");
          let feed = Feed::parse(&moved).unwrap();
          assert!(feed.repo_renames.is_empty(), "{:?}", feed.repo_renames);
-@@ -613,17 +616,17 @@ mod tests {
+@@ -613,17 +620,17 @@ mod tests {
          let with_notices = sample()
              .replace(
                  "\"announcements\": []",
@@ -149297,7 +149388,7 @@ index 542c6f624c75004429c447e47ed37e94ec2c75be..3c3fa737f50593c2829500fc8a6d5ddb
              "new_name_lower": "docucraft", "description": "Same app, new name.", "renamed_at": "2026-10-09T08:00:00Z"}]"#,
              );
          let feed = Feed::parse(&with_notices).unwrap();
-@@ -631,7 +634,7 @@ mod tests {
+@@ -631,7 +638,7 @@ mod tests {
          assert_eq!(feed.alerts[0].link.as_deref(), Some("https://getartcraft.com/security"));
          assert_eq!(feed.alerts[1].link, None, "only web links are kept");
          let titles: Vec<&str> = feed.announcements.iter().map(|n| n.title.as_str()).collect();
@@ -149307,10 +149398,23 @@ index 542c6f624c75004429c447e47ed37e94ec2c75be..3c3fa737f50593c2829500fc8a6d5ddb
          assert_eq!(Feed::parse(&with_notices).unwrap().alerts[0].id, feed.alerts[0].id);
      }
 diff --git a/crates/core/src/kio_registry.rs b/crates/core/src/kio_registry.rs
-index b0ac5f40dabf10a6d7d3b3daa33f1ed9a8e4e634..b10cf34784e3a266b74f62a9b212ef9ef40dcba4 100644
+index b0ac5f40dabf10a6d7d3b3daa33f1ed9a8e4e634..2babcb701b74deed66f681090f27f445e77c91f7 100644
 --- a/crates/core/src/kio_registry.rs
 +++ b/crates/core/src/kio_registry.rs
-@@ -18,15 +18,15 @@ pub fn app_by_kio_id(id: &str) -> Option<&'static CraftApp> {
+@@ -6,8 +6,10 @@ use crate::feed::{Feed, FeedApp, FeedRelease};
+ use crate::platform::{AssetName, PackageKind};
+ use crate::version;
+ 
+-pub const REPOSITORY: &str = "qptywoei777-rgb/kio-native-apps";
+-pub const REGISTRY_URL: &str = "https://kio-library.vercel.app/downloads/native-apps-manifest.json";
++pub const REPOSITORY: &str = "qptywoei-sudo/bogo-native-apps";
++pub const LEGACY_REPOSITORY: &str = "qptywoei777-rgb/kio-native-apps";
++pub const REGISTRY_URL: &str = "https://raw.githubusercontent.com/qptywoei-sudo/bogo-native-apps/refs/heads/codex/bogo-native-rebrand-20261026/manifests/bogo-native-downloads.json";
++pub const LEGACY_REGISTRY_URL: &str = "https://kio-library.vercel.app/downloads/native-apps-manifest.json";
+ pub const MAX_REGISTRY_BYTES: usize = 2 * 1024 * 1024;
+ 
+ pub fn app_by_kio_id(id: &str) -> Option<&'static CraftApp> {
+@@ -18,15 +20,15 @@ pub fn app_by_kio_id(id: &str) -> Option<&'static CraftApp> {
  /// entries mean unavailable; missing entries cannot fall back to another app's release.
  pub fn parse(json: &str) -> Result<Feed, String> {
      if json.len() > MAX_REGISTRY_BYTES {
@@ -149331,7 +149435,7 @@ index b0ac5f40dabf10a6d7d3b3daa33f1ed9a8e4e634..b10cf34784e3a266b74f62a9b212ef9e
      }
      let mut feed = Feed { kio_registry: true, ..Feed::default() };
      // A reviewed static release remains valid while offline. It is replaced only by another
-@@ -36,16 +36,17 @@ pub fn parse(json: &str) -> Result<Feed, String> {
+@@ -36,16 +38,18 @@ pub fn parse(json: &str) -> Result<Feed, String> {
      }
      let mut seen = std::collections::BTreeSet::new();
      for row in programs {
@@ -149343,19 +149447,21 @@ index b0ac5f40dabf10a6d7d3b3daa33f1ed9a8e4e634..b10cf34784e3a266b74f62a9b212ef9e
 -            return Err("duplicate KIO program".into());
 +            return Err("duplicate Bogo program".into());
          }
-         if row.get("repository").and_then(serde_json::Value::as_str) != Some(REPOSITORY) {
+-        if row.get("repository").and_then(serde_json::Value::as_str) != Some(REPOSITORY) {
 -            return Err("KIO release repository is not allowed".into());
-+            return Err("Bogo release repository is not allowed".into());
-         }
--        let full_version = row.get("version").and_then(serde_json::Value::as_str).ok_or("missing KIO version")?;
--        let (upstream, revision) = full_version.split_once("-kio.").ok_or("missing KIO release revision")?;
 +        let full_version = row.get("version").and_then(serde_json::Value::as_str).ok_or("missing Bogo version")?;
 +        let (upstream, revision) =
 +            full_version.split_once("-bogo.").or_else(|| full_version.split_once("-kio.")).ok_or("missing Bogo release revision")?;
++        let repository = if full_version.contains("-bogo.") { REPOSITORY } else { LEGACY_REPOSITORY };
++        if row.get("repository").and_then(serde_json::Value::as_str) != Some(repository) {
++            return Err("release family does not match its exact repository".into());
+         }
+-        let full_version = row.get("version").and_then(serde_json::Value::as_str).ok_or("missing KIO version")?;
+-        let (upstream, revision) = full_version.split_once("-kio.").ok_or("missing KIO release revision")?;
          let parsed = version::parse(upstream).ok_or("invalid upstream version")?;
          if !parsed.pre.is_empty()
              || !parsed.build.is_empty()
-@@ -54,46 +55,47 @@ pub fn parse(json: &str) -> Result<Feed, String> {
+@@ -54,46 +58,47 @@ pub fn parse(json: &str) -> Result<Feed, String> {
              || !revision.bytes().all(|b| b.is_ascii_digit())
              || revision.parse::<u64>().ok().is_none_or(|n| n == 0)
          {
@@ -149391,7 +149497,8 @@ index b0ac5f40dabf10a6d7d3b3daa33f1ed9a8e4e634..b10cf34784e3a266b74f62a9b212ef9e
 +            let prefix = display.replace(' ', "-");
              if !crate::release::valid_file_name(name)
                  || !filenames.insert(name.to_string())
-                 || url != format!("https://github.com/{REPOSITORY}/releases/download/{tag}/{name}")
+-                || url != format!("https://github.com/{REPOSITORY}/releases/download/{tag}/{name}")
++                || url != format!("https://github.com/{repository}/releases/download/{tag}/{name}")
              {
 -                return Err("KIO artifact URL or filename is not bound to its exact release".into());
 +                return Err("Bogo artifact URL or filename is not bound to its exact release".into());
@@ -149417,7 +149524,7 @@ index b0ac5f40dabf10a6d7d3b3daa33f1ed9a8e4e634..b10cf34784e3a266b74f62a9b212ef9e
              let suffix = match (platform, arch, kind) {
                  ("macos", "arm64" | "aarch64", "dmg") => "macos-arm64.dmg",
                  ("windows", "x64" | "x86_64", "msi") => "windows-x64.msi",
-@@ -101,10 +103,10 @@ pub fn parse(json: &str) -> Result<Feed, String> {
+@@ -101,21 +106,21 @@ pub fn parse(json: &str) -> Result<Feed, String> {
                  // Full application ZIPs are useful downloads; the native installer deliberately
                  // selects the original DMG/MSI path. Source archives are never installers.
                  ("macos", "arm64" | "aarch64", "app-zip" | "zip") => "macos-arm64.zip",
@@ -149430,7 +149537,21 @@ index b0ac5f40dabf10a6d7d3b3daa33f1ed9a8e4e634..b10cf34784e3a266b74f62a9b212ef9e
              }
              assets.push((name.into(), bytes, url.into(), Some(hash.to_ascii_lowercase())));
          }
-@@ -127,28 +129,35 @@ pub fn asset_name(name: &str, stems: &[&str]) -> Option<AssetName> {
+         let release = (!assets.is_empty()).then(|| FeedRelease {
+             tag: tag.into(),
+-            name: format!("{} {full_version}", app.name),
+-            html_url: format!("https://github.com/{REPOSITORY}/releases/tag/{tag}"),
++            name: format!("{} {full_version}", if full_version.contains("-bogo.") { app.name } else { app.legacy_name() }),
++            html_url: format!("https://github.com/{repository}/releases/tag/{tag}"),
+             assets,
+             ..FeedRelease::default()
+         });
+-        feed.apps.insert(app.id.into(), FeedApp { repo: Some(REPOSITORY.into()), fetched_at: Some(0), release });
++        feed.apps.insert(app.id.into(), FeedApp { repo: Some(repository.into()), fetched_at: Some(0), release });
+     }
+     Ok(feed)
+ }
+@@ -127,39 +132,58 @@ pub fn asset_name(name: &str, stems: &[&str]) -> Option<AssetName> {
          if !stems.contains(&app.id) {
              continue;
          }
@@ -149488,7 +149609,40 @@ index b0ac5f40dabf10a6d7d3b3daa33f1ed9a8e4e634..b10cf34784e3a266b74f62a9b212ef9e
      }
      None
  }
-@@ -204,3 +213,28 @@ mod tests {
+ 
++/// Validate a fetched catalog's family as well as every individual exact artifact.
++/// Cached historical catalogs still use parse(), which binds each family itself.
++pub fn catalog_family(body: &str, bogo: bool) -> Result<bool, String> {
++    parse(body)?;
++    let raw: serde_json::Value = serde_json::from_str(body).map_err(|_| "invalid registry")?;
++    let rows = raw["programs"].as_array().ok_or("missing programs")?;
++    let suffix = if bogo { "-bogo." } else { "-kio." };
++    if rows.iter().any(|row| !row["version"].as_str().is_some_and(|value| value.contains(suffix))) {
++        return Err("catalog contains a different release family".into());
++    }
++    Ok(rows.iter().any(|row| row["artifacts"].as_array().is_some_and(|items| !items.is_empty())))
++}
+ #[cfg(test)]
+ mod tests {
+     use super::*;
+     use crate::feed::FeedAnswer;
+     fn sample() -> String {
+         let name = "KIO-Word-0.7.0-kio.1-windows-x64.msi";
+-        serde_json::json!({"schemaVersion":1,"programs":[{"id":"word","version":"0.7.0-kio.1","upstreamVersion":"0.7.0","repository":REPOSITORY,"releaseTag":"word-v0.7.0-kio.1","artifacts":[{"name":name,"platform":"windows","arch":"x86_64","kind":"msi","bytes":123,"sha256":"a".repeat(64),"url":format!("https://github.com/{REPOSITORY}/releases/download/word-v0.7.0-kio.1/{name}")}]}]}).to_string()
++        serde_json::json!({"schemaVersion":1,"programs":[{"id":"word","version":"0.7.0-kio.1","upstreamVersion":"0.7.0","repository":LEGACY_REPOSITORY,"releaseTag":"word-v0.7.0-kio.1","artifacts":[{"name":name,"platform":"windows","arch":"x86_64","kind":"msi","bytes":123,"sha256":"a".repeat(64),"url":format!("https://github.com/{LEGACY_REPOSITORY}/releases/download/word-v0.7.0-kio.1/{name}")}]}]}).to_string()
+     }
+     #[test]
+     fn valid_registry_binds_app_tag_asset_hash_size_and_missing_apps_are_unavailable() {
+@@ -177,7 +201,7 @@ mod tests {
+     fn malicious_or_mixed_app_registry_never_installs() {
+         for (from, to) in [
+             ("word-v0.7.0-kio.1", "grid-v0.7.0-kio.1"),
+-            (REPOSITORY, "other/kio-native-apps"),
++            (LEGACY_REPOSITORY, "other/kio-native-apps"),
+             ("KIO-Word-", "KIO-Grid-"),
+             ("\"bytes\":123", "\"bytes\":0"),
+             ("\"id\":\"word\"", "\"id\":\"studio\""),
+@@ -204,3 +228,33 @@ mod tests {
          assert!(crate::platform::pick_asset(&release, &[app.id], Platform { os: Os::MacOs, arch: Arch::X64 }, &[PackageKind::Dmg]).is_none());
      }
  }
@@ -149500,14 +149654,19 @@ index b0ac5f40dabf10a6d7d3b3daa33f1ed9a8e4e634..b10cf34784e3a266b74f62a9b212ef9e
 +    fn both_measured_release_families_remain_bound() {
 +        for (family, brand) in [("kio", "KIO"), ("bogo", "Bogo")] {
 +            let version = format!("0.7.0-{family}.1");
++            let repository = if family == "bogo" { REPOSITORY } else { LEGACY_REPOSITORY };
 +            let tag = format!("word-v{version}");
 +            let name = format!("{brand}-Word-{version}-windows-x64.msi");
 +            let row = serde_json::json!({"schemaVersion":1,"programs":[{
-+                "id":"word","version":version,"upstreamVersion":"0.7.0","repository":REPOSITORY,
++                "id":"word","version":version,"upstreamVersion":"0.7.0","repository":repository,
 +                "releaseTag":tag,"artifacts":[{"platform":"windows","arch":"x86_64","kind":"msi",
-+                "bytes":123,"sha256":"a".repeat(64),"url":format!("https://github.com/{REPOSITORY}/releases/download/{tag}/{name}")}]}]});
++                "bytes":123,"sha256":"a".repeat(64),"url":format!("https://github.com/{repository}/releases/download/{tag}/{name}")}]}]});
 +            let json = row.to_string();
 +            assert!(parse(&json).is_ok());
++            let other_repository = if family == "bogo" { LEGACY_REPOSITORY } else { REPOSITORY };
++            assert!(parse(&json.replace(repository, other_repository)).is_err());
++            assert!(catalog_family(&json, family == "bogo").is_ok());
++            assert!(catalog_family(&json, family != "bogo").is_err());
 +            assert!(asset_name(&name, &["wordcraft"]).is_some());
 +            assert!(asset_name(&name, &["gridcraft"]).is_none());
 +            let wrong = json.replace(&format!("{brand}-Word-"), "Bogo-Grid-");
@@ -149611,10 +149770,10 @@ index 629e58eec031f79a505dfd0b428915e4c6673e38..7edcb41c2a91bd0985144ac6166adbe6
              Self::Msi => "Windows Installer",
              Self::Deb => "Debian package",
 diff --git a/crates/core/src/version.rs b/crates/core/src/version.rs
-index 9785c19bccde6ee8ca3730c26e1c2b0ab9a2c0ff..263f806a0bc9fd14c6333937f32d528b416f9709 100644
+index 9785c19bccde6ee8ca3730c26e1c2b0ab9a2c0ff..fea05e54a0843208e898b4d6304e028f4c5cdf26 100644
 --- a/crates/core/src/version.rs
 +++ b/crates/core/src/version.rs
-@@ -106,6 +106,11 @@ pub fn is_stable(v: &Version) -> bool {
+@@ -106,11 +106,19 @@ pub fn is_stable(v: &Version) -> bool {
  
  /// Orders by precedence, ignoring build metadata.
  pub fn compare(a: &Version, b: &Version) -> Ordering {
@@ -149626,7 +149785,15 @@ index 9785c19bccde6ee8ca3730c26e1c2b0ab9a2c0ff..263f806a0bc9fd14c6333937f32d528b
      a.cmp_precedence(b)
  }
  
-@@ -119,14 +124,31 @@ pub fn is_newer(latest: &Version, installed: &Version) -> bool {
+ /// True when `latest` is newer than `installed`.
+ pub fn is_newer(latest: &Version, installed: &Version) -> bool {
++    if installed.pre.as_str().starts_with("bogo.") && latest.pre.as_str().starts_with("kio.") {
++        return false;
++    }
+     compare(latest, installed) == Ordering::Greater
+ }
+ 
+@@ -119,14 +127,34 @@ pub fn is_newer(latest: &Version, installed: &Version) -> bool {
  /// matches a pre-release's numbers, rather than nagging forever. KIO's positive integer
  /// packaging revisions are different: a numeric-only manual install has an unknown revision,
  /// treated as revision zero until a verified managed install records the complete KIO version.
@@ -149653,6 +149820,9 @@ index 9785c19bccde6ee8ca3730c26e1c2b0ab9a2c0ff..263f806a0bc9fd14c6333937f32d528b
 -        return latest.pre.as_str().strip_prefix("kio.").is_some_and(|revision| {
 -            !revision.is_empty() && revision.bytes().all(|b| b.is_ascii_digit()) && revision.parse::<u64>().is_ok_and(|n| n > 0)
 -        });
++    if installed.pre.as_str().starts_with("bogo.") && latest.pre.as_str().starts_with("kio.") {
++        return false;
++    }
 +    if (latest.major, latest.minor, latest.patch) == (installed.major, installed.minor, installed.patch) {
 +        match (packaging_revision(latest), packaging_revision(installed)) {
 +            (Some(a), Some(b)) => return a > b,
@@ -149665,7 +149835,7 @@ index 9785c19bccde6ee8ca3730c26e1c2b0ab9a2c0ff..263f806a0bc9fd14c6333937f32d528b
      }
      is_newer(latest, installed)
  }
-@@ -202,3 +224,20 @@ mod tests {
+@@ -202,3 +230,22 @@ mod tests {
          }
      }
  }
@@ -149678,6 +149848,8 @@ index 9785c19bccde6ee8ca3730c26e1c2b0ab9a2c0ff..263f806a0bc9fd14c6333937f32d528b
 +        let v = |s| parse(s).unwrap();
 +        assert!(is_update(&v("0.7.0-bogo.1"), &v("0.7.0-kio.99")));
 +        assert!(!is_update(&v("0.7.0-kio.99"), &v("0.7.0-bogo.1")));
++        assert!(!is_update(&v("0.9.0-kio.1"), &v("0.8.0-bogo.1")));
++        assert!(!is_newer(&v("0.9.0-kio.1"), &v("0.8.0-bogo.1")));
 +        assert!(is_update(&v("0.7.0-bogo.1"), &v("0.7.0")));
 +        assert!(is_update(&v("0.7.0-bogo.2"), &v("0.7.0-bogo.1")));
 +        assert!(!is_update(&v("0.7.0-bogo.1"), &v("0.7.0-bogo.1")));
@@ -149687,7 +149859,7 @@ index 9785c19bccde6ee8ca3730c26e1c2b0ab9a2c0ff..263f806a0bc9fd14c6333937f32d528b
 +    }
 +}
 diff --git a/crates/native/src/backend.rs b/crates/native/src/backend.rs
-index e038fe00d113c5b24b11805bd5509c0f18dd64a2..8bfbc58d01f7f21ec75da4d1bc33410fbed321fe 100644
+index e038fe00d113c5b24b11805bd5509c0f18dd64a2..b7e39ccf47a1fc77589c17de417a5bdb2f58c914 100644
 --- a/crates/native/src/backend.rs
 +++ b/crates/native/src/backend.rs
 @@ -64,7 +64,7 @@ struct Shared {
@@ -149735,6 +149907,15 @@ index e038fe00d113c5b24b11805bd5509c0f18dd64a2..8bfbc58d01f7f21ec75da4d1bc33410f
           let {them} finish or cancel {them}, then press Update and restart again."
      )
  }
+@@ -767,7 +767,7 @@ fn fetch_feed(http: &Http, paths: &Paths, url: &str, throttle: &Mutex<FeedThrott
+             throttle.sending(now);
+         }
+         asked = true;
+-        let outcome = match http.get_feed(url) {
++        let outcome = match bogo_registry_body(http, url) {
+             Ok(body) => match Feed::parse(&body) {
+                 Some(feed) if feed.kio_registry => {
+                     if let Err(e) = crate::paths::write_atomic(&paths.feed_cache(), body.as_bytes()) {
 @@ -1204,13 +1204,13 @@ mod tests {
          let word = CraftApp::by_id("wordcraft").unwrap();
          let feed = feed();
@@ -149772,6 +149953,295 @@ index e038fe00d113c5b24b11805bd5509c0f18dd64a2..8bfbc58d01f7f21ec75da4d1bc33410f
      }
  
      #[test]
+@@ -1454,3 +1454,30 @@ mod tests {
+         assert!(!restarting.load(Ordering::SeqCst));
+     }
+ }
++
++/// Only the exact new catalog or the exact historical KIO catalog are trusted.
++/// An unpublished/empty Bogo catalog may show genuine legacy availability.
++fn bogo_registry_body(http: &Http, url: &str) -> Result<String, http::FeedError> {
++    use artcraft_launcher_core::kio_registry as registry;
++    if url != registry::REGISTRY_URL {
++        return http.get_feed(url);
++    }
++    let primary = http.get_feed(registry::REGISTRY_URL);
++    let mut empty_primary = None;
++    match primary {
++        Ok(body) => match registry::catalog_family(&body, true) {
++            Ok(true) => return Ok(body),
++            Ok(false) => empty_primary = Some(body),
++            Err(why) => return Err(http::FeedError { why, throttled: false, retry_after: None }),
++        },
++        Err(_) => {}
++    }
++    match http.get_feed(registry::LEGACY_REGISTRY_URL) {
++        Ok(body) if registry::catalog_family(&body, false).is_ok() => Ok(body),
++        _ => empty_primary.ok_or_else(|| http::FeedError {
++            why: "neither exact Bogo catalog nor validated historical catalog is available".into(),
++            throttled: false,
++            retry_after: None,
++        }),
++    }
++}
+diff --git a/crates/native/src/bogo_qa.rs b/crates/native/src/bogo_qa.rs
+new file mode 100644
+index 0000000000000000000000000000000000000000..581fdf5de4faf206c156c66575cca3d038649942
+--- /dev/null
++++ b/crates/native/src/bogo_qa.rs
+@@ -0,0 +1,252 @@
++//! Explicit, private QA profiles. Normal storage identities stay unchanged.
++#![allow(dead_code)]
++
++use std::ffi::OsString;
++use std::path::{Component, Path, PathBuf};
++
++const APP: &str = "launcher";
++
++/// A pure parser, also used by tests: partial opt-in always fails closed.
++fn resolve(mode: Option<OsString>, base: Option<OsString>) -> Result<Option<PathBuf>, String> {
++    if mode.is_none() && base.is_none() {
++        return Ok(None);
++    }
++    if mode.as_deref() != Some(std::ffi::OsStr::new("1")) {
++        return Err("BOGO_QA_MODE must equal 1 when QA settings are supplied".into());
++    }
++    let base = base.filter(|value| !value.is_empty()).ok_or("BOGO_QA_ROOT is required in QA mode")?;
++    let base = PathBuf::from(base);
++    if !base.is_absolute()
++        || base.components().any(|part| matches!(part, Component::ParentDir))
++        || !base.components().any(|part| matches!(part, Component::Normal(_)))
++    {
++        return Err("BOGO_QA_ROOT must be an absolute task directory without parent traversal".into());
++    }
++    Ok(Some(base))
++}
++
++#[cfg(not(target_arch = "wasm32"))]
++fn private_directory(path: &Path) -> Result<(), String> {
++    match std::fs::symlink_metadata(path) {
++        Ok(metadata) if metadata.file_type().is_symlink() || !metadata.is_dir() => {
++            return Err("QA directory is a link or is not a directory".into());
++        }
++        Ok(_) => {}
++        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
++            let mut builder = std::fs::DirBuilder::new();
++            builder.recursive(true);
++            #[cfg(unix)]
++            {
++                use std::os::unix::fs::DirBuilderExt;
++                builder.mode(0o700);
++            }
++            builder.create(path).map_err(|error| format!("cannot create QA directory: {error}"))?;
++        }
++        Err(error) => return Err(format!("cannot inspect QA directory: {error}")),
++    }
++    let metadata = std::fs::symlink_metadata(path).map_err(|error| format!("cannot inspect QA directory: {error}"))?;
++    if metadata.file_type().is_symlink() || !metadata.is_dir() {
++        return Err("QA directory changed into a link or a file".into());
++    }
++    #[cfg(unix)]
++    {
++        use std::os::unix::fs::PermissionsExt;
++        if metadata.permissions().mode() & 0o077 != 0 {
++            return Err("QA directory must be private to its owner (mode 0700)".into());
++        }
++    }
++    Ok(())
++}
++
++#[cfg(not(target_arch = "wasm32"))]
++fn owned_root(base: &Path) -> Result<PathBuf, String> {
++    private_directory(base)?;
++    let base = std::fs::canonicalize(base).map_err(|error| format!("cannot resolve QA directory: {error}"))?;
++    let app = base.join(APP);
++    private_directory(&app)?;
++    Ok(app)
++}
++
++#[cfg(not(target_arch = "wasm32"))]
++fn refuse(message: &str) -> ! {
++    eprintln!("Bogo QA profile refused: {message}");
++    std::process::exit(2)
++}
++
++/// None only for a completely ordinary launch. Invalid QA settings exit before
++/// the caller can fall back to personal preferences, recovery, logs or caches.
++#[cfg(not(target_arch = "wasm32"))]
++pub fn root() -> Option<PathBuf> {
++    static ROOT: std::sync::OnceLock<Option<PathBuf>> = std::sync::OnceLock::new();
++    ROOT.get_or_init(|| match resolve(std::env::var_os("BOGO_QA_MODE"), std::env::var_os("BOGO_QA_ROOT")) {
++        Ok(Some(base)) => Some(owned_root(&base).unwrap_or_else(|error| refuse(&error))),
++        Ok(None) => None,
++        Err(error) => refuse(&error),
++    })
++    .clone()
++}
++
++/// Browser builds retain their existing browser storage and do not read native
++/// process environment variables or create host directories.
++#[cfg(target_arch = "wasm32")]
++pub fn root() -> Option<PathBuf> {
++    None
++}
++
++pub fn path(relative: &str) -> Option<PathBuf> {
++    root().map(|root| {
++        let relative = Path::new(relative);
++        if relative.as_os_str().is_empty() || relative.components().any(|part| !matches!(part, Component::Normal(_))) {
++            #[cfg(not(target_arch = "wasm32"))]
++            refuse("invalid internal QA path");
++        }
++        root.join(relative)
++    })
++}
++
++#[cfg(test)]
++mod qa_profile_tests {
++    use super::*;
++
++    #[test]
++    fn ordinary_launch_has_no_qa_profile() {
++        assert_eq!(resolve(None, None), Ok(None));
++    }
++
++    #[test]
++    fn partial_invalid_and_relative_configuration_never_fall_back() {
++        for (mode, root) in [
++            (Some("1"), None),
++            (None, Some("/private/qa")),
++            (Some("0"), Some("/private/qa")),
++            (Some("true"), Some("/private/qa")),
++            (Some("1"), Some("")),
++            (Some("1"), Some("relative")),
++            (Some("1"), Some("/")),
++            (Some("1"), Some("/private/qa/../user")),
++        ] {
++            assert!(resolve(mode.map(OsString::from), root.map(OsString::from)).is_err());
++        }
++    }
++
++    #[test]
++    fn complete_configuration_is_explicit_and_keeps_the_app_namespace() {
++        let absolute = std::env::temp_dir().join("bogo-qa-parser");
++        assert_eq!(resolve(Some("1".into()), Some(absolute.as_os_str().into())), Ok(Some(absolute.clone())));
++    }
++
++    #[cfg(not(target_arch = "wasm32"))]
++    #[test]
++    fn owned_paths_are_private_and_links_or_existing_public_roots_are_refused() {
++        let base = std::env::temp_dir().join(format!("bogo-qa-profile-{}-{}", APP, std::process::id()));
++        assert!(!base.exists());
++        let app = owned_root(&base).expect("fresh private QA root");
++        assert_eq!(app, std::fs::canonicalize(&base).expect("QA base").join(APP));
++        assert!(app.is_dir());
++        #[cfg(unix)]
++        {
++            use std::os::unix::fs::{PermissionsExt, symlink};
++            assert_eq!(std::fs::metadata(&base).expect("QA metadata").permissions().mode() & 0o777, 0o700);
++            let link = base.with_extension("link");
++            symlink(&base, &link).expect("QA link fixture");
++            assert!(owned_root(&link).is_err());
++            std::fs::remove_file(&link).expect("remove own link");
++            std::fs::set_permissions(&base, std::fs::Permissions::from_mode(0o755)).expect("public fixture");
++            assert!(owned_root(&base).is_err());
++            std::fs::set_permissions(&base, std::fs::Permissions::from_mode(0o700)).expect("restore own fixture");
++        }
++        std::fs::remove_dir_all(&base).expect("remove own fixture");
++    }
++}
++
++/// QA must never ask an installed launcher to show, quit, or replace itself.
++/// Query process names only; no process is signalled and no existing socket is
++/// contacted. Query failure is a refusal, rather than permission to continue.
++pub fn launcher_listener(addr: std::net::SocketAddr) -> Result<std::net::TcpListener, String> {
++    let output = {
++        #[cfg(windows)]
++        {
++            use std::os::windows::process::CommandExt;
++            let executable =
++                std::env::var_os("SystemRoot").map_or_else(|| PathBuf::from(r"C:\Windows"), PathBuf::from).join(r"System32\tasklist.exe");
++            std::process::Command::new(executable).args(["/FO", "CSV", "/NH"]).creation_flags(0x08000000).output()
++        }
++        #[cfg(not(windows))]
++        {
++            std::process::Command::new("/bin/ps").args(["-axo", "pid=,comm="]).output()
++        }
++    }
++    .map_err(|error| format!("cannot inspect existing Launcher processes: {error}"))?;
++    if !output.status.success() {
++        return Err("cannot inspect existing Launcher processes".into());
++    }
++    let text = String::from_utf8(output.stdout).map_err(|_| "unreadable Launcher process list")?;
++    refuse_other_launchers(&text, std::process::id(), cfg!(windows))?;
++    qa_bind(addr)
++}
++
++fn launcher_name(name: &str) -> bool {
++    let name = name.rsplit(['/', '\\']).next().unwrap_or(name).to_ascii_lowercase();
++    matches!(
++        name.as_str(),
++        "bogo launcher" | "kio launcher" | "artcraft-launcher" | "bogo launcher.exe" | "kio launcher.exe" | "artcraft-launcher.exe"
++    )
++}
++
++fn refuse_other_launchers(text: &str, ours: u32, windows: bool) -> Result<(), String> {
++    let mut seen = false;
++    for line in text.lines().filter(|line| !line.trim().is_empty()) {
++        let (pid, name) = if windows {
++            let fields: Vec<_> = line.trim().trim_matches('"').split("\",\"").collect();
++            if fields.len() < 2 {
++                return Err("unreadable Launcher process row".into());
++            }
++            (fields[1].parse::<u32>().map_err(|_| "unreadable Launcher process id")?, fields[0])
++        } else {
++            let line = line.trim_start();
++            let (pid, name) = line.split_once(char::is_whitespace).ok_or("unreadable Launcher process row")?;
++            (pid.parse::<u32>().map_err(|_| "unreadable Launcher process id")?, name.trim())
++        };
++        seen = true;
++        if pid != ours && launcher_name(name) {
++            return Err("another Launcher process is running; QA will not signal or replace it".into());
++        }
++    }
++    if !seen {
++        return Err("empty Launcher process list".into());
++    }
++    Ok(())
++}
++
++fn qa_bind(addr: std::net::SocketAddr) -> Result<std::net::TcpListener, String> {
++    std::net::TcpListener::bind(addr).map_err(|_| "Launcher instance port is occupied; QA will not contact or replace its owner".into())
++}
++
++#[cfg(test)]
++mod qa_launcher_tests {
++    use super::*;
++
++    #[test]
++    fn process_guard_excludes_only_itself_and_refuses_old_and_new_launchers() {
++        assert!(refuse_other_launchers("42 /tmp/Bogo Launcher\n43 /usr/bin/python3\n", 42, false).is_ok());
++        for name in ["/Applications/KIO Launcher.app/Contents/MacOS/KIO Launcher", "/tmp/Bogo Launcher", "/tmp/artcraft-launcher"] {
++            assert!(refuse_other_launchers(&format!("42 /tmp/Bogo Launcher\n43 {name}\n"), 42, false).is_err());
++        }
++        assert!(refuse_other_launchers("\"Bogo Launcher.exe\",\"42\",\"Console\"", 42, true).is_ok());
++        assert!(refuse_other_launchers("\"KIO Launcher.exe\",\"43\",\"Console\"", 42, true).is_err());
++        assert!(refuse_other_launchers("", 42, false).is_err());
++        assert!(refuse_other_launchers("unreadable", 42, false).is_err());
++    }
++
++    #[test]
++    fn occupied_port_is_refused_without_any_connection_or_handshake() {
++        let owner = std::net::TcpListener::bind("127.0.0.1:0").expect("own socket fixture");
++        owner.set_nonblocking(true).expect("nonblocking own fixture");
++        let addr = owner.local_addr().expect("fixture address");
++        assert!(qa_bind(addr).is_err());
++        assert!(matches!(owner.accept(), Err(error) if error.kind() == std::io::ErrorKind::WouldBlock));
++        drop(owner);
++        let ours = qa_bind(addr).expect("free port can be owned by QA");
++        assert_eq!(ours.local_addr().expect("QA address"), addr);
++    }
++}
 diff --git a/crates/native/src/desktop_entry.rs b/crates/native/src/desktop_entry.rs
 index 3f37b1f77e5f4f6b1f07bf2b1110bffd95a14daa..8922a3854d3719ce383925c18e68ffb47176eaf4 100644
 --- a/crates/native/src/desktop_entry.rs
@@ -149946,10 +150416,34 @@ index 535d0bac9b2505a5ebce33788419862e45fab8cd..06a9d42339196ad62fd8395ddbd424ed
 +    }
 +}
 diff --git a/crates/native/src/install.rs b/crates/native/src/install.rs
-index b2efb98591c596f825da2c26f0918e475c6ebe5e..d03ef2c1a7d1958a16f0058ff9691851a0733868 100644
+index b2efb98591c596f825da2c26f0918e475c6ebe5e..a59500437cc39f919a672dde9b480b8c5ec920ea 100644
 --- a/crates/native/src/install.rs
 +++ b/crates/native/src/install.rs
-@@ -942,7 +942,14 @@ pub mod macos {
+@@ -896,15 +896,19 @@ pub mod macos {
+     const DITTO: &str = "/usr/bin/ditto";
+     const CODESIGN: &str = "/usr/bin/codesign";
+ 
+-    pub fn install_dmg(app: &CraftApp, dmg: &Path, existing: Option<&Installed>, paths: &Paths, expect: &Expect<'_>) -> Result<PathBuf, String> {
++    pub fn install_dmg(app: &CraftApp, dmg: &Path, existing: Option<&Installed>, _paths: &Paths, expect: &Expect<'_>) -> Result<PathBuf, String> {
+         // A new, empty mount point for every install. A fixed one can still hold an image from an
+         // attach that was interrupted or timed out, and hdiutil won't mount another over it.
+         let attempt = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_nanos()).unwrap_or_default();
+-        let mount = paths.cache.join(format!("mount-{}-{}-{attempt}", app.id, std::process::id()));
+-        std::fs::create_dir_all(&mount).map_err(|e| format!("couldn't create a folder to open the disk image in ({e})"))?;
++        let mount = Path::new("/Volumes").join(format!("Bogo-{}-{}-{attempt}", app.id, std::process::id()));
++        match std::fs::symlink_metadata(&mount) {
++            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
++            Ok(_) => return Err("the unique disk-image mount location already exists; nothing was mounted".into()),
++            Err(error) => return Err(format!("couldn't inspect the disk-image mount location ({error})")),
++        }
+         let (Some(dmg_s), Some(mount_s)) = (dmg.to_str(), mount.to_str()) else {
+             let _ = std::fs::remove_dir(&mount);
+-            return Err("unusual characters in the cache folder's path".into());
++            return Err("unusual characters in the disk-image path".into());
+         };
+         // diskimages-helper refuses an attach while it is busy with another image ("Resource
+         // temporarily unavailable"): attach one image at a time (several apps may be updating at
+@@ -942,7 +946,14 @@ pub mod macos {
      }
  
      fn copy_app(app: &CraftApp, mount: &Path, existing: Option<&Installed>, expect: &Expect<'_>) -> Result<PathBuf, String> {
@@ -149965,7 +150459,7 @@ index b2efb98591c596f825da2c26f0918e475c6ebe5e..d03ef2c1a7d1958a16f0058ff9691851
          let src = mount.join(&bundle);
          crate::detect::macos::read_bundle(app, &src).ok_or("the disk image doesn't contain the app")?;
          let dir = applications_dir(existing)?;
-@@ -963,10 +970,73 @@ pub mod macos {
+@@ -963,10 +974,73 @@ pub mod macos {
              let _ = std::fs::remove_dir_all(&staged);
              return Err(e);
          }
@@ -150040,7 +150534,7 @@ index b2efb98591c596f825da2c26f0918e475c6ebe5e..d03ef2c1a7d1958a16f0058ff9691851
      /// Checks a copied bundle against what its release promises, before it replaces anything.
      fn check(bundle: &Path, found: &Installed, expect: &Expect<'_>) -> Result<(), String> {
          if !cfg!(test) && !valid_signature(bundle) {
-@@ -1208,8 +1278,10 @@ foreach($key in @('ProductName','Manufacturer','ProductVersion')) {{
+@@ -1208,8 +1282,10 @@ foreach($key in @('ProductName','Manufacturer','ProductVersion')) {{
          let fields: serde_json::Value = serde_json::from_str(output.trim()).map_err(|_| "invalid Windows Installer identity")?;
          let text = |key| fields.get(key).and_then(serde_json::Value::as_str);
          let native = text("ProductVersion").and_then(artcraft_launcher_core::version::parse);
@@ -150054,7 +150548,7 @@ index b2efb98591c596f825da2c26f0918e475c6ebe5e..d03ef2c1a7d1958a16f0058ff9691851
                  if a.pre.is_empty() && (a.major,a.minor,a.patch) == (b.major,b.minor,b.patch))
          {
 diff --git a/crates/native/src/lib.rs b/crates/native/src/lib.rs
-index f24250378b3e72bce1c06d3a2e4d1f9f54d8c642..7f4eed291eb01a23e5c1c1593936cb8de0e7e078 100644
+index f24250378b3e72bce1c06d3a2e4d1f9f54d8c642..53a6dc90cfa8f1423005d2c5ed41f16671db9052 100644
 --- a/crates/native/src/lib.rs
 +++ b/crates/native/src/lib.rs
 @@ -1,4 +1,4 @@
@@ -150063,6 +150557,14 @@ index f24250378b3e72bce1c06d3a2e4d1f9f54d8c642..7f4eed291eb01a23e5c1c1593936cb8d
  //!
  //! [`NativeBackend`] runs every slow thing (HTTP, scanning disks, installers) on worker threads
  //! and reports back through [`Event`](artcraft_launcher_core::protocol::Event)s, so the UI never
+@@ -8,6 +8,7 @@
+ #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
+ 
+ pub mod backend;
++pub mod bogo_qa;
+ pub mod desktop_entry;
+ pub mod detect;
+ pub mod feed_throttle;
 diff --git a/crates/native/src/login.rs b/crates/native/src/login.rs
 index 7b99d315f2fb1021794669665201b123c079178f..79ab8b6f87d63abcc2e57df0de19fc06b7922ae6 100644
 --- a/crates/native/src/login.rs
@@ -150116,6 +150618,20 @@ index 0f820a6711d563b05310bb28fd448a4ca8dce7fc..663ebfaaa00f0acd160f48672a36faaa
          assert_eq!(find(pdf, &installed, &[InstallSource::Pacman]).unwrap().name, "printcraft-bin");
          assert!(find(CraftApp::by_id("wordcraft").unwrap(), &installed, &[InstallSource::Pacman]).is_none());
      }
+diff --git a/crates/native/src/paths.rs b/crates/native/src/paths.rs
+index a25a2fc99d473b4f860f03187cb37f0c6f3658b7..ec64db349d58137626e1ed420288e4ef450a45d3 100644
+--- a/crates/native/src/paths.rs
++++ b/crates/native/src/paths.rs
+@@ -15,6 +15,9 @@ const DIR: &str = "com.kio.launcher";
+ 
+ impl Paths {
+     pub fn new() -> Result<Self, String> {
++        if let Some(root) = crate::bogo_qa::root() {
++            return Ok(Self::under(&root));
++        }
+         if let Some(root) = portable_root() {
+             return Ok(Self::under(&root));
+         }
 diff --git a/crates/native/src/process.rs b/crates/native/src/process.rs
 index 9f8209c83f52282829cb850a41cafe2484910705..3140cc2bbcdcb1bb0dee7e25766ef094c54185a5 100644
 --- a/crates/native/src/process.rs
@@ -150200,10 +150716,24 @@ index 9af2241f1c508655cc83bdcd39e28416f2a177b8..ee9a284a72d437c78311090fa482cdd8
              .arg(&dmg)
              .status()
 diff --git a/crates/native/src/single_instance.rs b/crates/native/src/single_instance.rs
-index ca226a0abb8969ef27a7d2fdd373fb72c36a5787..8f9d1133768a2686d7b416c460429ee740868e7c 100644
+index ca226a0abb8969ef27a7d2fdd373fb72c36a5787..9447363bf73e3268d2e9a2bd463aabe193e0f43e 100644
 --- a/crates/native/src/single_instance.rs
 +++ b/crates/native/src/single_instance.rs
-@@ -90,7 +90,7 @@ pub fn claim(wake: Wake) -> Instance {
+@@ -73,6 +73,13 @@ fn ours() -> Option<Version> {
+ pub fn claim(wake: Wake) -> Instance {
+     let addr = SocketAddr::from((Ipv4Addr::LOCALHOST, PORT));
+     let ours = ours();
++    if crate::bogo_qa::root().is_some() {
++        let listener = crate::bogo_qa::launcher_listener(addr).unwrap_or_else(|error| {
++            eprintln!("Bogo Launcher QA refused: {error}");
++            std::process::exit(2)
++        });
++        return Instance::Primary(listen(listener, ours, wake));
++    }
+     if let Ok(listener) = TcpListener::bind(addr) {
+         return Instance::Primary(listen(listener, ours, wake));
+     }
+@@ -90,7 +97,7 @@ pub fn claim(wake: Wake) -> Instance {
              Instance::Secondary
          }
          Ok(Answer::Legacy) => {
@@ -150212,6 +150742,19 @@ index ca226a0abb8969ef27a7d2fdd373fb72c36a5787..8f9d1133768a2686d7b416c460429ee7
              Instance::Primary(channel().1)
          }
          // The port is taken by something else: run anyway rather than refuse to start.
+diff --git a/crates/native/src/source.rs b/crates/native/src/source.rs
+index 6cfabd892aa5d39129daeb2dcbbd41382951555a..599a9c11919b7b89112b652a7f234ab274748731 100644
+--- a/crates/native/src/source.rs
++++ b/crates/native/src/source.rs
+@@ -186,7 +186,7 @@ pub struct KioRegistryOnly;
+ impl ReleaseSource for KioRegistryOnly {
+     fn latest(&self, _repo: &str, _prereleases: bool) -> Answer {
+         Answer {
+-            latest: LatestRelease::Failed("The verified KIO release registry is unavailable. Try Check for updates again.".into()),
++            latest: LatestRelease::Failed("The verified Bogo release registry is unavailable. Try Check for updates again.".into()),
+             source: Source::Cache,
+         }
+     }
 diff --git a/crates/ui-egui/src/app.rs b/crates/ui-egui/src/app.rs
 index 499dca6f12258b53670fc53fe06771e9a5d22eb3..f57ceda35e8bef5bd7772f03971018ecc5bf5b77 100644
 --- a/crates/ui-egui/src/app.rs
@@ -152051,9 +152594,18 @@ index 2620e860377b0cc79110d8898a205d9b4cfd4b1b..21d7f41618fee356afaf2170bf629430
          warn: hex(0x8a5800),
          bad: hex(0xb3261e),
 diff --git a/crates/ui-egui/src/views.rs b/crates/ui-egui/src/views.rs
-index 004f45a34fdf173062a9c8cd90ab08d61452440a..54532b22eb5cb8a2b8ad04184cb7801b62a5e52e 100644
+index 004f45a34fdf173062a9c8cd90ab08d61452440a..0203f553a727ddf0bf6025afd3fa006ca7735120 100644
 --- a/crates/ui-egui/src/views.rs
 +++ b/crates/ui-egui/src/views.rs
+@@ -80,7 +80,7 @@ impl LauncherUi {
+             // The ArtCraft wordmark exactly as supplied, in its own cell.
+             let logo = vec2(14.0 * crate::icons::ARTCRAFT_LOGO_ASPECT, 14.0);
+             let (cell, _) = ui.allocate_exact_size(vec2(logo.x + 40.0, h), Sense::hover());
+-            egui::Image::new(crate::icons::artcraft_logo(t.dark)).alt_text(tl!("ArtCraft")).paint_at(ui, Rect::from_center_size(cell.center(), logo));
++            egui::Image::new(crate::icons::artcraft_logo(t.dark)).alt_text("Bogo").paint_at(ui, Rect::from_center_size(cell.center(), logo));
+             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                 if bar == TitleBar::Custom {
+                     widgets::window_buttons(ui, h);
 @@ -117,9 +117,9 @@ impl LauncherUi {
                          ui.add_space(16.0);
                          widgets::tag(ui, tl!("Launcher"), t.invert_bg, t.invert_fg);
@@ -152075,6 +152627,28 @@ index 004f45a34fdf173062a9c8cd90ab08d61452440a..54532b22eb5cb8a2b8ad04184cb7801b
                                  .family(theme::medium())
                                  .color(t.ink_strong),
                          );
+diff --git a/crates/ui-egui/src/widgets.rs b/crates/ui-egui/src/widgets.rs
+index 1f5562ebc06b8f4bb2e8624bc36c35ad89d34639..33d5b0139beaea8499f6619f80de18f02799205e 100644
+--- a/crates/ui-egui/src/widgets.rs
++++ b/crates/ui-egui/src/widgets.rs
+@@ -23,7 +23,7 @@ pub fn tone_color(t: &Tokens, tone: Tone) -> Color32 {
+ /// `text` laid out upper case in `family`, `spacing` points between letters.
+ pub fn caps(ui: &Ui, text: &str, size: f32, family: egui::FontFamily, spacing: f32, color: Color32) -> Arc<Galley> {
+     let format = egui::TextFormat { font_id: egui::FontId::new(size, family), color, extra_letter_spacing: spacing, ..Default::default() };
+-    ui.painter().layout_job(egui::text::LayoutJob::single_section(text.to_uppercase(), format))
++    ui.painter().layout_job(egui::text::LayoutJob::single_section(text.to_uppercase().replace("BOGO", "Bogo"), format))
+ }
+ 
+ /// A `.hud-label`: 11 px Geist Mono, upper case, widely spaced.
+@@ -60,7 +60,7 @@ pub fn hud_elided(ui: &mut Ui, text: &str, color: Color32, max_width: f32) -> Re
+         extra_letter_spacing: theme::HUD_SPACING,
+         ..Default::default()
+     };
+-    let mut job = egui::text::LayoutJob::single_section(text.to_uppercase(), format);
++    let mut job = egui::text::LayoutJob::single_section(text.to_uppercase().replace("BOGO", "Bogo"), format);
+     job.wrap = egui::text::TextWrapping::truncate_at_width(max_width.min(ui.available_width()).max(0.0));
+     let galley = ui.painter().layout_job(job);
+     let elided = galley.elided;
 diff --git a/crates/ui-egui/tests/french.rs b/crates/ui-egui/tests/french.rs
 index 4cbad7447ce526292b47762c1ad7c1f555dfe162..43ece4ef1cca27d03b4eaa41af3d2e5c36413f46 100644
 --- a/crates/ui-egui/tests/french.rs
@@ -152755,6 +153329,24 @@ index 94145a60ada3152fb720d24224d596ca3cacdd88..76847f7949a19db4d703ae02ee720c17
  
  ARCH=universal
  while [ $# -gt 0 ]; do
+diff --git a/packaging/windows/artcraft-launcher.en-us.wxl b/packaging/windows/artcraft-launcher.en-us.wxl
+index 96f0c34767f65a2e4bec299ee2a6788ceb61f995..128712f87805f55c87fbd90e352a35b22a4ceea4 100644
+--- a/packaging/windows/artcraft-launcher.en-us.wxl
++++ b/packaging/windows/artcraft-launcher.en-us.wxl
+@@ -6,11 +6,11 @@
+ -->
+ <WixLocalization Culture="en-US" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+   <String Id="WelcomeDlgTitle" Value="{\WixUI_Font_Bigger}Welcome to [ProductName] [ArtCraftLauncherVersion]" />
+-  <String Id="WelcomeDlgDescription" Value="KIO Launcher installs, updates and opens the KIO App Suite: KIO Photo, KIO Vector, KIO Film and the rest of the open-source KIO apps.&#13;&#10;&#13;&#10;It installs for you only, so no administrator rights are needed. Click Next to continue." />
++  <String Id="WelcomeDlgDescription" Value="Bogo Launcher installs, updates and opens the Bogo App Suite: Bogo Photo, Bogo Vector, Bogo Film and the rest of the open-source Bogo apps.&#13;&#10;&#13;&#10;It installs for you only, so no administrator rights are needed. Click Next to continue." />
+   <!-- The folder page (ArtCraftInstallDirDlg). -->
+   <String Id="InstallDirDlgTitle" Value="{\WixUI_Font_Title}Choose where to install" />
+   <String Id="InstallDirDlgDescription" Value="Click Next to install to the default folder, or click Change to pick another." />
+-  <String Id="ArtCraftInstallDirNote" Value="KIO Launcher installs for you only, without administrator rights, so pick a folder you can write to (not Program Files). Updates install into the same folder." />
++  <String Id="ArtCraftInstallDirNote" Value="Bogo Launcher installs for you only, without administrator rights, so pick a folder you can write to (not Program Files). Updates install into the same folder." />
+   <String Id="ArtCraftDesktopShortcut" Value="Create a desktop shortcut" />
+   <String Id="VerifyReadyDlgInstallTitle" Value="{\WixUI_Font_Title}Ready to install [ProductName] [ArtCraftLauncherVersion]" />
+   <!-- Also shown after a repair or removal from the same wizard, so it doesn't say "installed". -->
 diff --git a/packaging/windows/artcraft-launcher.wxs b/packaging/windows/artcraft-launcher.wxs
 index 60ad31e2a4f07b7f1c05d3e14b4bdb08a38b5db3..6fbd3cbf8c47d0e566235d6da49c72281bf46d50 100644
 --- a/packaging/windows/artcraft-launcher.wxs
@@ -152880,7 +153472,7 @@ index 904e8f6ef284e93f87a756257a6b970ff050e763..15837a95bcc76a6063a456942493e4d8
  .DESCRIPTION
    Windows Installer caches each <Icon> under its Id as a file name, so a shortcut icon Id needs an
 diff --git a/packaging/windows/package.ps1 b/packaging/windows/package.ps1
-index 54e9a7220cf1b65b0a0c679fc057b06d6c8d6ba6..05c3c8e714a259e51ed084d98bb9f8e17fc6bb1b 100644
+index 54e9a7220cf1b65b0a0c679fc057b06d6c8d6ba6..cf6b71d483344d9142b60595208cf1e7cfd00eb9 100644
 --- a/packaging/windows/package.ps1
 +++ b/packaging/windows/package.ps1
 @@ -1,6 +1,6 @@
@@ -152900,15 +153492,32 @@ index 54e9a7220cf1b65b0a0c679fc057b06d6c8d6ba6..05c3c8e714a259e51ed084d98bb9f8e1
  
  function Invoke-Native([string] $What, [scriptblock] $Block) {
    Write-Output "==> $What"
-@@ -109,7 +109,7 @@ function New-InstallerArt([string] $BannerOut, [string] $DialogOut) {
-   $accent = [System.Drawing.ColorTranslator]::FromHtml('#2d81ff')
-   $muted = [System.Drawing.Color]::FromArgb(153, 242, 241, 238)
-   $line = [System.Drawing.Color]::FromArgb(38, 242, 241, 238)
+@@ -105,11 +105,11 @@ Copy-Item (Join-Path $Bin $Exe) $Stage
+ # KIO owner-supplied artwork replaces the upstream trademarks; retain the original installer layout.
+ function New-InstallerArt([string] $BannerOut, [string] $DialogOut) {
+   Add-Type -AssemblyName System.Drawing
+-  $ink = [System.Drawing.ColorTranslator]::FromHtml('#121316')
+-  $accent = [System.Drawing.ColorTranslator]::FromHtml('#2d81ff')
+-  $muted = [System.Drawing.Color]::FromArgb(153, 242, 241, 238)
+-  $line = [System.Drawing.Color]::FromArgb(38, 242, 241, 238)
 -  # The KIO App Suite, in the launcher's order (crates/core/src/catalog.rs).
++  $ink = [System.Drawing.ColorTranslator]::FromHtml('#FFF3E8')
++  $accent = [System.Drawing.ColorTranslator]::FromHtml('#FC7501')
++  $muted = [System.Drawing.ColorTranslator]::FromHtml('#342B26')
++  $line = [System.Drawing.ColorTranslator]::FromHtml('#F1D3BD')
 +  # The Bogo App Suite, in the launcher's order (crates/core/src/catalog.rs).
    $apps = 'photocraft', 'vectorcraft', 'filmcraft', 'lightcraft', 'pdfcraft', 'effectcraft',
      'designcraft', 'wordcraft', 'deckcraft', 'gridcraft', 'cadcraft', 'soundcraft', 'figcraft'
    $mark = [System.Drawing.Image]::FromFile((Join-Path $Root 'assets\app-icon\hicolor\256x256\apps\com.kio.launcher.png'))
+@@ -130,7 +130,7 @@ function New-InstallerArt([string] $BannerOut, [string] $DialogOut) {
+         $g.PixelOffsetMode = [System.Drawing.Drawing2D.PixelOffsetMode]::HighQuality
+         $g.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
+         $g.TextRenderingHint = [System.Drawing.Text.TextRenderingHint]::AntiAliasGridFit
+-        $g.Clear([System.Drawing.Color]::White)
++        $g.Clear([System.Drawing.ColorTranslator]::FromHtml('#FFFAF6'))
+         if ($spec[2] -eq 58) {
+           $g.FillRectangle($panel, 405, 0, 88, 58)
+           $g.FillRectangle($stripe, 405, 0, 2, 58)
 diff --git a/packaging/windows/sign.ps1 b/packaging/windows/sign.ps1
 index 715694e4d80cc36c85aca7ac29861ce63b74118c..1cfc203f29170ddf4fc89548cc9b740d32c9dd35 100644
 --- a/packaging/windows/sign.ps1

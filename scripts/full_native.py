@@ -532,8 +532,11 @@ def package(args, lock):
         dmg.mkdir()
         run(['ditto', app, dmg / app.name])
         (dmg / 'Applications').symlink_to('/Applications')
-        run(['hdiutil', 'makehybrid', '-hfs', '-hfs-volume-name', lock['name'], '-o', stage / 'raw.dmg', dmg])
-        run(['hdiutil', 'convert', stage / 'raw.dmg', '-format', 'UDZO', '-imagekey', 'zlib-level=9', '-o', output / (base + '.dmg')])
+        # makehybrid synthesizes FinderInfo on executable files in the HFS image,
+        # which makes an otherwise valid app fail strict codesign after mounting.
+        # Native disk-image creation preserves the signed app's actual metadata.
+        run(['hdiutil', 'create', '-fs', 'HFS+', '-volname', lock['name'], '-srcfolder', dmg,
+             '-format', 'UDZO', '-imagekey', 'zlib-level=9', output / (base + '.dmg')])
         run(sign + [output / (base + '.dmg')])
         run(['codesign', '--verify', '--strict', output / (base + '.dmg')])
         record['signing'] = {'kind': 'ad-hoc', 'notarized': False}

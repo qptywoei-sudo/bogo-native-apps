@@ -36,6 +36,172 @@ index 73712c66aea179d2a03dd84bdde824d71e534246..420611d1c1d61812eca9a58284fcbcf6
          .set("LegalCopyright", "Copyright (c) 2026 ArtCraft Team and the CADCraft contributors. MIT OR Apache-2.0.")
          .set("OriginalFilename", "cadcraft.exe")
          .set("InternalName", "cadcraft");
+diff --git a/apps/cadcraft/src/bogo_qa.rs b/apps/cadcraft/src/bogo_qa.rs
+new file mode 100644
+index 0000000000000000000000000000000000000000..97b5873ce781b395698dd739092076d4acb186a5
+--- /dev/null
++++ b/apps/cadcraft/src/bogo_qa.rs
+@@ -0,0 +1,160 @@
++//! Explicit, private QA profiles. Normal storage identities stay unchanged.
++#![allow(dead_code)]
++
++use std::ffi::OsString;
++use std::path::{Component, Path, PathBuf};
++
++const APP: &str = "cad";
++
++/// A pure parser, also used by tests: partial opt-in always fails closed.
++fn resolve(mode: Option<OsString>, base: Option<OsString>) -> Result<Option<PathBuf>, String> {
++    if mode.is_none() && base.is_none() {
++        return Ok(None);
++    }
++    if mode.as_deref() != Some(std::ffi::OsStr::new("1")) {
++        return Err("BOGO_QA_MODE must equal 1 when QA settings are supplied".into());
++    }
++    let base = base.filter(|value| !value.is_empty()).ok_or("BOGO_QA_ROOT is required in QA mode")?;
++    let base = PathBuf::from(base);
++    if !base.is_absolute()
++        || base.components().any(|part| matches!(part, Component::ParentDir))
++        || !base.components().any(|part| matches!(part, Component::Normal(_)))
++    {
++        return Err("BOGO_QA_ROOT must be an absolute task directory without parent traversal".into());
++    }
++    Ok(Some(base))
++}
++
++#[cfg(not(target_arch = "wasm32"))]
++fn private_directory(path: &Path) -> Result<(), String> {
++    match std::fs::symlink_metadata(path) {
++        Ok(metadata) if metadata.file_type().is_symlink() || !metadata.is_dir() => {
++            return Err("QA directory is a link or is not a directory".into());
++        }
++        Ok(_) => {}
++        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
++            let mut builder = std::fs::DirBuilder::new();
++            builder.recursive(true);
++            #[cfg(unix)]
++            {
++                use std::os::unix::fs::DirBuilderExt;
++                builder.mode(0o700);
++            }
++            builder.create(path).map_err(|error| format!("cannot create QA directory: {error}"))?;
++        }
++        Err(error) => return Err(format!("cannot inspect QA directory: {error}")),
++    }
++    let metadata = std::fs::symlink_metadata(path).map_err(|error| format!("cannot inspect QA directory: {error}"))?;
++    if metadata.file_type().is_symlink() || !metadata.is_dir() {
++        return Err("QA directory changed into a link or a file".into());
++    }
++    #[cfg(unix)]
++    {
++        use std::os::unix::fs::PermissionsExt;
++        if metadata.permissions().mode() & 0o077 != 0 {
++            return Err("QA directory must be private to its owner (mode 0700)".into());
++        }
++    }
++    Ok(())
++}
++
++#[cfg(not(target_arch = "wasm32"))]
++fn owned_root(base: &Path) -> Result<PathBuf, String> {
++    private_directory(base)?;
++    let base = std::fs::canonicalize(base).map_err(|error| format!("cannot resolve QA directory: {error}"))?;
++    let app = base.join(APP);
++    private_directory(&app)?;
++    Ok(app)
++}
++
++#[cfg(not(target_arch = "wasm32"))]
++fn refuse(message: &str) -> ! {
++    eprintln!("Bogo QA profile refused: {message}");
++    std::process::exit(2)
++}
++
++/// None only for a completely ordinary launch. Invalid QA settings exit before
++/// the caller can fall back to personal preferences, recovery, logs or caches.
++#[cfg(not(target_arch = "wasm32"))]
++pub fn root() -> Option<PathBuf> {
++    static ROOT: std::sync::OnceLock<Option<PathBuf>> = std::sync::OnceLock::new();
++    ROOT.get_or_init(|| match resolve(std::env::var_os("BOGO_QA_MODE"), std::env::var_os("BOGO_QA_ROOT")) {
++        Ok(Some(base)) => Some(owned_root(&base).unwrap_or_else(|error| refuse(&error))),
++        Ok(None) => None,
++        Err(error) => refuse(&error),
++    })
++    .clone()
++}
++
++/// Browser builds retain their existing browser storage and do not read native
++/// process environment variables or create host directories.
++#[cfg(target_arch = "wasm32")]
++pub fn root() -> Option<PathBuf> {
++    None
++}
++
++pub fn path(relative: &str) -> Option<PathBuf> {
++    root().map(|root| {
++        let relative = Path::new(relative);
++        if relative.as_os_str().is_empty() || relative.components().any(|part| !matches!(part, Component::Normal(_))) {
++            #[cfg(not(target_arch = "wasm32"))]
++            refuse("invalid internal QA path");
++        }
++        root.join(relative)
++    })
++}
++
++#[cfg(test)]
++mod qa_profile_tests {
++    use super::*;
++
++    #[test]
++    fn ordinary_launch_has_no_qa_profile() {
++        assert_eq!(resolve(None, None), Ok(None));
++    }
++
++    #[test]
++    fn partial_invalid_and_relative_configuration_never_fall_back() {
++        for (mode, root) in [
++            (Some("1"), None),
++            (None, Some("/private/qa")),
++            (Some("0"), Some("/private/qa")),
++            (Some("true"), Some("/private/qa")),
++            (Some("1"), Some("")),
++            (Some("1"), Some("relative")),
++            (Some("1"), Some("/")),
++            (Some("1"), Some("/private/qa/../user")),
++        ] {
++            assert!(resolve(mode.map(OsString::from), root.map(OsString::from)).is_err());
++        }
++    }
++
++    #[test]
++    fn complete_configuration_is_explicit_and_keeps_the_app_namespace() {
++        let absolute = std::env::temp_dir().join("bogo-qa-parser");
++        assert_eq!(resolve(Some("1".into()), Some(absolute.as_os_str().into())), Ok(Some(absolute.clone())));
++    }
++
++    #[cfg(not(target_arch = "wasm32"))]
++    #[test]
++    fn owned_paths_are_private_and_links_or_existing_public_roots_are_refused() {
++        let base = std::env::temp_dir().join(format!("bogo-qa-profile-{}-{}", APP, std::process::id()));
++        assert!(!base.exists());
++        let app = owned_root(&base).expect("fresh private QA root");
++        assert_eq!(app, std::fs::canonicalize(&base).expect("QA base").join(APP));
++        assert!(app.is_dir());
++        #[cfg(unix)]
++        {
++            use std::os::unix::fs::{PermissionsExt, symlink};
++            assert_eq!(std::fs::metadata(&base).expect("QA metadata").permissions().mode() & 0o777, 0o700);
++            let link = base.with_extension("link");
++            symlink(&base, &link).expect("QA link fixture");
++            assert!(owned_root(&link).is_err());
++            std::fs::remove_file(&link).expect("remove own link");
++            std::fs::set_permissions(&base, std::fs::Permissions::from_mode(0o755)).expect("public fixture");
++            assert!(owned_root(&base).is_err());
++            std::fs::set_permissions(&base, std::fs::Permissions::from_mode(0o700)).expect("restore own fixture");
++        }
++        std::fs::remove_dir_all(&base).expect("remove own fixture");
++    }
++}
 diff --git a/apps/cadcraft/src/logging.rs b/apps/cadcraft/src/logging.rs
 index 2571b214ad4e636b4224bb8d6452ad4ad08955b5..baee7a925fcc48fc3957341dcc5acea24b2ac944 100644
 --- a/apps/cadcraft/src/logging.rs
@@ -59,10 +225,15 @@ index 2571b214ad4e636b4224bb8d6452ad4ad08955b5..baee7a925fcc48fc3957341dcc5acea2
          assert!(logger.enabled(&log::Metadata::builder().level(log::Level::Info).target("cadcraft_ui_egui::gpu").build()));
          assert!(!logger.enabled(&log::Metadata::builder().level(log::Level::Info).target("naga").build()));
 diff --git a/apps/cadcraft/src/main.rs b/apps/cadcraft/src/main.rs
-index b859af8d0ba5f5340c2d1afab6b237d5ab9e1c16..8b3ab05e2c0014f7d7f1665a2be86cd01896ba34 100644
+index b859af8d0ba5f5340c2d1afab6b237d5ab9e1c16..0b44816caab8c59480847e4b80fd82466a36e79c 100644
 --- a/apps/cadcraft/src/main.rs
 +++ b/apps/cadcraft/src/main.rs
-@@ -18,8 +18,8 @@ mod control_server;
+@@ -14,12 +14,13 @@
+ #![cfg_attr(all(target_os = "windows", not(debug_assertions)), windows_subsystem = "windows")]
+ #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
+ 
++mod bogo_qa;
+ mod control_server;
  mod desktop_theme;
  #[cfg(any(target_os = "windows", test))]
  mod graphics;
@@ -72,7 +243,7 @@ index b859af8d0ba5f5340c2d1afab6b237d5ab9e1c16..8b3ab05e2c0014f7d7f1665a2be86cd0
  #[cfg(target_os = "macos")]
  mod native_menu;
  mod spacemouse;
-@@ -47,7 +47,7 @@ impl App {
+@@ -47,7 +48,7 @@ impl App {
          let result = if final_attempt { self.workspace.save_on_exit(&self.cad.ui) } else { self.workspace.save_if_changed(&self.cad.ui) };
          if let Err(error) = result {
              if self.workspace_error.as_ref() != Some(&error) {
@@ -81,7 +252,25 @@ index b859af8d0ba5f5340c2d1afab6b237d5ab9e1c16..8b3ab05e2c0014f7d7f1665a2be86cd0
                  self.cad.set_status(format!("Workspace could not be saved: {error}"));
                  self.workspace_error = Some(error);
              }
-@@ -266,7 +266,7 @@ fn main() -> eframe::Result {
+@@ -163,6 +164,9 @@ fn filters_for_save(name: &str) -> [(&'static str, &'static str); 6] {
+ /// `$XDG_CONFIG_HOME/cadcraft` or `~/.config/com.kio.cad` on Linux and the BSDs,
+ /// `~/Library/Application Support/com.kio.cad` on macOS, `%APPDATA%\com.kio.cad` on Windows.
+ fn config_dir() -> Option<std::path::PathBuf> {
++    if let Some(path) = bogo_qa::path("profile") {
++        return Some(path);
++    }
+     config_dir_from(|k| std::env::var_os(k))
+ }
+ 
+@@ -227,6 +231,7 @@ fn control_flag(current: Option<u16>, value: Option<String>) -> Option<u16> {
+ }
+ 
+ fn main() -> eframe::Result {
++    let _ = bogo_qa::root();
+     // First, so every start-up record is captured; see `logging`.
+     let logger = logging::install();
+     // lossy, so a value that is not Unicode is reported like any other bad port instead of ignored
+@@ -266,7 +271,7 @@ fn main() -> eframe::Result {
          // swapchains hold two frames back under vsync (`CADCRAFT_VSYNC=1` restores vsync).
          wgpu_options: eframe::egui_wgpu::WgpuConfiguration::default().with_surface_config(surface),
          viewport: egui::ViewportBuilder::default()
@@ -90,7 +279,15 @@ index b859af8d0ba5f5340c2d1afab6b237d5ab9e1c16..8b3ab05e2c0014f7d7f1665a2be86cd0
              .with_inner_size([1600.0, 1000.0])
              .with_min_inner_size([900.0, 560.0])
              .with_drag_and_drop(true)
-@@ -307,7 +307,7 @@ fn main() -> eframe::Result {
+@@ -274,6 +279,7 @@ fn main() -> eframe::Result {
+             .with_titlebar_shown(false)
+             .with_title_shown(false)
+             .with_app_id(APP_ID),
++        persistence_path: bogo_qa::path("profile/app.ron"),
+         persist_window: false,
+         // A stencil buffer clips the contents of clipped layout viewports on the GPU.
+         stencil_buffer: STENCIL_BITS,
+@@ -307,7 +313,7 @@ fn main() -> eframe::Result {
          }));
      }
      eframe::run_native(
@@ -99,7 +296,7 @@ index b859af8d0ba5f5340c2d1afab6b237d5ab9e1c16..8b3ab05e2c0014f7d7f1665a2be86cd0
          options,
          Box::new(move |cc| {
              let mut app = CadApp::new(Session::empty(), services());
-@@ -316,7 +316,7 @@ fn main() -> eframe::Result {
+@@ -316,7 +322,7 @@ fn main() -> eframe::Result {
                  app.ui = ui;
              }
              if let Some(error) = &workspace_error {
@@ -141,6 +338,34 @@ index 35b296efb150b966a43b858d3c68aa86fe377d4b..3d1be4c839454a9161f62062f2872a2f
          items.insert("cc-discord".into(), ("ui.discord".into(), "Join the ArtCraft Discord…".into(), discord));
          items.insert("cc-settings".into(), ("options".into(), "Settings...".into(), settings));
          let _ = menu.append(&app_menu);
+diff --git a/apps/cadcraft/src/workspace.rs b/apps/cadcraft/src/workspace.rs
+index ffa52864e3a8492d7bc1cdd870938969ec1f18e8..6872e46bf6fc9ed631c60642510fba6b70519304 100644
+--- a/apps/cadcraft/src/workspace.rs
++++ b/apps/cadcraft/src/workspace.rs
+@@ -27,7 +27,9 @@ fn config_dir_from(platform: &str, get: impl Fn(&str) -> Option<OsString>) -> Op
+     match platform {
+         "macos" => nonempty("HOME").map(|home| home.join("Library/Application Support/com.kio.cad")),
+         "windows" => nonempty("APPDATA").map(|root| root.join("com.kio.cad")),
+-        _ => nonempty("XDG_CONFIG_HOME").map(|root| root.join("com.kio.cad")).or_else(|| nonempty("HOME").map(|home| home.join(".config/com.kio.cad"))),
++        _ => {
++            nonempty("XDG_CONFIG_HOME").map(|root| root.join("com.kio.cad")).or_else(|| nonempty("HOME").map(|home| home.join(".config/com.kio.cad")))
++        }
+     }
+ }
+ 
+@@ -128,7 +130,11 @@ fn write(path: &Path, workspace: &Value) -> Result<(), String> {
+ 
+ impl Workspace {
+     pub fn load() -> (Self, Option<UiState>, Option<String>) {
+-        Self::at(config_dir_from(std::env::consts::OS, |key| std::env::var_os(key)).map(|root| root.join("workspace.json")))
++        Self::at(
++            crate::bogo_qa::path("profile")
++                .or_else(|| config_dir_from(std::env::consts::OS, |key| std::env::var_os(key)))
++                .map(|root| root.join("workspace.json")),
++        )
+     }
+ 
+     fn at(path: Option<PathBuf>) -> (Self, Option<UiState>, Option<String>) {
 diff --git a/assets/app-icon/BOGO-ICON-SOURCE.txt b/assets/app-icon/BOGO-ICON-SOURCE.txt
 new file mode 100644
 index 0000000000000000000000000000000000000000..ffd0aca3ed1905a5095166b0382a9cc548090b91
@@ -63774,7 +63999,7 @@ index 2147662e955fb13fbcc48f16ded6614607f74b01..dce09924afc89310cc0dd518b64629fe
  rm -f "$WORK/raw.dmg"
  sign "$DMG"
 diff --git a/packaging/windows/cadcraft.wxs b/packaging/windows/cadcraft.wxs
-index e12946503507df1ad2dc931024687eeac62d6435..977db04971a257e2a7b285c2b5d7efe75525eb2a 100644
+index e12946503507df1ad2dc931024687eeac62d6435..4114a008deb606548c371512f730d7d29560bbf5 100644
 --- a/packaging/windows/cadcraft.wxs
 +++ b/packaging/windows/cadcraft.wxs
 @@ -1,12 +1,12 @@
@@ -63815,16 +64040,33 @@ index e12946503507df1ad2dc931024687eeac62d6435..977db04971a257e2a7b285c2b5d7efe7
      <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
  
      <Icon Id="CadcraftIcon.ico" SourceFile="$(var.IconPath)" />
-@@ -36,7 +36,7 @@
+@@ -35,8 +35,24 @@
+     <Property Id="ARPURLUPDATEINFO" Value="https://getartcraft.com/apps/cadcraft" />
      <Property Id="ARPHELPLINK" Value="https://discord.gg/artcraft" />
  
++    <!-- Reuse an existing custom folder only after an exact old/new executable is found. -->
++    <Property Id="BOGOPREVIOUSAPPFOLDER" Secure="yes">
++      <RegistrySearch Id="BogoPreviousAppFolder" Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\KIO Cad.exe" Type="file" Bitness="always64" />
++    </Property>
++    <Property Id="BOGOPREVIOUSAPPEXE" Secure="yes">
++      <RegistrySearch Id="BogoPreviousAppExe" Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\KIO Cad.exe" Type="file" Bitness="always64">
++        <FileSearch Id="BogoPreviousAppExeFile" Name="KIO Cad.exe" />
++      </RegistrySearch>
++    </Property>
++    <Property Id="BOGOCURRENTAPPEXE" Secure="yes">
++      <RegistrySearch Id="BogoCurrentAppExe" Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\KIO Cad.exe" Type="file" Bitness="always64">
++        <FileSearch Id="BogoCurrentAppExeFile" Name="Bogo CAD.exe" />
++      </RegistrySearch>
++    </Property>
++    <SetProperty Id="INSTALLFOLDER" Action="BogoSetExistingAppFolder" Value="[BOGOPREVIOUSAPPFOLDER]"
++        After="AppSearch" Sequence="both" Condition="NOT INSTALLFOLDER AND BOGOPREVIOUSAPPFOLDER AND (BOGOPREVIOUSAPPEXE OR BOGOCURRENTAPPEXE)" />
      <StandardDirectory Id="ProgramFiles6432Folder">
 -      <Directory Id="INSTALLFOLDER" Name="KIO Cad" />
 +      <Directory Id="INSTALLFOLDER" Name="Bogo CAD" />
      </StandardDirectory>
      <StandardDirectory Id="ProgramMenuFolder" />
      <!-- Per-machine (ALLUSERS=1), so this is the all-users (Public) desktop, like the Start Menu above. -->
-@@ -58,7 +58,7 @@
+@@ -58,7 +74,7 @@
  
      <UIRef Id="CadcraftUI" />
  
@@ -63833,7 +64075,7 @@ index e12946503507df1ad2dc931024687eeac62d6435..977db04971a257e2a7b285c2b5d7efe7
        <ComponentGroupRef Id="CadcraftFiles" />
      </Feature>
    </Package>
-@@ -66,9 +66,9 @@
+@@ -66,9 +82,9 @@
    <Fragment>
      <ComponentGroup Id="CadcraftFiles" Directory="INSTALLFOLDER">
        <Component Id="CadcraftApp" Guid="C7D64D2B-C064-5992-8F0C-88D724F52B45">
@@ -63846,15 +64088,17 @@ index e12946503507df1ad2dc931024687eeac62d6435..977db04971a257e2a7b285c2b5d7efe7
                Icon="CadcraftIcon.ico" IconIndex="0" />
          </File>
  
-@@ -88,7 +88,7 @@
+@@ -88,8 +104,8 @@
             Public desktop) must be under HKCU (ICE38, ICE43, ICE57). -->
        <Component Id="DesktopShortcut" Directory="DesktopFolder" Guid="0AF454B0-57CC-5E08-A352-372B82B979B0"
            Condition="DESKTOPSHORTCUT = &quot;1&quot;">
 -        <Shortcut Id="DesktopShortcut" Name="KIO Cad" Description="KIO Cad computer-aided design"
+-            Target="[INSTALLFOLDER]cadcraft.exe" WorkingDirectory="INSTALLFOLDER" Icon="CadcraftIcon.ico" IconIndex="0" />
 +        <Shortcut Id="DesktopShortcut" Name="Bogo CAD" Description="Bogo CAD computer-aided design"
-             Target="[INSTALLFOLDER]cadcraft.exe" WorkingDirectory="INSTALLFOLDER" Icon="CadcraftIcon.ico" IconIndex="0" />
++            Target="[#CadcraftExe]" WorkingDirectory="INSTALLFOLDER" Icon="CadcraftIcon.ico" IconIndex="0" />
          <RegistryValue Root="HKCU" Key="Software\Learning Machines LLC\KIO Cad" Name="DesktopShortcut"
              Value="1" Type="string" KeyPath="yes" />
+       </Component>
 diff --git a/packaging/windows/package.ps1 b/packaging/windows/package.ps1
 index 5b52ccc9c878b68882b98d50ad902b414e136c6c..eddb02b35206291159934b420cbf07b76c240151 100644
 --- a/packaging/windows/package.ps1
