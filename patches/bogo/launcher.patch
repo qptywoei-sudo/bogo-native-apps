@@ -153669,7 +153669,7 @@ index d6d0a1fd72ef6bce416b76bdda7393518756f0ed..ce99cec24f0944c7c7a0f372988a0660
      let mut table = harness(ViewMode::Table);
      table.run_steps(8);
 diff --git a/crates/ui-egui/tests/ui.rs b/crates/ui-egui/tests/ui.rs
-index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..6292d71c1ce3a941adbd2c96a963bb574d55746b 100644
+index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..03019a2f82d9b13936ecf8b1b3494b8c3510242e 100644
 --- a/crates/ui-egui/tests/ui.rs
 +++ b/crates/ui-egui/tests/ui.rs
 @@ -294,7 +294,7 @@ fn grid_shows_every_status_and_installs_on_click() {
@@ -153805,7 +153805,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..6292d71c1ce3a941adbd2c96a963bb57
      h.get_all_by_label("…").next().unwrap().click();
      h.run_steps(3);
      h.get_by_label("Uninstall…").click();
-@@ -624,23 +625,19 @@ fn the_uninstall_prompt_keeps_its_own_size_after_a_taller_dialog() {
+@@ -624,28 +625,29 @@ fn the_uninstall_prompt_keeps_its_own_size_after_a_taller_dialog() {
  fn links_to_the_website_github_and_each_apps_pages() {
      let (mut h, _) = harness(ViewMode::Grid, egui::Theme::Dark, true);
      h.run_steps(6);
@@ -153837,7 +153837,38 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..6292d71c1ce3a941adbd2c96a963bb57
  }
  
  /// Clicks the `n`th widget labelled `label` and returns the URL the app asked to open.
-@@ -673,24 +670,20 @@ fn all_opened(h: &mut Harness<'_, Option<LauncherUi>>, label: &str) -> Vec<Strin
+ fn click_nth_opens(h: &mut Harness<'_, Option<LauncherUi>>, label: &str, n: usize) -> Option<String> {
+-    h.get_all_by_label(label).nth(n)?.click();
++    let target_id = h.query_all_by_label(label).nth(n)?.accesskit_node().id();
++    h.query_all_by_label(label).nth(n)?.scroll_to_me();
++    h.run_steps(4);
++    let target = h.query_all_by_label(label).nth(n)?;
++    assert_eq!(target.accesskit_node().id(), target_id, "{label}[{n}]: scrolling must preserve the button identity");
++    target.click();
+     for _ in 0..3 {
+         h.step();
+         let url = h.output().platform_output.commands.iter().find_map(|c| match c {
+@@ -665,32 +667,43 @@ fn click_opens(h: &mut Harness<'_, Option<LauncherUi>>, label: &str) -> Option<S
+ 
+ /// Every URL the widgets labelled `label` open.
+ fn all_opened(h: &mut Harness<'_, Option<LauncherUi>>, label: &str) -> Vec<String> {
+-    let n = h.query_all_by_label(label).count();
+-    (0..n).filter_map(|i| click_nth_opens(h, label, i)).collect()
++    let ids: Vec<_> = h.query_all_by_label(label).map(|node| node.accesskit_node().id()).collect();
++    for (i, id) in ids.iter().enumerate() {
++        assert!(!ids[..i].contains(id), "{label}: every link button must have a distinct identity");
++    }
++    ids.iter()
++        .enumerate()
++        .map(|(i, expected_id)| {
++            let actual_id = h.query_all_by_label(label).nth(i).expect("recorded link button must remain").accesskit_node().id();
++            assert_eq!(&actual_id, expected_id, "{label}[{i}]: link order must remain stable");
++            click_nth_opens(h, label, i).expect("every distinct reachable link must emit its own OpenUrl")
++        })
++        .collect()
+ }
+ 
+ #[test]
  fn links_open_the_right_pages() {
      let (mut h, _) = harness(ViewMode::Grid, egui::Theme::Dark, true);
      h.run_steps(6);
@@ -153859,20 +153890,26 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..6292d71c1ce3a941adbd2c96a963bb57
 -    assert_eq!(click_opens(&mut h, "Instagram").as_deref(), Some("https://www.instagram.com/officialartcraftstudios"));
 -    assert_eq!(click_opens(&mut h, "LinkedIn").as_deref(), Some("https://www.linkedin.com/company/artcraft-ai"));
 -    // The … menu.
+-    h.get_all_by_label("…").next().unwrap().click();
 +    assert!(!sites.contains(&"https://kio-library.vercel.app".to_string()), "the removed footer homepage must not remain: {sites:?}");
 +    assert!(sites.contains(&"https://kio-library.vercel.app/?program=photo".to_string()), "official product page remains: {sites:?}");
 +    for label in ["X", "YouTube", "TikTok", "Instagram", "LinkedIn"] {
 +        assert_eq!(h.query_all_by_label(label).count(), 0, "retired social widget: {label}");
 +        assert_eq!(click_opens(&mut h, label), None);
 +    }
-     h.get_all_by_label("…").next().unwrap().click();
++    let more_id = h.get_all_by_label("…").next().unwrap().accesskit_node().id();
++    h.get_all_by_label("…").next().unwrap().scroll_to_me();
++    h.run_steps(4);
++    let more = h.get_all_by_label("…").next().unwrap();
++    assert_eq!(more.accesskit_node().id(), more_id, "the first app menu must retain its identity after scrolling");
++    more.click();
      h.run_steps(3);
 -    assert_eq!(click_opens(&mut h, "All releases").as_deref(), Some("https://github.com/qptywoei777-rgb/kio-native-apps/releases"));
 +    assert_eq!(click_opens(&mut h, "All releases").as_deref(), Some("https://github.com/qptywoei-sudo/bogo-native-apps/releases"));
  }
  
  #[test]
-@@ -780,7 +773,7 @@ fn the_launcher_updates_itself_and_quits_to_restart() {
+@@ -780,7 +793,7 @@ fn the_launcher_updates_itself_and_quits_to_restart() {
          None,
      );
      h.run_steps(6);
@@ -153881,7 +153918,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..6292d71c1ce3a941adbd2c96a963bb57
      h.get_by_label("Update and restart").click();
      h.run_steps(2);
      assert!(sent.borrow().contains(&Command::UpdateLauncher));
-@@ -804,7 +797,7 @@ fn launcher_update_prompts_to_relaunch_with_updated_version() {
+@@ -804,7 +817,7 @@ fn launcher_update_prompts_to_relaunch_with_updated_version() {
      let (mut h, _) = harness_with(ev, ViewMode::Grid, egui::Theme::Dark, true, 1.0);
      h.run_steps(6);
      // Dialog pops up on launch with the update prompt
@@ -153890,7 +153927,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..6292d71c1ce3a941adbd2c96a963bb57
      h.get_by_label("A new version is available. Would you like to relaunch with the updated version?");
      h.get_by_label("What's new");
      // Clicking "Later" dismisses the modal dialog
-@@ -840,7 +833,7 @@ fn feed_announcements_and_alerts_show_until_dismissed() {
+@@ -840,7 +853,7 @@ fn feed_announcements_and_alerts_show_until_dismissed() {
      let sent = Rc::new(RefCell::new(Vec::new()));
      let mut evs = events();
      evs.push(Event::Notices {
@@ -153899,7 +153936,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..6292d71c1ce3a941adbd2c96a963bb57
          alerts: vec![notice("x1", "Security update", Some("https://getartcraft.com/security"))],
      });
      let mut backend = Some(Fake { events: evs, sent, manage: true, pictures: Rc::default(), asked: Vec::new(), clock: Rc::new(Cell::new(NOW)) });
-@@ -867,11 +860,11 @@ fn feed_announcements_and_alerts_show_until_dismissed() {
+@@ -867,11 +880,11 @@ fn feed_announcements_and_alerts_show_until_dismissed() {
      assert!(h.query_by_label("Security update").is_none());
      assert!(h.state().as_ref().unwrap().settings.dismissed_notices.contains("x1"));
      // The announcement stays inline until dismissed.
@@ -153913,7 +153950,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..6292d71c1ce3a941adbd2c96a963bb57
      assert!(h.state().as_ref().unwrap().settings.dismissed_notices.contains("a1"));
  }
  
-@@ -967,10 +960,10 @@ fn the_footer_names_the_services_behind_what_is_on_screen() {
+@@ -967,10 +980,10 @@ fn the_footer_names_the_services_behind_what_is_on_screen() {
              h.get_by_label_contains("Checked ").accesskit_node().label().or_else(|| h.get_by_label_contains("Checked ").accesskit_node().value());
          label.unwrap_or_default()
      };
@@ -153926,7 +153963,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..6292d71c1ce3a941adbd2c96a963bb57
  }
  
  #[test]
-@@ -1027,9 +1020,9 @@ fn clicking_a_card_opens_its_details_drawer() {
+@@ -1027,9 +1040,9 @@ fn clicking_a_card_opens_its_details_drawer() {
      let (mut h, _sent) = harness(ViewMode::Grid, egui::Theme::Dark, true);
      h.run_steps(8);
      // Every app has a page: a card of each generation opens one.
@@ -153939,7 +153976,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..6292d71c1ce3a941adbd2c96a963bb57
      h.run_steps(10);
      snapshot(&mut h, "details-dark");
      h.get_by_label_contains("The image editor you already know how to use");
-@@ -1055,7 +1048,7 @@ fn clicking_a_card_opens_its_details_drawer() {
+@@ -1055,7 +1068,7 @@ fn clicking_a_card_opens_its_details_drawer() {
  fn details_drawer_in_the_light_theme() {
      let (mut h, _sent) = harness(ViewMode::Grid, egui::Theme::Light, true);
      h.run_steps(8);
@@ -153948,7 +153985,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..6292d71c1ce3a941adbd2c96a963bb57
      h.run_steps(10);
      snapshot(&mut h, "details-light");
      h.get_by_label_contains("The image editor you already know how to use");
-@@ -1070,26 +1063,26 @@ fn opening_a_page_asks_for_its_pictures_once_and_only_while_it_lacks_some() {
+@@ -1070,26 +1083,26 @@ fn opening_a_page_asks_for_its_pictures_once_and_only_while_it_lacks_some() {
      let (mut h, sent) = harness(ViewMode::Grid, egui::Theme::Dark, true);
      h.run_steps(8);
      assert_eq!(fetches(&sent, "photocraft"), 0, "nothing is fetched before a page is opened");
@@ -153979,7 +154016,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..6292d71c1ce3a941adbd2c96a963bb57
      h.run_steps(10);
      assert_eq!(fetches(&sent, "pdfcraft"), 0);
  }
-@@ -1099,7 +1092,7 @@ fn a_frame_stands_in_for_the_pictures_until_they_arrive() {
+@@ -1099,7 +1112,7 @@ fn a_frame_stands_in_for_the_pictures_until_they_arrive() {
      let pictures = Rc::new(Cell::new(Pictures::Silent));
      let (mut h, sent) = harness_pictures(events(), ViewMode::Grid, egui::Theme::Dark, true, 1.0, pictures.clone());
      h.run_steps(8);
@@ -153988,7 +154025,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..6292d71c1ce3a941adbd2c96a963bb57
      h.run_steps(10);
      snapshot(&mut h, "details-loading-dark");
      h.get_by_label("Loading pictures…");
-@@ -1122,7 +1115,7 @@ fn offline_the_frame_says_so_and_opening_the_page_again_retries() {
+@@ -1122,7 +1135,7 @@ fn offline_the_frame_says_so_and_opening_the_page_again_retries() {
      let pictures = Rc::new(Cell::new(Pictures::Offline));
      let (mut h, sent) = harness_pictures(events(), ViewMode::Grid, egui::Theme::Light, true, 1.0, pictures.clone());
      h.run_steps(8);
@@ -153997,7 +154034,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..6292d71c1ce3a941adbd2c96a963bb57
      h.run_steps(10);
      snapshot(&mut h, "details-offline-light");
      h.get_by_label("Pictures couldn't be loaded. Reopen this page to try again.");
-@@ -1133,7 +1126,7 @@ fn offline_the_frame_says_so_and_opening_the_page_again_retries() {
+@@ -1133,7 +1146,7 @@ fn offline_the_frame_says_so_and_opening_the_page_again_retries() {
      pictures.set(Pictures::Online);
      h.key_press(egui::Key::Escape);
      h.run_steps(10);
@@ -154006,7 +154043,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..6292d71c1ce3a941adbd2c96a963bb57
      h.run_steps(10);
      assert_eq!(fetches(&sent, "photocraft"), 2);
      h.get_by_label("Enlarge picture");
-@@ -1145,7 +1138,7 @@ fn the_enlarged_view_shows_a_frame_for_a_picture_still_missing() {
+@@ -1145,7 +1158,7 @@ fn the_enlarged_view_shows_a_frame_for_a_picture_still_missing() {
      let pictures = Rc::new(Cell::new(Pictures::SecondFails));
      let (mut h, _sent) = harness_pictures(events(), ViewMode::Grid, egui::Theme::Dark, true, 1.0, pictures);
      h.run_steps(8);
@@ -154015,7 +154052,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..6292d71c1ce3a941adbd2c96a963bb57
      h.run_steps(10);
      h.get_by_label("Enlarge picture").click();
      h.run_steps(3);
-@@ -1164,8 +1157,8 @@ fn the_enlarged_view_shows_a_frame_for_a_picture_still_missing() {
+@@ -1164,8 +1177,8 @@ fn the_enlarged_view_shows_a_frame_for_a_picture_still_missing() {
  fn a_page_without_pictures_has_no_gallery() {
      let (mut h, _sent) = harness(ViewMode::Grid, egui::Theme::Dark, true);
      h.run_steps(8);
@@ -154026,7 +154063,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..6292d71c1ce3a941adbd2c96a963bb57
      h.run_steps(10);
      snapshot(&mut h, "details-no-pictures-dark");
      h.get_by_label_contains("The open-source PDF workbench.");
-@@ -1178,7 +1171,7 @@ fn a_page_without_pictures_has_no_gallery() {
+@@ -1178,7 +1191,7 @@ fn a_page_without_pictures_has_no_gallery() {
  fn the_lead_picture_can_be_enlarged() {
      let (mut h, _sent) = harness(ViewMode::Grid, egui::Theme::Dark, true);
      h.run_steps(8);
@@ -154035,7 +154072,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..6292d71c1ce3a941adbd2c96a963bb57
      h.run_steps(10);
      // The drawer has one "Close (Esc)"; the enlarged view adds its own.
      assert_eq!(h.query_all_by_label("Close (Esc)").count(), 1);
-@@ -1200,7 +1193,7 @@ fn the_lead_picture_can_be_enlarged() {
+@@ -1200,7 +1213,7 @@ fn the_lead_picture_can_be_enlarged() {
      assert!(h.query_by_label_contains("The image editor you already know").is_none());
  }
  
@@ -154044,7 +154081,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..6292d71c1ce3a941adbd2c96a963bb57
  /// pressed more often than there are pictures, both ways, to wrap around the list and to do nothing on a
  /// page that has one or none; the enlarged view is opened wherever there is a picture to enlarge.
  #[test]
-@@ -1252,7 +1245,7 @@ fn every_page_opens_and_pages_through_its_pictures() {
+@@ -1252,7 +1265,7 @@ fn every_page_opens_and_pages_through_its_pictures() {
  fn the_drawer_and_the_enlarged_picture_survive_any_window_size() {
      let (mut h, _sent) = harness(ViewMode::Grid, egui::Theme::Dark, true);
      h.run_steps(8);
@@ -154053,7 +154090,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..6292d71c1ce3a941adbd2c96a963bb57
      h.run_steps(10);
      let sizes = [(1180.0, 900.0), (720.0, 500.0), (480.0, 320.0), (320.0, 200.0), (120.0, 90.0), (40.0, 30.0), (4000.0, 2400.0)];
      for zoom in [false, true] {
-@@ -1315,9 +1308,9 @@ fn the_rate_limit_notice_never_runs_under_the_footer_links() {
+@@ -1315,9 +1328,9 @@ fn the_rate_limit_notice_never_runs_under_the_footer_links() {
          for label in ["Website", "GitHub", "Discord", "X", "YouTube", "TikTok", "Instagram", "LinkedIn"] {
              right.extend(h.query_all_by_label(label).map(|n| n.rect()).filter(|r| (r.center().y - notice.center().y).abs() < 12.0));
          }
@@ -154065,7 +154102,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..6292d71c1ce3a941adbd2c96a963bb57
          right.extend(platform);
          for r in right {
              assert!(!r.intersects(notice), "{width}: notice {notice:?} overlaps {r:?}");
-@@ -1338,7 +1331,7 @@ fn narrow_header_keeps_the_view_switch_clear_of_brand_text() {
+@@ -1338,7 +1351,7 @@ fn narrow_header_keeps_the_view_switch_clear_of_brand_text() {
                  for label in ["Grid", "Table", "Settings", "Check for updates"] {
                      let rect = h.get_by_label(label).rect();
                      assert!(rect.left() >= 0.0 && rect.right() <= width, "{bar:?} {width}: {label} {rect:?}");
@@ -154074,7 +154111,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..6292d71c1ce3a941adbd2c96a963bb57
                          if let Some(text) = h.query_by_label(label) {
                              assert!(!rect.intersects(text.rect()), "{bar:?} {width}: {label} overlaps {rect:?}");
                          }
-@@ -1352,7 +1345,7 @@ fn narrow_header_keeps_the_view_switch_clear_of_brand_text() {
+@@ -1352,7 +1365,7 @@ fn narrow_header_keeps_the_view_switch_clear_of_brand_text() {
                  }
                  if width == 1180.0 {
                      h.get_by_label("Launcher");

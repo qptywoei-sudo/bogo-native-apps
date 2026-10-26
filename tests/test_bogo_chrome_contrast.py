@@ -250,6 +250,28 @@ fn contrast(a:Color32,b:Color32)->f64 {let(a,b)=(lum(a),lum(b)); (a.max(b)+0.05)
         self.assertEqual(test.count('#[test]'), 2)
 
     @unittest.skipUnless(os.environ.get('BOGO_NATIVE_ARCHIVES') or os.environ.get('BOGO_NATIVE_SOURCE_ARCHIVE_CACHE'), 'exact original source archives required')
+    def test_pdf_dock_tab_uses_pressed_role_without_recoloring_document_selection(self):
+        relative = 'crates/ui-egui/src/docking.rs'
+        before = archived_sources('pdf', (relative,))[relative]
+        rows = chrome.PDF_ROLE_REPLACEMENTS[relative]
+        self.assertEqual(rows, [('    style.active_background = t.selected;', '    style.active_background = t.pressed;', 1)])
+        after = chrome.transform('pdf', relative, before)
+        self.assertEqual(after.replace(rows[0][1], rows[0][0]), before)
+        self.assertEqual(before[before.index('fn permissions('):before.index('pub fn show(')], after[after.index('fn permissions('):after.index('pub fn show(')])
+        theme_path = 'crates/ui-egui/src/theme.rs'
+        theme = archived_sources('pdf', (theme_path,))[theme_path]
+        self.assertEqual(chrome.transform('pdf', theme_path, theme), theme)
+        from bogo_brand import theme as brand_theme
+        final_theme = brand_theme(theme)
+        pressed = re.findall(r'^\s*pressed:\s*Color32::from_rgb\(([^\n]+)\),', final_theme, re.M)
+        self.assertEqual(pressed, ['0xFF, 0xE7, 0xD4'] * 2)
+        source_tests = chrome.PDF_ROLE_REPLACEMENTS['crates/ui-egui/tests/ui.rs'][0][1]
+        self.assertIn('text == "Tools"', source_tests)
+        self.assertIn('bogo_last_opaque_fill(&default, tools.2.center())', source_tests)
+        self.assertIn('the actual selected docktab uses the Bogo chrome selection surface', source_tests)
+        self.assertEqual(source_tests.count('#[test]'), 2)
+
+    @unittest.skipUnless(os.environ.get('BOGO_NATIVE_ARCHIVES') or os.environ.get('BOGO_NATIVE_SOURCE_ARCHIVE_CACHE'), 'exact original source archives required')
     def test_photo_recovery_warning_uses_readable_ink_without_changing_renderer_state_or_semantic_warning(self):
         relative = 'crates/ui-egui/src/gpu_status.rs'
         before = archived_sources('photo', (relative,))[relative]

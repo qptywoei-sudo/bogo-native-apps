@@ -4223,10 +4223,10 @@
       "baseLock": "manifests/full-native-apps.json",
       "baseLockSha256": "0c71246652db45818401d22d1267c79f84e01294c4e18f12ac83f536c6ed2a58",
       "baseSourceTreeSha256": "50c345f28ac941ae8d4e7dfa7ecc41dc4b1642d4dd57319b7ddf020ce8db8bfe",
-      "sourceTreeSha256": "544a087adba01dd8c41a2d4104aafe31a2be5a60c234624e66d53b0be79168ae",
+      "sourceTreeSha256": "1d612ed7eaa8aae71dfc7b9f3dd73531eb385982436ae11a00237d9b7a736bd9",
       "patch": "patches/bogo/pdf.patch",
-      "patchSha256": "2e59d904659fca687ef52eee47cbdda41d1bfa315c7fcd8eb8937d744f6d5f55",
-      "patchBytes": 6207801,
+      "patchSha256": "3bdba36f32c3a66ea77c2e64af7623c58e330cdfe2f6de96f48fe3bd21034e4d",
+      "patchBytes": 6208846,
       "files": [
         {
           "path": "apps/pdfcraft-cli/build.rs",
@@ -4674,6 +4674,17 @@
           }
         },
         {
+          "path": "crates/ui-egui/src/docking.rs",
+          "before": {
+            "sha256": "f04feaaf4e3d6717b62352ee310c1d5183aaac804d12edfb957faddc3a7a0efe",
+            "bytes": 24599
+          },
+          "after": {
+            "sha256": "3fb0dc7f29149f850e13ea49158626f0405ce5b30fe61f8b68012c7501f7fcb3",
+            "bytes": 24598
+          }
+        },
+        {
           "path": "crates/ui-egui/src/fill_sign.rs",
           "before": {
             "sha256": "6717990bb9060dfda587002405b1ea1f639eab5d3ddde8d00aea1683c950563b",
@@ -5109,8 +5120,8 @@
             "bytes": 57209
           },
           "after": {
-            "sha256": "7d0a71b4ecfd9104f6951897ebc1bd9ba7fadf5f94d4c564dd2a458537d255e0",
-            "bytes": 62254
+            "sha256": "5d0a1c3575c4df33064c253108c90ba94c58f443323645d560e320e67cebdbee",
+            "bytes": 62610
           }
         },
         {
@@ -9196,10 +9207,10 @@
       "baseLock": "manifests/launcher.lock.json",
       "baseLockSha256": "46fa9e82194ee555f1ed72acf5b54709738d3d9db2c4a30b03995850d6e70237",
       "baseSourceTreeSha256": "d0c47781d861fa777ae4c9b931e870f5013b435039791a91b14923583c55b318",
-      "sourceTreeSha256": "bc326c54ecb7eb0ca6dbd8f507d6194f0937e3089b56c73cfc0137d0202041bf",
+      "sourceTreeSha256": "7285b2922a51515b49d555a0b2026095e74fbc1f4ffd9372da4e845e13cd7d10",
       "patch": "patches/bogo/launcher.patch",
-      "patchSha256": "5b179b022bf56821ed7d0b55a7ba534403d8ae206e76fc2f6dced4f7ec325320",
-      "patchBytes": 11991382,
+      "patchSha256": "0d86c00d722ff2541d972cf3e23778f1f76a20ff538f38cad208614fd5dba85b",
+      "patchBytes": 11993339,
       "files": [
         {
           "path": "apps/artcraft-launcher-web/index.html",
@@ -10192,8 +10203,8 @@
             "bytes": 65718
           },
           "after": {
-            "sha256": "d866dd7d7bacd1ee5d251513233859d506fcea3d6ece7672778599ba08d5ed44",
-            "bytes": 65269
+            "sha256": "61fde7d5658096455fd77014bf7bed28920f49ac86fc389872fbcaa059d2f737",
+            "bytes": 66439
           }
         },
         {

@@ -62,6 +62,8 @@ class LauncherPromotionTestAdaptation(unittest.TestCase):
                 self.assertEqual(after.count('#[ignore'), before.count('#[ignore'))
                 self.assertEqual(re.findall(r'(?m)^fn ([a-zA-Z0-9_]+)\(', before), re.findall(r'(?m)^fn ([a-zA-Z0-9_]+)\(', after))
                 restored = after.replace('Bogo catalog', 'ArtCraft API')
+                if relative.endswith('/ui.rs'):
+                    restored = launcher_tests.restore_optional_link_helpers(restored)
                 if relative.endswith('/hungarian.rs'):
                     restored = restored.replace('Kilépés a Bogo Launcherből', 'Kilépés az ArtCraft Launcherből')
                 for name in allowed.get(Path(relative).name, set()):
@@ -118,6 +120,79 @@ class LauncherPromotionTestAdaptation(unittest.TestCase):
                 self.assertEqual({relative: (root / relative).read_text(encoding='utf-8') for relative in inputs}, inputs)
         with self.assertRaises(ValueError):
             launcher_tests.transform(launcher_tests.TEST_ROOT + 'ui.rs', self.source[launcher_tests.TEST_ROOT + 'ui.rs'] * 2)
+
+    def test_optional_query_whole_file_inverse_recovers_actual_authenticated_4dc_source(self):
+        relative = launcher_tests.TEST_ROOT + 'ui.rs'
+        after = launcher_tests.transform(relative, self.source[relative])
+        launcher_tests.validate_optional_click_helper(after)
+        recorded = launcher_tests.restore_optional_link_helpers(after)
+        self.assertEqual(identity(recorded), launcher_tests.RECORDED_UI_BEFORE_QUERY_FIX)
+        # This exact complete preimage is independently measured from the real
+        # successful4dc Source job ZIP, not a fabricated reduced helper fixture.
+        self.assertEqual(hashlib.sha256(recorded.encode()).hexdigest(),
+                         'd866dd7d7bacd1ee5d251513233859d506fcea3d6ece7672778599ba08d5ed44')
+        before_helper = function_text(self.source[relative], 'click_nth_opens')
+        after_helper = function_text(after, 'click_nth_opens')
+        self.assertEqual(after_helper.replace(launcher_tests.CLICK_QUERY_AFTER, launcher_tests.CLICK_QUERY_BEFORE), before_helper)
+
+    def test_optional_query_preserves_every_positive_and_negative_link_assertion(self):
+        relative = launcher_tests.TEST_ROOT + 'ui.rs'
+        after = launcher_tests.transform(relative, self.source[relative])
+        helper = function_text(after, 'click_nth_opens')
+        self.assertIn(launcher_tests.CLICK_QUERY_AFTER, helper)
+        self.assertNotIn(launcher_tests.CLICK_QUERY_BEFORE, helper)
+        links = function_text(after, 'links_open_the_right_pages')
+        for marker in ['assert_eq!(click_opens(&mut h, "Discord"), None)',
+                       'github.len() >= 13',
+                       'url == "https://github.com/qptywoei-sudo/bogo-native-apps"',
+                       'https://kio-library.vercel.app/?program=photo',
+                       'for label in ["X", "YouTube", "TikTok", "Instagram", "LinkedIn"]',
+                       'assert_eq!(h.query_all_by_label(label).count(), 0',
+                       'assert_eq!(click_opens(&mut h, label), None)',
+                       'Some("https://github.com/qptywoei-sudo/bogo-native-apps/releases")']:
+            self.assertIn(marker, links)
+        all_opened = function_text(after, 'all_opened')
+        self.assertEqual(all_opened.replace(launcher_tests.ALL_OPENED_AFTER, launcher_tests.ALL_OPENED_BEFORE),
+                         function_text(self.source[relative], 'all_opened'))
+
+    def test_optional_query_contract_rejects_broken_helper_or_weakened_assertions(self):
+        relative = launcher_tests.TEST_ROOT + 'ui.rs'
+        after = launcher_tests.transform(relative, self.source[relative])
+        mutants = [after.replace(launcher_tests.CLICK_QUERY_AFTER, launcher_tests.CLICK_QUERY_BEFORE),
+                   after + '\n' + launcher_tests.CLICK_QUERY_AFTER,
+                   after.replace('assert_eq!(click_opens(&mut h, "Discord"), None);', ''),
+                   after.replace('github.len() >= 13', 'github.len() >= 0'),
+                   after.replace('https://github.com/qptywoei-sudo/bogo-native-apps/releases', 'https://example.invalid/releases'),
+                   after.replace('assert_eq!(click_opens(&mut h, label), None);', ''),
+                   after.replace('h.run_steps(4);\n    let target', 'h.run_steps(0);\n    let target'),
+                   after.replace('h.query_all_by_label(label).nth(n)?;', 'h.query_all_by_label(label).next()?;'),
+                   after.replace('assert!(!ids[..i].contains(id), "{label}: every link button must have a distinct identity");', ''),
+                   after.replace('assert_eq!(&actual_id, expected_id, "{label}[{i}]: link order must remain stable");', ''),
+                   after.replace('h.get_all_by_label("…").next().unwrap().scroll_to_me();', ''),
+                   after.replace('.nth(n)?', '.next()?'),
+                   after.replace('assert_eq!(target.accesskit_node().id(), target_id, "{label}[{n}]: scrolling must preserve the button identity");', '')]
+        for mutant in mutants:
+            with self.subTest(mutant=hashlib.sha256(mutant.encode()).hexdigest()), self.assertRaises(ValueError):
+                launcher_tests.validate_optional_click_helper(mutant)
+
+    def test_all_distinct_link_buttons_are_scrolled_settled_requeried_and_checked_in_order(self):
+        relative = launcher_tests.TEST_ROOT + 'ui.rs'
+        after = launcher_tests.transform(relative, self.source[relative])
+        helper = function_text(after, 'click_nth_opens')
+        self.assertEqual(helper.count('.nth(n)?'), 3, 'capture, scroll and click must address the same nth button')
+        self.assertLess(helper.index('scroll_to_me()'), helper.index('h.run_steps(4)'))
+        self.assertLess(helper.index('h.run_steps(4)'), helper.index('let target ='))
+        self.assertLess(helper.index('let target ='), helper.index('assert_eq!(target.accesskit_node().id(), target_id'))
+        self.assertLess(helper.index('assert_eq!(target.accesskit_node().id(), target_id'), helper.index('target.click()'))
+        all_opened = function_text(after, 'all_opened')
+        for marker in ['let ids: Vec<_>', '!ids[..i].contains(id)', 'ids.iter()', '.enumerate()',
+                       'h.query_all_by_label(label).nth(i)', 'assert_eq!(&actual_id, expected_id',
+                       'click_nth_opens(h, label, i).expect("every distinct reachable link must emit its own OpenUrl")']:
+            self.assertIn(marker, all_opened)
+        self.assertNotIn('filter_map', all_opened, 'a missed offscreen link must fail, not silently reduce coverage')
+        links = function_text(after, 'links_open_the_right_pages')
+        self.assertIn(launcher_tests.MORE_AFTER, links)
+        self.assertIn('github.len() >= 13', links)
 
 
 if __name__ == '__main__':

@@ -23,6 +23,46 @@ PREIMAGES = {
     'ui.rs': ('562468f8885dc6143a67d50a3ec1680fc6c75384ed320bcd825e6637640b92cb',),
 }
 
+# The actual4dc corresponding-source ZIP and recorded overlay both contain this
+# complete UI file. Inverting only the bounded optional-query/scroll helpers must
+# recover it exactly, including every positive URL and negative promo assertion.
+RECORDED_UI_BEFORE_QUERY_FIX = {
+    'sha256': 'd866dd7d7bacd1ee5d251513233859d506fcea3d6ece7672778599ba08d5ed44',
+    'bytes': 65269,
+}
+CLICK_QUERY_BEFORE = '    h.get_all_by_label(label).nth(n)?.click();'
+CLICK_QUERY_AFTER = '''    let target_id = h.query_all_by_label(label).nth(n)?.accesskit_node().id();
+    h.query_all_by_label(label).nth(n)?.scroll_to_me();
+    h.run_steps(4);
+    let target = h.query_all_by_label(label).nth(n)?;
+    assert_eq!(target.accesskit_node().id(), target_id, "{label}[{n}]: scrolling must preserve the button identity");
+    target.click();'''
+ALL_OPENED_BEFORE = '''    let n = h.query_all_by_label(label).count();
+    (0..n).filter_map(|i| click_nth_opens(h, label, i)).collect()'''
+ALL_OPENED_AFTER = '''    let ids: Vec<_> = h.query_all_by_label(label).map(|node| node.accesskit_node().id()).collect();
+    for (i, id) in ids.iter().enumerate() {
+        assert!(!ids[..i].contains(id), "{label}: every link button must have a distinct identity");
+    }
+    ids.iter()
+        .enumerate()
+        .map(|(i, expected_id)| {
+            let actual_id = h.query_all_by_label(label).nth(i).expect("recorded link button must remain").accesskit_node().id();
+            assert_eq!(&actual_id, expected_id, "{label}[{i}]: link order must remain stable");
+            click_nth_opens(h, label, i).expect("every distinct reachable link must emit its own OpenUrl")
+        })
+        .collect()'''
+MORE_BEFORE = '''    h.get_all_by_label("…").next().unwrap().click();
+    h.run_steps(3);
+    assert_eq!(click_opens(&mut h, "All releases").as_deref(), Some("https://github.com/qptywoei-sudo/bogo-native-apps/releases"));'''
+MORE_AFTER = '''    let more_id = h.get_all_by_label("…").next().unwrap().accesskit_node().id();
+    h.get_all_by_label("…").next().unwrap().scroll_to_me();
+    h.run_steps(4);
+    let more = h.get_all_by_label("…").next().unwrap();
+    assert_eq!(more.accesskit_node().id(), more_id, "the first app menu must retain its identity after scrolling");
+    more.click();
+    h.run_steps(3);
+    assert_eq!(click_opens(&mut h, "All releases").as_deref(), Some("https://github.com/qptywoei-sudo/bogo-native-apps/releases"));'''
+
 LINKS_VISIBLE = '''
     let (mut h, _) = harness(ViewMode::Grid, egui::Theme::Dark, true);
     h.run_steps(6);
@@ -106,14 +146,36 @@ def replace_test_body(text, name, replacement):
     return text[:opening + 1] + replacement + text[end - 1:]
 
 
+def restore_optional_link_helpers(text):
+    text = once(text, CLICK_QUERY_AFTER, CLICK_QUERY_BEFORE)
+    text = once(text, ALL_OPENED_AFTER, ALL_OPENED_BEFORE)
+    return once(text, MORE_AFTER, MORE_BEFORE)
+
+
+def validate_optional_click_helper(text):
+    require(text.count(CLICK_QUERY_AFTER) == 1 and CLICK_QUERY_BEFORE not in text,
+            'Launcher optional click helper must use the non-panicking query exactly once')
+    restored = restore_optional_link_helpers(text)
+    require(identity(restored) == RECORDED_UI_BEFORE_QUERY_FIX,
+            'Launcher optional-query change must preserve every recorded test, URL and negative assertion')
+
+
 def transform_ui(text):
+    # get_all asserts at least one match before nth can return None. Removed
+    # Discord/social controls intentionally have zero matches; query_all keeps
+    # the Option contract while positive URL assertions below remain strict.
+    text = once(text, CLICK_QUERY_BEFORE, CLICK_QUERY_AFTER)
+    text = once(text, ALL_OPENED_BEFORE, ALL_OPENED_AFTER)
     text = once(text, 'assert!(h.query_all_by_label_contains("Discord").count() >= 2); // header link and footer link', 'assert_eq!(h.query_all_by_label_contains("Discord").count(), 0); // retired header/footer promotion')
     text = once(text, '    h.get_by_label("Questions, ideas and news from the ArtCraft team");', '    h.get_by_label("Done"); // Settings really opened, rather than making absence vacuous.\n    assert!(h.query_by_label("Questions, ideas and news from the ArtCraft team").is_none());')
     text = once(text, '    assert!(h.query_all_by_label_contains("Discord").count() >= 2);', '    assert_eq!(h.query_all_by_label_contains("Discord").count(), 0);')
     text = replace_test_body(text, 'links_to_the_website_github_and_each_apps_pages', LINKS_VISIBLE)
     text = replace_test_body(text, 'links_open_the_right_pages', LINKS_OPEN)
+    text = once(text, MORE_BEFORE, MORE_AFTER)
     text = once(text, '        assert_eq!(right.len(), 8, "{width}: {right:?}");', '        assert_eq!(right.len(), 0, "{width}: retired footer promotions remain: {right:?}");')
-    return once(text, '        assert_eq!(platform.is_some(), width > 720.0, "{width}: the platform label shows unless the window is narrow");', '        assert!(platform.is_some(), "{width}: removing promotions leaves room for the functional platform label");')
+    text = once(text, '        assert_eq!(platform.is_some(), width > 720.0, "{width}: the platform label shows unless the window is narrow");', '        assert!(platform.is_some(), "{width}: removing promotions leaves room for the functional platform label");')
+    validate_optional_click_helper(text)
+    return text
 
 
 def transform(relative, text):

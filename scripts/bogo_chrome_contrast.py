@@ -554,6 +554,11 @@ PDF_ROLE_REPLACEMENTS = {'crates/ui-egui/src/home.rs': [('pub fn show(app: &mut 
                                  '    default.get_by_label_contains("Welcome to Bogo PDF");\n'
                                  '    assert_eq!(bogo_last_opaque_fill(&default, bogo_canvas_blank_margin(&default)), '
                                  'Some(expected));\n'
+                                 '    let tools = painted_text(&default).into_iter().find(|(text, _, _)| text == '
+                                 '"Tools").expect("actual selected Tools docktab is painted");\n'
+                                 '    assert_eq!(bogo_last_opaque_fill(&default, tools.2.center()), '
+                                 'Some(egui::Color32::from_rgb(0xFF, 0xE7, 0xD4)), "the actual selected docktab uses the Bogo '
+                                 'chrome selection surface");\n'
                                  '    let read = harness(|app| {\n'
                                  '        app.mode = Mode::Read;\n'
                                  '    });\n'
@@ -594,7 +599,8 @@ PDF_ROLE_REPLACEMENTS = {'crates/ui-egui/src/home.rs': [('pub fn show(app: &mut 
                                  'Some(expected));\n'
                                  '}\n'
                                  '\n',
-                                 1)]}
+                                 1)],
+ 'crates/ui-egui/src/docking.rs': [('    style.active_background = t.selected;', '    style.active_background = t.pressed;', 1)]}
 
 
 EXTRA_VISUAL_REPLACEMENTS = {('photo', 'crates/ui-egui/src/gpu_status.rs'): [('            ui.label(egui::RichText::new(tl!("GPU acceleration could not '

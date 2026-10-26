@@ -48201,6 +48201,19 @@ index e5df0f3d3979315a99f42cce0f31c9ce14b3050c..9255e4719b7788b2a87e32d1bfd99a67
                                  ui.label(crate::i18n::fmt(tl!("Version {v}"), &[("v", &pdfcraft_engine::build_info::version())]));
                              });
                          });
+diff --git a/crates/ui-egui/src/docking.rs b/crates/ui-egui/src/docking.rs
+index fe4c0390dfa64c6784052fac55c5350a9cf9f61a..3c667afd7de612542aefe3d383bb8afb0d7530e4 100644
+--- a/crates/ui-egui/src/docking.rs
++++ b/crates/ui-egui/src/docking.rs
+@@ -384,7 +384,7 @@ pub fn show(app: &mut crate::PdfCraftApp, ui: &mut egui::Ui) {
+     style.resize_window_label = crate::i18n::t("Resize panel window").into();
+     style.background = t.panel;
+     style.tab_background = t.chrome;
+-    style.active_background = t.selected;
++    style.active_background = t.pressed;
+     style.text = t.text;
+     style.inactive_text = t.text_muted;
+     style.border = egui::Stroke::new(1.0, t.divider);
 diff --git a/crates/ui-egui/src/fill_sign.rs b/crates/ui-egui/src/fill_sign.rs
 index 5f462667218fadcc7a5ccb5c55fc9631f48c770e..41a48c9f570046ed90d64371a381813d7612633f 100644
 --- a/crates/ui-egui/src/fill_sign.rs
@@ -52498,10 +52511,10 @@ index b99e2bfba2d4448231fd00291c807da50ce9ffd4..50db8aa1a75c3196fd55d9919a02cb04
      h.run_steps(3);
      assert_eq!(h.state().dialog, Some(Dialog::Sign));
 diff --git a/crates/ui-egui/tests/ui.rs b/crates/ui-egui/tests/ui.rs
-index 67d80a0c81211308770ecbb0d2e25f8c84b325af..7a2ca5754d38914bc76c21cf74468579221a9ed5 100644
+index 67d80a0c81211308770ecbb0d2e25f8c84b325af..78de15985d170249ccf2c7611df3221646e6c012 100644
 --- a/crates/ui-egui/tests/ui.rs
 +++ b/crates/ui-egui/tests/ui.rs
-@@ -6,6 +6,111 @@ use egui_kittest::Harness;
+@@ -6,6 +6,117 @@ use egui_kittest::Harness;
  use egui_kittest::kittest::{NodeT, Queryable};
  use pdfcraft_ui_egui::PdfCraftApp;
  
@@ -52575,6 +52588,12 @@ index 67d80a0c81211308770ecbb0d2e25f8c84b325af..7a2ca5754d38914bc76c21cf74468579
 +    assert_eq!(default.state().mode, Mode::AllTools, "the actual default must exercise docking");
 +    default.get_by_label_contains("Welcome to Bogo PDF");
 +    assert_eq!(bogo_last_opaque_fill(&default, bogo_canvas_blank_margin(&default)), Some(expected));
++    let tools = painted_text(&default).into_iter().find(|(text, _, _)| text == "Tools").expect("actual selected Tools docktab is painted");
++    assert_eq!(
++        bogo_last_opaque_fill(&default, tools.2.center()),
++        Some(egui::Color32::from_rgb(0xFF, 0xE7, 0xD4)),
++        "the actual selected docktab uses the Bogo chrome selection surface"
++    );
 +    let read = harness(|app| {
 +        app.mode = Mode::Read;
 +    });
@@ -52613,7 +52632,7 @@ index 67d80a0c81211308770ecbb0d2e25f8c84b325af..7a2ca5754d38914bc76c21cf74468579
  /// A tiny PDF with two pages, two bookmarks and one sticky note.
  const FIXTURE: &[u8] = b"%PDF-1.7
  1 0 obj << /Type /Catalog /Pages 2 0 R /Outlines 6 0 R >> endobj
-@@ -34,7 +139,7 @@ fn harness(setup: impl FnOnce(&mut PdfCraftApp) + 'static) -> Harness<'static, P
+@@ -34,7 +145,7 @@ fn harness(setup: impl FnOnce(&mut PdfCraftApp) + 'static) -> Harness<'static, P
  #[test]
  fn home_shows_welcome_and_tools() {
      let h = harness(|_| {});
@@ -52622,7 +52641,7 @@ index 67d80a0c81211308770ecbb0d2e25f8c84b325af..7a2ca5754d38914bc76c21cf74468579
      assert!(h.query_all_by_label("Organize pages").count() >= 2, "tool list + home card");
      h.get_by_label("Open file");
  }
-@@ -111,7 +216,7 @@ fn home_removes_one_recent_file_or_clears_them_all() {
+@@ -111,7 +222,7 @@ fn home_removes_one_recent_file_or_clears_them_all() {
      h.get_by_label("Clear Recent Files").click();
      h.run_steps(2);
      assert!(h.state().recent.is_empty(), "Clear empties the list");
@@ -52631,7 +52650,7 @@ index 67d80a0c81211308770ecbb0d2e25f8c84b325af..7a2ca5754d38914bc76c21cf74468579
      assert!(h.query_by_label("Clear Recent Files").is_none(), "and goes away with nothing left to clear");
  }
  
-@@ -330,8 +435,8 @@ fn tabs_shrink_to_fit_then_arrows_step_through_them_and_open_stays_in_sight() {
+@@ -330,8 +441,8 @@ fn tabs_shrink_to_fit_then_arrows_step_through_them_and_open_stays_in_sight() {
          }
      });
      let open = h.get_by_label("Open").rect();
@@ -52642,7 +52661,7 @@ index 67d80a0c81211308770ecbb0d2e25f8c84b325af..7a2ca5754d38914bc76c21cf74468579
      let mut previous_right = f32::MIN;
      for i in 0..5 {
          let tab = h.get_by_label(&name(i)).rect();
-@@ -355,15 +460,15 @@ fn tabs_shrink_to_fit_then_arrows_step_through_them_and_open_stays_in_sight() {
+@@ -355,15 +466,15 @@ fn tabs_shrink_to_fit_then_arrows_step_through_them_and_open_stays_in_sight() {
      assert_eq!(enabled(&h, "Scroll tabs right"), Some(true), "and then there is more to the right");
      let open = h.get_by_label("Open").rect();
      let right = h.get_by_label("Scroll tabs right").rect();
@@ -52661,7 +52680,7 @@ index 67d80a0c81211308770ecbb0d2e25f8c84b325af..7a2ca5754d38914bc76c21cf74468579
  }
  
  /// macOS (#789): with the integrated title bar, the strip is the 28 pt band AppKit centres the
-@@ -376,7 +481,7 @@ fn the_integrated_title_bar_is_the_traffic_light_band() {
+@@ -376,7 +487,7 @@ fn the_integrated_title_bar_is_the_traffic_light_band() {
          app.open_bytes("band.pdf", None, FIXTURE.to_vec()).unwrap();
      });
      let band = 28.0;
@@ -52670,7 +52689,7 @@ index 67d80a0c81211308770ecbb0d2e25f8c84b325af..7a2ca5754d38914bc76c21cf74468579
          let r = h.get_by_label(label).rect();
          assert!(r.top() >= 0.0 && r.bottom() <= band, "{label}: {r:?} inside the {band} pt title bar");
          assert!(r.height() >= 24.0, "{label}: {r:?} stays clickable");
-@@ -1064,7 +1169,7 @@ fn closing_the_last_active_tab_selects_the_previous_one_then_home() {
+@@ -1064,7 +1175,7 @@ fn closing_the_last_active_tab_selects_the_previous_one_then_home() {
          assert!(app.session.get(ids[removed]).is_none());
      }
      assert_eq!(h.state().active, None);
