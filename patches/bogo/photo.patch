@@ -49891,7 +49891,7 @@ index caf88785a78dd90f25f62254d0d813d2702acb43..6adaf4b4a7b34f3cac7f6002ebaee6a8
          let template = "{message} ({note})";
          crate::i18n::fmt(tl!(template), &[("message", &loaded), ("note", &note)])
 diff --git a/crates/ui-egui/src/canvas.rs b/crates/ui-egui/src/canvas.rs
-index 81e6c84685ddd1789995883cc8e9fe4d8e74a72e..159ce2196006eda5aaa5746f635df6bf53cccc17 100644
+index 81e6c84685ddd1789995883cc8e9fe4d8e74a72e..56040deacfabb07814ca3790b2256473e1ede15b 100644
 --- a/crates/ui-egui/src/canvas.rs
 +++ b/crates/ui-egui/src/canvas.rs
 @@ -2639,7 +2639,7 @@ fn start_screen(app: &mut PhotocraftApp, ui: &mut egui::Ui) {
@@ -49903,6 +49903,15 @@ index 81e6c84685ddd1789995883cc8e9fe4d8e74a72e..159ce2196006eda5aaa5746f635df6bf
                  let by = ui.painter().layout_no_wrap(tl!("open source").into(), egui::FontId::proportional(13.0), t.text_faint);
                  let total = title.size().x + by.size().x + 10.0;
                  ui.add_space(((card.width() - total) / 2.0).max(0.0));
+@@ -5594,7 +5594,7 @@ pub fn extra_windows(app: &mut PhotocraftApp, ctx: &egui::Context) {
+     let wins = app.ui.windows.clone();
+     for w in wins.into_iter().filter(|w| w.open) {
+         let Some(st) = app.session.documents().get(w.document) else { continue };
+-        let title = format!("{} — window {}", st.doc.name, w.id);
++        let title = format!("{} — window {} — Bogo Photo", st.doc.name, w.id);
+         let vid = egui::ViewportId::from_hash_of(("docwin", w.id));
+         let mut builder = egui::ViewportBuilder::default().with_title(title).with_inner_size([800.0, 600.0]);
+         if let Some([x, y]) = w.position {
 diff --git a/crates/ui-egui/src/chrome_ui.rs b/crates/ui-egui/src/chrome_ui.rs
 index 39b2072b507134aea1cd5377de6726d3e646fe6a..7e68a311f7781db348228d31645e0936122c0856 100644
 --- a/crates/ui-egui/src/chrome_ui.rs
@@ -52848,7 +52857,7 @@ index 60ae208808dc2297eb2f2d4706cc90d19dde6f14..2a96cc5d3fc35ff266b6dac21478180c
      assert_eq!(field(&h, "messageWarning"), json!(false), "an import clears the earlier shortcut conflict warning");
      // Nothing is applied until OK.
 diff --git a/crates/ui-egui/src/links.rs b/crates/ui-egui/src/links.rs
-index a318e1a29cd65e3c9c2d49e3606df7241ca35b7b..62ac98e0fe497955661d5603faa242d8420201a2 100644
+index a318e1a29cd65e3c9c2d49e3606df7241ca35b7b..763029c1b7bd228889d3eb95762fa8e6afc9d7d8 100644
 --- a/crates/ui-egui/src/links.rs
 +++ b/crates/ui-egui/src/links.rs
 @@ -41,11 +41,11 @@ pub fn discord_button(app: &mut PhotocraftApp, ui: &mut egui::Ui, min_width: f32
@@ -52865,6 +52874,15 @@ index a318e1a29cd65e3c9c2d49e3606df7241ca35b7b..62ac98e0fe497955661d5603faa242d8
      let font = egui::FontId::proportional(12.5);
      let sep = "  ·  ";
      let width: f32 = links.iter().map(|(l, _)| ui.painter().layout_no_wrap((*l).into(), font.clone(), t.text).size().x).sum::<f32>()
+@@ -58,7 +58,7 @@ pub fn link_row(app: &mut PhotocraftApp, ui: &mut egui::Ui) {
+             if i > 0 {
+                 ui.label(egui::RichText::new(sep).font(font.clone()).color(t.text_faint));
+             }
+-            if ui.link(egui::RichText::new(*label).font(font.clone()).color(t.accent)).on_hover_text(*url).clicked() {
++            if ui.link(egui::RichText::new(*label).font(font.clone()).color(t.text)).on_hover_text(*url).clicked() {
+                 clicked = Some(url);
+             }
+         }
 diff --git a/crates/ui-egui/src/menus.rs b/crates/ui-egui/src/menus.rs
 index b80bdd495381bbb9a755a85e42ac49c60be203b5..bd0c20af888816444c9fea2181dabfce67ccf1c3 100644
 --- a/crates/ui-egui/src/menus.rs

@@ -63163,6 +63163,19 @@ index c4d996afa208097ad09c4cb74691e32a6739d0fc..bcce523eed9eb1d7cf892df69fdd854f
              ui.add_space(4.0);
              ui.collapsing("Details", |ui| {
                  ui.label(RichText::new(&n.fault.message).color(t.text_dim).monospace());
+diff --git a/crates/ui-egui/src/canvas/blockedit.rs b/crates/ui-egui/src/canvas/blockedit.rs
+index d30d231400381427c17581b3953d3f59682f9cd4..e6f6ab1a94fce28ca816d2840d98ffb04929533e 100644
+--- a/crates/ui-egui/src/canvas/blockedit.rs
++++ b/crates/ui-egui/src/canvas/blockedit.rs
+@@ -45,7 +45,7 @@ pub(super) fn paint(app: &mut CadApp, ctx: &egui::Context, p: &egui::Painter, xf
+         |ui| {
+             egui::Frame::new().fill(t.cmd_bg).stroke(Stroke::new(1.0, t.accent)).corner_radius(4.0).inner_margin(6.0).show(ui, |ui| {
+                 ui.horizontal(|ui| {
+-                    ui.label(RichText::new(crate::tl!("Block Editor")).color(t.accent).strong());
++                    ui.label(RichText::new(crate::tl!("Block Editor")).color(t.text).strong());
+                     ui.label(RichText::new(&name).color(t.text));
+                     if unsaved {
+                         ui.label(RichText::new("●").color(t.warn)).on_hover_text(crate::tl!("Unsaved changes"));
 diff --git a/crates/ui-egui/src/chrome.rs b/crates/ui-egui/src/chrome.rs
 index 5f32799b48b49caad5384ef0e9a6c647e9a09b20..de2b7a4cd9e6750634bf56447b65b071af29e734 100644
 --- a/crates/ui-egui/src/chrome.rs
@@ -63349,6 +63362,19 @@ index 52da58a76457fc67b868071012536cfafe9a24b6..70bc5ad97b5f2ae96fdfc55be356e31c
  ];
  
  pub fn is_ui_command(id: &str) -> bool {
+diff --git a/crates/ui-egui/src/opening.rs b/crates/ui-egui/src/opening.rs
+index 4db230c5c02f5a0b6a31b82a058cc7f0684cfe8a..9beda4b0d0db07906a29279d1a4ec2c5d7260da1 100644
+--- a/crates/ui-egui/src/opening.rs
++++ b/crates/ui-egui/src/opening.rs
+@@ -89,7 +89,7 @@ impl Opening {
+                     .inner_margin(egui::Margin::symmetric(18, 12))
+                     .show(ui, |ui| {
+                         ui.horizontal(|ui| {
+-                            ui.add(egui::Spinner::new().color(t.accent));
++                            ui.add(egui::Spinner::new().color(t.text));
+                             ui.label(egui::RichText::new(label).color(t.text));
+                         });
+                     });
 diff --git a/crates/ui-egui/src/options/dialog.rs b/crates/ui-egui/src/options/dialog.rs
 index 717a31685935f2a071824bc7fed0eff298bc17e6..64bb630e60961f3e12ffc1b15c039da8842e4fb3 100644
 --- a/crates/ui-egui/src/options/dialog.rs
@@ -63362,8 +63388,34 @@ index 717a31685935f2a071824bc7fed0eff298bc17e6..64bb630e60961f3e12ffc1b15c039da8
      ));
      ui.add_space(8.0);
      ui.horizontal(|ui| {
+diff --git a/crates/ui-egui/src/palettes/quickcalc.rs b/crates/ui-egui/src/palettes/quickcalc.rs
+index e8102679346b3cfbe21d26864a6ca88cefb835cb..bf6eb57e73bbe94f3882fad85d413fb6ab96482c 100644
+--- a/crates/ui-egui/src/palettes/quickcalc.rs
++++ b/crates/ui-egui/src/palettes/quickcalc.rs
+@@ -264,9 +264,7 @@ pub fn show(app: &mut CadApp, ui: &mut egui::Ui) {
+                         reuse = Some(expr.clone());
+                     }
+                     ui.label(RichText::new("=").color(t.text_dim));
+-                    if ui
+-                        .add(egui::Label::new(RichText::new(result).font(crate::theme::mono()).color(t.accent)).sense(egui::Sense::click()))
+-                        .clicked()
++                    if ui.add(egui::Label::new(RichText::new(result).font(crate::theme::mono()).color(t.text)).sense(egui::Sense::click())).clicked()
+                     {
+                         reuse = Some(if result.contains(',') { format!("[{result}]") } else { result.clone() });
+                     }
+@@ -316,8 +314,8 @@ pub fn show(app: &mut CadApp, ui: &mut egui::Ui) {
+                     st.convert(app);
+                 }
+                 if !st.conv_result.is_empty() {
+-                    let r = ui
+-                        .add(egui::Label::new(RichText::new(&st.conv_result).font(crate::theme::mono()).color(t.accent)).sense(egui::Sense::click()));
++                    let r =
++                        ui.add(egui::Label::new(RichText::new(&st.conv_result).font(crate::theme::mono()).color(t.text)).sense(egui::Sense::click()));
+                     if r.clicked() {
+                         st.input.push_str(&st.conv_result);
+                     }
 diff --git a/crates/ui-egui/src/theme.rs b/crates/ui-egui/src/theme.rs
-index 9064b92e42b0ff0fa70f08a6d9c43e9222d85adc..0e424a58da63b20645fbcf5a006b68902bd8208e 100644
+index 9064b92e42b0ff0fa70f08a6d9c43e9222d85adc..1516946f12066c392067f7a052ad2ff1fbe5dd20 100644
 --- a/crates/ui-egui/src/theme.rs
 +++ b/crates/ui-egui/src/theme.rs
 @@ -128,27 +128,27 @@ pub struct Tokens {
@@ -63371,10 +63423,11 @@ index 9064b92e42b0ff0fa70f08a6d9c43e9222d85adc..0e424a58da63b20645fbcf5a006b6890
  impl Tokens {
      pub const DARK: Tokens = Tokens {
 -        chrome: Color32::from_rgb(0x3b, 0x44, 0x53),
-+        chrome: Color32::from_rgb(0xFF, 0xF3, 0xE8),
-         chrome_dark: Color32::from_rgb(0x31, 0x38, 0x44),
+-        chrome_dark: Color32::from_rgb(0x31, 0x38, 0x44),
 -        panel: Color32::from_rgb(0x3c, 0x44, 0x52),
 -        tab_active: Color32::from_rgb(0x4e, 0x5a, 0x6e),
++        chrome: Color32::from_rgb(0xFF, 0xF3, 0xE8),
++        chrome_dark: Color32::from_rgb(0xFF, 0xFA, 0xF6),
 +        panel: Color32::from_rgb(0xFF, 0xFA, 0xF6),
 +        tab_active: Color32::from_rgb(0xFF, 0xFA, 0xF6),
          control: Color32::from_rgb(0x50, 0x5a, 0x6d),
@@ -63407,24 +63460,35 @@ index 9064b92e42b0ff0fa70f08a6d9c43e9222d85adc..0e424a58da63b20645fbcf5a006b6890
          grip: Color32::from_rgb(0x2f, 0x6b, 0xff),
          grip_hot: Color32::from_rgb(0xff, 0x3b, 0x3b),
          grip_dyn: Color32::from_rgb(0x26, 0xc6, 0xe8),
-@@ -160,7 +160,7 @@ impl Tokens {
+@@ -158,15 +158,15 @@ impl Tokens {
+         compare_area: Color32::from_rgb(0xff, 0xb4, 0x3c),
+         window_stroke: Color32::from_rgb(0x6f, 0xa8, 0xff),
          crossing_stroke: Color32::from_rgb(0x7f, 0xe0, 0x7f),
-         cmd_bg: Color32::from_rgba_premultiplied(0x34, 0x3c, 0x4a, 0xf0),
+-        cmd_bg: Color32::from_rgba_premultiplied(0x34, 0x3c, 0x4a, 0xf0),
++        cmd_bg: Color32::from_rgb(0xFF, 0xFA, 0xF6),
          toggle_on: Color32::from_rgb(0x3d, 0x8b, 0xfd),
 -        field: Color32::from_rgb(0x31, 0x38, 0x44),
 +        field: Color32::from_rgb(0xFF, 0xFA, 0xF6),
          select_bg: Color32::from_rgb(0x3d, 0x8b, 0xfd),
          canvas_ink: Color32::from_rgb(0xa3, 0xaa, 0xb4),
          cmd_history: Color32::from_rgba_unmultiplied_const(0x2a, 0x30, 0x3a, 170),
-@@ -177,23 +177,23 @@ impl Tokens {
+         cmd_border: Color32::from_rgb(0x55, 0x5f, 0x70),
+         cmd_keyword: Color32::from_rgb(0x8f, 0xc1, 0xff),
+-        cmd_keyword_hover: Color32::from_rgb(0x2f, 0x5e, 0xa8),
++        cmd_keyword_hover: Color32::from_rgb(0xFF, 0xE7, 0xD4),
+         list_bg: Color32::from_rgb(0x2b, 0x31, 0x3b),
+         list_row: Color32::from_rgb(0x3a, 0x42, 0x50),
+         warn: Color32::from_rgb(0xff, 0xd0, 0x80),
+@@ -177,28 +177,28 @@ impl Tokens {
      /// Light grey chrome with dark text. The drawing-area colours (canvas, grid, axes, selection,
      /// grips, snap markers, selection windows) are the same as [`Tokens::DARK`]'s.
      pub const LIGHT: Tokens = Tokens {
 -        chrome: Color32::from_rgb(0xe4, 0xe7, 0xeb),
-+        chrome: Color32::from_rgb(0xFF, 0xF3, 0xE8),
-         chrome_dark: Color32::from_rgb(0xd5, 0xd9, 0xdf),
+-        chrome_dark: Color32::from_rgb(0xd5, 0xd9, 0xdf),
 -        panel: Color32::from_rgb(0xee, 0xf0, 0xf3),
 -        tab_active: Color32::from_rgb(0xc8, 0xd3, 0xe2),
++        chrome: Color32::from_rgb(0xFF, 0xF3, 0xE8),
++        chrome_dark: Color32::from_rgb(0xFF, 0xFA, 0xF6),
 +        panel: Color32::from_rgb(0xFF, 0xFA, 0xF6),
 +        tab_active: Color32::from_rgb(0xFF, 0xFA, 0xF6),
          control: Color32::from_rgb(0xdc, 0xe0, 0xe6),
@@ -63444,14 +63508,21 @@ index 9064b92e42b0ff0fa70f08a6d9c43e9222d85adc..0e424a58da63b20645fbcf5a006b6890
 +        icon_accent: Color32::from_rgb(0xFC, 0x75, 0x01),
          icon_point: Color32::from_rgb(0xd3, 0x5a, 0x1c),
 -        accent: Color32::from_rgb(0x2f, 0x7c, 0xf6),
+-        cmd_bg: Color32::from_rgba_unmultiplied_const(0xf9, 0xfa, 0xfb, 0xf0),
 +        accent: Color32::from_rgb(0xFC, 0x75, 0x01),
-         cmd_bg: Color32::from_rgba_unmultiplied_const(0xf9, 0xfa, 0xfb, 0xf0),
++        cmd_bg: Color32::from_rgb(0xFF, 0xFA, 0xF6),
          toggle_on: Color32::from_rgb(0x2f, 0x7c, 0xf6),
 -        field: Color32::from_rgb(0xff, 0xff, 0xff),
 +        field: Color32::from_rgb(0xFF, 0xFA, 0xF6),
          select_bg: Color32::from_rgb(0xb6, 0xd3, 0xfb),
          cmd_history: Color32::from_rgba_unmultiplied_const(0xf0, 0xf2, 0xf5, 0xdc),
          cmd_border: Color32::from_rgb(0xa9, 0xb0, 0xba),
+         cmd_keyword: Color32::from_rgb(0x15, 0x59, 0xc0),
+-        cmd_keyword_hover: Color32::from_rgb(0xcf, 0xe0, 0xfa),
++        cmd_keyword_hover: Color32::from_rgb(0xFF, 0xE7, 0xD4),
+         list_bg: Color32::from_rgb(0xfb, 0xfc, 0xfd),
+         list_row: Color32::from_rgb(0xe3, 0xe8, 0xef),
+         warn: Color32::from_rgb(0x8a, 0x53, 0x00),
 diff --git a/crates/ui-egui/src/viewcube.rs b/crates/ui-egui/src/viewcube.rs
 index e277674d61977b747feebf240ea549eec540c4c7..5f59ce29a31a25ace38490a575a3b568f42e5642 100644
 --- a/crates/ui-egui/src/viewcube.rs

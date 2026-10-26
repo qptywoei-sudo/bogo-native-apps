@@ -51179,7 +51179,7 @@ index 003b8a5a3554f16b6c4b13e906028c4a1b9ea58b..e83600b809c86643e656f3fa7ead517e
      ("M", Entry::Tab("Formulas")),
      ("A", Entry::Tab("Data")),
 diff --git a/crates/ui-egui/src/lib.rs b/crates/ui-egui/src/lib.rs
-index 9748943436571d0c28d2d9a79b5c3ab7c1909c0e..9c3282d0228ed0d368c70730860d482112f1a276 100644
+index 9748943436571d0c28d2d9a79b5c3ab7c1909c0e..4a50ea7227dfda24383c34307b8e6cf738e99356 100644
 --- a/crates/ui-egui/src/lib.rs
 +++ b/crates/ui-egui/src/lib.rs
 @@ -538,7 +538,7 @@ impl SheetApp {
@@ -51254,10 +51254,37 @@ index 9748943436571d0c28d2d9a79b5c3ab7c1909c0e..9c3282d0228ed0d368c70730860d4821
              }
              self.after_engine();
          }
+@@ -1160,7 +1160,7 @@ impl SheetApp {
+         if let Some(d) = self.session.active() {
+             let title = format!("{}{}", d.display_title(), if d.is_dirty() { " — Edited" } else { "" });
+             if self.grid.last_title.as_deref() != Some(title.as_str()) {
+-                ctx.send_viewport_cmd(egui::ViewportCommand::Title(title.clone()));
++                ctx.send_viewport_cmd(egui::ViewportCommand::Title(format!("{title} — Bogo Grid")));
+                 self.grid.last_title = Some(title);
+             }
+         }
 diff --git a/crates/ui-egui/src/ribbon.rs b/crates/ui-egui/src/ribbon.rs
-index 9e2fd0b017d54f22b21e3ba5636105ccd98df2c9..0c55921aef5a83118efddfcf50df06256f6aa7b6 100644
+index 9e2fd0b017d54f22b21e3ba5636105ccd98df2c9..0f0ebe409c7d391a8962be3314e52564c655814f 100644
 --- a/crates/ui-egui/src/ribbon.rs
 +++ b/crates/ui-egui/src/ribbon.rs
+@@ -38,7 +38,7 @@ const _: () = assert!(TITLE_CONTROL_H < TITLE_BAR_H, "title-bar controls keep a
+ pub fn title_bar(app: &mut SheetApp, ui: &mut Ui) {
+     let t = Tokens::get(ui.ctx());
+     let ch = TITLE_CONTROL_H;
+-    egui::Panel::top("title_bar").exact_size(TITLE_BAR_H).frame(egui::Frame::NONE.fill(t.window)).show(ui, |ui| {
++    egui::Panel::top("title_bar").exact_size(TITLE_BAR_H).frame(egui::Frame::NONE.fill(t.header_bg)).show(ui, |ui| {
+         let rect = ui.max_rect();
+         // Dragging the empty title area moves the window.
+         let bg = ui.interact(rect, ui.id().with("drag_title"), Sense::click_and_drag());
+@@ -258,7 +258,7 @@ pub fn show(app: &mut SheetApp, ui: &mut Ui) {
+ /// Excel's; the ribbon's tab and collapsed state are left as they were for when it closes.
+ fn file_menu(app: &mut SheetApp, ui: &mut Ui) {
+     let t = Tokens::get(ui.ctx());
+-    let label = egui::RichText::new(app.ui.language.tr("File")).font(theme::ui_font(13.5)).color(t.accent);
++    let label = egui::RichText::new(app.ui.language.tr("File")).font(theme::ui_font(13.5)).color(t.text);
+     let file = ui.add(egui::Button::new(label).frame(false).min_size(vec2(46.0, 30.0)));
+     if file.clicked() {
+         app.open_backstage(crate::backstage::Page::Home);
 @@ -1439,7 +1439,7 @@ fn insert(app: &mut SheetApp, ui: &mut Ui) {
              // in dialogs.rs) — otherwise the prior cell/range selection is left in place, and
              // Del right after inserting deletes the source data instead of the chart.
@@ -51285,6 +51312,19 @@ index 9e2fd0b017d54f22b21e3ba5636105ccd98df2c9..0c55921aef5a83118efddfcf50df0625
      control_keytip(app, ui, &__k, "about");
      if __k.clicked() {
          app.open_dialog("about", json!({}));
+diff --git a/crates/ui-egui/src/tabs.rs b/crates/ui-egui/src/tabs.rs
+index b77524bb962bbcdeab263105d60be5e4bf68ae0e..a652a94f2b03fc1937a96d802cace077977ac60b 100644
+--- a/crates/ui-egui/src/tabs.rs
++++ b/crates/ui-egui/src/tabs.rs
+@@ -146,7 +146,7 @@ pub fn sheet_tabs(app: &mut SheetApp, ui: &mut Ui) {
+                                         app.grid.renaming_tab = None;
+                                     }
+                                 } else {
+-                                    ui.painter().text(r.center(), Align2::CENTER_CENTER, &name, font, if active { t.accent } else { t.text });
++                                    ui.painter().text(r.center(), Align2::CENTER_CENTER, &name, font, t.text);
+                                 }
+                                 if resp.clicked() {
+                                     activate_sheet(app, i);
 diff --git a/crates/ui-egui/src/theme.rs b/crates/ui-egui/src/theme.rs
 index 485b9a2f3799cb09e7e6cfb9b2cff6794a226fa5..164248b6ef3553dfbe82a9aa9cba7a4a7a6658ef 100644
 --- a/crates/ui-egui/src/theme.rs

@@ -50961,7 +50961,7 @@ index 8506df4590df12606c98952f26b67a3bf4ffd0ce..e48023906eb40522e2f5a7cf532873ae
                  ui.hyperlink_to("Upstream SoundCraft project", "https://getartcraft.com/apps/soundcraft");
                  ui.hyperlink_to("Upstream SoundCraft community", "https://discord.gg/artcraft");
 diff --git a/crates/ui-egui/src/theme.rs b/crates/ui-egui/src/theme.rs
-index 0cf5b9bd60658e45a851b44703e65690967eeccb..1c2dd83cc3f76e75ce67363c1aab80e3ee1d92d0 100644
+index 0cf5b9bd60658e45a851b44703e65690967eeccb..fe356ad60721d97435d6f3b7bdd322710e73e433 100644
 --- a/crates/ui-egui/src/theme.rs
 +++ b/crates/ui-egui/src/theme.rs
 @@ -214,31 +214,31 @@ pub struct Tokens {
@@ -51058,7 +51058,7 @@ index 0cf5b9bd60658e45a851b44703e65690967eeccb..1c2dd83cc3f76e75ce67363c1aab80e3
          marker_text: Color32::from_rgb(236, 236, 236),
          playlist_lane: Color32::from_rgb(30, 30, 31),
          universe_bg: Color32::from_rgb(18, 18, 19),
-@@ -290,7 +290,7 @@ impl Tokens {
+@@ -290,40 +290,40 @@ impl Tokens {
          knob_bg: Color32::from_rgb(26, 26, 28),
          knob_ring: Color32::from_rgb(150, 150, 154),
          knob_pointer: Color32::from_rgb(230, 230, 230),
@@ -51066,8 +51066,10 @@ index 0cf5b9bd60658e45a851b44703e65690967eeccb..1c2dd83cc3f76e75ce67363c1aab80e3
 +        section_label: Color32::from_rgb(0x34, 0x2B, 0x26),
          slot_well: Color32::from_rgb(43, 43, 43),
          slot_empty: Color32::from_rgb(39, 39, 39),
-         slot_face: [Color32::from_rgb(92, 92, 92), Color32::from_rgb(75, 75, 75)],
-@@ -299,31 +299,31 @@ impl Tokens {
+-        slot_face: [Color32::from_rgb(92, 92, 92), Color32::from_rgb(75, 75, 75)],
++        slot_face: [Color32::from_rgb(0xFF, 0xFA, 0xF6); 2],
+         slot_bypassed: [Color32::from_rgb(66, 96, 146), Color32::from_rgb(50, 76, 120)],
+         slot_mark: Color32::from_rgb(159, 159, 159),
      };
  
      pub const LIGHT: Tokens = Tokens {
@@ -51161,7 +51163,7 @@ index 0cf5b9bd60658e45a851b44703e65690967eeccb..1c2dd83cc3f76e75ce67363c1aab80e3
          marker_text: Color32::from_rgb(24, 25, 28),
          playlist_lane: Color32::from_rgb(200, 202, 206),
          universe_bg: Color32::from_rgb(198, 200, 204),
-@@ -375,7 +375,7 @@ impl Tokens {
+@@ -375,10 +375,10 @@ impl Tokens {
          knob_bg: Color32::from_rgb(232, 233, 236),
          knob_ring: Color32::from_rgb(116, 120, 128),
          knob_pointer: Color32::from_rgb(30, 32, 38),
@@ -51169,7 +51171,47 @@ index 0cf5b9bd60658e45a851b44703e65690967eeccb..1c2dd83cc3f76e75ce67363c1aab80e3
 +        section_label: Color32::from_rgb(0x34, 0x2B, 0x26),
          slot_well: Color32::from_rgb(212, 214, 218),
          slot_empty: Color32::from_rgb(198, 200, 205),
-         slot_face: [Color32::from_rgb(244, 245, 247), Color32::from_rgb(214, 216, 220)],
+-        slot_face: [Color32::from_rgb(244, 245, 247), Color32::from_rgb(214, 216, 220)],
++        slot_face: [Color32::from_rgb(0xFF, 0xFA, 0xF6); 2],
+         slot_bypassed: [Color32::from_rgb(190, 210, 240), Color32::from_rgb(160, 186, 228)],
+         slot_mark: Color32::from_rgb(92, 95, 102),
+     };
+diff --git a/crates/ui-egui/src/toolbar.rs b/crates/ui-egui/src/toolbar.rs
+index 41d83ac4db2668e736ad7435fe154540b8df66d2..51ce5c04a43154059bf686826f942ba1def48726 100644
+--- a/crates/ui-egui/src/toolbar.rs
++++ b/crates/ui-egui/src/toolbar.rs
+@@ -228,7 +228,12 @@ fn counters(app: &mut SoundApp, ui: &mut Ui) {
+     let txt = fmt_pos(app, pos, main_fmt);
+     ui.painter().text(pos2(main_r.max.x - 18.0, main_r.center().y), Align2::RIGHT_CENTER, txt, mono(26.0), t.counter_text);
+     let resp = ui.interact(main_r, ui.id().with("main_counter"), Sense::click());
+-    icons::draw(ui.painter(), Rect::from_center_size(pos2(main_r.max.x - 9.0, main_r.center().y), vec2(10.0, 10.0)), "triangle_down", t.text_dim);
++    icons::draw(
++        ui.painter(),
++        Rect::from_center_size(pos2(main_r.max.x - 9.0, main_r.center().y), vec2(10.0, 10.0)),
++        "triangle_down",
++        t.counter_label,
++    );
+     egui::Popup::menu(&resp).show(|ui| {
+         for f in TimeFormat::ALL {
+             if ui.selectable_label(main_fmt == f, f.label()).clicked() {
+@@ -255,7 +260,7 @@ fn counters(app: &mut SoundApp, ui: &mut Ui) {
+     ui.painter().text(pos2(r.min.x + 150.0, y), Align2::RIGHT_CENTER, fmt_pos(app, pos, sub_fmt), mono(11.0), t.counter_text);
+     let st = if app.engine.is_dirty() { "modified" } else { "saved" };
+     let dev = app.player.as_ref().map_or("no audio engine", |p| if p.silent { "silent clock" } else { "audio on" });
+-    ui.painter().text(pos2(r.max.x - 8.0, y), Align2::RIGHT_CENTER, format!("{st} · {dev}"), regular(10.0), t.text_dim);
++    ui.painter().text(pos2(r.max.x - 8.0, y), Align2::RIGHT_CENTER, format!("{st} · {dev}"), regular(10.0), t.counter_label);
+ }
+ 
+ fn grid_nudge(app: &mut SoundApp, ui: &mut Ui) {
+@@ -283,7 +288,7 @@ fn grid_nudge(app: &mut SoundApp, ui: &mut Ui) {
+     let nresp = ui.interact(nr, ui.id().with("nudge_value"), Sense::click());
+     value_menu(app, &nresp, "view.nudge");
+     for rr in [gr, nr] {
+-        icons::draw(ui.painter(), Rect::from_center_size(pos2(rr.max.x - 6.0, rr.center().y), vec2(10.0, 10.0)), "triangle_down", t.text_dim);
++        icons::draw(ui.painter(), Rect::from_center_size(pos2(rr.max.x - 6.0, rr.center().y), vec2(10.0, 10.0)), "triangle_down", t.counter_label);
+     }
+ }
+ 
 diff --git a/packaging/freebsd/package.sh b/packaging/freebsd/package.sh
 index c9e611a1504cac2699bc6b9730d4e6719918edf1..5f6e60f675194b486ff43cc5c153cc9d9353da12 100755
 --- a/packaging/freebsd/package.sh

@@ -47788,6 +47788,19 @@ index 536384ab67be122bfe434968bb817d4c19dfd8dd..17f9a6441f348e3b98c58f9761a697f4
              false,
          ))
      } else if info.xfa == Some(pdfcraft_render::Xfa::Static) {
+diff --git a/crates/ui-egui/src/combine_ui.rs b/crates/ui-egui/src/combine_ui.rs
+index 467a040b9752efd830007e66fdcd11cfde1e5dac..cd48233b9e1acfad187eec94991e525ee8eb12c8 100644
+--- a/crates/ui-egui/src/combine_ui.rs
++++ b/crates/ui-egui/src/combine_ui.rs
+@@ -1542,7 +1542,7 @@ fn table_body(
+                                 ui.add(icons::image(icon, 15.0, colour));
+                                 if f.lock.is_some() {
+                                     let link =
+-                                        ui.add(egui::Link::new(egui::RichText::new(tl!("Unlock…")).color(t.accent))).on_hover_text(match f.lock {
++                                        ui.add(egui::Link::new(egui::RichText::new(tl!("Unlock…")).color(t.text))).on_hover_text(match f.lock {
+                                             Some(Lock::Permissions) => tl!("Enter the permissions password to allow combining"),
+                                             _ => tl!("Enter the password that opens it"),
+                                         });
 diff --git a/crates/ui-egui/src/content_ui.rs b/crates/ui-egui/src/content_ui.rs
 index 8d1426fa0fd8e20a15a8bb7b0759e6d61cffeeee..2c9a9d6e565178f40999f548f61ed1dd6e1afebd 100644
 --- a/crates/ui-egui/src/content_ui.rs

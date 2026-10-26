@@ -69,6 +69,19 @@ class BogoNativeIdentity(unittest.TestCase):
 
     def test_six_language_and_escaped_newline_labels_keep_correct_brand_case(self):
         self.assertEqual(brand.display('About\\nKIO Grid / KIO Launcher를 / KIO Effectについて / KIO Photo設定 / KIO CAD'), 'About\\nBogo Grid / Bogo Launcher를 / Bogo Effectについて / Bogo Photo設定 / Bogo CAD')
+        self.assertEqual(brand.display('KIO Wordu / KIO Wordi / KIO Wordban'), 'Bogo Wordu / Bogo Wordi / Bogo Wordban')
+
+    def test_launcher_bundles_every_editor_original_in_its_actual_program_list(self):
+        lock = bogo.load_lock('launcher')
+        files = {item['path']: item['after'] for item in lock['bogoOverlay']['files']}
+        originals = {r['id']: r['sha256'] for r in json.loads((ROOT / 'assets/bogo-program-icons/manifest.json').read_text())['items']}
+        for app in brand.NAMES:
+            if app == 'launcher':
+                continue
+            stem = 'figcraft' if app == 'ui' else app + 'craft'
+            path = 'assets/app-icons/' + stem + '.png'
+            self.assertIn(path, files)
+            self.assertEqual(files[path]['sha256'], originals[app])
 
     def test_msi_display_changes_keep_registry_keys_and_guid_inputs(self):
         old = '<Package Name="KIO Grid" Manufacturer="KIO" UpgradeCode="C670EFE0-1FE3-512C-84F0-9804B489A606"><RegistryValue Key="Software\\KIO Grid\\Capabilities" Name="ApplicationName" Value="KIO Grid"/><RegistryValue Key="Software\\RegisteredApplications" Name="KIO Grid" Value="Software\\KIO Grid\\Capabilities"/></Package>'

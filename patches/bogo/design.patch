@@ -52436,7 +52436,7 @@ index f6692c773c516d65fcac876134d6440c6832daf6..3e7a686de67eae0ebd5824595d266df6
                      if link(ui, text, links::get(key).unwrap_or_default(), t.accent) {
                          open = Some(key);
 diff --git a/crates/ui-egui/src/chrome.rs b/crates/ui-egui/src/chrome.rs
-index 967730af5e309819caf55cef3df4a6c8e33a7261..313e2c71e5dc7e34c214ccef852ca9b90b0eac91 100644
+index 967730af5e309819caf55cef3df4a6c8e33a7261..d0598f6881c4dabbe68ac92d5a26f297e2114d10 100644
 --- a/crates/ui-egui/src/chrome.rs
 +++ b/crates/ui-egui/src/chrome.rs
 @@ -139,8 +139,8 @@ pub fn app_bar(app: &mut DesignApp, ui: &mut egui::Ui) {
@@ -52459,7 +52459,7 @@ index 967730af5e309819caf55cef3df4a6c8e33a7261..313e2c71e5dc7e34c214ccef852ca9b9
              ));
              ui.label(crate::rtl::widget(
                  ui,
-@@ -766,7 +766,7 @@ fn community_card(app: &mut DesignApp, ui: &mut egui::Ui) {
+@@ -766,10 +766,10 @@ fn community_card(app: &mut DesignApp, ui: &mut egui::Ui) {
                  ));
                  ui.add_space(4.0);
                  ui.horizontal(|ui| {
@@ -52467,7 +52467,11 @@ index 967730af5e309819caf55cef3df4a6c8e33a7261..313e2c71e5dc7e34c214ccef852ca9b9
 +                    for (text, id) in [("Bogo Design page", "help.appPage"), ("GitHub", "help.github"), ("getartcraft.com", "help.website")] {
                          let url = designcraft_engine::links::get(&id[5..]).unwrap_or_default();
                          let l = ui
-                             .add(egui::Label::new(egui::RichText::new(text).size(12.0).color(t.accent).underline()).sense(Sense::click()))
+-                            .add(egui::Label::new(egui::RichText::new(text).size(12.0).color(t.accent).underline()).sense(Sense::click()))
++                            .add(egui::Label::new(egui::RichText::new(text).size(12.0).color(t.text).underline()).sense(Sense::click()))
+                             .on_hover_text(url)
+                             .on_hover_cursor(egui::CursorIcon::PointingHand);
+                         if l.clicked() {
 diff --git a/crates/ui-egui/src/i18n.rs b/crates/ui-egui/src/i18n.rs
 index d010e7dc8f47f2d8b4f64a3735b8b22a1a62e6b9..cde75ca613acc525e2f62f1b0a4bd596154e2d08 100644
 --- a/crates/ui-egui/src/i18n.rs
@@ -52714,6 +52718,19 @@ index 76f7a38b1636a8b903352aa13621699ff6b025a3..ebaf0791e9f689d40d6c4c064ec92bdd
      ("When Scaling", "Під час масштабування"),
      ("[Basic] (working) ▾", "[Основний] (робочий) ▾"),
      ("[Black] Overprint", "Накладання [Чорного]"),
+diff --git a/crates/ui-egui/src/lib.rs b/crates/ui-egui/src/lib.rs
+index 1db2f591d6c444f8a80f2c519e5c0019acaf1f0c..9cc5e319cc926f84b5ee466e714acdbc6c9b6fc2 100644
+--- a/crates/ui-egui/src/lib.rs
++++ b/crates/ui-egui/src/lib.rs
+@@ -1251,7 +1251,7 @@ impl DesignApp {
+         // New Window: pane 1 in a window of its own.
+         if self.second_window
+             && !presenting
+-            && let Some(title) = self.session.active().map(|d| format!("{} — 2", d.doc.title))
++            && let Some(title) = self.session.active().map(|d| format!("{} — 2 — Bogo Design", d.doc.title))
+         {
+             let fill = t.pasteboard;
+             let ctx = ui.ctx().clone();
 diff --git a/crates/ui-egui/src/menus.rs b/crates/ui-egui/src/menus.rs
 index 82a659a53b2754e392e6ecc36b22ffb41216f9d7..d1e071fe239ebcfd08fed3a42f57b733f4c42559 100644
 --- a/crates/ui-egui/src/menus.rs

@@ -50268,7 +50268,7 @@ zHle3un3g{xyR9%Jba-#ym1~a<bsyT7gv)04o6R693M^KQrdSEiC(M~?QDDG>;&q_w
 u_{$u70KNW&i2eWNfeqk)HWHW5>?gP>g5F&tx@a7doLg3Rf3Cmonfz}xTliA|
 
 diff --git a/crates/ui-egui/src/backstage.rs b/crates/ui-egui/src/backstage.rs
-index b5ed06306963b7e3b74710655c7c52c3300f29db..1a61b467e759499979fed3d0dd29938da6e42be9 100644
+index b5ed06306963b7e3b74710655c7c52c3300f29db..b30228580d8b37677311f9d00f2b5e686283dc29 100644
 --- a/crates/ui-egui/src/backstage.rs
 +++ b/crates/ui-egui/src/backstage.rs
 @@ -208,7 +208,7 @@ impl Backstage {
@@ -50280,6 +50280,15 @@ index b5ed06306963b7e3b74710655c7c52c3300f29db..1a61b467e759499979fed3d0dd29938d
      ("pdf", "PDF (*.pdf)", "A fixed copy that keeps its layout on any device"),
      ("outline", "Outline (*.txt)", "The slide titles and bullet text as plain text"),
      ("png", "PNG Picture (*.png)", "The current slide as a picture"),
+@@ -460,7 +460,7 @@ fn dim(ui: &mut Ui, text: &str) {
+ /// A link with an arrow (More themes →): true when clicked.
+ fn arrow_link(ui: &mut Ui, text: &str) -> bool {
+     let t = Tokens::get(ui.ctx());
+-    ui.add(egui::Label::new(RichText::new(format!("{text}  →")).font(theme::font(12.5)).color(t.accent)).sense(Sense::click()))
++    ui.add(egui::Label::new(RichText::new(format!("{text}  →")).font(theme::font(12.5)).color(t.text)).sense(Sense::click()))
+         .on_hover_cursor(egui::CursorIcon::PointingHand)
+         .clicked()
+ }
 @@ -634,7 +634,7 @@ fn home(app: &mut SlideApp, ui: &mut Ui, bs: &mut Backstage, out: &mut Outcome)
      ui.horizontal(|ui| {
          let (r, _) = ui.allocate_exact_size(vec2(36.0, 36.0), Sense::hover());
@@ -50289,6 +50298,15 @@ index b5ed06306963b7e3b74710655c7c52c3300f29db..1a61b467e759499979fed3d0dd29938d
      });
      ui.add_space(18.0);
      ui.horizontal(|ui| {
+@@ -732,7 +732,7 @@ fn info(app: &mut SlideApp, ui: &mut Ui, bs: &mut Backstage) {
+     let path = v.get("path").and_then(Value::as_str).map(str::to_string);
+     let title = v.get("title").and_then(Value::as_str).unwrap_or("").to_string();
+     let dirty = v.get("dirty").and_then(Value::as_bool).unwrap_or(false);
+-    ui.label(RichText::new(&title).font(theme::font(24.0)).color(t.accent));
++    ui.label(RichText::new(&title).font(theme::font(24.0)).color(t.text));
+     match &path {
+         Some(p) => dim(ui, p),
+         None => dim(ui, "Not saved yet"),
 @@ -925,9 +925,9 @@ fn print(app: &mut SlideApp, ui: &mut Ui, bs: &mut Backstage) {
              dim(
                  ui,
@@ -50450,6 +50468,19 @@ index aeb3299ed14a04a2e7a324d459798c9d006c3443..20466595bfdb1400bd903a2124779daa
          |ui, _| {
              egui::CentralPanel::default().frame(egui::Frame::NONE.fill(Color32::from_gray(24)).inner_margin(egui::Margin::same(16))).show(ui, |ui| {
                  ui.horizontal(|ui| {
+diff --git a/crates/ui-egui/src/status.rs b/crates/ui-egui/src/status.rs
+index 8e915b7199355279111810999aa14acee1b8c46f..7d2dc5102410aab75e72f294fc9a3517f7d70b36 100644
+--- a/crates/ui-egui/src/status.rs
++++ b/crates/ui-egui/src/status.rs
+@@ -24,7 +24,7 @@ pub fn status_bar(app: &mut SlideApp, ui: &mut Ui) {
+         // Transient status message.
+         if let Some((msg, at)) = app.status.clone() {
+             if crate::now_ms() - at < 6000.0 {
+-                p.text(pos2(rect.min.x + 290.0, rect.center().y), Align2::LEFT_CENTER, &msg, theme::font(12.0), t.accent);
++                p.text(pos2(rect.min.x + 290.0, rect.center().y), Align2::LEFT_CENTER, &msg, theme::font(12.0), t.text);
+                 ui.ctx().request_repaint_after(std::time::Duration::from_millis(500));
+             } else {
+                 app.status = None;
 diff --git a/crates/ui-egui/src/theme.rs b/crates/ui-egui/src/theme.rs
 index 1847d47f1ef5688057920243938ba10c225463c3..fd21cc0c300228a7dab1edebac0dcd31b409c58e 100644
 --- a/crates/ui-egui/src/theme.rs

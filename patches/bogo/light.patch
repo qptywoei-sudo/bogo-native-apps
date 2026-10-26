@@ -260,7 +260,7 @@ index 6f2a992811ea10efabd0537cfe1125372eabdd06..d204461ea1b2fdbc6fa9bee2fb6f4519
 +    }
 +}
 diff --git a/apps/lightcraft/src/main.rs b/apps/lightcraft/src/main.rs
-index 17a486e96dbabcc9ef2c1f4ab9181ebd473da9bc..608892210f7f978c5d19443c9185dd55ea145861 100644
+index 17a486e96dbabcc9ef2c1f4ab9181ebd473da9bc..7f508c8cbbf9f9d16c3804f13e3ceb8d6909962a 100644
 --- a/apps/lightcraft/src/main.rs
 +++ b/apps/lightcraft/src/main.rs
 @@ -564,7 +564,7 @@ fn services(cc: &eframe::CreationContext<'_>, log_file: Option<&std::path::Path>
@@ -272,6 +272,24 @@ index 17a486e96dbabcc9ef2c1f4ab9181ebd473da9bc..608892210f7f978c5d19443c9185dd55
                  .set_file_name(name)
                  .save_file()
                  .map(|p| p.to_string_lossy().to_string())
+@@ -820,7 +820,7 @@ fn main() -> eframe::Result {
+     let options = eframe::NativeOptions {
+         renderer,
+         viewport: egui::ViewportBuilder::default()
+-            .with_title("LightCraft")
++            .with_title("Bogo Light")
+             .with_inner_size([1600.0, 1000.0])
+             .with_min_inner_size([900.0, 560.0])
+             .with_drag_and_drop(true)
+@@ -849,7 +849,7 @@ fn main() -> eframe::Result {
+     }
+     let started = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+         eframe::run_native(
+-            "LightCraft",
++            "Bogo Light",
+             options,
+             Box::new(move |cc| {
+                 // the window's renderer is up (eframe calls this after creating it)
 diff --git a/apps/lightcraft/src/native_menu.rs b/apps/lightcraft/src/native_menu.rs
 index 7add4fd0d6e6326738c90d0125f2edd19fe19981..174b507ce95407132ac3a7b5042c949a944a00cc 100644
 --- a/apps/lightcraft/src/native_menu.rs
@@ -51818,10 +51836,32 @@ index db412d8e055d7c78e6c6e0b1972593b9df315aae..778ff3930a6e053df09c46d260209653
                      match crate::pick::ask(app, id, p, "path", req, |s| s.save_preset_file.as_mut().map(|f| f(&name).into_iter().collect())) {
                          Picked::Now(v) => v.into_iter().next(),
                          Picked::Later => return Some(Ok(Value::Null)),
+diff --git a/crates/ui-egui/src/panels/activity.rs b/crates/ui-egui/src/panels/activity.rs
+index 7b0d449c699cde3ffbb98daf2c4461bb6ce12cc4..58f1680cd24d0f1cd9cfb6bd1751a2d636b0f34e 100644
+--- a/crates/ui-egui/src/panels/activity.rs
++++ b/crates/ui-egui/src/panels/activity.rs
+@@ -95,7 +95,7 @@ pub fn show(app: &mut LightcraftApp, ctx: &egui::Context) {
+             if hidden > 0 || (app.activity_expanded && tasks.len() > MAX_ROWS) {
+                 ui.add_space(4.0);
+                 let text = if hidden > 0 { tr_format!("+{n} more", n = hidden) } else { tr("Show less").to_string() };
+-                let r = ui.add(egui::Label::new(RichText::new(text).font(t.font(11.0)).color(t.accent)).sense(Sense::click()));
++                let r = ui.add(egui::Label::new(RichText::new(text).font(t.font(11.0)).color(t.text)).sense(Sense::click()));
+                 register(ui.ctx(), "activity:more", r.rect);
+                 toggle = r.clicked();
+             }
 diff --git a/crates/ui-egui/src/panels/denoise.rs b/crates/ui-egui/src/panels/denoise.rs
-index 18274f53ddbc1274a968cf8390c81331be9e5e8e..f4a07df5c836050653b5eb6d32d4f63958c6e9db 100644
+index 18274f53ddbc1274a968cf8390c81331be9e5e8e..9ad4b2235b247effe694c06173c0e665a7f977c1 100644
 --- a/crates/ui-egui/src/panels/denoise.rs
 +++ b/crates/ui-egui/src/panels/denoise.rs
+@@ -416,7 +416,7 @@ fn model_row(app: &mut LightcraftApp, ui: &mut egui::Ui, t: &Tokens, m: &Value,
+                         ui.label(RichText::new(size).color(t.text_dim));
+                     }
+                     if selected {
+-                        ui.label(RichText::new(tr("in use")).color(t.accent));
++                        ui.label(RichText::new(tr("in use")).color(t.text));
+                     } else if installed {
+                         ui.label(RichText::new(tr("installed")).color(t.text_dim));
+                     }
 @@ -662,7 +662,7 @@ pub fn model_dialog(app: &mut LightcraftApp, ui: &mut egui::Ui, t: &Tokens, info
          ui.add(
              egui::Label::new(
@@ -51898,10 +51938,32 @@ index 20bade39054f04f5334743b5badbe5396f20f333..1fa535729f466f3f14597fa37bfd4248
          ))
          .color(t.text_label),
      );
+diff --git a/crates/ui-egui/src/panels/edit.rs b/crates/ui-egui/src/panels/edit.rs
+index 533354b6c56accd351567aa6cd4a96446b671409..52ee119c034995bf29a047f886db574569667258 100644
+--- a/crates/ui-egui/src/panels/edit.rs
++++ b/crates/ui-egui/src/panels/edit.rs
+@@ -144,7 +144,7 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId) {
+     if app.session.auto_sync && n > 1 {
+         egui::Frame::NONE.inner_margin(egui::Margin { left: 24, right: 22, top: 0, bottom: 10 }).show(ui, |ui| {
+             ui.horizontal(|ui| {
+-                ui.label(egui::RichText::new(crate::i18n::tr_format!("Auto Sync: edits apply to {n} photos", n = n)).color(t.accent).size(12.0));
++                ui.label(egui::RichText::new(crate::i18n::tr_format!("Auto Sync: edits apply to {n} photos", n = n)).color(t.text).size(12.0));
+                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                     if text_button(ui, "autoSyncOff", crate::i18n::tr("Turn Off"), false).clicked() {
+                         let _ = app.run("develop.autoSync", json!({"on": false}));
 diff --git a/crates/ui-egui/src/panels/faces.rs b/crates/ui-egui/src/panels/faces.rs
-index 0b151fc5e41e90041b45ed8e2871e82e0c2809e5..e289f4d08de51b3783dbd0349776afd305b92dad 100644
+index 0b151fc5e41e90041b45ed8e2871e82e0c2809e5..3cd4acb512a276985a6849a47dcd0ba615ebcb56 100644
 --- a/crates/ui-egui/src/panels/faces.rs
 +++ b/crates/ui-egui/src/panels/faces.rs
+@@ -293,7 +293,7 @@ fn model_row(app: &mut LightcraftApp, ui: &mut egui::Ui, t: &Tokens, m: &Value,
+                         ui.label(RichText::new(size).color(t.text_dim));
+                     }
+                     if selected {
+-                        ui.label(RichText::new("in use").color(t.accent));
++                        ui.label(RichText::new("in use").color(t.text));
+                     } else if installed {
+                         ui.label(RichText::new("installed").color(t.text_dim));
+                     }
 @@ -406,7 +406,7 @@ pub fn model_dialog(app: &mut LightcraftApp, ui: &mut egui::Ui, t: &Tokens, info
          ui.label(RichText::new("This file cannot be used yet").font(t.semibold(13.5)).color(t.caution));
          ui.add(
@@ -51941,6 +52003,46 @@ index 0b151fc5e41e90041b45ed8e2871e82e0c2809e5..e289f4d08de51b3783dbd0349776afd3
      };
      ui.label(RichText::new(closing).font(t.font(11.5)).color(t.text_dim));
  }
+@@ -634,7 +634,7 @@ pub fn name_editor(
+                 }
+             }
+             if let Some(label) = setup.short() {
+-                let b = ui.add(egui::Button::new(RichText::new(label).font(t.font(12.0)).color(t.accent)).frame(false));
++                let b = ui.add(egui::Button::new(RichText::new(label).font(t.font(12.0)).color(t.text)).frame(false));
+                 register(ui.ctx(), "faces:setup", b.rect);
+                 if b.clicked() {
+                     outcome = Editor::Setup;
+diff --git a/crates/ui-egui/src/panels/grid.rs b/crates/ui-egui/src/panels/grid.rs
+index 52edfa460c240ea839fd0ff39aed7c63abb47b52..d181c8c9f218d97473ae9ef118d3010c2e92c207 100644
+--- a/crates/ui-egui/src/panels/grid.rs
++++ b/crates/ui-egui/src/panels/grid.rs
+@@ -153,7 +153,7 @@ fn show_inner(app: &mut LightcraftApp, ui: &mut egui::Ui) {
+         }
+         None => {
+             let (hr, _) = ui.allocate_exact_size(vec2(ui.available_width(), 44.0), Sense::hover());
+-            ui.painter().rect_filled(hr, 0.0, t.canvas);
++            ui.painter().rect_filled(hr, 0.0, t.chrome);
+             let full = crate::i18n::source_title(&app.session);
+             let count_w = ui.painter().layout_no_wrap(cnt.clone(), t.font(12.5), t.text_dim).size().x;
+             // the title gives way to the count: a long album or folder name is trimmed, in full on hover
+@@ -463,7 +463,7 @@ fn group_header(app: &mut LightcraftApp, ui: &mut egui::Ui, run: &DateRun, ids:
+     }
+     let p = ui.painter();
+     if pinned {
+-        p.rect_filled(r, 0.0, t.canvas);
++        p.rect_filled(r, 0.0, t.chrome);
+         p.hline(r.x_range(), r.bottom(), Stroke::new(1.0, t.divider));
+     }
+     let g = p.layout_no_wrap(crate::i18n::date_group_label(&run.key, false), t.semibold(15.0), if resp.hovered() { t.text } else { t.text_label });
+@@ -752,7 +752,7 @@ fn folder_header(app: &mut LightcraftApp, ui: &mut egui::Ui, b: &lightcraft_engi
+     let t = Tokens::get(ui.ctx());
+     // The path/count and actions need independent rows. The frame reserves the actual height,
+     // including any wrapped actions, so the grid below never paints under the header.
+-    let header = egui::Frame::NONE.fill(t.canvas).inner_margin(egui::Margin::symmetric(16, 6)).show(ui, |ui| {
++    let header = egui::Frame::NONE.fill(t.chrome).inner_margin(egui::Margin::symmetric(16, 6)).show(ui, |ui| {
+         ui.set_width(ui.available_width());
+         ui.horizontal(|ui| {
+             ui.spacing_mut().item_spacing.x = 8.0;
 diff --git a/crates/ui-egui/src/panels/library_problem.rs b/crates/ui-egui/src/panels/library_problem.rs
 index 77a36ac85c15420efe16f8731aff9d8ca9cd5da9..910c33a3a6d68889251c4d70bc70bc0c693370dc 100644
 --- a/crates/ui-egui/src/panels/library_problem.rs
@@ -51984,7 +52086,7 @@ index 6798bde139c1ca2aff355223c2ceb274b695f64c..25a8b25f52410529c985a9db06ea5019
          // (without native windows — web, headless — egui wraps this in a floating window)
          egui::CentralPanel::default().frame(egui::Frame::NONE.fill(Color32::BLACK)).show(ctx, |ui| body(app, ui));
 diff --git a/crates/ui-egui/src/panels/settings.rs b/crates/ui-egui/src/panels/settings.rs
-index 59010aa6434a6dae4f7c704a73468f1b1090706a..f1ae986011e930063df99ff066670f76415f3812 100644
+index 59010aa6434a6dae4f7c704a73468f1b1090706a..e9b68847dd6ad7a13986b1fa4422ddb6c77b6e96 100644
 --- a/crates/ui-egui/src/panels/settings.rs
 +++ b/crates/ui-egui/src/panels/settings.rs
 @@ -238,7 +238,7 @@ fn import_tab(app: &mut LightcraftApp, ui: &mut egui::Ui, t: &Tokens) {
@@ -52023,6 +52125,15 @@ index 59010aa6434a6dae4f7c704a73468f1b1090706a..f1ae986011e930063df99ff066670f76
      }
  }
  
+@@ -715,7 +715,7 @@ fn theme_card<V: PartialEq + Copy>(
+                 ui.horizontal(|ui| {
+                     ui.label(RichText::new(crate::i18n::tr(title)).font(t.semibold(12.0)).color(t.text));
+                     if active {
+-                        ui.label(RichText::new(crate::i18n::tr("In Use")).size(11.0).color(t.accent));
++                        ui.label(RichText::new(crate::i18n::tr("In Use")).size(11.0).color(t.text));
+                     }
+                 });
+                 let shown = options.iter().find(|(v, _)| v == value).or(options.first()).map(|(_, k)| *k).unwrap_or_default();
 diff --git a/crates/ui-egui/src/state.rs b/crates/ui-egui/src/state.rs
 index 9a8d07bef3697aa5d2abb812e33aa4f64648bd5e..b0b989bac9926cb9e8e479a61b3ed80bb594f5b3 100644
 --- a/crates/ui-egui/src/state.rs
@@ -52089,7 +52200,7 @@ index 5c4a730a64d1515b2239b3613f405c61bcf07ef7..268333c60681d43bc146e5b90e05018b
  }
  
 diff --git a/crates/ui-egui/src/theme.rs b/crates/ui-egui/src/theme.rs
-index 282f9c70ef21306ad5df6508b9f95c4829a26077..cecd2dbef95597835d35e7b30e9b09179682968d 100644
+index 282f9c70ef21306ad5df6508b9f95c4829a26077..a9a29e809d9807a07a6d09fb55c878bed197d9d5 100644
 --- a/crates/ui-egui/src/theme.rs
 +++ b/crates/ui-egui/src/theme.rs
 @@ -120,29 +120,29 @@ impl ThemeKind {
@@ -52100,7 +52211,7 @@ index 282f9c70ef21306ad5df6508b9f95c4829a26077..cecd2dbef95597835d35e7b30e9b0917
 +            chrome: Color32::from_rgb(0xFF, 0xF3, 0xE8),
              canvas: Color32::from_rgb(0x1c, 0x1c, 0x1c),
              grid_bg: Color32::from_rgb(0x0f, 0x0f, 0x0f),
-             cell: Color32::from_rgb(0x1c, 0x1c, 0x1c),
+-            cell: Color32::from_rgb(0x1c, 0x1c, 0x1c),
 -            cell_selected: Color32::from_rgb(0x2d, 0x2d, 0x2d),
 -            divider: Color32::from_rgb(0x1c, 0x1c, 0x1c),
 -            inset: Color32::from_rgb(0x23, 0x23, 0x23),
@@ -52116,6 +52227,7 @@ index 282f9c70ef21306ad5df6508b9f95c4829a26077..cecd2dbef95597835d35e7b30e9b0917
 -            text_dim: Color32::from_rgb(0x8e, 0x8e, 0x8e),
 -            text_disabled: Color32::from_rgb(0x5c, 0x5c, 0x5c),
 -            icon: Color32::from_rgb(0x9a, 0x9a, 0x9a),
++            cell: Color32::from_rgb(0xFF, 0xFA, 0xF6),
 +            cell_selected: Color32::from_rgb(0xFF, 0xE7, 0xD4),
 +            divider: Color32::from_rgb(0xF1, 0xD3, 0xBD),
 +            inset: Color32::from_rgb(0xFF, 0xFA, 0xF6),
@@ -52139,6 +52251,131 @@ index 282f9c70ef21306ad5df6508b9f95c4829a26077..cecd2dbef95597835d35e7b30e9b0917
              star: Color32::from_rgb(0xd8, 0xd8, 0xd8),
              pick: Color32::from_rgb(0xf0, 0xf0, 0xf0),
              reject: Color32::from_rgb(0xe0, 0x4a, 0x4a),
+@@ -167,46 +167,46 @@ impl Tokens {
+         match kind {
+             ThemeKind::Charcoal => base,
+             ThemeKind::Midnight => Tokens {
+-                chrome: rgb(0x1e1e1e),
++                chrome: Color32::from_rgb(0xFF, 0xF3, 0xE8),
+                 canvas: rgb(0x121212),
+                 grid_bg: rgb(0x080808),
+-                cell: rgb(0x121212),
+-                cell_selected: rgb(0x262626),
+-                divider: rgb(0x0e0e0e),
+-                inset: rgb(0x181818),
+-                field: rgb(0x161616),
+-                field_border: rgb(0x333333),
+-                button: rgb(0x191919),
+-                button_border: rgb(0x404040),
+-                hover: rgb(0x2e2e2e),
+-                pressed: rgb(0x343434),
+-                tool_active: rgb(0x343434),
++                cell: Color32::from_rgb(0xFF, 0xFA, 0xF6),
++                cell_selected: Color32::from_rgb(0xFF, 0xE7, 0xD4),
++                divider: Color32::from_rgb(0xF1, 0xD3, 0xBD),
++                inset: Color32::from_rgb(0xFF, 0xFA, 0xF6),
++                field: Color32::from_rgb(0xFF, 0xFA, 0xF6),
++                field_border: Color32::from_rgb(0xF1, 0xD3, 0xBD),
++                button: Color32::from_rgb(0xFF, 0xFA, 0xF6),
++                button_border: Color32::from_rgb(0xF1, 0xD3, 0xBD),
++                hover: Color32::from_rgb(0xFF, 0xE7, 0xD4),
++                pressed: Color32::from_rgb(0xFF, 0xE7, 0xD4),
++                tool_active: Color32::from_rgb(0xFF, 0xE7, 0xD4),
+                 ..base
+             },
+             ThemeKind::Silver => Tokens {
+-                chrome: rgb(0xe6e6e6),
++                chrome: Color32::from_rgb(0xFF, 0xF3, 0xE8),
+                 canvas: rgb(0xcfcfcf),
+                 grid_bg: rgb(0xd9d9d9),
+-                cell: rgb(0xcbcbcb),
+-                cell_selected: rgb(0xb4b4b4),
+-                divider: rgb(0xc4c4c4),
+-                inset: rgb(0xdcdcdc),
+-                field: rgb(0xf6f6f6),
+-                field_border: rgb(0xb8b8b8),
+-                button: rgb(0xf2f2f2),
+-                button_border: rgb(0xb0b0b0),
+-                hover: rgb(0xd2d2d2),
+-                pressed: rgb(0xc4c4c4),
+-                tool_active: rgb(0xcacaca),
+-                text: rgb(0x1c1c1c),
+-                text_label: rgb(0x383838),
+-                text_dim: rgb(0x6a6a6a),
+-                text_disabled: rgb(0xa2a2a2),
+-                icon: rgb(0x555555),
++                cell: Color32::from_rgb(0xFF, 0xFA, 0xF6),
++                cell_selected: Color32::from_rgb(0xFF, 0xE7, 0xD4),
++                divider: Color32::from_rgb(0xF1, 0xD3, 0xBD),
++                inset: Color32::from_rgb(0xFF, 0xFA, 0xF6),
++                field: Color32::from_rgb(0xFF, 0xFA, 0xF6),
++                field_border: Color32::from_rgb(0xF1, 0xD3, 0xBD),
++                button: Color32::from_rgb(0xFF, 0xFA, 0xF6),
++                button_border: Color32::from_rgb(0xF1, 0xD3, 0xBD),
++                hover: Color32::from_rgb(0xFF, 0xE7, 0xD4),
++                pressed: Color32::from_rgb(0xFF, 0xE7, 0xD4),
++                tool_active: Color32::from_rgb(0xFF, 0xE7, 0xD4),
++                text: Color32::from_rgb(0x34, 0x2B, 0x26),
++                text_label: Color32::from_rgb(0x34, 0x2B, 0x26),
++                text_dim: Color32::from_rgb(0x34, 0x2B, 0x26),
++                text_disabled: Color32::from_rgb(0x34, 0x2B, 0x26),
++                icon: Color32::from_rgb(0x34, 0x2B, 0x26),
+                 track: rgb(0xa8a8a8),
+                 thumb: rgb(0x5e5e5e),
+                 thumb_hover: rgb(0x262626),
+-                accent: rgb(0x0a62d0),
++                accent: Color32::from_rgb(0xFC, 0x75, 0x01),
+                 star: rgb(0x3a3a3a),
+                 pick: rgb(0x2a2a2a),
+                 reject: rgb(0xc83434),
+@@ -214,29 +214,29 @@ impl Tokens {
+                 ..base
+             },
+             ThemeKind::Paper => Tokens {
+-                chrome: rgb(0xfafafa),
++                chrome: Color32::from_rgb(0xFF, 0xF3, 0xE8),
+                 canvas: rgb(0xececec),
+                 grid_bg: rgb(0xf2f2f2),
+-                cell: rgb(0xe8e8e8),
+-                cell_selected: rgb(0xd2d2d2),
+-                divider: rgb(0xe0e0e0),
+-                inset: rgb(0xf0f0f0),
+-                field: rgb(0xffffff),
+-                field_border: rgb(0xcccccc),
+-                button: rgb(0xffffff),
+-                button_border: rgb(0xc6c6c6),
+-                hover: rgb(0xebebeb),
+-                pressed: rgb(0xdedede),
+-                tool_active: rgb(0xe2e2e2),
+-                text: rgb(0x161616),
+-                text_label: rgb(0x343434),
+-                text_dim: rgb(0x707070),
+-                text_disabled: rgb(0xababab),
+-                icon: rgb(0x585858),
++                cell: Color32::from_rgb(0xFF, 0xFA, 0xF6),
++                cell_selected: Color32::from_rgb(0xFF, 0xE7, 0xD4),
++                divider: Color32::from_rgb(0xF1, 0xD3, 0xBD),
++                inset: Color32::from_rgb(0xFF, 0xFA, 0xF6),
++                field: Color32::from_rgb(0xFF, 0xFA, 0xF6),
++                field_border: Color32::from_rgb(0xF1, 0xD3, 0xBD),
++                button: Color32::from_rgb(0xFF, 0xFA, 0xF6),
++                button_border: Color32::from_rgb(0xF1, 0xD3, 0xBD),
++                hover: Color32::from_rgb(0xFF, 0xE7, 0xD4),
++                pressed: Color32::from_rgb(0xFF, 0xE7, 0xD4),
++                tool_active: Color32::from_rgb(0xFF, 0xE7, 0xD4),
++                text: Color32::from_rgb(0x34, 0x2B, 0x26),
++                text_label: Color32::from_rgb(0x34, 0x2B, 0x26),
++                text_dim: Color32::from_rgb(0x34, 0x2B, 0x26),
++                text_disabled: Color32::from_rgb(0x34, 0x2B, 0x26),
++                icon: Color32::from_rgb(0x34, 0x2B, 0x26),
+                 track: rgb(0xbdbdbd),
+                 thumb: rgb(0x606060),
+                 thumb_hover: rgb(0x202020),
+-                accent: rgb(0x0a62d0),
++                accent: Color32::from_rgb(0xFC, 0x75, 0x01),
+                 star: rgb(0x3a3a3a),
+                 pick: rgb(0x2a2a2a),
+                 reject: rgb(0xc83434),
 diff --git a/crates/ui-egui/src/widgets.rs b/crates/ui-egui/src/widgets.rs
 index 1972e346f2b87ad9e74fb80ef8564cd0712f9935..dfa664b18ca9fab10fd88ec29c070aad160ddc29 100644
 --- a/crates/ui-egui/src/widgets.rs

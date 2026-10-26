@@ -59370,6 +59370,19 @@ index 8c804f6b1c82cdbd789a8fcb1d8ec27293895a43..8bb4a0ad330792529ec818bdf26cbec0
          ] {
              if crate::right::menu_item(ui, l, crate::shortcuts::shortcut(c).unwrap_or("")) {
                  app.run(c, json!({}));
+diff --git a/crates/ui-egui/src/typography.rs b/crates/ui-egui/src/typography.rs
+index 873ac0f0bd725a0b84a20513ff09b31555574767..7c3e044ce3bb3e6a1a08e0937bac9482164cca08 100644
+--- a/crates/ui-egui/src/typography.rs
++++ b/crates/ui-egui/src/typography.rs
+@@ -706,7 +706,7 @@ fn variable_axes(app: &mut FigApp, ui: &mut Ui, ids: &[NodeId], styles: &[TextSt
+     }
+     if styles.iter().any(|s| !s.variations.is_empty()) {
+         ui.add_space(8.0);
+-        let r = ui.add(egui::Label::new(egui::RichText::new(tr("Reset to style")).font(regular(11.0)).color(t.accent)).sense(Sense::click()));
++        let r = ui.add(egui::Label::new(egui::RichText::new(tr("Reset to style")).font(regular(11.0)).color(t.text)).sense(Sense::click()));
+         if r.on_hover_text(tr("Back to the values the font style implies")).clicked() {
+             app.run("text.setVariations", json!({"ids": ids, "variations": {}, "replace": true}));
+         }
 diff --git a/crates/ui-egui/src/windows.rs b/crates/ui-egui/src/windows.rs
 index c8cdf394c9cea44ca6f97c9f2848c098dae95f96..f4bdfc29688fe6fce2426f0dfd56992781b9c8b0 100644
 --- a/crates/ui-egui/src/windows.rs
@@ -59821,7 +59834,7 @@ index fd835f487875c72707519bf7ce29e54db1399e31..64d58829f53fe7d662c4676e522a2494
          <RegistryValue Root="HKLM" Key="Software\Classes\Applications\KIO UI.exe\SupportedTypes" Name=".figcraft" Value="" Type="string" />
          <RegistryValue Root="HKLM" Key="Software\Classes\Applications\KIO UI.exe\SupportedTypes" Name=".svg" Value="" Type="string" />
 diff --git a/packaging/windows/package.ps1 b/packaging/windows/package.ps1
-index 85c3c97fca861c3b67980b56309f6a57abb66db3..3cab62e699fdbaf9ad838dbb8bef4eb6e7ef58c7 100644
+index 85c3c97fca861c3b67980b56309f6a57abb66db3..f369594dbbda437a2b62268d6f3f1e19e35b3a2e 100644
 --- a/packaging/windows/package.ps1
 +++ b/packaging/windows/package.ps1
 @@ -1,6 +1,6 @@
@@ -59850,6 +59863,15 @@ index 85c3c97fca861c3b67980b56309f6a57abb66db3..3cab62e699fdbaf9ad838dbb8bef4eb6
  # WiX's stock bitmaps: a 493x58 banner across the top of the inner pages (the page title is drawn
  # over its left side, so that stays white) and a 493x312 backdrop for the Welcome and Finish pages
  # (their text sits on the right; the left 164 px are ours). Both must be 24-bit BMPs.
+@@ -170,7 +170,7 @@ if ($env:CRAFT_FONTS_DIR) {
+     if (Test-Path $lic) { Copy-Item $lic (Join-Path $Portable "OFL-$($_.Name).txt") }
+   }
+ }
+-# files go to KIO UIData\ next to the exe instead of %APPDATA% (#228; see app_dirs.rs).
++# files go to Bogo UIData\ next to the exe instead of %APPDATA% (#228; see app_dirs.rs).
+ $Zip = Join-Path $Dist "figcraft-$Version-windows-$Arch-portable.zip"
+ Remove-Item -Force $Zip -ErrorAction SilentlyContinue
+ Compress-Archive -Path $Portable -DestinationPath $Zip
 diff --git a/packaging/windows/sign.ps1 b/packaging/windows/sign.ps1
 index 18978d2296dcb809b4f28fbb274cd396974954b7..014aaee07947710cede42985eed82445b453e1bb 100644
 --- a/packaging/windows/sign.ps1

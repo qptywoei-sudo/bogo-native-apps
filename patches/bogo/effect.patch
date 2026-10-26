@@ -54833,6 +54833,19 @@ index 4ba2c77180f14d94a8adb0e73b44e22aa5ef62e9..351115cefdb7c38aabefee303a6aafa0
              ];
              let _ = widgets::popup_menu(ui, apop, about.left_bottom(), &lines, None);
          }
+diff --git a/crates/ui-egui/src/panels/essential.rs b/crates/ui-egui/src/panels/essential.rs
+index 2e99c7d39c90ae7ceb67a8d49135a9e0caf5eba8..54733546439e718cc884df0a7df4389c8eeb4fb5 100644
+--- a/crates/ui-egui/src/panels/essential.rs
++++ b/crates/ui-egui/src/panels/essential.rs
+@@ -213,7 +213,7 @@ fn controls(app: &mut EffectcraftApp, ui: &mut egui::Ui, cid: ItemId, list: &[Eg
+                         _ => None,
+                     };
+                     if let Some((text, tip)) = badge {
+-                        let r = ui.label(RichText::new(text).color(t.accent).size(10.0)).on_hover_text(&tip);
++                        let r = ui.label(RichText::new(text).color(t.text).size(10.0)).on_hover_text(&tip);
+                         app.auto.add(&format!("essential.control.{}.badge", c.id), r.rect, &tip);
+                     }
+                     let src = essential::source_prop(&app.session.project, cid, c).map(|(l, p)| (l.id.0, l.layer_time(app.session.time()), p.clone()));
 diff --git a/crates/ui-egui/src/panels/home.rs b/crates/ui-egui/src/panels/home.rs
 index 414bce258e8dc94fc21f878abe0755be4c6d47af..e130495a5e1ce51850304f8ea494146777cdf350 100644
 --- a/crates/ui-egui/src/panels/home.rs
@@ -54885,7 +54898,7 @@ index 414bce258e8dc94fc21f878abe0755be4c6d47af..e130495a5e1ce51850304f8ea4941467
          assert_eq!(tr("Filter recent files"), "Filter recent files");
      }
 diff --git a/crates/ui-egui/src/panels/learn.rs b/crates/ui-egui/src/panels/learn.rs
-index f69f08cf23e18c9779a0272c26f9fae415e7ee2a..7e4d790c1768a619dd06763d7cebc4f1a6de779a 100644
+index f69f08cf23e18c9779a0272c26f9fae415e7ee2a..2b06296718eb4d7106a0a064d177749e68c036d2 100644
 --- a/crates/ui-egui/src/panels/learn.rs
 +++ b/crates/ui-egui/src/panels/learn.rs
 @@ -18,7 +18,7 @@ pub fn home_tab(app: &mut EffectcraftApp, ui: &mut egui::Ui, area: Rect) {
@@ -54897,6 +54910,15 @@ index f69f08cf23e18c9779a0272c26f9fae415e7ee2a..7e4d790c1768a619dd06763d7cebc4f1
          Tokens::ui(11.5),
          t.text_faint,
      );
+@@ -113,7 +113,7 @@ pub fn coach(app: &mut EffectcraftApp, ctx: &egui::Context) {
+                 .show(ui, |ui| {
+                     ui.set_width(w - 28.0);
+                     ui.horizontal(|ui| {
+-                        ui.label(egui::RichText::new(tr("LEARN")).font(Tokens::semibold(10.0)).color(t.accent));
++                        ui.label(egui::RichText::new(tr("LEARN")).font(Tokens::semibold(10.0)).color(t.text));
+                         ui.label(egui::RichText::new(&tut.title).font(Tokens::ui(11.0)).color(t.text_dim));
+                         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                             let (cr, r) = ui.allocate_exact_size(vec2(16.0, 16.0), Sense::click());
 diff --git a/crates/ui-egui/src/panels/project.rs b/crates/ui-egui/src/panels/project.rs
 index 731513cab433dcfe38ed81d9fc4e468204f18a91..c4834926090a0bb67194161a0ad22a3c1068ebb9 100644
 --- a/crates/ui-egui/src/panels/project.rs
@@ -54915,8 +54937,21 @@ index 731513cab433dcfe38ed81d9fc4e468204f18a91..c4834926090a0bb67194161a0ad22a3c
          sort_items(&mut kids, "name", true);
          assert_eq!(kids[0].name, "Solids");
      }
+diff --git a/crates/ui-egui/src/panels/properties.rs b/crates/ui-egui/src/panels/properties.rs
+index 2649a38efa9329ee4652bb0058db5e0406a787b7..bccc6a8310c9a2d20e7840f4a96c8a30cf47bc84 100644
+--- a/crates/ui-egui/src/panels/properties.rs
++++ b/crates/ui-egui/src/panels/properties.rs
+@@ -88,7 +88,7 @@ pub fn show(app: &mut EffectcraftApp, ui: &mut egui::Ui, rect: Rect) {
+         section_header(app, ui, &p, x0, w, y, "Layer Transform", "properties.transform");
+         let rr = Rect::from_min_size(pos2(x0 + w - 40.0, y), vec2(40.0, ROW_H));
+         let resp = ui.interact(rr, egui::Id::new("props-reset"), Sense::click());
+-        p.text(rr.right_center(), Align2::RIGHT_CENTER, crate::i18n::tr("Reset"), Tokens::ui(12.0), if resp.hovered() { t.accent_hover } else { t.accent });
++        p.text(rr.right_center(), Align2::RIGHT_CENTER, crate::i18n::tr("Reset"), Tokens::ui(12.0), t.text);
+         app.auto.add("properties.transform.reset", rr, "Reset Transform");
+         if resp.clicked() {
+             for pr in tr.props() {
 diff --git a/crates/ui-egui/src/panels/settings.rs b/crates/ui-egui/src/panels/settings.rs
-index 625c5d79834aa7e9d1068a1f3447ff82aa6665da..61d55c071695027e4e81e9aea6984a5633559057 100644
+index 625c5d79834aa7e9d1068a1f3447ff82aa6665da..9bfdf77f635a38031a3f2c86505be2537dd4f21e 100644
 --- a/crates/ui-egui/src/panels/settings.rs
 +++ b/crates/ui-egui/src/panels/settings.rs
 @@ -101,7 +101,7 @@ fn page_ui(app: &mut EffectcraftApp, ui: &mut egui::Ui, page: &Page, cur: &Value
@@ -54928,6 +54963,15 @@ index 625c5d79834aa7e9d1068a1f3447ff82aa6665da..61d55c071695027e4e81e9aea6984a56
                  let mut resp: Option<egui::Response> = None;
                  match kind {
                      Kind::Bool => {
+@@ -325,7 +325,7 @@ fn theme_card(
+             ui.horizontal(|ui| {
+                 ui.label(RichText::new(title).font(Tokens::semibold(12.5)).color(t.text));
+                 if active {
+-                    ui.label(RichText::new(tr("Active")).color(t.accent).small());
++                    ui.label(RichText::new(tr("Active")).color(t.text).small());
+                 }
+             });
+             ui.add_space(4.0);
 @@ -768,7 +768,7 @@ pub fn recovery(app: &mut EffectcraftApp, ctx: &egui::Context, t: &Tokens) {
      };
      let mut choice: Option<&str> = None;
@@ -54937,6 +54981,19 @@ index 625c5d79834aa7e9d1068a1f3447ff82aa6665da..61d55c071695027e4e81e9aea6984a56
          ui.add_space(6.0);
          if let Some(p) = &r.project {
              ui.label(tr_args("Project: {}", &[&p]));
+diff --git a/crates/ui-egui/src/panels/timeline.rs b/crates/ui-egui/src/panels/timeline.rs
+index 163e6507d4e786e2fd3487d607fb4689423503f9..13ed0d0712ff22614e3b8c7a250e7a1d6d9bf31e 100644
+--- a/crates/ui-egui/src/panels/timeline.rs
++++ b/crates/ui-egui/src/panels/timeline.rs
+@@ -2449,7 +2449,7 @@ pub fn show(app: &mut EffectcraftApp, ui: &mut egui::Ui, rect: Rect) {
+                 text_anim_popups(app, ui, &lp, layer, *uid, cw.switches, cy, &mut actions);
+                 shape_add_popup(app, ui, &lp, layer, *uid, cw.switches, cy, &mut actions);
+                 if *uid == GEOM_BIT | layer.id.0 {
+-                    let lr = lp.text(pos2(cw.switches + 6.0, cy), Align2::LEFT_CENTER, crate::i18n::tr("Change Renderer…"), Tokens::ui(11.5), t.accent);
++                    let lr = lp.text(pos2(cw.switches + 6.0, cy), Align2::LEFT_CENTER, crate::i18n::tr("Change Renderer…"), Tokens::ui(11.5), t.text);
+                     let resp = ui
+                         .interact(lr, egui::Id::new(("tl-change-renderer", layer.id.0)), Sense::click())
+                         .on_hover_text(crate::i18n::tr("Composition Settings ▸ 3D Renderer"));
 diff --git a/crates/ui-egui/src/panels/unsaved.rs b/crates/ui-egui/src/panels/unsaved.rs
 index 8ac9560d37d571d4941c7d36df6d43f4af051f71..7e062c858ad9bb11f79975447150640082ccffa7 100644
 --- a/crates/ui-egui/src/panels/unsaved.rs
@@ -54951,7 +55008,7 @@ index 8ac9560d37d571d4941c7d36df6d43f4af051f71..7e062c858ad9bb11f799754471506400
  
  /// Whether the prompt is Revert Project (Revert / Cancel) instead of Unsaved Changes.
 diff --git a/crates/ui-egui/src/theme.rs b/crates/ui-egui/src/theme.rs
-index f5a0664c25a807ea8bda6ed1d7c07bab3ccd9627..e99a3765c58695f1d9c9a604d6ebc8f94c398dd6 100644
+index f5a0664c25a807ea8bda6ed1d7c07bab3ccd9627..d94ef7223ac5a10fb0fb9ccb387250e3cb1eb526 100644
 --- a/crates/ui-egui/src/theme.rs
 +++ b/crates/ui-egui/src/theme.rs
 @@ -131,27 +131,27 @@ impl Tokens {
@@ -54986,18 +55043,29 @@ index f5a0664c25a807ea8bda6ed1d7c07bab3ccd9627..e99a3765c58695f1d9c9a604d6ebc8f9
 -            field_bg: Color32::from_rgb(0x17, 0x17, 0x17),
 -            field_border: Color32::from_rgb(0x3a, 0x3a, 0x3a),
 -            separator: Color32::from_rgb(0x34, 0x34, 0x34),
+-            row: Color32::from_rgb(0x23, 0x23, 0x23),
+-            row_alt: Color32::from_rgb(0x27, 0x27, 0x27),
+-            row_selected: Color32::from_rgb(0x3a, 0x3a, 0x3a),
 +            hover: Color32::from_rgb(0xFF, 0xE7, 0xD4),
 +            pressed: Color32::from_rgb(0xFF, 0xE7, 0xD4),
 +            field_bg: Color32::from_rgb(0xFF, 0xFA, 0xF6),
 +            field_border: Color32::from_rgb(0xF1, 0xD3, 0xBD),
 +            separator: Color32::from_rgb(0xF1, 0xD3, 0xBD),
-             row: Color32::from_rgb(0x23, 0x23, 0x23),
-             row_alt: Color32::from_rgb(0x27, 0x27, 0x27),
--            row_selected: Color32::from_rgb(0x3a, 0x3a, 0x3a),
++            row: Color32::from_rgb(0xFF, 0xFA, 0xF6),
++            row_alt: Color32::from_rgb(0xFF, 0xFA, 0xF6),
 +            row_selected: Color32::from_rgb(0xFF, 0xE7, 0xD4),
              hot_text: Color32::from_rgb(0x3d, 0x8f, 0xf5),
              tl_bg: Color32::from_rgb(0x1b, 0x1b, 0x1b),
              tl_ruler_bg: Color32::from_rgb(0x23, 0x23, 0x23),
+@@ -170,7 +170,7 @@ impl Tokens {
+             fx_header: Color32::from_rgb(0x2a, 0x2a, 0x2a),
+             fx_header_active: Color32::from_rgb(0x2f, 0x3a, 0x52),
+             tl_graph_selected: Color32::from_rgb(0x2a, 0x2a, 0x2a),
+-            switch_well: Color32::from_rgb(0x19, 0x19, 0x19),
++            switch_well: Color32::from_rgb(0xFF, 0xFA, 0xF6),
+             tl_nav_bar: Color32::from_rgb(0x55, 0x55, 0x55),
+             tl_work_area_bar: Color32::from_rgb(0x5c, 0x5c, 0x5c),
+             expr_bg: Color32::from_rgb(0x1a, 0x1a, 0x1a),
 @@ -186,38 +186,38 @@ impl Tokens {
          match kind {
              ThemeKind::Dark => dark,
@@ -55005,11 +55073,13 @@ index f5a0664c25a807ea8bda6ed1d7c07bab3ccd9627..e99a3765c58695f1d9c9a604d6ebc8f9
 -                app_bg: Color32::from_rgb(0x08, 0x08, 0x08),
 -                header_bg: Color32::from_rgb(0x16, 0x16, 0x16),
 -                panel_bg: Color32::from_rgb(0x19, 0x19, 0x19),
+-                row: Color32::from_rgb(0x19, 0x19, 0x19),
+-                row_alt: Color32::from_rgb(0x1d, 0x1d, 0x1d),
 +                app_bg: Color32::from_rgb(0xFF, 0xFA, 0xF6),
 +                header_bg: Color32::from_rgb(0xFF, 0xF3, 0xE8),
 +                panel_bg: Color32::from_rgb(0xFF, 0xFA, 0xF6),
-                 row: Color32::from_rgb(0x19, 0x19, 0x19),
-                 row_alt: Color32::from_rgb(0x1d, 0x1d, 0x1d),
++                row: Color32::from_rgb(0xFF, 0xFA, 0xF6),
++                row_alt: Color32::from_rgb(0xFF, 0xFA, 0xF6),
                  tl_bg: Color32::from_rgb(0x12, 0x12, 0x12),
                  tl_ruler_bg: Color32::from_rgb(0x19, 0x19, 0x19),
 -                field_bg: Color32::from_rgb(0x0e, 0x0e, 0x0e),
@@ -55044,18 +55114,29 @@ index f5a0664c25a807ea8bda6ed1d7c07bab3ccd9627..e99a3765c58695f1d9c9a604d6ebc8f9
 -                field_bg: Color32::from_rgb(0xfa, 0xfa, 0xfa),
 -                field_border: Color32::from_rgb(0xaa, 0xaa, 0xaa),
 -                separator: Color32::from_rgb(0xc8, 0xc8, 0xc8),
+-                row: Color32::from_rgb(0xe6, 0xe6, 0xe6),
+-                row_alt: Color32::from_rgb(0xde, 0xde, 0xde),
+-                row_selected: Color32::from_rgb(0xaa, 0xc8, 0xf0),
 +                hover: Color32::from_rgb(0xFF, 0xE7, 0xD4),
 +                pressed: Color32::from_rgb(0xFF, 0xE7, 0xD4),
 +                field_bg: Color32::from_rgb(0xFF, 0xFA, 0xF6),
 +                field_border: Color32::from_rgb(0xF1, 0xD3, 0xBD),
 +                separator: Color32::from_rgb(0xF1, 0xD3, 0xBD),
-                 row: Color32::from_rgb(0xe6, 0xe6, 0xe6),
-                 row_alt: Color32::from_rgb(0xde, 0xde, 0xde),
--                row_selected: Color32::from_rgb(0xaa, 0xc8, 0xf0),
++                row: Color32::from_rgb(0xFF, 0xFA, 0xF6),
++                row_alt: Color32::from_rgb(0xFF, 0xFA, 0xF6),
 +                row_selected: Color32::from_rgb(0xFF, 0xE7, 0xD4),
                  tl_bg: Color32::from_rgb(0xd2, 0xd2, 0xd2),
                  tl_ruler_bg: Color32::from_rgb(0xe2, 0xe2, 0xe2),
                  tl_ruler_text: Color32::from_rgb(0x50, 0x50, 0x50),
+@@ -229,7 +229,7 @@ impl Tokens {
+                 fx_header: Color32::from_rgb(0xd8, 0xd8, 0xd8),
+                 fx_header_active: Color32::from_rgb(0xb0, 0xcf, 0xec),
+                 tl_graph_selected: Color32::from_rgb(0xc2, 0xc2, 0xc2),
+-                switch_well: Color32::from_rgb(0xf2, 0xf2, 0xf2),
++                switch_well: Color32::from_rgb(0xFF, 0xFA, 0xF6),
+                 tl_nav_bar: Color32::from_rgb(0x9a, 0x9a, 0x9a),
+                 tl_work_area_bar: Color32::from_rgb(0x94, 0x94, 0x94),
+                 expr_bg: Color32::from_rgb(0xf2, 0xf2, 0xf2),
 diff --git a/crates/ui-egui/tests/ui_keyframes.rs b/crates/ui-egui/tests/ui_keyframes.rs
 index 94d0a093f3d8cc77d6a37028905779cc81e08ee9..3c2b34529c484f2e1cb5db249d3de37ed910eab8 100644
 --- a/crates/ui-egui/tests/ui_keyframes.rs
@@ -55447,7 +55528,7 @@ index 7411a0903160a1ab2bfc8cf96731936ca2ccdc0f..f97770d54a4061e65055d53a617bf4a1
  
      fresh install:  DestDlg (folder, Change... opens BrowseDlg, desktop shortcut) -> ReadyDlg -> ProgressDlg -> ExitDlg
 diff --git a/packaging/windows/package.ps1 b/packaging/windows/package.ps1
-index e014f472d3e1e061ced55bf306fc4118db18cc91..6e78cb18e50a100f5c0830140a431c25a7a73865 100644
+index e014f472d3e1e061ced55bf306fc4118db18cc91..9e9c07fa22118e7f86efb886b48a71fb7836d65f 100644
 --- a/packaging/windows/package.ps1
 +++ b/packaging/windows/package.ps1
 @@ -1,6 +1,6 @@
@@ -55467,6 +55548,15 @@ index e014f472d3e1e061ced55bf306fc4118db18cc91..6e78cb18e50a100f5c0830140a431c25
  
  if (-not $SkipBuild) {
    # Static CRT: no VC++ redistributable needed. Scoped to the target so host build scripts and
+@@ -111,7 +111,7 @@ foreach ($f in 'README.md', 'LICENSE', 'LICENSE-MIT', 'LICENSE-APACHE') {
+   if (Test-Path $p) { Copy-Item $p $Portable }
+ }
+ # portable.txt beside effectcraft.exe switches on portable mode: settings, shortcuts and recovery
+-# files go to KIO EffectData\ next to the exe instead of %APPDATA% (#993; see app_dirs.rs).
++# files go to Bogo EffectData\ next to the exe instead of %APPDATA% (#993; see app_dirs.rs).
+ Copy-Item (Join-Path $PSScriptRoot 'portable.txt') $Portable
+ $Zip = Join-Path $Dist "effectcraft-$Version-windows-$Arch-portable.zip"
+ Remove-Item -Force $Zip -ErrorAction SilentlyContinue
 diff --git a/packaging/windows/sign.ps1 b/packaging/windows/sign.ps1
 index edc73b998e9090d2c1243b2f59bfe9a78446bd9f..4efb67f47b8d2f2b70b626831757f193d559786a 100644
 --- a/packaging/windows/sign.ps1

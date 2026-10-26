@@ -50546,7 +50546,7 @@ index a494c86908eb7da6f9cc99664a660e1f0e1ee814..2830e2b048b02f736b9fb9310756796a
      link(ui, "reportIssue", Icon::Code, tl!("Report an issue"), links::ISSUES, false);
      ui.add_space(10.0);
 diff --git a/crates/ui-egui/src/panels/export_mode.rs b/crates/ui-egui/src/panels/export_mode.rs
-index bda4af7f9b79dd925e45fe72fb7551dd5e40cec6..6ab884ffbcf76dec9296e72c47984f1f3ff92fa5 100644
+index bda4af7f9b79dd925e45fe72fb7551dd5e40cec6..baac691c81e0f5163812e45e54ac1053d558e539 100644
 --- a/crates/ui-egui/src/panels/export_mode.rs
 +++ b/crates/ui-egui/src/panels/export_mode.rs
 @@ -310,7 +310,7 @@ fn row<R>(ui: &mut egui::Ui, t: &Tokens, label: &str, add: impl FnOnce(&mut egui
@@ -50567,6 +50567,15 @@ index bda4af7f9b79dd925e45fe72fb7551dd5e40cec6..6ab884ffbcf76dec9296e72c47984f1f
              };
              let labels: Vec<(String, Option<&str>)> = SampleFormat::ALL.iter().zip(sizes).map(|(&f, l)| (l.to_string(), why(f))).collect();
              let cur = SampleFormat::ALL.iter().position(|&f| f == s.audio.sample_format()).and_then(|i| sizes.get(i).copied()).unwrap_or(sizes[0]);
+@@ -1247,7 +1247,7 @@ fn preset_manager(app: &mut FilmcraftApp, ctx: &egui::Context) {
+                         let _ = r;
+                         ui.label(egui::RichText::new(p.settings.format.label()).color(t.text_dim).size(11.0));
+                         if !p.builtin {
+-                            ui.label(egui::RichText::new(tl!("User")).color(t.accent).size(10.5));
++                            ui.label(egui::RichText::new(tl!("User")).color(t.text).size(10.5));
+                         }
+                     });
+                 }
 diff --git a/crates/ui-egui/src/panels/file_dialogs.rs b/crates/ui-egui/src/panels/file_dialogs.rs
 index c4376e5114cb2bfe0ec9de0dd87e76a2254be903..09773fc6978340ae2ec8d2251a5456aa314a0b5a 100644
 --- a/crates/ui-egui/src/panels/file_dialogs.rs
@@ -50649,9 +50658,18 @@ index df6111ef6300757c7d6e7c9954acb42e10e19d13..0bc0c513dba848d41d7d83c7a5d2a3dd
  /// The Timebase list (frames per second as num/den), Premiere's common rates.
  const TIMEBASES: [(i64, i64); 15] = [
 diff --git a/crates/ui-egui/src/panels/settings.rs b/crates/ui-egui/src/panels/settings.rs
-index 1006b57d55b9805aa56050352397fde63883a1bd..c8f9df1c26cad67a950e45087e9170343222ac55 100644
+index 1006b57d55b9805aa56050352397fde63883a1bd..e14a1cc5bf027b3dbb2761b6379589d30bbdb889 100644
 --- a/crates/ui-egui/src/panels/settings.rs
 +++ b/crates/ui-egui/src/panels/settings.rs
+@@ -259,7 +259,7 @@ fn theme_card(app: &mut FilmcraftApp, ui: &mut Ui, d: &mut SettingsDraft, key: &
+                 ui.horizontal(|ui| {
+                     ui.label(RichText::new(crate::i18n::t(title)).size(12.5).strong());
+                     if active {
+-                        ui.label(RichText::new(tl!("Active")).size(11.0).color(t.accent));
++                        ui.label(RichText::new(tl!("Active")).size(11.0).color(t.text));
+                     }
+                 });
+                 ui.add_space(4.0);
 @@ -750,7 +750,7 @@ fn custom(app: &mut FilmcraftApp, ui: &mut Ui, d: &mut SettingsDraft, name: &str
          "memoryInfo" => {
              let (used, budget) = app.frames.cache_usage();
@@ -50684,7 +50702,7 @@ index 3e36f0c9f48c91d2c9a2150d28858a10de4d3fef..52330e783a3b736e0473a1d12d8391fc
          assert_eq!(visual("سنة ١٤٤٥"), [["١", "٤", "٤", "٥", " ", "سنة"]]);
      }
 diff --git a/crates/ui-egui/src/theme.rs b/crates/ui-egui/src/theme.rs
-index 21a50012a24341c6e5db61dd9efd6d175f013311..2d0406adb29d41f2762d584bb5bac6e100037298 100644
+index 21a50012a24341c6e5db61dd9efd6d175f013311..c1e45fdd8074acf7939608dd4e3dc90443b16eb1 100644
 --- a/crates/ui-egui/src/theme.rs
 +++ b/crates/ui-egui/src/theme.rs
 @@ -154,33 +154,33 @@ impl Tokens {
@@ -50721,13 +50739,14 @@ index 21a50012a24341c6e5db61dd9efd6d175f013311..2d0406adb29d41f2762d584bb5bac6e1
 -            field_bg: Color32::from_rgb(0x0e, 0x0e, 0x0e),
 -            field_border: Color32::from_rgb(0x30, 0x30, 0x30),
 -            separator: Color32::from_rgb(0x30, 0x30, 0x30),
+-            row_alt: Color32::from_rgb(0x21, 0x21, 0x21),
+-            row_selected: Color32::from_rgb(0x33, 0x33, 0x33),
 +            hover: Color32::from_rgb(0xFF, 0xE7, 0xD4),
 +            pressed: Color32::from_rgb(0xFF, 0xE7, 0xD4),
 +            field_bg: Color32::from_rgb(0xFF, 0xFA, 0xF6),
 +            field_border: Color32::from_rgb(0xF1, 0xD3, 0xBD),
 +            separator: Color32::from_rgb(0xF1, 0xD3, 0xBD),
-             row_alt: Color32::from_rgb(0x21, 0x21, 0x21),
--            row_selected: Color32::from_rgb(0x33, 0x33, 0x33),
++            row_alt: Color32::from_rgb(0xFF, 0xFA, 0xF6),
 +            row_selected: Color32::from_rgb(0xFF, 0xE7, 0xD4),
              hot_text: Color32::from_rgb(0x40, 0x96, 0xf3),
              pill_active_bg: Color32::from_rgb(0x3a, 0x3a, 0x3a),
@@ -50778,8 +50797,9 @@ index 21a50012a24341c6e5db61dd9efd6d175f013311..2d0406adb29d41f2762d584bb5bac6e1
 +                tl_header_bg: Color32::from_rgb(0xFF, 0xF3, 0xE8),
                  tl_ruler_bg: Color32::from_rgb(0x32, 0x32, 0x32),
                  monitor_bg: Color32::from_rgb(0x32, 0x32, 0x32),
-                 row_alt: Color32::from_rgb(50, 50, 50),
+-                row_alt: Color32::from_rgb(50, 50, 50),
 -                hover: Color32::from_rgb(64, 64, 64),
++                row_alt: Color32::from_rgb(0xFF, 0xFA, 0xF6),
 +                hover: Color32::from_rgb(0xFF, 0xE7, 0xD4),
                  ..dark
              },
@@ -50799,6 +50819,8 @@ index 21a50012a24341c6e5db61dd9efd6d175f013311..2d0406adb29d41f2762d584bb5bac6e1
 -                field_bg: Color32::from_rgb(250, 250, 250),
 -                field_border: Color32::from_rgb(170, 170, 170),
 -                separator: Color32::from_rgb(200, 200, 200),
+-                row_alt: Color32::from_rgb(224, 224, 224),
+-                row_selected: Color32::from_rgb(170, 200, 240),
 +                app_bg: Color32::from_rgb(0xFF, 0xFA, 0xF6),
 +                header_bg: Color32::from_rgb(0xFF, 0xF3, 0xE8),
 +                panel_bg: Color32::from_rgb(0xFF, 0xFA, 0xF6),
@@ -50814,8 +50836,7 @@ index 21a50012a24341c6e5db61dd9efd6d175f013311..2d0406adb29d41f2762d584bb5bac6e1
 +                field_bg: Color32::from_rgb(0xFF, 0xFA, 0xF6),
 +                field_border: Color32::from_rgb(0xF1, 0xD3, 0xBD),
 +                separator: Color32::from_rgb(0xF1, 0xD3, 0xBD),
-                 row_alt: Color32::from_rgb(224, 224, 224),
--                row_selected: Color32::from_rgb(170, 200, 240),
++                row_alt: Color32::from_rgb(0xFF, 0xFA, 0xF6),
 +                row_selected: Color32::from_rgb(0xFF, 0xE7, 0xD4),
                  pill_active_bg: Color32::from_rgb(196, 196, 196),
                  clip_bar_bg: Color32::from_rgb(190, 203, 224),
