@@ -668,3 +668,138 @@ def replacements(app, relative):
 
 def transform(app, relative, text):
     return replace_exact(text, replacements(app, relative))
+
+
+# Applied after the exact existing promotion-test transform, before normal rustfmt.
+LAUNCHER_POST_ROLE_ROWS = {'crates/ui-egui/src/theme.rs': {'beforeSha256': '217e17d6f6aed75ac814ff6143f8ef2a3938c5151be3239d72c7b19758da70c3',
+                                 'afterSha256': 'ac3ec9fba6640e65bebf6e8d50f7135de45071a2d811f36006c39eaf9c63f149',
+                                 'pairs': [['    pub bg: Color32,',
+                                            '    pub bg: Color32,\n'
+                                            '    /// Header chrome, independent of gallery and document colours.\n'
+                                            '    pub header: Color32,\n'
+                                            '    /// Selected and hovered application controls.\n'
+                                            '    pub selection: Color32,',
+                                            1],
+                                           ['        bg: Color32::from_rgb(0xFF, 0xFA, 0xF6),\n        sunken:',
+                                            '        bg: Color32::from_rgb(0xFF, 0xFA, 0xF6),\n'
+                                            '        header: Color32::from_rgb(0xFF, 0xF3, 0xE8),\n'
+                                            '        selection: Color32::from_rgb(0xFF, 0xE7, 0xD4),\n'
+                                            '        sunken:',
+                                            2],
+                                           ['    v.selection.bg_fill = t.accent;', '    v.selection.bg_fill = t.selection;', 1],
+                                           ['    v.selection.stroke = Stroke::new(1.0, Color32::WHITE);',
+                                            '    v.selection.stroke = Stroke::new(1.0, t.ink);',
+                                            1],
+                                           ['(&mut v.widgets.hovered, t.sunken, t.line_strong, t.ink_strong)',
+                                            '(&mut v.widgets.hovered, t.selection, t.line_strong, t.ink_strong)',
+                                            1],
+                                           ['(&mut v.widgets.active, t.sunken, t.line_strong, t.ink_strong)',
+                                            '(&mut v.widgets.active, t.selection, t.line_strong, t.ink_strong)',
+                                            1],
+                                           ['(&mut v.widgets.open, t.sunken, t.line_strong, t.ink_strong)',
+                                            '(&mut v.widgets.open, t.selection, t.line_strong, t.ink_strong)',
+                                            1]]},
+ 'crates/ui-egui/src/app.rs': {'beforeSha256': '241713bb24d8af8e9b7c37b61c511a91176352fbc2a435f3a8de2ad329c8613d',
+                               'afterSha256': '334215c0742f8548498a0a6606a84cb8e739e1663fe48f746d8dbe60f58df930',
+                               'pairs': [['        egui::Panel::top("header")\n'
+                                          '            .frame(egui::Frame::new().fill(tokens.bg))',
+                                          '        egui::Panel::top("header")\n'
+                                          '            .frame(egui::Frame::new().fill(tokens.header))',
+                                          1]]},
+ 'crates/ui-egui/src/widgets.rs': {'beforeSha256': '2d9f26525dff8f619fc79a20f1120c3dc86b93e623eabc4365ef57e0329204fd',
+                                   'afterSha256': 'a1102857a4174856ceed65078d14d4160c3e54176b50d56ba2464f655bc966aa',
+                                   'pairs': [['ui.painter().rect_filled(span, CornerRadius::ZERO, t.invert_bg);',
+                                              'ui.painter().rect_filled(span, CornerRadius::ZERO, t.selection);',
+                                              1],
+                                             ['        p.rect_filled(rect, CornerRadius::ZERO, t.invert_bg);',
+                                              '        p.rect_filled(rect, CornerRadius::ZERO, t.selection);',
+                                              2],
+                                             ['Kind::Primary => (t.invert_bg.gamma_multiply(if hovered { 0.8 } else { 1.0 }), '
+                                              'Stroke::NONE, t.invert_fg),',
+                                              'Kind::Primary => (if hovered { t.selection } else { t.invert_bg }, Stroke::NONE, '
+                                              't.invert_fg),',
+                                              1],
+                                             ['Kind::Secondary if hovered => (t.invert_bg, Stroke::NONE, t.invert_fg),',
+                                              'Kind::Secondary if hovered => (t.selection, Stroke::NONE, t.ink_strong),',
+                                              1],
+                                             ['if on { t.invert_fg.gamma_multiply(0.6) } else { highlight.filter(|_| n > '
+                                              '0).unwrap_or(t.faint) }',
+                                              'if on { t.ink_strong } else { highlight.filter(|_| n > 0).unwrap_or(t.faint) }',
+                                              1],
+                                             ['(true, _) => (t.invert_bg, t.invert_fg),',
+                                              '(true, _) => (t.selection, t.ink_strong),',
+                                              1],
+                                             ['(false, true) => (t.sunken, t.ink_strong),',
+                                              '(false, true) => (t.selection, t.ink_strong),',
+                                              1]]},
+ 'crates/ui-egui/src/views.rs': {'beforeSha256': '08239da360f8e1138eaa7355b9c4f1cdebaa8bdb81d8df5fa710e8f8cafea0d8',
+                                 'afterSha256': '574fa442f1ba240c50a6fca0695e1df138a436423dba481992ccfc263baefee1',
+                                 'pairs': [['widgets::tag(ui, tl!("Launcher"), t.invert_bg, t.invert_fg);',
+                                            'widgets::tag(ui, tl!("Launcher"), t.selection, t.ink_strong);',
+                                            1],
+                                           ['widgets::tag(ui, tl!("Update"), t.accent, Color32::WHITE);',
+                                            'widgets::tag(ui, tl!("Update"), t.selection, t.ink_strong);',
+                                            1],
+                                           ['        let app_color = rgb(app.color);', '        let app_color = t.accent;', 1],
+                                           ['let fill = t.bg.lerp_to_gamma(app_color, 0.05 * lift);',
+                                            'let fill = t.bg.lerp_to_gamma(t.selection, lift);',
+                                            1],
+                                           ['widgets::tag(&mut strip_ui, &number, app_color, Color32::BLACK);',
+                                            'widgets::tag(&mut strip_ui, &number, t.selection, t.ink_strong);',
+                                            1]]},
+ 'crates/ui-egui/src/details.rs': {'beforeSha256': '3b70dccc9befbff63ed6fc77c12214bc39af9801850e905080768725c053a252',
+                                   'afterSha256': '9185af4157b6be068a73f5ededa0683adb880f20a5c42ca9f5dbfd2be74488b2',
+                                   'pairs': [['        let app_color = rgb(app.color);', '        let app_color = t.accent;', 1],
+                                             ['egui::Frame::new().fill(tint(app_color, if t.dark { 0.09 } else { 0.07 '
+                                              '})).inner_margin',
+                                              'egui::Frame::new().fill(t.header).inner_margin',
+                                              1],
+                                             ['let (fill, ink) = if resp.hovered() { (t.invert_bg, t.invert_fg) } else { '
+                                              '(t.bg.gamma_multiply(0.92), t.ink) };',
+                                              'let (fill, ink) = if resp.hovered() { (t.selection, t.ink_strong) } else { '
+                                              '(t.bg.gamma_multiply(0.92), t.ink) };',
+                                              1]]}}
+
+LAUNCHER_ROLE_TEST_PREIMAGE_SHA256 = "61fde7d5658096455fd77014bf7bed28920f49ac86fc389872fbcaa059d2f737"
+LAUNCHER_ROLE_PAINT_TEST = '// Append after the existing promotion-test transform. The original tests remain byte-identical.\n#[test]\nfn bogo_launcher_actual_header_selection_hover_and_index_shapes() {\n    use egui::{Color32, Pos2, Rect};\n    use egui::epaint::Shape;\n    const HEADER: Color32 = Color32::from_rgb(0xff, 0xf3, 0xe8);\n    const SELECTED: Color32 = Color32::from_rgb(0xff, 0xe7, 0xd4);\n    const INK: Color32 = Color32::from_rgb(0x34, 0x2b, 0x26);\n\n    // Retain painter order and the parent\'s real clip, including nested Shape::Vec.\n    fn leaves<\'a>(shape: &\'a Shape, clip: Rect, out: &mut Vec<(Rect, &\'a Shape)>) {\n        if let Shape::Vec(children) = shape {\n            for child in children { leaves(child, clip, out); }\n        } else {\n            out.push((clip, shape));\n        }\n    }\n    fn painted<\'a>(h: &\'a Harness<\'_, Option<LauncherUi>>) -> Vec<(Rect, &\'a Shape)> {\n        let mut out = Vec::new();\n        for clipped in &h.output().shapes { leaves(&clipped.shape, clipped.clip_rect, &mut out); }\n        out\n    }\n    fn top_rect_fill(h: &Harness<\'_, Option<LauncherUi>>, p: Pos2) -> Option<Color32> {\n        painted(h).into_iter().filter_map(|(clip, shape)| match shape {\n            Shape::Rect(r) if clip.contains(p) && r.rect.contains(p) && r.fill.a() == 255 => Some(r.fill),\n            _ => None,\n        }).last()\n    }\n    fn assert_ink(h: &Harness<\'_, Option<LauncherUi>>, target: Rect, text: &str) {\n        let matching: Vec<_> = painted(h).into_iter().filter_map(|(clip, shape)| match shape {\n            Shape::Text(t) if t.galley.job.text == text\n                && clip.intersects(target) && t.visual_bounding_rect().intersects(target) => Some(t),\n            _ => None,\n        }).collect();\n        assert_eq!(matching.len(), 1, "one actual visible text shape {text:?} in {target:?}");\n        let t = matching[0];\n        assert_eq!(t.opacity_factor, 1.0, "{text}: no dimming of the selected label");\n        // widgets::paint_left/paint_centred use galley_with_override_text_color.\n        assert_eq!(t.override_text_color, Some(INK), "{text}: actual glyph ink must remain readable brown");\n    }\n    fn assert_selection(h: &Harness<\'_, Option<LauncherUi>>, label: &str, text: &str) {\n        let rect = h.get_by_label(label).rect();\n        assert_eq!(top_rect_fill(h, rect.center()), Some(SELECTED), "actual selected/hover fill for {label}");\n        assert_ink(h, rect, text);\n    }\n\n    for theme in [egui::Theme::Light, egui::Theme::Dark] {\n        let (mut h, _) = harness(ViewMode::Grid, theme, true);\n        h.event(egui::Event::PointerGone);\n        h.run_steps(6);\n        assert_eq!(h.state().as_ref().unwrap().settings.view, ViewMode::Grid);\n        assert_eq!(h.state().as_ref().unwrap().settings.filter, artcraft_launcher_ui_egui::settings::Filter::All);\n        let grid = h.get_by_label("Grid").rect();\n        let header_rects: Vec<_> = painted(&h).into_iter().filter_map(|(clip, shape)| match shape {\n            Shape::Rect(r) if r.fill == HEADER => {\n                let visible = r.rect.intersect(clip);\n                (visible.width() >= 1100.0 && visible.height() >= 40.0 && visible.height() <= 90.0\n                    && visible.contains(grid.center())).then_some(visible)\n            }\n            _ => None,\n        }).collect();\n        assert!(!header_rects.is_empty(), "{theme:?}: actual full-width pale header must contain the Grid navigation center");\n        assert_selection(&h, "Grid", "GRID");\n        assert_selection(&h, "All 13", "ALL");\n        // Index 01 can be below the fold under a different legitimate sort order.\n        let index_id = h.get_by_label("01").accesskit_node().id();\n        h.get_by_label("01").scroll_to_me();\n        h.run_steps(4);\n        assert_eq!(h.get_by_label("01").accesskit_node().id(), index_id, "probe the same real index badge after scrolling");\n        assert_selection(&h, "01", "01");\n\n        let table = h.get_by_label("Table").rect();\n        assert_ne!(top_rect_fill(&h, table.center()), Some(SELECTED), "unselected Table starts unhighlighted");\n        let table_id = h.get_by_label("Table").accesskit_node().id();\n        h.event(egui::Event::PointerMoved(table.center()));\n        h.run_steps(4);\n        assert_eq!(h.get_by_label("Table").accesskit_node().id(), table_id, "hover the same real node");\n        assert_eq!(h.state().as_ref().unwrap().settings.view, ViewMode::Grid, "hover must not click or switch views");\n        assert_selection(&h, "Table", "TABLE");\n        assert_selection(&h, "Grid", "GRID");\n    }\n}\n'
+
+
+def launcher_role_text(relative, text):
+    """One authenticated Launcher UI preimage; never a global palette rewrite."""
+    import hashlib
+    row = LAUNCHER_POST_ROLE_ROWS.get(relative)
+    if row is None or hashlib.sha256(text.encode('utf-8')).hexdigest() != row['beforeSha256']:
+        raise ValueError('Exact reviewed post-promotion Launcher UI source required: ' + relative)
+    after = replace_exact(text, row['pairs'])
+    if hashlib.sha256(after.encode('utf-8')).hexdigest() != row['afterSha256']:
+        raise ValueError('Unexpected Launcher UI role output: ' + relative)
+    return after
+
+
+def apply_launcher_role_source(source, app):
+    """Closed UI-only post-hook; preserve every original test before appending one."""
+    if app != 'launcher':
+        return []
+    import hashlib
+    from pathlib import Path
+    source = Path(source)
+    if not source.is_dir() or source.is_symlink():
+        raise ValueError('Launcher role source must be a regular prepared directory')
+    planned = {}
+    test_relative = 'crates/ui-egui/tests/ui.rs'
+    for relative in (*LAUNCHER_POST_ROLE_ROWS, test_relative):
+        path = source / relative
+        if not path.is_file() or path.is_symlink() or any(parent.is_symlink() for parent in path.parents if parent == source or source in parent.parents):
+            raise ValueError('Linked or missing Launcher UI role source: ' + relative)
+        before = path.read_text(encoding='utf-8')
+        if relative == test_relative:
+            if hashlib.sha256(before.encode('utf-8')).hexdigest() != LAUNCHER_ROLE_TEST_PREIMAGE_SHA256:
+                raise ValueError('Every original Launcher UI test must retain its exact reviewed bytes')
+            planned[path] = before + '\n' + LAUNCHER_ROLE_PAINT_TEST
+        else:
+            planned[path] = launcher_role_text(relative, before)
+    # Validate all six original files before any write. Data, registry, media,
+    # assets, dependency, license and unrelated application paths are never visited.
+    for path, after in planned.items():
+        path.write_text(after, encoding='utf-8', newline='')
+    return sorted(path.relative_to(source).as_posix() for path in planned)

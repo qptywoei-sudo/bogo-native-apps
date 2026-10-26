@@ -150807,7 +150807,7 @@ index 6cfabd892aa5d39129daeb2dcbbd41382951555a..599a9c11919b7b89112b652a7f234ab2
          }
      }
 diff --git a/crates/ui-egui/src/app.rs b/crates/ui-egui/src/app.rs
-index 499dca6f12258b53670fc53fe06771e9a5d22eb3..6f36b51259d8ea35d59e19205b07fbefad25e5a2 100644
+index 499dca6f12258b53670fc53fe06771e9a5d22eb3..165ed0084582617daa8d23171e3c4129ccefbf07 100644
 --- a/crates/ui-egui/src/app.rs
 +++ b/crates/ui-egui/src/app.rs
 @@ -437,7 +437,7 @@ impl LauncherUi {
@@ -150819,6 +150819,15 @@ index 499dca6f12258b53670fc53fe06771e9a5d22eb3..6f36b51259d8ea35d59e19205b07fbef
                      (crate::i18n::fmt(tl!("{name} {v} is available"), &[("name", name), ("v", v)]), body)
                  }
                  many => {
+@@ -522,7 +522,7 @@ impl LauncherUi {
+ 
+         // The bars' separator lines are the hairlines under the header and over the footer.
+         egui::Panel::top("header")
+-            .frame(egui::Frame::new().fill(tokens.bg))
++            .frame(egui::Frame::new().fill(tokens.header))
+             .exact_size(crate::views::HEADER_H)
+             .resizable(false)
+             .show(ui, |ui| self.header(ui, host.title_bar()));
 @@ -617,7 +617,7 @@ impl LauncherUi {
          list.into_iter().map(|(_, e)| e.app.id).collect()
      }
@@ -150828,6 +150837,31 @@ index 499dca6f12258b53670fc53fe06771e9a5d22eb3..6f36b51259d8ea35d59e19205b07fbef
      /// screen right now. `None` until something has loaded.
      pub(crate) fn sources_label(&self) -> Option<String> {
          use artcraft_launcher_core::protocol::Origin;
+diff --git a/crates/ui-egui/src/details.rs b/crates/ui-egui/src/details.rs
+index 3f62e645461115906cb6441e171027688c1f93d5..da8893a23c59ba91321c070ce3c90fae7826fb74 100644
+--- a/crates/ui-egui/src/details.rs
++++ b/crates/ui-egui/src/details.rs
+@@ -203,9 +203,9 @@ impl LauncherUi {
+     /// version and main button, and the app's links.
+     fn details_hero(&mut self, ui: &mut Ui, entry: &AppEntry, details: &AppDetails, t: &Tokens) {
+         let app = entry.app;
+-        let app_color = rgb(app.color);
++        let app_color = t.accent;
+         let status = entry.status(self.platform, self.caps.manage_apps);
+-        let hero = egui::Frame::new().fill(tint(app_color, if t.dark { 0.09 } else { 0.07 })).inner_margin(Margin::same(PAD as i8)).show(ui, |ui| {
++        let hero = egui::Frame::new().fill(t.header).inner_margin(Margin::same(PAD as i8)).show(ui, |ui| {
+             ui.set_width(ui.available_width());
+             ui.horizontal(|ui| {
+                 widgets::hud(ui, tl!("App details"), t.faint);
+@@ -464,7 +464,7 @@ fn features(ui: &mut Ui, details: &AppDetails, app: &CraftApp, t: &Tokens) {
+ /// inverted on hover like the site's outlined buttons. True when clicked.
+ fn arrow_button(ui: &mut Ui, rect: Rect, id: Id, left: bool, tip: &str, t: &Tokens) -> bool {
+     let resp = ui.interact(rect, id, Sense::click());
+-    let (fill, ink) = if resp.hovered() { (t.invert_bg, t.invert_fg) } else { (t.bg.gamma_multiply(0.92), t.ink) };
++    let (fill, ink) = if resp.hovered() { (t.selection, t.ink_strong) } else { (t.bg.gamma_multiply(0.92), t.ink) };
+     let painter = ui.painter();
+     painter.rect(rect, CornerRadius::ZERO, fill, Stroke::new(1.0, t.line_strong), egui::StrokeKind::Inside);
+     let (c, s) = (rect.center(), if left { -1.0 } else { 1.0 });
 diff --git a/crates/ui-egui/src/dialogs.rs b/crates/ui-egui/src/dialogs.rs
 index b53e720c8cf64ea7b4833bdc0740e3b89cefd891..a7bc496e504e5141f8fd6bef3d80fc2aa9316d38 100644
 --- a/crates/ui-egui/src/dialogs.rs
@@ -153205,10 +153239,21 @@ index 064b24a5703ccd3a830e981a113cad85477c10fa..1763e4b8791aaf1b5373c75bdc8e7e03
  //!
  //! The UI is thin: it draws [`model::AppEntry`]s and sends
 diff --git a/crates/ui-egui/src/theme.rs b/crates/ui-egui/src/theme.rs
-index 2620e860377b0cc79110d8898a205d9b4cfd4b1b..21d7f41618fee356afaf2170bf62943029ee7a9b 100644
+index 2620e860377b0cc79110d8898a205d9b4cfd4b1b..32ac5f919c1ba91aad316fdd06edee4f9af4213d 100644
 --- a/crates/ui-egui/src/theme.rs
 +++ b/crates/ui-egui/src/theme.rs
-@@ -79,19 +79,19 @@ const fn hex(rgb: u32) -> Color32 {
+@@ -40,6 +40,10 @@ pub struct Tokens {
+     pub dark: bool,
+     /// Page and card surface.
+     pub bg: Color32,
++    /// Header chrome, independent of gallery and document colours.
++    pub header: Color32,
++    /// Selected and hovered application controls.
++    pub selection: Color32,
+     /// Badges, wells and row hovers.
+     pub sunken: Color32,
+     /// Body text.
+@@ -79,19 +83,21 @@ const fn hex(rgb: u32) -> Color32 {
  impl Tokens {
      pub const DARK: Self = Self {
          dark: true,
@@ -153226,6 +153271,8 @@ index 2620e860377b0cc79110d8898a205d9b4cfd4b1b..21d7f41618fee356afaf2170bf629430
 -        invert_fg: hex(0x0b0b0c),
 -        // KIO PDF's and KIO Light's inks, so status colours come from the site's palette.
 +        bg: Color32::from_rgb(0xFF, 0xFA, 0xF6),
++        header: Color32::from_rgb(0xFF, 0xF3, 0xE8),
++        selection: Color32::from_rgb(0xFF, 0xE7, 0xD4),
 +        sunken: Color32::from_rgb(0xFF, 0xFA, 0xF6),
 +        ink: Color32::from_rgb(0x34, 0x2B, 0x26),
 +        ink_strong: Color32::from_rgb(0x34, 0x2B, 0x26),
@@ -153241,7 +153288,7 @@ index 2620e860377b0cc79110d8898a205d9b4cfd4b1b..21d7f41618fee356afaf2170bf629430
          good: hex(0x3fd6b8),
          warn: hex(0xffc14d),
          bad: hex(0xff6259),
-@@ -99,18 +99,18 @@ impl Tokens {
+@@ -99,18 +105,20 @@ impl Tokens {
  
      pub const LIGHT: Self = Self {
          dark: false,
@@ -153258,6 +153305,8 @@ index 2620e860377b0cc79110d8898a205d9b4cfd4b1b..21d7f41618fee356afaf2170bf629430
 -        invert_bg: hex(0x101014),
 -        invert_fg: hex(0xf2f1ee),
 +        bg: Color32::from_rgb(0xFF, 0xFA, 0xF6),
++        header: Color32::from_rgb(0xFF, 0xF3, 0xE8),
++        selection: Color32::from_rgb(0xFF, 0xE7, 0xD4),
 +        sunken: Color32::from_rgb(0xFF, 0xFA, 0xF6),
 +        ink: Color32::from_rgb(0x34, 0x2B, 0x26),
 +        ink_strong: Color32::from_rgb(0x34, 0x2B, 0x26),
@@ -153272,8 +153321,30 @@ index 2620e860377b0cc79110d8898a205d9b4cfd4b1b..21d7f41618fee356afaf2170bf629430
          good: hex(0x0a7563),
          warn: hex(0x8a5800),
          bad: hex(0xb3261e),
+@@ -181,16 +189,16 @@ fn visuals(t: &Tokens) -> Visuals {
+     v.popup_shadow = shadow(t);
+     v.override_text_color = Some(t.ink);
+     v.hyperlink_color = t.accent_ink;
+-    v.selection.bg_fill = t.accent;
+-    v.selection.stroke = Stroke::new(1.0, Color32::WHITE);
++    v.selection.bg_fill = t.selection;
++    v.selection.stroke = Stroke::new(1.0, t.ink);
+     v.warn_fg_color = t.warn;
+     v.error_fg_color = t.bad;
+     for (w, fill, stroke, fg) in [
+         (&mut v.widgets.noninteractive, t.bg, t.line, t.muted),
+         (&mut v.widgets.inactive, t.bg, t.line, t.ink),
+-        (&mut v.widgets.hovered, t.sunken, t.line_strong, t.ink_strong),
+-        (&mut v.widgets.active, t.sunken, t.line_strong, t.ink_strong),
+-        (&mut v.widgets.open, t.sunken, t.line_strong, t.ink_strong),
++        (&mut v.widgets.hovered, t.selection, t.line_strong, t.ink_strong),
++        (&mut v.widgets.active, t.selection, t.line_strong, t.ink_strong),
++        (&mut v.widgets.open, t.selection, t.line_strong, t.ink_strong),
+     ] {
+         w.bg_fill = fill;
+         w.weak_bg_fill = fill;
 diff --git a/crates/ui-egui/src/views.rs b/crates/ui-egui/src/views.rs
-index 004f45a34fdf173062a9c8cd90ab08d61452440a..5f5e677e2ce31eb569fe7e5a1740fce3e13b380c 100644
+index 004f45a34fdf173062a9c8cd90ab08d61452440a..646f32a85f0c5f0e8d2fe7fd612392104489820a 100644
 --- a/crates/ui-egui/src/views.rs
 +++ b/crates/ui-egui/src/views.rs
 @@ -80,7 +80,7 @@ impl LauncherUi {
@@ -153295,9 +153366,12 @@ index 004f45a34fdf173062a9c8cd90ab08d61452440a..5f5e677e2ce31eb569fe7e5a1740fce3
                  ui.add_space(6.0);
                  widgets::rule(ui, h);
                  ui.add_space(6.0);
-@@ -117,9 +114,9 @@ impl LauncherUi {
+@@ -115,11 +112,11 @@ impl LauncherUi {
+                     if ui.available_width() >= 17.0 + tag_width {
+                         widgets::rule(ui, h);
                          ui.add_space(16.0);
-                         widgets::tag(ui, tl!("Launcher"), t.invert_bg, t.invert_fg);
+-                        widgets::tag(ui, tl!("Launcher"), t.invert_bg, t.invert_fg);
++                        widgets::tag(ui, tl!("Launcher"), t.selection, t.ink_strong);
                      }
 -                    if ui.available_width() >= 12.0 + widgets::hud_galley(ui, tl!("KIO App Suite"), t.muted).size().x {
 +                    if ui.available_width() >= 12.0 + widgets::hud_galley(ui, tl!("Bogo App Suite"), t.muted).size().x {
@@ -153307,8 +153381,12 @@ index 004f45a34fdf173062a9c8cd90ab08d61452440a..5f5e677e2ce31eb569fe7e5a1740fce3
                      }
                  });
              });
-@@ -143,7 +140,7 @@ impl LauncherUi {
-                         widgets::tag(ui, tl!("Update"), t.accent, Color32::WHITE);
+@@ -140,10 +137,10 @@ impl LauncherUi {
+                 .inner_margin(egui::Margin::symmetric(16, 10))
+                 .show(ui, |ui| {
+                     ui.horizontal(|ui| {
+-                        widgets::tag(ui, tl!("Update"), t.accent, Color32::WHITE);
++                        widgets::tag(ui, tl!("Update"), t.selection, t.ink_strong);
                          ui.add_space(4.0);
                          ui.label(
 -                            RichText::new(fmt(tl!("KIO Launcher {version} is available."), &[("version", &r.version_label())]))
@@ -153355,8 +153433,35 @@ index 004f45a34fdf173062a9c8cd90ab08d61452440a..5f5e677e2ce31eb569fe7e5a1740fce3
              ui.with_layout(egui::Layout::left_to_right(egui::Align::Center), |ui| {
                  // While GitHub is rate limited, saying so matters more than when we last checked.
                  let avail = ui.available_width();
+@@ -397,7 +374,7 @@ impl LauncherUi {
+         let hovered = ui.rect_contains_pointer(rect);
+         let wipe = if self.reduce_motion { 0.0 } else { 0.3 };
+         let lift = ui.ctx().animate_bool_with_time(ui.id().with(("card-hover", id)), hovered, wipe);
+-        let app_color = rgb(app.color);
++        let app_color = t.accent;
+         // The whole card opens the app's page. Added before the card's own links and buttons, so
+         // they sit on top of it and keep their clicks.
+         if AppDetails::by_id(id).is_some() {
+@@ -409,7 +386,7 @@ impl LauncherUi {
+         }
+         let painter = ui.painter_at(rect.expand(16.0));
+         // A faint wash in the app's colour fades in under the pointer.
+-        let fill = t.bg.lerp_to_gamma(app_color, 0.05 * lift);
++        let fill = t.bg.lerp_to_gamma(t.selection, lift);
+         painter.rect(rect, CornerRadius::ZERO, fill, t.hairline(), egui::StrokeKind::Inside);
+         // On hover, a 2 px rule in the app's colour wipes in from the left along the top.
+         if lift > 0.0 {
+@@ -424,7 +401,7 @@ impl LauncherUi {
+             let mut strip_ui = ui.new_child(
+                 egui::UiBuilder::new().max_rect(strip.shrink2(vec2(CARD_PAD, 0.0))).layout(egui::Layout::left_to_right(egui::Align::Center)),
+             );
+-            widgets::tag(&mut strip_ui, &number, app_color, Color32::BLACK);
++            widgets::tag(&mut strip_ui, &number, t.selection, t.ink_strong);
+             strip_ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                 ui.spacing_mut().item_spacing.x = 16.0;
+                 widgets::hud_link(ui, tl!("GitHub"), &app.repo_url());
 diff --git a/crates/ui-egui/src/widgets.rs b/crates/ui-egui/src/widgets.rs
-index 1f5562ebc06b8f4bb2e8624bc36c35ad89d34639..8a3eb841cae6e2760d22721ed8bb82e56b8c6982 100644
+index 1f5562ebc06b8f4bb2e8624bc36c35ad89d34639..974b14e8cdb3dc71539a6e3798bcdc37d117ef5a 100644
 --- a/crates/ui-egui/src/widgets.rs
 +++ b/crates/ui-egui/src/widgets.rs
 @@ -23,7 +23,7 @@ pub fn tone_color(t: &Tokens, tone: Tone) -> Color32 {
@@ -153377,6 +153482,64 @@ index 1f5562ebc06b8f4bb2e8624bc36c35ad89d34639..8a3eb841cae6e2760d22721ed8bb82e5
      job.wrap = egui::text::TextWrapping::truncate_at_width(max_width.min(ui.available_width()).max(0.0));
      let galley = ui.painter().layout_job(job);
      let elided = galley.elided;
+@@ -106,7 +106,7 @@ pub fn nav_link(ui: &mut Ui, text: &str, tip: &str, height: f32, active: bool) -
+     let on = active || resp.hovered();
+     let span = Rect::from_center_size(rect.center(), galley.size() + vec2(12.0, 6.0));
+     if on {
+-        ui.painter().rect_filled(span, CornerRadius::ZERO, t.invert_bg);
++        ui.painter().rect_filled(span, CornerRadius::ZERO, t.selection);
+     }
+     paint_centred(ui, rect, galley, if on { t.invert_fg } else { t.muted });
+     resp.widget_info(|| egui::WidgetInfo::selected(egui::WidgetType::Button, true, active, text));
+@@ -121,7 +121,7 @@ pub fn nav_icon(ui: &mut Ui, symbol: &str, tip: &str, height: f32, busy: bool) -
+     let p = ui.painter();
+     let hovered = resp.hovered() && !busy;
+     if hovered {
+-        p.rect_filled(rect, CornerRadius::ZERO, t.invert_bg);
++        p.rect_filled(rect, CornerRadius::ZERO, t.selection);
+     }
+     p.vline(rect.left() + 0.5, rect.y_range(), t.hairline());
+     if busy {
+@@ -326,9 +326,9 @@ pub fn button(ui: &mut Ui, text: &str, kind: Kind, width: f32) -> Response {
+     let enabled = ui.is_enabled();
+     let hovered = resp.hovered() && enabled;
+     let (fill, stroke, color) = match kind {
+-        Kind::Primary => (t.invert_bg.gamma_multiply(if hovered { 0.8 } else { 1.0 }), Stroke::NONE, t.invert_fg),
++        Kind::Primary => (if hovered { t.selection } else { t.invert_bg }, Stroke::NONE, t.invert_fg),
+         Kind::Danger => (t.bad.gamma_multiply(if hovered { 0.8 } else { 1.0 }), Stroke::NONE, Color32::WHITE),
+-        Kind::Secondary if hovered => (t.invert_bg, Stroke::NONE, t.invert_fg),
++        Kind::Secondary if hovered => (t.selection, Stroke::NONE, t.ink_strong),
+         Kind::Secondary => (t.bg, Stroke::new(1.0, t.line_strong), t.ink),
+     };
+     // Disabled: the whole button at half strength, like the site's `opacity-50`.
+@@ -362,15 +362,15 @@ pub fn cells<T: PartialEq + Copy>(ui: &mut Ui, value: &mut T, options: &[(T, Cel
+             let on = *value == *opt;
+             let label = hud_galley(ui, cell.label, t.ink);
+             let count = cell.count.map(|(n, highlight)| {
+-                let c = if on { t.invert_fg.gamma_multiply(0.6) } else { highlight.filter(|_| n > 0).unwrap_or(t.faint) };
++                let c = if on { t.ink_strong } else { highlight.filter(|_| n > 0).unwrap_or(t.faint) };
+                 (hud_galley(ui, &n.to_string(), c), c)
+             });
+             let w = label.size().x + count.as_ref().map_or(0.0, |(g, _)| g.size().x + 8.0) + 24.0;
+             let (rect, resp) = ui.allocate_exact_size(vec2(w, theme::CONTROL_H), Sense::click());
+             let hovered = resp.hovered();
+             let (fill, ink) = match (on, hovered) {
+-                (true, _) => (t.invert_bg, t.invert_fg),
+-                (false, true) => (t.sunken, t.ink_strong),
++                (true, _) => (t.selection, t.ink_strong),
++                (false, true) => (t.selection, t.ink_strong),
+                 (false, false) => (Color32::TRANSPARENT, t.muted),
+             };
+             ui.painter().rect_filled(rect, CornerRadius::ZERO, fill);
+@@ -461,7 +461,7 @@ pub fn glyph_button(ui: &mut Ui, glyph: Glyph, tip: &str) -> Response {
+     let hovered = resp.hovered();
+     let p = ui.painter();
+     if hovered {
+-        p.rect_filled(rect, CornerRadius::ZERO, t.invert_bg);
++        p.rect_filled(rect, CornerRadius::ZERO, t.selection);
+     } else {
+         p.rect_stroke(rect, CornerRadius::ZERO, t.hairline(), egui::StrokeKind::Inside);
+     }
 @@ -496,24 +496,6 @@ pub fn more_menu<R>(ui: &mut Ui, add_contents: impl FnOnce(&mut Ui) -> R) {
  
  /// ArtCraft's social accounts as a row of small monochrome icons (faint, brighter on hover).
@@ -153669,7 +153832,7 @@ index d6d0a1fd72ef6bce416b76bdda7393518756f0ed..ce99cec24f0944c7c7a0f372988a0660
      let mut table = harness(ViewMode::Table);
      table.run_steps(8);
 diff --git a/crates/ui-egui/tests/ui.rs b/crates/ui-egui/tests/ui.rs
-index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..03019a2f82d9b13936ecf8b1b3494b8c3510242e 100644
+index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..cf38f2e32fc828ece7dfb7857c11f265d2504ed1 100644
 --- a/crates/ui-egui/tests/ui.rs
 +++ b/crates/ui-egui/tests/ui.rs
 @@ -294,7 +294,7 @@ fn grid_shows_every_status_and_installs_on_click() {
@@ -154120,6 +154283,105 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..03019a2f82d9b13936ecf8b1b3494b8c
                  }
                  if [720.0, 800.0, 1180.0].contains(&width) {
                      snapshot(&mut h, &format!("header-{theme:?}-{bar:?}-{width}"));
+@@ -1496,3 +1509,98 @@ fn with_animations_on_hovering_a_card_animates() {
+     let frames = frames_to_hover_the_next_card(&mut h);
+     assert!(frames >= 10, "{frames} frames");
+ }
++
++// Append after the existing promotion-test transform. The original tests remain byte-identical.
++#[test]
++fn bogo_launcher_actual_header_selection_hover_and_index_shapes() {
++    use egui::epaint::Shape;
++    use egui::{Color32, Pos2, Rect};
++    const HEADER: Color32 = Color32::from_rgb(0xff, 0xf3, 0xe8);
++    const SELECTED: Color32 = Color32::from_rgb(0xff, 0xe7, 0xd4);
++    const INK: Color32 = Color32::from_rgb(0x34, 0x2b, 0x26);
++
++    // Retain painter order and the parent's real clip, including nested Shape::Vec.
++    fn leaves<'a>(shape: &'a Shape, clip: Rect, out: &mut Vec<(Rect, &'a Shape)>) {
++        if let Shape::Vec(children) = shape {
++            for child in children {
++                leaves(child, clip, out);
++            }
++        } else {
++            out.push((clip, shape));
++        }
++    }
++    fn painted<'a>(h: &'a Harness<'_, Option<LauncherUi>>) -> Vec<(Rect, &'a Shape)> {
++        let mut out = Vec::new();
++        for clipped in &h.output().shapes {
++            leaves(&clipped.shape, clipped.clip_rect, &mut out);
++        }
++        out
++    }
++    fn top_rect_fill(h: &Harness<'_, Option<LauncherUi>>, p: Pos2) -> Option<Color32> {
++        painted(h)
++            .into_iter()
++            .filter_map(|(clip, shape)| match shape {
++                Shape::Rect(r) if clip.contains(p) && r.rect.contains(p) && r.fill.a() == 255 => Some(r.fill),
++                _ => None,
++            })
++            .last()
++    }
++    fn assert_ink(h: &Harness<'_, Option<LauncherUi>>, target: Rect, text: &str) {
++        let matching: Vec<_> = painted(h)
++            .into_iter()
++            .filter_map(|(clip, shape)| match shape {
++                Shape::Text(t) if t.galley.job.text == text && clip.intersects(target) && t.visual_bounding_rect().intersects(target) => Some(t),
++                _ => None,
++            })
++            .collect();
++        assert_eq!(matching.len(), 1, "one actual visible text shape {text:?} in {target:?}");
++        let t = matching[0];
++        assert_eq!(t.opacity_factor, 1.0, "{text}: no dimming of the selected label");
++        // widgets::paint_left/paint_centred use galley_with_override_text_color.
++        assert_eq!(t.override_text_color, Some(INK), "{text}: actual glyph ink must remain readable brown");
++    }
++    fn assert_selection(h: &Harness<'_, Option<LauncherUi>>, label: &str, text: &str) {
++        let rect = h.get_by_label(label).rect();
++        assert_eq!(top_rect_fill(h, rect.center()), Some(SELECTED), "actual selected/hover fill for {label}");
++        assert_ink(h, rect, text);
++    }
++
++    for theme in [egui::Theme::Light, egui::Theme::Dark] {
++        let (mut h, _) = harness(ViewMode::Grid, theme, true);
++        h.event(egui::Event::PointerGone);
++        h.run_steps(6);
++        assert_eq!(h.state().as_ref().unwrap().settings.view, ViewMode::Grid);
++        assert_eq!(h.state().as_ref().unwrap().settings.filter, artcraft_launcher_ui_egui::settings::Filter::All);
++        let grid = h.get_by_label("Grid").rect();
++        let header_rects: Vec<_> = painted(&h)
++            .into_iter()
++            .filter_map(|(clip, shape)| match shape {
++                Shape::Rect(r) if r.fill == HEADER => {
++                    let visible = r.rect.intersect(clip);
++                    (visible.width() >= 1100.0 && visible.height() >= 40.0 && visible.height() <= 90.0 && visible.contains(grid.center()))
++                        .then_some(visible)
++                }
++                _ => None,
++            })
++            .collect();
++        assert!(!header_rects.is_empty(), "{theme:?}: actual full-width pale header must contain the Grid navigation center");
++        assert_selection(&h, "Grid", "GRID");
++        assert_selection(&h, "All 13", "ALL");
++        // Index 01 can be below the fold under a different legitimate sort order.
++        let index_id = h.get_by_label("01").accesskit_node().id();
++        h.get_by_label("01").scroll_to_me();
++        h.run_steps(4);
++        assert_eq!(h.get_by_label("01").accesskit_node().id(), index_id, "probe the same real index badge after scrolling");
++        assert_selection(&h, "01", "01");
++
++        let table = h.get_by_label("Table").rect();
++        assert_ne!(top_rect_fill(&h, table.center()), Some(SELECTED), "unselected Table starts unhighlighted");
++        let table_id = h.get_by_label("Table").accesskit_node().id();
++        h.event(egui::Event::PointerMoved(table.center()));
++        h.run_steps(4);
++        assert_eq!(h.get_by_label("Table").accesskit_node().id(), table_id, "hover the same real node");
++        assert_eq!(h.state().as_ref().unwrap().settings.view, ViewMode::Grid, "hover must not click or switch views");
++        assert_selection(&h, "Table", "TABLE");
++        assert_selection(&h, "Grid", "GRID");
++    }
++}
 diff --git a/packaging/freebsd/package.sh b/packaging/freebsd/package.sh
 index 2cb1cc0711be13c0837f3b72dc813139a6f6b38a..ab828b5f0f18989e40a235dd358643c053e76812 100755
 --- a/packaging/freebsd/package.sh

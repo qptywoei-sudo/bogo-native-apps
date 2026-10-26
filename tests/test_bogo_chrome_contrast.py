@@ -377,5 +377,133 @@ fn contrast(a:Color32,b:Color32)->f64 {let(a,b)=(lum(a),lum(b)); (a.max(b)+0.05)
                 self.assertEqual(unrelated_ui.read_text(encoding='utf-8'), sentinel)
 
 
+def authenticated_launcher_role_sources():
+    import bogo_brand as brand
+    import bogo_promotion_removal as promotions
+    from bogo_launcher import _brand_case
+    from bogo_promotion_four import identity
+    from test_bogo_promotion_four import apply_text_hunks
+    from test_bogo_promotion_launcher_tests import authenticated_launcher_tests
+    import bogo_promotion_launcher_tests as launcher_tests
+    lock = bogo.base_lock('launcher')
+    archive = bogo.full.common.verified_archive(lock['source'], ROOT / '.cache/archives', False)
+    if hashlib.sha256(archive.read_bytes()).hexdigest() != lock['source']['sha256']:
+        raise ValueError('Authenticated Launcher source archive changed')
+    patch = ROOT / lock['branding']['patch']
+    manifest = ROOT / lock['branding']['manifest']
+    if hashlib.sha256(patch.read_bytes()).hexdigest() != lock['branding']['sha256'] or hashlib.sha256(manifest.read_bytes()).hexdigest() != lock['branding']['manifestSha256']:
+        raise ValueError('Immutable legacy Launcher branding inputs changed')
+    metadata = {row['path']: row for row in __import__('json').loads(manifest.read_text(encoding='utf-8'))['files']}
+    result = {}
+    with tarfile.open(archive) as tar:
+        for relative in chrome.LAUNCHER_POST_ROLE_ROWS:
+            raw = tar.extractfile(lock['source']['root'] + '/' + relative).read().decode('utf-8')
+            legacy = apply_text_hunks(raw, patch.read_text(encoding='utf-8'), relative)
+            if relative in metadata and identity(legacy) != metadata[relative]['after']:
+                raise ValueError('Exact legacy Launcher file identity changed')
+            text = _brand_case(legacy) if relative.endswith('/widgets.rs') else legacy
+            text = brand.rust_display(text)
+            if relative.endswith('/theme.rs'):
+                text = brand.theme(text)
+            text = re.sub(r'\.color\((t|tokens)\.accent\)', lambda m: '.color(' + m[1] + '.ink)', text)
+            if relative.endswith('/views.rs'):
+                text = text.replace('.alt_text(tl!("ArtCraft"))', '.alt_text("Bogo")')
+            result[relative] = promotions.app_text('launcher', relative, text)
+    _, tests = authenticated_launcher_tests()
+    relative = 'crates/ui-egui/tests/ui.rs'
+    result[relative] = launcher_tests.transform(relative, tests[relative])
+    return result
+
+
+class LauncherActualChromeRoles(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.sources = authenticated_launcher_role_sources()
+
+    def test_authenticated_five_whole_preimages_and_inverse_leave_every_other_byte(self):
+        for relative, row in chrome.LAUNCHER_POST_ROLE_ROWS.items():
+            before = self.sources[relative]
+            self.assertEqual(hashlib.sha256(before.encode()).hexdigest(), row['beforeSha256'])
+            after = chrome.launcher_role_text(relative, before)
+            spans = []
+            for old, new, count in row['pairs']:
+                offset = 0
+                for _ in range(count):
+                    start = before.index(old, offset); spans.append((start, start + len(old), old, new)); offset = start + len(old)
+            spans.sort(); delta = 0; actual = []
+            for start, end, old, new in spans:
+                at = start + delta; self.assertEqual(after[at:at + len(new)], new)
+                actual.append((at, at + len(new), old)); delta += len(new) - len(old)
+            for start, end, old in reversed(actual):
+                after = after[:start] + old + after[end:]
+            self.assertEqual(after, before, relative)
+
+    def test_closed_inputs_reject_mutation_duplicate_already_applied_or_other_paths(self):
+        for relative in chrome.LAUNCHER_POST_ROLE_ROWS:
+            before = self.sources[relative]
+            for bad in (before + '\n', before + before, chrome.launcher_role_text(relative, before)):
+                with self.subTest(relative=relative), self.assertRaises(ValueError):
+                    chrome.launcher_role_text(relative, bad)
+        with self.assertRaises(ValueError):
+            chrome.launcher_role_text('crates/core/src/catalog.rs', 'anything')
+        for app in ('cad','design','vector','film','light','pdf','effect','ui','word','sound','deck','grid','photo'):
+            self.assertEqual(chrome.apply_launcher_role_source('/missing-and-never-read', app), [])
+
+    def test_post_hook_appends_one_real_paint_test_and_keeps_original_hundred_assertions_exact(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            source = Path(temporary)
+            for relative, text in self.sources.items():
+                path = source / relative; path.parent.mkdir(parents=True, exist_ok=True); path.write_text(text, encoding='utf-8')
+            sentinel = source / 'crates/core/src/settings.rs'; sentinel.parent.mkdir(parents=True); sentinel.write_text('unchanged storage, data and version-kio.1', encoding='utf-8')
+            before = self.sources['crates/ui-egui/tests/ui.rs']
+            changed = chrome.apply_launcher_role_source(source, 'launcher')
+            self.assertEqual(set(changed), set(self.sources))
+            after = (source / 'crates/ui-egui/tests/ui.rs').read_text(encoding='utf-8')
+            self.assertEqual(after, before + '\n' + chrome.LAUNCHER_ROLE_PAINT_TEST)
+            self.assertEqual(after[:len(before)], before)
+            self.assertEqual(after.count('#[test]'), before.count('#[test]') + 1)
+            self.assertEqual(after.count('#[ignore'), before.count('#[ignore'))
+            self.assertEqual(sentinel.read_text(), 'unchanged storage, data and version-kio.1')
+            with self.assertRaises(ValueError):
+                chrome.apply_launcher_role_source(source, 'launcher')
+
+    def test_failed_whole_preimage_validation_writes_nothing(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            source = Path(temporary)
+            for relative, text in self.sources.items():
+                path = source / relative; path.parent.mkdir(parents=True, exist_ok=True); path.write_text(text, encoding='utf-8')
+            test_path = source / 'crates/ui-egui/tests/ui.rs'
+            test_path.write_text(test_path.read_text() + '// unexpected original test mutation\n')
+            before = {p: p.read_bytes() for p in source.rglob('*') if p.is_file()}
+            with self.assertRaises(ValueError):
+                chrome.apply_launcher_role_source(source, 'launcher')
+            self.assertEqual(before, {p: p.read_bytes() for p in source.rglob('*') if p.is_file()})
+
+    def test_both_styles_exact_roles_preserve_semantic_status_and_gallery(self):
+        relative = 'crates/ui-egui/src/theme.rs'; before = self.sources[relative]; after = chrome.launcher_role_text(relative, before)
+        for field, rgb in [('header', '0xFF, 0xF3, 0xE8'), ('selection', '0xFF, 0xE7, 0xD4'), ('bg', '0xFF, 0xFA, 0xF6')]:
+            self.assertEqual(len(re.findall(r'^\s*' + field + r': Color32::from_rgb\(' + re.escape(rgb) + r'\),', after, re.M)), 2)
+        for field in ('good','warn','bad','accent','invert_bg','invert_fg','sunken'):
+            pattern = r'^\s*' + field + r':.*$'; self.assertEqual(re.findall(pattern, before, re.M), re.findall(pattern, after, re.M))
+        relative = 'crates/ui-egui/src/details.rs'; before = self.sources[relative]; after = chrome.launcher_role_text(relative, before)
+        start = before.index('    fn gallery('); end = before.index('\n    }', start) + 6
+        self.assertIn(before[start:end], after)
+        for relative in chrome.LAUNCHER_POST_ROLE_ROWS:
+            before = self.sources[relative]; after = chrome.launcher_role_text(relative, before)
+            for pattern in (r'^.*\bSense::.*$', r'^.*\.clicked\(\).*$', r'^.*\.interact\(.*$', r'^.*https?://.*$', r'^.*egui::Image::.*$'):
+                self.assertEqual(re.findall(pattern, before, re.M), re.findall(pattern, after, re.M), (relative, pattern))
+
+    def test_real_shape_regression_uses_original_harness_and_real_hover_without_overwriting_old_tests(self):
+        text = chrome.LAUNCHER_ROLE_PAINT_TEST
+        for marker in ('for theme in [egui::Theme::Light, egui::Theme::Dark]', 'h.output().shapes', 'clip_rect', 'visible.contains(grid.center())', 'top_rect_fill', 'override_text_color', 'assert_selection(&h, "Grid", "GRID")', 'assert_selection(&h, "All 13", "ALL")', 'assert_selection(&h, "01", "01")', 'egui::Event::PointerMoved(table.center())', 'h.run_steps(4)', 'accesskit_node().id()', 'hover must not click or switch views'):
+            self.assertIn(marker, text)
+        self.assertEqual(text.count('#[test]'), 1)
+        import bogo_brand as brand
+        import inspect
+        code = inspect.getsource(brand.transform_source)
+        self.assertLess(code.index('remove_promotions(source, app)'), code.index('apply_launcher_role_source(source, app)'))
+        self.assertNotIn('rustfmt', inspect.getsource(chrome.apply_launcher_role_source))
+
+
 if __name__ == '__main__':
     unittest.main()

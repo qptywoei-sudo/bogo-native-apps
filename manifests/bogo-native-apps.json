@@ -9207,10 +9207,10 @@
       "baseLock": "manifests/launcher.lock.json",
       "baseLockSha256": "46fa9e82194ee555f1ed72acf5b54709738d3d9db2c4a30b03995850d6e70237",
       "baseSourceTreeSha256": "d0c47781d861fa777ae4c9b931e870f5013b435039791a91b14923583c55b318",
-      "sourceTreeSha256": "7285b2922a51515b49d555a0b2026095e74fbc1f4ffd9372da4e845e13cd7d10",
+      "sourceTreeSha256": "82b6ca6c0591e540d4c56801d476ad082c93db0acc9219ef9e271d4d2493bb88",
       "patch": "patches/bogo/launcher.patch",
-      "patchSha256": "0d86c00d722ff2541d972cf3e23778f1f76a20ff538f38cad208614fd5dba85b",
-      "patchBytes": 11993339,
+      "patchSha256": "aa41dc880e1a333ff42ec2340f9f85610570d9c19b1925a5e5c443d71b7a2aed",
+      "patchBytes": 12007886,
       "files": [
         {
           "path": "apps/artcraft-launcher-web/index.html",
@@ -9862,8 +9862,19 @@
             "bytes": 30564
           },
           "after": {
-            "sha256": "241713bb24d8af8e9b7c37b61c511a91176352fbc2a435f3a8de2ad329c8613d",
-            "bytes": 30565
+            "sha256": "334215c0742f8548498a0a6606a84cb8e739e1663fe48f746d8dbe60f58df930",
+            "bytes": 30569
+          }
+        },
+        {
+          "path": "crates/ui-egui/src/details.rs",
+          "before": {
+            "sha256": "3b70dccc9befbff63ed6fc77c12214bc39af9801850e905080768725c053a252",
+            "bytes": 24183
+          },
+          "after": {
+            "sha256": "9185af4157b6be068a73f5ededa0683adb880f20a5c42ca9f5dbfd2be74488b2",
+            "bytes": 24137
           }
         },
         {
@@ -10071,8 +10082,8 @@
             "bytes": 13150
           },
           "after": {
-            "sha256": "217e17d6f6aed75ac814ff6143f8ef2a3938c5151be3239d72c7b19758da70c3",
-            "bytes": 13595
+            "sha256": "ac3ec9fba6640e65bebf6e8d50f7135de45071a2d811f36006c39eaf9c63f149",
+            "bytes": 13988
           }
         },
         {
@@ -10082,8 +10093,8 @@
             "bytes": 53373
           },
           "after": {
-            "sha256": "08239da360f8e1138eaa7355b9c4f1cdebaa8bdb81d8df5fa710e8f8cafea0d8",
-            "bytes": 51897
+            "sha256": "574fa442f1ba240c50a6fca0695e1df138a436423dba481992ccfc263baefee1",
+            "bytes": 51888
           }
         },
         {
@@ -10093,8 +10104,8 @@
             "bytes": 25152
           },
           "after": {
-            "sha256": "2d9f26525dff8f619fc79a20f1120c3dc86b93e623eabc4365ef57e0329204fd",
-            "bytes": 24157
+            "sha256": "a1102857a4174856ceed65078d14d4160c3e54176b50d56ba2464f655bc966aa",
+            "bytes": 24131
           }
         },
         {
@@ -10203,8 +10214,8 @@
             "bytes": 65718
           },
           "after": {
-            "sha256": "61fde7d5658096455fd77014bf7bed28920f49ac86fc389872fbcaa059d2f737",
-            "bytes": 66439
+            "sha256": "538283d2981c70041faa856984b00103a39a63c1bb224c7c209f2738aae59d1b",
+            "bytes": 71179
           }
         },
         {

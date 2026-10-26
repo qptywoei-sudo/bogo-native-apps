@@ -8,7 +8,7 @@ import shutil
 from pathlib import Path
 
 from bogo_assets import ASSETS, originals
-from bogo_chrome_contrast import transform as chrome_contrast
+from bogo_chrome_contrast import transform as chrome_contrast, apply_launcher_role_source
 from bogo_promotion_removal import apply as remove_promotions
 
 NAMES = {'cad': 'CAD', 'design': 'Design', 'vector': 'Vector', 'film': 'Film', 'light': 'Light', 'pdf': 'PDF', 'effect': 'Effect', 'ui': 'UI', 'word': 'Word', 'sound': 'Sound', 'deck': 'Deck', 'grid': 'Grid', 'launcher': 'Launcher', 'photo': 'Photo'}
@@ -227,3 +227,4 @@ def transform_source(source, app):
             path.write_text(new, encoding='utf-8')
     icon_assets(source, app)
     remove_promotions(source, app)
+    apply_launcher_role_source(source, app)
