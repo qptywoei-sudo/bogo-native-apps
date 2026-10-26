@@ -13,6 +13,7 @@ import xml.etree.ElementTree as ET
 
 import full_native as full
 import launcher_native as launcher
+import bogo_home_gate as home_gate
 from bogo_brand import NAMES, PALETTE
 from bogo_release_identity import release_version, approved_promotion_transition, promotion_transition_records
 
@@ -124,6 +125,7 @@ def public_files(lock):
     extra += ['scripts/bogo_packaging.py', 'tests/test_bogo_packaging.py']
     extra += ['docs/bogo-ci-verification.md']
     extra += ['scripts/bogo_chrome_contrast.py', 'tests/test_bogo_chrome_contrast.py']
+    extra += ['scripts/bogo_home_gate.py', 'tests/test_bogo_home_gate.py']
     extra += ['scripts/bogo_release_identity.py', 'tests/test_bogo_release_identity.py', 'manifests/bogo-prior-bogo-upgrade-inputs.json']
     extra += ['scripts/bogo_promotion_removal.py', 'tests/test_bogo_promotion_removal.py', 'scripts/bogo_promotion_four.py', 'tests/test_bogo_promotion_four.py', 'scripts/bogo_promotion_launcher_tests.py', 'tests/test_bogo_promotion_launcher_tests.py']
     extra += ['scripts/bogo_runtime_icons.py', 'tests/test_bogo_runtime_icons.py', 'scripts/bogo_ci_artifact.py', 'tests/test_bogo_ci_artifact.py', 'scripts/bogo_msi_art.py', 'tests/test_bogo_msi_art.py', '.github/workflows/bogo-windows-acceptance.yml']
@@ -232,8 +234,10 @@ def main():
         elif args.command == 'build':
             shared_target_cache(lock, args.platform)
             (launcher.build if lock['id'] == 'launcher' else full.build)(args, lock)
+            home_gate.complete(lock, args.platform)
         elif args.command == 'package':
             args.existing_target = None
+            home_gate.require_complete(lock, args.platform)
             (launcher.package if lock['id'] == 'launcher' else full.package)(args, lock)
         elif args.command == 'source':
             full.make_source(args, lock)

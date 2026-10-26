@@ -48997,6 +48997,19 @@ index ae0ee69affc11feb3340d457996f372a58e639c8..7437ead9abc7e7e66cec550ceca97747
      }
  }
  
+diff --git a/crates/ui-egui/src/dock.rs b/crates/ui-egui/src/dock.rs
+index d144bd57e2c2bbfc98f3ed2c393d321dcaf20e87..38058603909bccb385e8168afff3f5255e20a83c 100644
+--- a/crates/ui-egui/src/dock.rs
++++ b/crates/ui-egui/src/dock.rs
+@@ -879,7 +879,7 @@ pub fn draw_group_chrome_details(ui: &mut egui::Ui, g: &Group, seqs: &SeqTabs, t
+ /// Paint once after the group's contents so child backgrounds cannot hide its focus (#1075).
+ pub(crate) fn paint_group_focus(ui: &egui::Ui, group: &Group, focused: PanelKind, tokens: &Tokens) {
+     if group.panels.get(group.active).copied() == Some(focused) {
+-        ui.painter().rect_stroke(group.rect, 0.0, Stroke::new(1.0, tokens.focus), StrokeKind::Inside);
++        ui.painter().rect_stroke(group.rect, 0.0, Stroke::new(1.0, tokens.chrome_focus), StrokeKind::Inside);
+     }
+ }
+ 
 diff --git a/crates/ui-egui/src/dock_shared.rs b/crates/ui-egui/src/dock_shared.rs
 index 8803bf264501d49111d501dca477842b7a35ed96..14e111d85e292c43b0c2579867420b26ca2229fc 100644
 --- a/crates/ui-egui/src/dock_shared.rs
@@ -51246,6 +51259,27 @@ index 1006b57d55b9805aa56050352397fde63883a1bd..e14a1cc5bf027b3dbb2761b6379589d3
          system.store(1, Ordering::Relaxed);
          app.apply_prefs(&ctx);
          assert_eq!(app.tokens.kind, ThemeKind::Dark);
+diff --git a/crates/ui-egui/src/panels/tools.rs b/crates/ui-egui/src/panels/tools.rs
+index 34106c6b94f18dcd1e52615ab41a0c1ecd4f50b2..4fa1e329ada74accc3f8fa8180bea9d949fdb7f9 100644
+--- a/crates/ui-egui/src/panels/tools.rs
++++ b/crates/ui-egui/src/panels/tools.rs
+@@ -35,13 +35,13 @@ pub fn show(app: &mut FilmcraftApp, ui: &mut egui::Ui, rect: Rect) {
+         }
+         let active = group.contains(&app.ui.tool);
+         if active {
+-            ui.painter().rect_filled(Rect::from_center_size(r.center(), vec2(26.0, 26.0)), 4.0, t.accent);
++            ui.painter().rect_filled(Rect::from_center_size(r.center(), vec2(26.0, 26.0)), 4.0, t.pressed);
+         } else if resp.hovered() {
+             ui.painter().rect_filled(r, 4.0, t.hover);
+         }
+-        icons::paint(ui.painter(), Rect::from_center_size(r.center(), vec2(17.0, 17.0)), current.icon(), if active { egui::Color32::WHITE } else { t.icon });
++        icons::paint(ui.painter(), Rect::from_center_size(r.center(), vec2(17.0, 17.0)), current.icon(), t.icon);
+         if resp.has_focus() {
+-            ui.painter().rect_stroke(r.shrink(2.0), 4.0, egui::Stroke::new(1.5, t.focus), egui::StrokeKind::Inside);
++            ui.painter().rect_stroke(r.shrink(2.0), 4.0, egui::Stroke::new(1.5, t.chrome_focus), egui::StrokeKind::Inside);
+         }
+         if group.len() > 1 {
+             let c = r.right_bottom() - vec2(3.0, 3.0);
 diff --git a/crates/ui-egui/src/rtl.rs b/crates/ui-egui/src/rtl.rs
 index 3e36f0c9f48c91d2c9a2150d28858a10de4d3fef..52330e783a3b736e0473a1d12d8391fca975266d 100644
 --- a/crates/ui-egui/src/rtl.rs
@@ -51260,10 +51294,18 @@ index 3e36f0c9f48c91d2c9a2150d28858a10de4d3fef..52330e783a3b736e0473a1d12d8391fc
          assert_eq!(visual("سنة ١٤٤٥"), [["١", "٤", "٤", "٥", " ", "سنة"]]);
      }
 diff --git a/crates/ui-egui/src/theme.rs b/crates/ui-egui/src/theme.rs
-index 21a50012a24341c6e5db61dd9efd6d175f013311..678ae4f170961160e1570131b74561df4b067bc7 100644
+index 21a50012a24341c6e5db61dd9efd6d175f013311..7af5348b9c50f8e8bb7c55f5cf2c4fd5d506922d 100644
 --- a/crates/ui-egui/src/theme.rs
 +++ b/crates/ui-egui/src/theme.rs
-@@ -154,33 +154,33 @@ impl Tokens {
+@@ -59,6 +59,7 @@ pub struct Tokens {
+     pub tab_text_active: Color32,
+     /// Blue focus rectangle around the active panel.
+     pub focus: Color32,
++    pub chrome_focus: Color32,
+     pub accent: Color32,
+     pub accent_hover: Color32,
+     pub text: Color32,
+@@ -154,33 +155,34 @@ impl Tokens {
          // Measured from Premiere 26 "Darkest" (plan/premiere/02-ui-ux.md §1).
          let dark = Tokens {
              kind,
@@ -51281,6 +51323,7 @@ index 21a50012a24341c6e5db61dd9efd6d175f013311..678ae4f170961160e1570131b74561df
 +            tab_text_active: Color32::from_rgb(0x34, 0x2B, 0x26),
              focus: Color32::from_rgb(0x57, 0x94, 0xec),
 -            accent: Color32::from_rgb(0x2f, 0x6b, 0xdf),
++            chrome_focus: Color32::from_rgb(0xFC, 0x75, 0x01),
 +            accent: Color32::from_rgb(0xFC, 0x75, 0x01),
              accent_hover: Color32::from_rgb(0x3f, 0x7c, 0xe8),
 -            text: Color32::from_rgb(0xd1, 0xd1, 0xd1),
@@ -51316,7 +51359,7 @@ index 21a50012a24341c6e5db61dd9efd6d175f013311..678ae4f170961160e1570131b74561df
              control_handle_bg: Color32::from_rgb(0x2a, 0x2a, 0x2a),
              control_handle: Color32::from_rgb(0xe0, 0xe0, 0xe0),
              control_handle_dim: Color32::from_rgb(0xb0, 0xb0, 0xb0),
-@@ -213,7 +213,7 @@ impl Tokens {
+@@ -213,7 +215,7 @@ impl Tokens {
              slider_disabled_track: Color32::from_gray(74),
              slider_disabled_knob: Color32::from_gray(106),
              button_hover: Color32::from_gray(42),
@@ -51325,7 +51368,7 @@ index 21a50012a24341c6e5db61dd9efd6d175f013311..678ae4f170961160e1570131b74561df
              caption_track_bg: Color32::from_rgb(0x23, 0x20, 0x2a),
              scroll_thumb: Color32::from_gray(0x4b),
              scroll_thumb_hover: Color32::from_gray(0x6a),
-@@ -222,7 +222,7 @@ impl Tokens {
+@@ -222,7 +224,7 @@ impl Tokens {
              tl_bg: Color32::from_rgb(0x1d, 0x1d, 0x1d),
              tl_track_bg: Color32::from_rgb(0x1d, 0x1d, 0x1d),
              tl_track_bg_alt: Color32::from_rgb(0x1d, 0x1d, 0x1d),
@@ -51334,7 +51377,7 @@ index 21a50012a24341c6e5db61dd9efd6d175f013311..678ae4f170961160e1570131b74561df
              tl_ruler_bg: Color32::from_rgb(0x1d, 0x1d, 0x1d),
              tl_ruler_tick: Color32::from_rgb(0x8d, 0x8d, 0x8d),
              tl_ruler_text: Color32::from_rgb(0xb0, 0xb0, 0xb0),
-@@ -244,44 +244,44 @@ impl Tokens {
+@@ -244,44 +246,44 @@ impl Tokens {
          match kind {
              ThemeKind::Dark => dark,
              ThemeKind::Medium => Tokens {
@@ -51405,7 +51448,7 @@ index 21a50012a24341c6e5db61dd9efd6d175f013311..678ae4f170961160e1570131b74561df
                  control_handle_bg: Color32::from_rgb(205, 205, 205),
                  control_handle: Color32::from_rgb(50, 50, 50),
                  control_handle_dim: Color32::from_rgb(85, 85, 85),
-@@ -314,7 +314,7 @@ impl Tokens {
+@@ -314,7 +316,7 @@ impl Tokens {
                  slider_disabled_track: Color32::from_gray(190),
                  slider_disabled_knob: Color32::from_gray(140),
                  button_hover: Color32::from_gray(210),
@@ -51414,7 +51457,7 @@ index 21a50012a24341c6e5db61dd9efd6d175f013311..678ae4f170961160e1570131b74561df
                  icon_active: Color32::from_rgb(34, 34, 34),
                  caption_track_bg: Color32::from_rgb(222, 215, 233),
                  scroll_thumb: Color32::from_gray(150),
-@@ -325,7 +325,7 @@ impl Tokens {
+@@ -325,7 +327,7 @@ impl Tokens {
                  tl_bg: Color32::from_rgb(210, 210, 210),
                  tl_track_bg: Color32::from_rgb(222, 222, 222),
                  tl_track_bg_alt: Color32::from_rgb(228, 228, 228),
@@ -51423,7 +51466,7 @@ index 21a50012a24341c6e5db61dd9efd6d175f013311..678ae4f170961160e1570131b74561df
                  tl_ruler_bg: Color32::from_rgb(226, 226, 226),
                  tl_ruler_text: Color32::from_rgb(80, 80, 80),
                  ..dark
-@@ -470,7 +470,7 @@ pub fn apply_visuals(ctx: &egui::Context, t: &Tokens) {
+@@ -470,7 +472,7 @@ pub fn apply_visuals(ctx: &egui::Context, t: &Tokens) {
      v.override_text_color = Some(t.text);
      v.selection.bg_fill = t.accent;
      v.selection.stroke = Stroke::new(1.0, Color32::WHITE);

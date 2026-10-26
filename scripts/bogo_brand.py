@@ -157,6 +157,14 @@ def transform_source(source, app):
             continue
         relative = path.relative_to(source).as_posix()
         if relative in SPECIAL or path.name in STORAGE_FILES or path.name in ('Cargo.toml', 'Cargo.lock'):
+            if app == 'light' and relative == 'crates/ui-egui/src/panels/profiles.rs':
+                # This exact presentation file shares a storage filename. Apply
+                # only its reviewed glyph role, preserving every profile key
+                # and display/storage string outside that closed expression.
+                old = path.read_text(encoding='utf-8')
+                new = chrome_contrast(app, relative, old)
+                if new != old:
+                    path.write_text(new, encoding='utf-8')
             continue
         # Engine/document model, dependencies, test inputs, licences and contributor records stay exact.
         allowed = relative.startswith(('apps/', 'crates/ui-egui/', 'crates/native/', 'crates/core/', 'packaging/', 'locales/', 'i18n/', 'translations/'))

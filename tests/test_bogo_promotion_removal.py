@@ -160,6 +160,131 @@ class PromotionRemoval(unittest.TestCase):
         self.assertEqual(promo.localization('crates/ui-egui/src/i18n/ja.rs',tuples),tuples.replace('    ("Join our Discord", "Discord に参加"),\n',''))
 
 
+class LauncherFunctionalTsvPreservation(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.contents=fixture('launcher')[2]
+
+    def test_hungarian_update_instruction_retains_three_fields_and_removes_only_promotions(self):
+        relative='crates/ui-egui/src/i18n/hu.tsv'
+        update='\tOpen Bogo Launcher to update.\tNyisd meg az ArtCraft Launchert a frissítéshez.\n'
+        quit_row='\tQuit Bogo Launcher\tKilépés az ArtCraft Launcherből\n'
+        legal='\tCopyright © ArtCraft Team\tCopyright © ArtCraft Team\n'
+        other='\t{name} {v} is available\tElérhető: {name} {v}\n'
+        promotion='\tJoin the ArtCraft Discord\tCsatlakozz az ArtCraft Discordhoz\n'
+        before=update+quit_row+legal+other+promotion
+        after=promo.localization(relative,before)
+        self.assertEqual(after, update.replace('az ArtCraft Launchert','a Bogo Launchert')+quit_row.replace('az ArtCraft Launcherből','a Bogo Launcherből')+legal+other)
+        rows=[row.split('\t')for row in after.splitlines()]
+        self.assertTrue(all(len(row)==3 for row in rows))
+        self.assertEqual(rows[0],['','Open Bogo Launcher to update.','Nyisd meg a Bogo Launchert a frissítéshez.'])
+        self.assertEqual(promo.localization('user/document.tsv',before),before)
+        # The reviewed exception cannot turn unrelated retired-brand rows into visible UI.
+        self.assertEqual(promo.localization(relative,'\tUnreviewed ArtCraft action\tArtCraft Launchert\n'),'')
+
+    def test_authenticated_launcher_catalog_keeps_update_key_and_grammatical_translation(self):
+        contents=self.contents
+        relative='crates/ui-egui/src/i18n/hu.tsv'
+        before=contents[relative].decode('utf-8')
+        key='Open Bogo Launcher to update.'
+        before_rows=[line.split('\t')for line in before.splitlines()if line.startswith('\t'+key+'\t')]
+        self.assertEqual(before_rows,[['',key,'Nyisd meg az ArtCraft Launchert a frissítéshez.']])
+        after=promo.localization(relative,before)
+        after_rows=[line.split('\t')for line in after.splitlines()if line.startswith('\t'+key+'\t')]
+        self.assertEqual(after_rows,[['',key,'Nyisd meg a Bogo Launchert a frissítéshez.']])
+        self.assertIn('tl!("'+key+'")',contents['crates/ui-egui/src/app.rs'].decode('utf-8'))
+        self.assertIn('fn complete_catalogs_cover_every_ui_literal()',contents['crates/ui-egui/src/i18n/tests.rs'].decode('utf-8'))
+        for line in after.splitlines():
+            if line and not line.startswith('#'):
+                self.assertEqual(len(line.split('\t')),3,line)
+                self.assertFalse(promo.PROMOTION.search(line),line)
+                self.assertTrue('ArtCraft'not in line or promo.LEGAL.search(line),line)
+
+    def test_all_authenticated_launcher_tsv_functional_rows_survive_the_promotion_filter(self):
+        catalogs={path:raw.decode('utf-8')for path,raw in self.contents.items()if path.endswith('.tsv')}
+        self.assertEqual({Path(path).name for path in catalogs}, {'cs.tsv','de.tsv','es.tsv','fr.tsv','hu.tsv','ja.tsv','pl.tsv','pt-BR.tsv','ru.tsv','zh-CN.tsv'})
+        retired_labels={'ArtCraft','ArtCraft on {name}','ArtCraft on GitHub'}
+        changed_functional_rows=0
+        for relative,before in catalogs.items():
+            after=promo.localization(relative,before)
+            for row in before.splitlines():
+                if not row or row.startswith('#')or row in after.splitlines():continue
+                fields=row.split('\t')
+                self.assertEqual(len(fields),3,(relative,row))
+                if promo.PROMOTION.search(row)or fields[1]in retired_labels:continue
+                expected=row.replace('Kilépés az ArtCraft Launcherből','Kilépés a Bogo Launcherből')
+                if relative=='crates/ui-egui/src/i18n/hu.tsv':
+                    expected=expected.replace('Nyisd meg az ArtCraft Launchert a frissítéshez.','Nyisd meg a Bogo Launchert a frissítéshez.')
+                self.assertNotEqual(expected,row,(relative,row))
+                self.assertIn(expected,after.splitlines(),(relative,row))
+                changed_functional_rows+=1
+        self.assertEqual(changed_functional_rows,3) # plain + command-id Quit, and update instruction
+
+
+class LightFunctionalRetryBrandProof(unittest.TestCase):
+    BASELINES = {
+        'de': ('2b0d8dedfedd3552c715ec94cd25d88e98731dd242a6a6c898afcb52d50f6a19',21141),
+        'es': ('1d44078a4dda6a56ebf198b441cbd5e6094b1ada7b7e6703be4c91f6e751233f',20975),
+        'fr': ('3a4f44712ee13210b7438e5ea773403e08d020f8232a9b9763362b24ed3ae14c',21689),
+        'ja': ('ce84a505251427ed2cd076e9bbca7bcbdd776d035579418e947cdde2168d3253',23028),
+        'pt-br': ('8925c7b42a535270df947c30c4b23ee3c5523bf3bfd30150e42b80936131405e',21039),
+        'ru': ('392e4b76c0a7fdc25c0bfd9fd8e08ac4a50c211774098a60a1e1625077d12571',25574),
+        'uk': ('485457abf21176a87a5d1d2229f6231d7996defcfbd64015cf88c19dd8f1e1d2',25774),
+        'zh-hans': ('b7f9265457eec6ba038133479fdd72200a74cbd71b7f0766e7f9bc4db61d87e7',20530),
+        'zh-hant': ('6c2967596a333ae7f49290312d4dd6a908da47c8215df81e5e9c9ae1545a0ea9',20393),
+    }
+
+    @classmethod
+    def setUpClass(cls):
+        cls.contents=fixture('light')[2]
+
+    def test_nine_authenticated_locale_rows_change_only_brand_and_preserve_every_other_byte(self):
+        old=promo.LIGHT_RETRY_KEY;new=old.replace('LightCraft','Bogo Light')
+        self.assertEqual(len(self.BASELINES),9)
+        self.assertEqual(set(promo.LIGHT_RETRY_FORMATS),{f'crates/ui-egui/locales/{locale}-formats.json'for locale in self.BASELINES})
+        changed_translations=0
+        for locale,(sha,size)in self.BASELINES.items():
+            relative=f'crates/ui-egui/locales/{locale}-formats.json'
+            before=self.contents[relative].decode('utf-8')
+            self.assertEqual(promo.identity(before),{'sha256':sha,'bytes':size})
+            after=promo.light_retry_brand(relative,before)
+            changes=[(a,b)for a,b in zip(before.splitlines(keepends=True),after.splitlines(keepends=True))if a!=b]
+            self.assertEqual(len(changes),1,locale)
+            self.assertEqual(after.replace(changes[0][1],changes[0][0],1),before)
+            previous=json.loads(before);current=json.loads(after)
+            old_value=previous.pop(old);new_value=current.pop(new)
+            self.assertEqual(previous,current)
+            self.assertEqual(new_value,old_value.replace('LightCraft','Bogo Light'))
+            self.assertEqual(re.findall(r'\{[^{}]*\}',new_value),re.findall(r'\{[^{}]*\}',old_value))
+            changed_translations+=new_value!=old_value
+            full=json.loads(promo.app_text('light',relative,before))
+            self.assertIn(new,full)
+            self.assertNotIn(old,full)
+        self.assertEqual(changed_translations,7)
+
+    def test_rust_required_key_matches_every_locale_and_warning_arguments_are_unchanged(self):
+        relative='crates/ui-egui/src/panels/topbar.rs';before=self.contents[relative].decode('utf-8')
+        self.assertEqual(promo.identity(before),{'sha256':'5ec1302b0bab5a4f82db213efffd52177bdcf77706f95fa78f0415ae80d84c97','bytes':12678})
+        old=json.dumps(promo.LIGHT_RETRY_KEY,ensure_ascii=False);new=old.replace('LightCraft','Bogo Light')
+        after=promo.light_retry_brand(relative,before)
+        self.assertEqual(before.count(old),1)
+        self.assertEqual(after.count(new),1)
+        self.assertEqual(after.replace(new,old),before)
+        self.assertIn(new,promo.app_text('light',relative,before))
+        self.assertNotIn(old,promo.app_text('light',relative,before))
+        for path in promo.LIGHT_RETRY_FORMATS:
+            self.assertIn(json.loads(new),json.loads(promo.light_retry_brand(path,self.contents[path].decode('utf-8'))))
+
+    def test_unknown_rows_locales_and_user_error_data_cannot_be_rewritten(self):
+        relative='crates/ui-egui/locales/de-formats.json';before=self.contents[relative].decode('utf-8')
+        for changed in (before.replace('LightCraft retries automatically','Different retries automatically'),
+                        before.replace('LightCraft versucht','Unexpected versucht')):
+            with self.assertRaises(ValueError):promo.light_retry_brand(relative,changed)
+        self.assertEqual(promo.light_retry_brand('user/errors.json',before),before)
+        self.assertEqual(promo.light_retry_brand('crates/ui-egui/locales/unreviewed-formats.json',before),before)
+        self.assertEqual(promo.app_text('word','user/errors.json',before),before)
+
+
 class BuiltinSampleBrandBatchProof(unittest.TestCase):
     BASELINES = {
         ('deck','crates/engine/src/sample.rs'): ('b2d8e6e9bc4078839c8a84825b582fea63a002f1efe92d43d86a1140b5e32908',7796),

@@ -48215,11 +48215,15 @@ index 5f462667218fadcc7a5ccb5c55fc9631f48c770e..41a48c9f570046ed90d64371a381813d
          .color(t.text_muted),
      );
 diff --git a/crates/ui-egui/src/home.rs b/crates/ui-egui/src/home.rs
-index 5a01bfe487600eeca3affb60afb8003ce6e771b9..ccbad15afbd4bbea3a8ba6c01eb1751f48ccbc75 100644
+index 5a01bfe487600eeca3affb60afb8003ce6e771b9..54b8b07b67a6de74323e3e53feab135253f44217 100644
 --- a/crates/ui-egui/src/home.rs
 +++ b/crates/ui-egui/src/home.rs
-@@ -22,32 +22,13 @@ pub fn show(app: &mut PdfCraftApp, ui: &mut egui::Ui) {
+@@ -20,34 +20,17 @@ fn card_lift(ui: &egui::Ui, t: &Tokens, rect: Rect, press: theme::Press) {
+ 
+ pub fn show(app: &mut PdfCraftApp, ui: &mut egui::Ui) {
      let t = Tokens::get(ui.ctx());
++    // Home owns this clipped UI surface in both Read and docked/floating Canvas routes.
++    ui.painter().rect_filled(ui.max_rect(), 0.0, t.panel);
      egui::ScrollArea::vertical().auto_shrink([false, false]).show(ui, |ui| {
          egui::Frame::NONE.inner_margin(egui::Margin { left: 36, right: 36, top: 28, bottom: 28 }).show(ui, |ui| {
 -            ui.label(egui::RichText::new(tl!("Welcome to KIO PDF")).font(theme::semibold(24.0)));
@@ -48252,7 +48256,16 @@ index 5a01bfe487600eeca3affb60afb8003ce6e771b9..ccbad15afbd4bbea3a8ba6c01eb1751f
              ui.add_space(22.0);
  
              egui::Frame::NONE
-@@ -141,7 +122,7 @@ pub fn show(app: &mut PdfCraftApp, ui: &mut egui::Ui) {
+@@ -108,7 +91,7 @@ pub fn show(app: &mut PdfCraftApp, ui: &mut egui::Ui) {
+                         ui.painter().rect(
+                             rect,
+                             CornerRadius::same(10),
+-                            press.fill(t.pasteboard, t.hover, t.pressed),
++                            press.fill(t.card, t.hover, t.pressed),
+                             Stroke::new(1.0, t.divider),
+                             egui::StrokeKind::Inside,
+                         );
+@@ -141,7 +124,7 @@ pub fn show(app: &mut PdfCraftApp, ui: &mut egui::Ui) {
              });
              ui.add_space(8.0);
              if app.recent.is_empty() {
@@ -48261,7 +48274,7 @@ index 5a01bfe487600eeca3affb60afb8003ce6e771b9..ccbad15afbd4bbea3a8ba6c01eb1751f
              }
              let mut open = None;
              let mut remove = None;
-@@ -207,7 +188,7 @@ pub fn show(app: &mut PdfCraftApp, ui: &mut egui::Ui) {
+@@ -207,7 +190,7 @@ pub fn show(app: &mut PdfCraftApp, ui: &mut egui::Ui) {
              ui.add_space(20.0);
              widgets::section_title(ui, tl!("Privacy"));
              ui.label(
@@ -52072,7 +52085,7 @@ index 95cdd1ac58f9a3c54ea5838568e121abb194ae7a..1c534f21cb08e2a834c5b5d9ad0b0564
      #[cfg(not(target_arch = "wasm32"))]
      ui.add(widgets::checkbox(&mut app.reload_changed_files, tl!("Reload documents when their files change on disk")));
 diff --git a/crates/ui-egui/src/lib.rs b/crates/ui-egui/src/lib.rs
-index c0d9102b4a45efd35183c77b1f1878e04a1a4741..8c4d8e4de4a374f9de06a224fb1107620dd6619a 100644
+index c0d9102b4a45efd35183c77b1f1878e04a1a4741..f058a1b2acefd03196cba67dee17b9df5788fcd4 100644
 --- a/crates/ui-egui/src/lib.rs
 +++ b/crates/ui-egui/src/lib.rs
 @@ -25,6 +25,7 @@ macro_rules! tl_ctx {
@@ -52104,17 +52117,6 @@ index c0d9102b4a45efd35183c77b1f1878e04a1a4741..8c4d8e4de4a374f9de06a224fb110762
          if title != self.window_title {
              ctx.send_viewport_cmd(egui::ViewportCommand::Title(title.clone()));
              self.window_title = title;
-@@ -2977,7 +2978,9 @@ impl eframe::App for PdfCraftApp {
-             }
-         }
-         let t = theme::Tokens::get(&ctx);
--        egui::CentralPanel::default().frame(egui::Frame::NONE.fill(t.pasteboard)).show(ui, |ui| {
-+        // Home is application chrome; keep the document/combine/docking pasteboard unchanged.
-+        let central_fill = if self.mode == Mode::Read && self.active.is_none() && !self.combine_showing() { t.panel } else { t.pasteboard };
-+        egui::CentralPanel::default().frame(egui::Frame::NONE.fill(central_fill)).show(ui, |ui| {
-             if self.mode == Mode::Read {
-                 match self.active {
-                     None if self.combine_showing() => combine_ui::page(self, ui),
 diff --git a/crates/ui-egui/src/ocr_ui.rs b/crates/ui-egui/src/ocr_ui.rs
 index 79ecf5b4e1580723517b3802c304923b8ec08c94..80585afd3cdf910a866b9afde34fd76176cca20c 100644
 --- a/crates/ui-egui/src/ocr_ui.rs
@@ -52496,10 +52498,104 @@ index b99e2bfba2d4448231fd00291c807da50ce9ffd4..50db8aa1a75c3196fd55d9919a02cb04
      h.run_steps(3);
      assert_eq!(h.state().dialog, Some(Dialog::Sign));
 diff --git a/crates/ui-egui/tests/ui.rs b/crates/ui-egui/tests/ui.rs
-index 67d80a0c81211308770ecbb0d2e25f8c84b325af..92da505a7b89595dd2153e391d39562c99334991 100644
+index 67d80a0c81211308770ecbb0d2e25f8c84b325af..099901b893e8f3420bcc675444ad85d1a2fccc90 100644
 --- a/crates/ui-egui/tests/ui.rs
 +++ b/crates/ui-egui/tests/ui.rs
-@@ -34,7 +34,7 @@ fn harness(setup: impl FnOnce(&mut PdfCraftApp) + 'static) -> Harness<'static, P
+@@ -6,6 +6,93 @@ use egui_kittest::Harness;
+ use egui_kittest::kittest::{NodeT, Queryable};
+ use pdfcraft_ui_egui::PdfCraftApp;
+ 
++// Bogo home surface regression: drive the real app, including its default docking path.
++fn bogo_last_opaque_fill(h: &Harness<'static, PdfCraftApp>, point: egui::Pos2) -> Option<egui::Color32> {
++    fn visit(shape: &egui::Shape, point: egui::Pos2, color: &mut Option<egui::Color32>) {
++        match shape {
++            egui::Shape::Vec(shapes) => {
++                for shape in shapes {
++                    visit(shape, point, color);
++                }
++            }
++            egui::Shape::Rect(rect) if rect.rect.contains(point) && rect.fill.a() == 255 => *color = Some(rect.fill),
++            _ => {}
++        }
++    }
++    let mut color = None;
++    for clipped in &h.output().shapes {
++        if clipped.clip_rect.contains(point) {
++            visit(&clipped.shape, point, &mut color);
++        }
++    }
++    color
++}
++
++fn bogo_canvas_blank_margin(h: &Harness<'static, PdfCraftApp>) -> egui::Pos2 {
++    // Use the real Canvas backdrop's bounds, not a guessed position or a home card.
++    let pasteboard = egui::Color32::from_rgb(0xF1, 0xF1, 0xF3);
++    let welcome = painted_text(h).into_iter().find(|(text, _, _)| text.contains("Welcome to Bogo PDF")).map(|(_, _, rect)| rect.center());
++    let canvases: Vec<_> = h
++        .output()
++        .shapes
++        .iter()
++        .filter_map(|clipped| {
++            if let egui::Shape::Rect(rect) = &clipped.shape {
++                let visible = rect.rect.intersect(clipped.clip_rect);
++                if rect.fill == pasteboard && visible.width() > 250.0 && visible.height() > 200.0 {
++                    return Some(visible);
++                }
++            }
++            None
++        })
++        .collect();
++    let canvas = if let Some(welcome) = welcome {
++        // A floating Canvas is painted after the vacated main dock; bind the
++        // probe to the actual welcome node and choose that topmost backdrop.
++        canvases.iter().rev().find(|rect| rect.contains(welcome)).copied().expect("welcome belongs to a real Canvas")
++    } else {
++        canvases.into_iter().max_by(|a, b| a.area().total_cmp(&b.area())).expect("real Canvas pasteboard exists")
++    };
++    // Home's36px left content margin, document margin and Combine's padding are free of content here.
++    egui::pos2(canvas.left() + 8.0, canvas.bottom() - 16.0)
++}
++
++#[test]
++fn bogo_home_surface_role_covers_real_default_read_and_floating_routes() {
++    use pdfcraft_ui_egui::{Mode, docking::Panel};
++    let expected = egui::Color32::from_rgb(0xFF, 0xFA, 0xF6);
++    let default = harness(|_| {});
++    assert_eq!(default.state().mode, Mode::AllTools, "the actual default must exercise docking");
++    default.get_by_label_contains("Welcome to Bogo PDF");
++    assert_eq!(bogo_last_opaque_fill(&default, bogo_canvas_blank_margin(&default)), Some(expected));
++    let read = harness(|app| {
++        app.mode = Mode::Read;
++    });
++    assert_eq!(read.state().mode, Mode::Read);
++    read.get_by_label_contains("Welcome to Bogo PDF");
++    assert_eq!(bogo_last_opaque_fill(&read, bogo_canvas_blank_margin(&read)), Some(expected));
++    let floating = harness(|app| {
++        app.docking.apply(craft_ui::docking::Action::Float { panel: Panel::Canvas, rect: [360.0, 140.0, 900.0, 620.0] }).unwrap();
++    });
++    floating.get_by_label_contains("Welcome to Bogo PDF");
++    assert_eq!(bogo_last_opaque_fill(&floating, bogo_canvas_blank_margin(&floating)), Some(expected));
++}
++
++#[test]
++fn bogo_home_surface_role_preserves_document_and_combine_pasteboards() {
++    let expected = egui::Color32::from_rgb(0xF1, 0xF1, 0xF3);
++    let document = harness(|app| {
++        app.open_bytes("fixture.pdf", None, FIXTURE.to_vec()).unwrap();
++    });
++    assert!(document.state().active.is_some());
++    assert_eq!(bogo_last_opaque_fill(&document, bogo_canvas_blank_margin(&document)), Some(expected));
++    let combine = harness(|app| {
++        app.open_combine_tab();
++    });
++    assert!(combine.state().combine_showing());
++    assert_eq!(bogo_last_opaque_fill(&combine, bogo_canvas_blank_margin(&combine)), Some(expected));
++}
++
+ /// A tiny PDF with two pages, two bookmarks and one sticky note.
+ const FIXTURE: &[u8] = b"%PDF-1.7
+ 1 0 obj << /Type /Catalog /Pages 2 0 R /Outlines 6 0 R >> endobj
+@@ -34,7 +121,7 @@ fn harness(setup: impl FnOnce(&mut PdfCraftApp) + 'static) -> Harness<'static, P
  #[test]
  fn home_shows_welcome_and_tools() {
      let h = harness(|_| {});
@@ -52508,7 +52604,7 @@ index 67d80a0c81211308770ecbb0d2e25f8c84b325af..92da505a7b89595dd2153e391d39562c
      assert!(h.query_all_by_label("Organize pages").count() >= 2, "tool list + home card");
      h.get_by_label("Open file");
  }
-@@ -111,7 +111,7 @@ fn home_removes_one_recent_file_or_clears_them_all() {
+@@ -111,7 +198,7 @@ fn home_removes_one_recent_file_or_clears_them_all() {
      h.get_by_label("Clear Recent Files").click();
      h.run_steps(2);
      assert!(h.state().recent.is_empty(), "Clear empties the list");
@@ -52517,7 +52613,7 @@ index 67d80a0c81211308770ecbb0d2e25f8c84b325af..92da505a7b89595dd2153e391d39562c
      assert!(h.query_by_label("Clear Recent Files").is_none(), "and goes away with nothing left to clear");
  }
  
-@@ -330,8 +330,8 @@ fn tabs_shrink_to_fit_then_arrows_step_through_them_and_open_stays_in_sight() {
+@@ -330,8 +417,8 @@ fn tabs_shrink_to_fit_then_arrows_step_through_them_and_open_stays_in_sight() {
          }
      });
      let open = h.get_by_label("Open").rect();
@@ -52528,7 +52624,7 @@ index 67d80a0c81211308770ecbb0d2e25f8c84b325af..92da505a7b89595dd2153e391d39562c
      let mut previous_right = f32::MIN;
      for i in 0..5 {
          let tab = h.get_by_label(&name(i)).rect();
-@@ -355,15 +355,15 @@ fn tabs_shrink_to_fit_then_arrows_step_through_them_and_open_stays_in_sight() {
+@@ -355,15 +442,15 @@ fn tabs_shrink_to_fit_then_arrows_step_through_them_and_open_stays_in_sight() {
      assert_eq!(enabled(&h, "Scroll tabs right"), Some(true), "and then there is more to the right");
      let open = h.get_by_label("Open").rect();
      let right = h.get_by_label("Scroll tabs right").rect();
@@ -52547,7 +52643,7 @@ index 67d80a0c81211308770ecbb0d2e25f8c84b325af..92da505a7b89595dd2153e391d39562c
  }
  
  /// macOS (#789): with the integrated title bar, the strip is the 28 pt band AppKit centres the
-@@ -376,7 +376,7 @@ fn the_integrated_title_bar_is_the_traffic_light_band() {
+@@ -376,7 +463,7 @@ fn the_integrated_title_bar_is_the_traffic_light_band() {
          app.open_bytes("band.pdf", None, FIXTURE.to_vec()).unwrap();
      });
      let band = 28.0;
@@ -52556,7 +52652,7 @@ index 67d80a0c81211308770ecbb0d2e25f8c84b325af..92da505a7b89595dd2153e391d39562c
          let r = h.get_by_label(label).rect();
          assert!(r.top() >= 0.0 && r.bottom() <= band, "{label}: {r:?} inside the {band} pt title bar");
          assert!(r.height() >= 24.0, "{label}: {r:?} stays clickable");
-@@ -1064,7 +1064,7 @@ fn closing_the_last_active_tab_selects_the_previous_one_then_home() {
+@@ -1064,7 +1151,7 @@ fn closing_the_last_active_tab_selects_the_previous_one_then_home() {
          assert!(app.session.get(ids[removed]).is_none());
      }
      assert_eq!(h.state().active, None);

@@ -14,6 +14,9 @@ from bogo_promotion_launcher_tests import apply as apply_launcher_tests
 APPS = {'cad','design','vector','film','light','pdf','effect','ui','word','sound','deck','grid','launcher','photo'}
 PROMOTION = re.compile(r'discord|getartcraft|aircraft|artcraft(?:\s+(?:website|family|apps|community|team))|github\.com/storytold',re.I)
 LEGAL = re.compile(r'copyright|©|license|licensed|licence|MIT OR Apache|Apache-2',re.I)
+LIGHT_RETRY_KEY = '{n} change{} saved in memory but not written to disk: {e}\nLightCraft retries automatically; quitting now would lose {}.'
+LIGHT_RETRY_FORMATS = {f'crates/ui-egui/locales/{locale}-formats.json': locale not in ('ja','pt-br')
+                       for locale in ('de','es','fr','ja','pt-br','ru','uk','zh-hans','zh-hant')}
 
 # Only compiled-in public demonstrations and their exact test/benchmark
 # references. Existing documents, model operations and technical theme IDs are
@@ -104,6 +107,28 @@ def remove_line(text,line):
     return ''.join(row for row in rows if row.strip()!=line)
 
 
+def light_retry_brand(relative,text):
+    """Keep the functional unsaved-data warning and every formatting argument."""
+    renamed=LIGHT_RETRY_KEY.replace('LightCraft','Bogo Light')
+    if relative=='crates/ui-egui/src/panels/topbar.rs':
+        return replace_exact(text,json.dumps(LIGHT_RETRY_KEY,ensure_ascii=False),json.dumps(renamed,ensure_ascii=False))
+    if relative not in LIGHT_RETRY_FORMATS:return text
+    rows=text.splitlines(keepends=True)
+    encoded_key=json.dumps(LIGHT_RETRY_KEY,ensure_ascii=False)
+    matches=[i for i,row in enumerate(rows)if row.lstrip().startswith(encoded_key+':')]
+    if len(matches)!=1:raise ValueError('Unreviewed Light retry locale key: '+relative)
+    index=matches[0];row=rows[index]
+    pair=json.loads('{'+row.strip().removesuffix(',')+'}')
+    if set(pair)!={LIGHT_RETRY_KEY}or not isinstance(pair[LIGHT_RETRY_KEY],str):
+        raise ValueError('Unreviewed Light retry locale row: '+relative)
+    expected_mentions=1 if LIGHT_RETRY_FORMATS[relative]else 0
+    if pair[LIGHT_RETRY_KEY].count('LightCraft')!=expected_mentions or row.count('LightCraft')!=1+expected_mentions:
+        raise ValueError('Unreviewed Light retry translated brand: '+relative)
+    # Only this one source-key/translation pair changes; surrounding JSON bytes stay exact.
+    rows[index]=row.replace('LightCraft','Bogo Light')
+    return ''.join(rows)
+
+
 def localization(relative,text):
     if not (any('/'+part+'/'in'/'+relative for part in('locales','i18n','translations')) or relative.endswith('/i18n.rs')):return text
     if relative.endswith('.rs'):
@@ -115,6 +140,9 @@ def localization(relative,text):
         text=re.sub(r'^    \(\n.*?^    \),\n',lambda m:''if PROMOTION.search(m[0])and not LEGAL.search(m[0])else m[0],text,flags=re.M|re.S)
     if relative.endswith('.tsv'):
         text=text.replace('Kilépés az ArtCraft Launcherből','Kilépés a Bogo Launcherből')
+        # A functional update instruction is not a promotion; Hungarian inflects the app name.
+        if relative=='crates/ui-egui/src/i18n/hu.tsv':
+            text=text.replace('\tOpen Bogo Launcher to update.\tNyisd meg az ArtCraft Launchert a frissítéshez.', '\tOpen Bogo Launcher to update.\tNyisd meg a Bogo Launchert a frissítéshez.')
         return ''.join(line for line in text.splitlines(keepends=True)if not((PROMOTION.search(line)or re.search(r'ArtCraft',line))and not LEGAL.search(line)))
     if relative.endswith('.json'):
         obj=json.loads(text)
@@ -133,6 +161,7 @@ def _simple_about(text):
 
 def transform(app,relative,text):
     if app not in APPS:return text
+    if app=='light':text=light_retry_brand(relative,text)
     text=localization(relative,text)
     if (app,relative)in{('sound','crates/ui-egui/src/panels.rs'),('ui','crates/ui-egui/src/dialogs.rs'),('deck','crates/ui-egui/src/dialogs.rs')}:
         text=_simple_about(text)

@@ -151704,7 +151704,7 @@ index 090fee2f0dcddd80eec3ba2e177a56edfda70c91..ff54c070a1416ee6e66f39aea67d577b
 +@plural	Bogo Launcher · {n} update available|Bogo Launcher · {n} updates available	Bogo Launcher · {n} mise à jour disponible|Bogo Launcher · {n} mises à jour disponibles
 +	No font for this language was found on this system. Install a font for this language and restart Bogo Launcher.	Aucune police pour cette langue n’a été trouvée sur ce système. Installez une police adaptée, puis redémarrez Bogo Launcher.
 diff --git a/crates/ui-egui/src/i18n/hu.tsv b/crates/ui-egui/src/i18n/hu.tsv
-index 2d90ca6ecfb3f24f97990af29a1da9916067fb08..71114a774130689b03f23249e3949436ffd02d4e 100644
+index 2d90ca6ecfb3f24f97990af29a1da9916067fb08..9c9bf3af698bbb7dee962bd13f023bf2f8b32397 100644
 --- a/crates/ui-egui/src/i18n/hu.tsv
 +++ b/crates/ui-egui/src/i18n/hu.tsv
 @@ -1,4 +1,4 @@
@@ -151823,11 +151823,12 @@ index 2d90ca6ecfb3f24f97990af29a1da9916067fb08..71114a774130689b03f23249e3949436
  	Update 1 app	1 alkalmazás frissítése
  	Update all ({count})	Összes frissítése ({count})
  	⊞  Grid	⊞  Rács
-@@ -247,11 +240,10 @@ month	Dec	dec.
+@@ -247,11 +240,11 @@ month	Dec	dec.
  	Full changelog	Teljes változásnapló
  	link	hivatkozás
  	No apps match	Nincs találat
 -	Open KIO Launcher to update.	Nyisd meg az ArtCraft Launchert a frissítéshez.
++	Open Bogo Launcher to update.	Nyisd meg a Bogo Launchert a frissítéshez.
  	{name} {v} is available	Elérhető: {name} {v}
  	{count} updates are available	{count} frissítés elérhető
  	These notes weren't fetched (GitHub's request limit was reached). They're on the release page.	A kiadási információkat nem sikerült betölteni, mert elértük a GitHub lekérdezési korlátját. A kiadás oldalán megtalálod őket.
@@ -151836,7 +151837,7 @@ index 2d90ca6ecfb3f24f97990af29a1da9916067fb08..71114a774130689b03f23249e3949436
  	Couldn't change the login item: {e}	Az automatikus indítás beállítását nem sikerült módosítani: {e}
  
  # Contextual: table column headers
-@@ -311,7 +303,7 @@ filter	Installed	Telepítve
+@@ -311,7 +304,7 @@ filter	Installed	Telepítve
  @id	launcher.notes	Újdonságok
  @id	launcher.dismiss	Elrejtés
  @id	settings.open	Beállítások
@@ -151845,7 +151846,7 @@ index 2d90ca6ecfb3f24f97990af29a1da9916067fb08..71114a774130689b03f23249e3949436
  @id	view.grid	Rács
  @id	view.table	Táblázat
  @id	filter.all	Összes
-@@ -325,7 +317,6 @@ filter	Installed	Telepítve
+@@ -325,7 +318,6 @@ filter	Installed	Telepítve
  @id	sort.installed	Telepített verzió
  @id	sort.latest	Legújabb verzió
  @id	sort.released	Legújabb kiadás
@@ -151853,7 +151854,7 @@ index 2d90ca6ecfb3f24f97990af29a1da9916067fb08..71114a774130689b03f23249e3949436
  @id	help.github	GitHub
  @id	help.website	Webhely
  @id	update.check	Frissítések keresése
-@@ -335,14 +326,11 @@ filter	Installed	Telepítve
+@@ -335,14 +327,11 @@ filter	Installed	Telepítve
  @id	linux.preferred_kind	Új alkalmazások csomagformátuma
  @id	tray.close_to_tray	Az ablak bezárásakor kerüljön a tálcára
  @id	tray.show_on_current_desktop	Ablak megjelenítése az aktuális asztalon

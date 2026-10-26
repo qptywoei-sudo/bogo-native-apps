@@ -50557,7 +50557,7 @@ index 576e0b4a8aaf2edae4104ec8a8ab515162d09efd..fc3a32a8714d52e034ab92287bb05d0e
                  }))
              }
 diff --git a/crates/ui-egui/src/backstage.rs b/crates/ui-egui/src/backstage.rs
-index b5ed06306963b7e3b74710655c7c52c3300f29db..543e6c5d7b66c9e3f7b2f258cc677cd02b8d1e42 100644
+index b5ed06306963b7e3b74710655c7c52c3300f29db..6c08cda88946c54a4808b067cc4d7ff662ab4332 100644
 --- a/crates/ui-egui/src/backstage.rs
 +++ b/crates/ui-egui/src/backstage.rs
 @@ -208,7 +208,7 @@ impl Backstage {
@@ -50596,7 +50596,29 @@ index b5ed06306963b7e3b74710655c7c52c3300f29db..543e6c5d7b66c9e3f7b2f258cc677cd0
          .on_hover_cursor(egui::CursorIcon::PointingHand)
          .clicked()
  }
-@@ -634,7 +634,7 @@ fn home(app: &mut SlideApp, ui: &mut Ui, bs: &mut Backstage, out: &mut Outcome)
+@@ -500,8 +500,10 @@ fn tile(ui: &mut Ui, label: &str, theme: Option<&deckcraft_model::Theme>, big: b
+ /// `blank`); at most `limit` theme tiles.
+ fn new_tiles(app: &mut SlideApp, ui: &mut Ui, query: &str, limit: usize, blank: bool) {
+     let q = query.trim().to_lowercase();
+-    let themes: Vec<deckcraft_model::Theme> =
+-        deckcraft_model::theme::builtin_themes().into_iter().filter(|th| q.is_empty() || th.name.to_lowercase().contains(&q)).collect();
++    let themes: Vec<deckcraft_model::Theme> = deckcraft_model::theme::builtin_themes()
++        .into_iter()
++        .filter(|th| q.is_empty() || th.name.to_lowercase().contains(&q) || crate::theme::builtin_display_name(&th.name).to_lowercase().contains(&q))
++        .collect();
+     let sample = q.is_empty() || "sample deck northern lights".contains(&q);
+     if themes.is_empty() && !sample {
+         dim(ui, &format!("No themes match “{}”.", query.trim()));
+@@ -517,7 +519,7 @@ fn new_tiles(app: &mut SlideApp, ui: &mut Ui, query: &str, limit: usize, blank:
+             if shown >= limit {
+                 break;
+             }
+-            if tile(ui, &th.name, Some(&th), false).clicked() {
++            if tile(ui, crate::theme::builtin_display_name(&th.name), Some(&th), false).clicked() {
+                 let _ = app.run("file.new", json!({"theme": th.name}));
+             }
+             shown += 1;
+@@ -634,7 +636,7 @@ fn home(app: &mut SlideApp, ui: &mut Ui, bs: &mut Backstage, out: &mut Outcome)
      ui.horizontal(|ui| {
          let (r, _) = ui.allocate_exact_size(vec2(36.0, 36.0), Sense::hover());
          crate::dialogs::paint_logo(ui.painter(), r);
@@ -50605,7 +50627,7 @@ index b5ed06306963b7e3b74710655c7c52c3300f29db..543e6c5d7b66c9e3f7b2f258cc677cd0
      });
      ui.add_space(18.0);
      ui.horizontal(|ui| {
-@@ -665,7 +665,6 @@ fn home(app: &mut SlideApp, ui: &mut Ui, bs: &mut Backstage, out: &mut Outcome)
+@@ -665,7 +667,6 @@ fn home(app: &mut SlideApp, ui: &mut Ui, bs: &mut Backstage, out: &mut Outcome)
          });
      }
      ui.add_space(30.0);
@@ -50613,7 +50635,7 @@ index b5ed06306963b7e3b74710655c7c52c3300f29db..543e6c5d7b66c9e3f7b2f258cc677cd0
  }
  
  /// New: a blank presentation, then every theme with a search box.
-@@ -732,7 +731,7 @@ fn info(app: &mut SlideApp, ui: &mut Ui, bs: &mut Backstage) {
+@@ -732,7 +733,7 @@ fn info(app: &mut SlideApp, ui: &mut Ui, bs: &mut Backstage) {
      let path = v.get("path").and_then(Value::as_str).map(str::to_string);
      let title = v.get("title").and_then(Value::as_str).unwrap_or("").to_string();
      let dirty = v.get("dirty").and_then(Value::as_bool).unwrap_or(false);
@@ -50622,7 +50644,7 @@ index b5ed06306963b7e3b74710655c7c52c3300f29db..543e6c5d7b66c9e3f7b2f258cc677cd0
      match &path {
          Some(p) => dim(ui, p),
          None => dim(ui, "Not saved yet"),
-@@ -925,9 +924,9 @@ fn print(app: &mut SlideApp, ui: &mut Ui, bs: &mut Backstage) {
+@@ -925,9 +926,9 @@ fn print(app: &mut SlideApp, ui: &mut Ui, bs: &mut Backstage) {
              dim(
                  ui,
                  if app.services.pick_save.is_some() {
@@ -50634,7 +50656,7 @@ index b5ed06306963b7e3b74710655c7c52c3300f29db..543e6c5d7b66c9e3f7b2f258cc677cd0
                  },
              );
              ui.add_space(14.0);
-@@ -1211,7 +1210,7 @@ fn account(app: &mut SlideApp, ui: &mut Ui) {
+@@ -1211,7 +1212,7 @@ fn account(app: &mut SlideApp, ui: &mut Ui) {
              });
              ui.add_space(16.0);
              heading(ui, "User Information");
@@ -50643,7 +50665,7 @@ index b5ed06306963b7e3b74710655c7c52c3300f29db..543e6c5d7b66c9e3f7b2f258cc677cd0
          });
          ui.add_space(40.0);
          ui.vertical(|ui| {
-@@ -1219,7 +1218,7 @@ fn account(app: &mut SlideApp, ui: &mut Ui) {
+@@ -1219,7 +1220,7 @@ fn account(app: &mut SlideApp, ui: &mut Ui) {
              ui.horizontal(|ui| {
                  let (r, _) = ui.allocate_exact_size(vec2(40.0, 40.0), Sense::hover());
                  crate::dialogs::paint_logo(ui.painter(), r);
@@ -50652,7 +50674,7 @@ index b5ed06306963b7e3b74710655c7c52c3300f29db..543e6c5d7b66c9e3f7b2f258cc677cd0
              });
              dim(ui, &crate::dialogs::version_line());
              dim(ui, "Open source under MIT OR Apache-2.0. Not affiliated with Microsoft.");
-@@ -1227,15 +1226,13 @@ fn account(app: &mut SlideApp, ui: &mut Ui) {
+@@ -1227,15 +1228,13 @@ fn account(app: &mut SlideApp, ui: &mut Ui) {
              if task(
                  ui,
                  Icon::Help,
@@ -50784,8 +50806,21 @@ index c2e512982fbfbcaddffcf1fa09fc53fb50584f70..a07efff83c32c934e9aba4a2d37aa320
 +        ("Help", vec![("About Bogo Deck", "app.about"), ("Command Palette", "app.palette")]),
      ]
  }
+diff --git a/crates/ui-egui/src/panes.rs b/crates/ui-egui/src/panes.rs
+index 2b3ada3a05a2da420f9bd5931a1e85ee74fb48ce..26490b9d4b7ed856f5662682800145ab2d025358 100644
+--- a/crates/ui-egui/src/panes.rs
++++ b/crates/ui-egui/src/panes.rs
+@@ -629,7 +629,7 @@ fn designer(app: &mut SlideApp, ui: &mut Ui) {
+             Stroke::new(if resp.hovered() { 2.5 } else { 1.0 }, if resp.hovered() { t.accent } else { t.border }),
+             egui::StrokeKind::Outside,
+         );
+-        if resp.on_hover_text(&th.name).clicked() {
++        if resp.on_hover_text(crate::theme::builtin_display_name(&th.name)).clicked() {
+             run(app, "design.theme", json!({"name": th.name}));
+         }
+         ui.add_space(8.0);
 diff --git a/crates/ui-egui/src/ribbon.rs b/crates/ui-egui/src/ribbon.rs
-index 8a17e8aec427a6f49ed9d0261e9658446a9e2a24..8d769c2bf7b339720d2428b13fcdebeff38ce9af 100644
+index 8a17e8aec427a6f49ed9d0261e9658446a9e2a24..b63ef8548974e14234d6db7d5a2bbe9a8d879aec 100644
 --- a/crates/ui-egui/src/ribbon.rs
 +++ b/crates/ui-egui/src/ribbon.rs
 @@ -63,7 +63,7 @@ pub fn title_bar(app: &mut SlideApp, ui: &mut Ui) {
@@ -50797,6 +50832,39 @@ index 8a17e8aec427a6f49ed9d0261e9658446a9e2a24..8d769c2bf7b339720d2428b13fcdebef
          ui.painter().text(rect.center(), Align2::CENTER_CENTER, title, theme::font(13.0), t.text);
          // Right side.
          let mut right = ui.new_child(
+@@ -1227,7 +1227,7 @@ fn design(app: &mut SlideApp, ui: &mut Ui) {
+                     paint_theme_tile(p, r, th);
+                 }
+             },
+-            |i| names.get(i).cloned().unwrap_or_default(),
++            |i| names.get(i).map(|name| crate::theme::builtin_display_name(name).to_owned()).unwrap_or_default(),
+         ) && let Some(n) = names.get(i)
+         {
+             run(app, "design.theme", json!({"name": n}));
+@@ -1247,7 +1247,13 @@ fn design(app: &mut SlideApp, ui: &mut Ui) {
+                             theme::to_color32(*c),
+                         );
+                     }
+-                    p.text(rect.min + vec2(104.0, 10.0), Align2::LEFT_CENTER, &cs.name, theme::font(12.0), Tokens::get(ui.ctx()).text);
++                    p.text(
++                        rect.min + vec2(104.0, 10.0),
++                        Align2::LEFT_CENTER,
++                        crate::theme::builtin_display_name(&cs.name),
++                        theme::font(12.0),
++                        Tokens::get(ui.ctx()).text,
++                    );
+                     if resp.clicked() {
+                         run(app, "design.colors", json!({"name": cs.name}));
+                         ui.close();
+@@ -2394,7 +2400,7 @@ fn slide_master(app: &mut SlideApp, ui: &mut Ui) {
+         let r = big_button(ui, Icon::Themes, "Themes", true);
+         egui::Popup::menu(&r).show(|ui| {
+             for th in deckcraft_model::theme::builtin_themes() {
+-                if ui.button(&th.name).clicked() {
++                if ui.button(crate::theme::builtin_display_name(&th.name)).clicked() {
+                     run(app, "design.theme", json!({"name": th.name}));
+                 }
+             }
 diff --git a/crates/ui-egui/src/show.rs b/crates/ui-egui/src/show.rs
 index aeb3299ed14a04a2e7a324d459798c9d006c3443..20466595bfdb1400bd903a2124779daa3151eaba 100644
 --- a/crates/ui-egui/src/show.rs
@@ -50824,7 +50892,7 @@ index 8e915b7199355279111810999aa14acee1b8c46f..7d2dc5102410aab75e72f294fc9a3517
              } else {
                  app.status = None;
 diff --git a/crates/ui-egui/src/theme.rs b/crates/ui-egui/src/theme.rs
-index 1847d47f1ef5688057920243938ba10c225463c3..77e1e171f6500a6c20744b4dcc23d381b39d4e79 100644
+index 1847d47f1ef5688057920243938ba10c225463c3..3298218fa5fe3cae1934fdeab26a8d9ef50f94d5 100644
 --- a/crates/ui-egui/src/theme.rs
 +++ b/crates/ui-egui/src/theme.rs
 @@ -48,56 +48,56 @@ impl Tokens {
@@ -50921,6 +50989,17 @@ index 1847d47f1ef5688057920243938ba10c225463c3..77e1e171f6500a6c20744b4dcc23d381
      v.override_text_color = Some(t.text);
      for w in [&mut v.widgets.noninteractive, &mut v.widgets.inactive, &mut v.widgets.hovered, &mut v.widgets.active, &mut v.widgets.open] {
          w.corner_radius = CornerRadius::same(5);
+@@ -232,6 +232,10 @@ pub fn to_color32(c: deckcraft_color::Rgba) -> Color32 {
+     Color32::from_rgba_unmultiplied(c.r, c.g, c.b, c.a)
+ }
+ 
++pub(crate) fn builtin_display_name(name: &str) -> &str {
++    if name == "DeckCraft" { "Bogo Deck" } else { name }
++}
++
+ #[cfg(test)]
+ mod tests {
+     /// Each character of `text` laid out in the interface fonts at interface sizes, and whether it
 diff --git a/packaging/freebsd/package.sh b/packaging/freebsd/package.sh
 index 0612cc24698099a5c2cf2a853a7fda0d16d5a13f..b1d133fb607fed34fff974a69832e437ba07165a 100755
 --- a/packaging/freebsd/package.sh

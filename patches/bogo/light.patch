@@ -49729,7 +49729,7 @@ index 6a89dda88ba0d0bc0e772070b377d2b896d561f3..a9012be1ba6b44a0d6f2958724f88f75
          };
          p.rating = [0, 3, 4, 5, 2, 0, 4, 3][sc.id as usize % 8];
 diff --git a/crates/ui-egui/locales/de-formats.json b/crates/ui-egui/locales/de-formats.json
-index e20827337ffd7dba698e09e6cb8b39462bc5af9d..71acfdd09a1202fddd13e91fde4b79521e500577 100644
+index e20827337ffd7dba698e09e6cb8b39462bc5af9d..b2226e236e25522fad09d03bb15c377d2d5a3564 100644
 --- a/crates/ui-egui/locales/de-formats.json
 +++ b/crates/ui-egui/locales/de-formats.json
 @@ -74,8 +74,8 @@
@@ -49743,11 +49743,13 @@ index e20827337ffd7dba698e09e6cb8b39462bc5af9d..71acfdd09a1202fddd13e91fde4b7952
    "Lightroom catalog inspected: {photos} photos, {collections} collections, {missing} missing": "Lightroom-Katalog geprüft: {photos} Fotos, {collections} Sammlungen, {missing} fehlen",
    "Lightroom import complete: {imported} photos added": "Lightroom-Import abgeschlossen: {imported} Fotos hinzugefügt",
    "Lightroom import complete: {imported} photos added, {failed} failed": "Lightroom-Import abgeschlossen: {imported} Fotos hinzugefügt, {failed} fehlgeschlagen",
-@@ -154,7 +154,7 @@
+@@ -153,8 +153,8 @@
+   "{name} opened for editing; it is stacked with the original": "{name} zum Bearbeiten geöffnet; mit dem Original gestapelt",
    "{name} — double-click to reset it": "{name} — zum Zurücksetzen doppelklicken",
    "{n} change{} couldn't be written to disk: {e}\nIf you quit now, {} lost.": "Nicht auf den Datenträger geschriebene Änderungen: {n}{0:.0}: {e}\nWenn du jetzt beendest, gehen diese Änderungen verloren.{1:.0}",
-   "{n} change{} saved in memory but not written to disk: {e}\nLightCraft retries automatically; quitting now would lose {}.": "Ungespeicherte Änderungen: {n}{0:.0} im Arbeitsspeicher, aber nicht auf dem Datenträger: {e}\nLightCraft versucht es automatisch erneut; beim Beenden gingen diese Änderungen verloren.{1:.0}",
+-  "{n} change{} saved in memory but not written to disk: {e}\nLightCraft retries automatically; quitting now would lose {}.": "Ungespeicherte Änderungen: {n}{0:.0} im Arbeitsspeicher, aber nicht auf dem Datenträger: {e}\nLightCraft versucht es automatisch erneut; beim Beenden gingen diese Änderungen verloren.{1:.0}",
 -  "{n} change{} saved in memory but not written to disk: {e} — KIO Light will retry": "Änderungen nur im Arbeitsspeicher gespeichert: {n}{:.0}: {e} — KIO Light versucht es erneut",
++  "{n} change{} saved in memory but not written to disk: {e}\nBogo Light retries automatically; quitting now would lose {}.": "Ungespeicherte Änderungen: {n}{0:.0} im Arbeitsspeicher, aber nicht auf dem Datenträger: {e}\nBogo Light versucht es automatisch erneut; beim Beenden gingen diese Änderungen verloren.{1:.0}",
 +  "{n} change{} saved in memory but not written to disk: {e} — Bogo Light will retry": "Änderungen nur im Arbeitsspeicher gespeichert: {n}{:.0}: {e} — Bogo Light versucht es erneut",
    "{n} found · {sel} selected": "{n} gefunden · {sel} ausgewählt",
    "{n} photos": "Fotos: {n}",
@@ -50032,7 +50034,7 @@ index 7379ac011e2f08eeabefb6de5cf9174019ff2159..83f0e3b746276db280d61c72aec0528e
    "Files with the same content as another file in this import: only the first is imported.": "Dateien mit demselben Inhalt wie eine andere Datei dieses Imports: Nur die erste wird importiert."
  }
 diff --git a/crates/ui-egui/locales/es-formats.json b/crates/ui-egui/locales/es-formats.json
-index 78b6eacfc0d4c4e61bdd080940184bf31f8a269f..84c58f865f1e22cefc32ad15ab59b8981f973979 100644
+index 78b6eacfc0d4c4e61bdd080940184bf31f8a269f..041ad461c5e76b884c53c77ef3e9286b499fe200 100644
 --- a/crates/ui-egui/locales/es-formats.json
 +++ b/crates/ui-egui/locales/es-formats.json
 @@ -74,8 +74,8 @@
@@ -50046,11 +50048,13 @@ index 78b6eacfc0d4c4e61bdd080940184bf31f8a269f..84c58f865f1e22cefc32ad15ab59b898
    "Lightroom catalog inspected: {photos} photos, {collections} collections, {missing} missing": "Catálogo de Lightroom inspeccionado: {photos} fotos, {collections} colecciones, {missing} no encontradas",
    "Lightroom import complete: {imported} photos added": "Importación de Lightroom completada: {imported} fotos añadidas",
    "Lightroom import complete: {imported} photos added, {failed} failed": "Importación de Lightroom completada: {imported} fotos añadidas, {failed} con errores",
-@@ -154,7 +154,7 @@
+@@ -153,8 +153,8 @@
+   "{name} opened for editing; it is stacked with the original": "{name} abierta para editar; está apilada con el original",
    "{name} — double-click to reset it": "{name}: doble clic para restablecer",
    "{n} change{} couldn't be written to disk: {e}\nIf you quit now, {} lost.": "Cambios que no se pudieron escribir en el disco: {n}{0:.0}: {e}\nSi se sale ahora, se perderán.{1:.0}",
-   "{n} change{} saved in memory but not written to disk: {e}\nLightCraft retries automatically; quitting now would lose {}.": "Cambios guardados en memoria, pero no escritos en el disco: {n}{0:.0}: {e}\nLightCraft vuelve a intentarlo automáticamente; si se sale ahora, se perderán.{1:.0}",
+-  "{n} change{} saved in memory but not written to disk: {e}\nLightCraft retries automatically; quitting now would lose {}.": "Cambios guardados en memoria, pero no escritos en el disco: {n}{0:.0}: {e}\nLightCraft vuelve a intentarlo automáticamente; si se sale ahora, se perderán.{1:.0}",
 -  "{n} change{} saved in memory but not written to disk: {e} — KIO Light will retry": "Cambios guardados solo en memoria: {n}{:.0}: {e}; KIO Light volverá a intentarlo",
++  "{n} change{} saved in memory but not written to disk: {e}\nBogo Light retries automatically; quitting now would lose {}.": "Cambios guardados en memoria, pero no escritos en el disco: {n}{0:.0}: {e}\nBogo Light vuelve a intentarlo automáticamente; si se sale ahora, se perderán.{1:.0}",
 +  "{n} change{} saved in memory but not written to disk: {e} — Bogo Light will retry": "Cambios guardados solo en memoria: {n}{:.0}: {e}; Bogo Light volverá a intentarlo",
    "{n} found · {sel} selected": "{n} encontradas · {sel} seleccionadas",
    "{n} photos": "{n} fotos",
@@ -50223,7 +50227,7 @@ index 5582e9d2a66f3f2bd73b81bbc20d2aed3cfe6629..a05bb5e38c3301c67ccd97370c55aa85
    "Files with the same content as another file in this import: only the first is imported.": "Archivos con el mismo contenido que otro archivo de esta importación: solo se importa el primero."
  }
 diff --git a/crates/ui-egui/locales/fr-formats.json b/crates/ui-egui/locales/fr-formats.json
-index 9d3ae10c301eaeddc5d8db4d71d28d20913f17bd..b87fdf80be5a5df54f020b9951694de6c6e531c2 100644
+index 9d3ae10c301eaeddc5d8db4d71d28d20913f17bd..825588d5194428364f59393dd98a439144e43d55 100644
 --- a/crates/ui-egui/locales/fr-formats.json
 +++ b/crates/ui-egui/locales/fr-formats.json
 @@ -74,8 +74,8 @@
@@ -50237,11 +50241,13 @@ index 9d3ae10c301eaeddc5d8db4d71d28d20913f17bd..b87fdf80be5a5df54f020b9951694de6
    "Lightroom catalog inspected: {photos} photos, {collections} collections, {missing} missing": "Catalogue Lightroom analysé : {photos} photos, {collections} collections, {missing} manquante(s)",
    "Lightroom import complete: {imported} photos added": "Importation Lightroom terminée : {imported} photos ajoutées",
    "Lightroom import complete: {imported} photos added, {failed} failed": "Importation Lightroom terminée : {imported} photos ajoutées, {failed} échec(s)",
-@@ -154,7 +154,7 @@
+@@ -153,8 +153,8 @@
+   "{name} opened for editing; it is stacked with the original": "{name} ouvert pour modification ; il est empilé avec l’original",
    "{name} — double-click to reset it": "{name} — double-cliquez pour réinitialiser",
    "{n} change{} couldn't be written to disk: {e}\nIf you quit now, {} lost.": "Impossible d’écrire {n} modification{} sur le disque : {e}\nSi vous quittez maintenant, {} seront perdues.",
-   "{n} change{} saved in memory but not written to disk: {e}\nLightCraft retries automatically; quitting now would lose {}.": "{n} modification{} enregistrée(s) en mémoire mais non écrite(s) sur le disque : {e}\nLightCraft réessaiera automatiquement ; quitter maintenant entraînerait la perte de {}.",
+-  "{n} change{} saved in memory but not written to disk: {e}\nLightCraft retries automatically; quitting now would lose {}.": "{n} modification{} enregistrée(s) en mémoire mais non écrite(s) sur le disque : {e}\nLightCraft réessaiera automatiquement ; quitter maintenant entraînerait la perte de {}.",
 -  "{n} change{} saved in memory but not written to disk: {e} — KIO Light will retry": "{n} modification{} enregistrée(s) en mémoire mais non écrite(s) sur le disque : {e} — KIO Light réessaiera.",
++  "{n} change{} saved in memory but not written to disk: {e}\nBogo Light retries automatically; quitting now would lose {}.": "{n} modification{} enregistrée(s) en mémoire mais non écrite(s) sur le disque : {e}\nBogo Light réessaiera automatiquement ; quitter maintenant entraînerait la perte de {}.",
 +  "{n} change{} saved in memory but not written to disk: {e} — Bogo Light will retry": "{n} modification{} enregistrée(s) en mémoire mais non écrite(s) sur le disque : {e} — Bogo Light réessaiera.",
    "{n} found · {sel} selected": "{n} trouvé(s) · {sel} sélectionné(s)",
    "{n} photos": "{n} photos",
@@ -50414,7 +50420,7 @@ index 6bdef2bab33c22d994cf977a61cedec0a157f5a7..7360371d6e262b2504bc5c8a1d1ddea9
    "Files with the same content as another file in this import: only the first is imported.": "Fichiers au contenu identique à un autre fichier de cette importation : seul le premier est importé."
  }
 diff --git a/crates/ui-egui/locales/ja-formats.json b/crates/ui-egui/locales/ja-formats.json
-index ea94ccd4f77a596ce99ab7fa5095d8cc1cba018f..ee2b1891184115ad395e8688fc70d77948aee14b 100644
+index ea94ccd4f77a596ce99ab7fa5095d8cc1cba018f..e15c9e1d9c62bf38d87e224ba0967a3f47c6392c 100644
 --- a/crates/ui-egui/locales/ja-formats.json
 +++ b/crates/ui-egui/locales/ja-formats.json
 @@ -35,8 +35,8 @@
@@ -50428,6 +50434,15 @@ index ea94ccd4f77a596ce99ab7fa5095d8cc1cba018f..ee2b1891184115ad395e8688fc70d779
    "Matches: {}": "一致条件：{}",
    "Merging… {stage} {:.0}%": "合成中… {stage} {:.0}%",
    "Move {what} to Recently Deleted?": "{what}を「最近削除した写真」に移動しますか？",
+@@ -86,7 +86,7 @@
+   "{name} Off": "{name}を無効にする",
+   "{name} On": "{name}を有効にする",
+   "{name} — double-click to reset it": "{name}：ダブルクリックでリセット",
+-  "{n} change{} saved in memory but not written to disk: {e}\nLightCraft retries automatically; quitting now would lose {}.": "{n}件の変更{:.0}をディスクに保存できません：{e}\n自動で再試行します。終了すると変更が失われます{:.0}",
++  "{n} change{} saved in memory but not written to disk: {e}\nBogo Light retries automatically; quitting now would lose {}.": "{n}件の変更{:.0}をディスクに保存できません：{e}\n自動で再試行します。終了すると変更が失われます{:.0}",
+   "{n} found · {sel} selected": "{n}枚検出・{sel}枚選択",
+   "{n} photos": "{n}枚",
+   "{n} photos in {} are hidden by the filters above": "{}の{n}枚は上のフィルターで非表示になっています",
 @@ -179,7 +179,7 @@
    "{label} {index} of {n}": "{label} {index}/{n}",
    "{name} opened for editing; it is stacked with the original": "{name}を編集用に開きました。元の写真とスタックにしてあります",
@@ -50621,7 +50636,7 @@ index 72c4337988f963a05459cb6415b5c6e2b62ac285..aea03d54e6bc1effe04dc5f8137c9210
    "Files with the same content as another file in this import: only the first is imported.": "この読み込み内の別のファイルと内容が同じファイルです。最初のファイルだけが読み込まれます。"
  }
 diff --git a/crates/ui-egui/locales/pt-br-formats.json b/crates/ui-egui/locales/pt-br-formats.json
-index 468e48a1bae000cfaf53439c8f70548ec43741c3..3e1ff1908a333c8e5fb0c80bd3740f54f78cebc3 100644
+index 468e48a1bae000cfaf53439c8f70548ec43741c3..c1ed80a3cc64867459555c739a228ab29862cdf7 100644
 --- a/crates/ui-egui/locales/pt-br-formats.json
 +++ b/crates/ui-egui/locales/pt-br-formats.json
 @@ -52,8 +52,8 @@
@@ -50640,7 +50655,7 @@ index 468e48a1bae000cfaf53439c8f70548ec43741c3..3e1ff1908a333c8e5fb0c80bd3740f54
    "{name} On": "{name} ativado",
    "{name} — double-click to reset it": "{name} — clique duas vezes para redefinir",
 -  "{n} change{} saved in memory but not written to disk: {e}\nLightCraft retries automatically; quitting now would lose {}.": "{n} alteração{:.0} salva na memória mas não gravada no disco: {e}\nO KIO Light tenta novamente automaticamente; encerrar agora perderia {}.",
-+  "{n} change{} saved in memory but not written to disk: {e}\nLightCraft retries automatically; quitting now would lose {}.": "{n} alteração{:.0} salva na memória mas não gravada no disco: {e}\nO Bogo Light tenta novamente automaticamente; encerrar agora perderia {}.",
++  "{n} change{} saved in memory but not written to disk: {e}\nBogo Light retries automatically; quitting now would lose {}.": "{n} alteração{:.0} salva na memória mas não gravada no disco: {e}\nO Bogo Light tenta novamente automaticamente; encerrar agora perderia {}.",
    "{n} found · {sel} selected": "{n} encontradas · {sel} selecionadas",
    "{n} photos": "{n} fotos",
    "{n} photos in {} are hidden by the filters above": "{n} fotos em {} estão ocultas pelos filtros acima",
@@ -50827,7 +50842,7 @@ index 88d19057ef75e2d598a4b3481d15e7aad0a94211..abf338d5e0c9747cf76216fdbbb5b161
    "Files with the same content as another file in this import: only the first is imported.": "Arquivos com o mesmo conteúdo de outro arquivo desta importação: apenas o primeiro é importado."
  }
 diff --git a/crates/ui-egui/locales/ru-formats.json b/crates/ui-egui/locales/ru-formats.json
-index b33ef8f4c737fcc2bacc94decd0ecef4800bbf57..2ce71c9891e72dbc92c7b7290eb4fc5b58121f37 100644
+index b33ef8f4c737fcc2bacc94decd0ecef4800bbf57..c9f2343f0cd20a06436e4eb66d1be8baca92060b 100644
 --- a/crates/ui-egui/locales/ru-formats.json
 +++ b/crates/ui-egui/locales/ru-formats.json
 @@ -77,9 +77,9 @@
@@ -50843,11 +50858,13 @@ index b33ef8f4c737fcc2bacc94decd0ecef4800bbf57..2ce71c9891e72dbc92c7b7290eb4fc5b
    "Lightroom catalog inspected: {photos} photos, {collections} collections, {missing} missing": "Каталог Lightroom проверен: фото — {photos}, коллекций — {collections}, отсутствует — {missing}",
    "Lightroom import complete: {imported} photos added": "Импорт из Lightroom завершён: добавлено фото — {imported}",
    "Lightroom import complete: {imported} photos added, {failed} failed": "Импорт из Lightroom завершён: добавлено фото — {imported}, ошибок — {failed}",
-@@ -159,7 +159,7 @@
+@@ -158,8 +158,8 @@
+   "{name} opened for editing; it is stacked with the original": "{name} открыт для редактирования и объединён в стопку с оригиналом",
    "{name} — double-click to reset it": "{name} — двойной щелчок для сброса",
    "{n} change{} couldn't be written to disk: {e}\nIf you quit now, {} lost.": "Изменений не удалось записать на диск: {n}{0:.0}: {e}\nЕсли выйти сейчас, они будут потеряны.{1:.0}",
-   "{n} change{} saved in memory but not written to disk: {e}\nLightCraft retries automatically; quitting now would lose {}.": "Не записано на диск, хранится только в памяти (изменений: {n}): {e}\nLightCraft повторяет попытку автоматически; при выходе сейчас они будут потеряны.{:.0}{:.0}",
+-  "{n} change{} saved in memory but not written to disk: {e}\nLightCraft retries automatically; quitting now would lose {}.": "Не записано на диск, хранится только в памяти (изменений: {n}): {e}\nLightCraft повторяет попытку автоматически; при выходе сейчас они будут потеряны.{:.0}{:.0}",
 -  "{n} change{} saved in memory but not written to disk: {e} — KIO Light will retry": "Изменений сохранено в памяти, но не записано на диск: {n}{:.0}: {e} — KIO Light повторит попытку",
++  "{n} change{} saved in memory but not written to disk: {e}\nBogo Light retries automatically; quitting now would lose {}.": "Не записано на диск, хранится только в памяти (изменений: {n}): {e}\nBogo Light повторяет попытку автоматически; при выходе сейчас они будут потеряны.{:.0}{:.0}",
 +  "{n} change{} saved in memory but not written to disk: {e} — Bogo Light will retry": "Изменений сохранено в памяти, но не записано на диск: {n}{:.0}: {e} — Bogo Light повторит попытку",
    "{n} found · {sel} selected": "Найдено: {n} · выбрано: {sel}",
    "{n} photos": "Фото: {n}",
@@ -51128,7 +51145,7 @@ index b2aac325ff04e81b663c9ff808d72136e99711e0..6ba7b6509cb8308fbd5d0b164cb29066
    "Files with the same content as another file in this import: only the first is imported.": "Файлы с тем же содержимым, что и другой файл этого импорта: импортируется только первый."
  }
 diff --git a/crates/ui-egui/locales/uk-formats.json b/crates/ui-egui/locales/uk-formats.json
-index 862ba1b54724bf1e502127e368f8a2fffbd5a37a..963b7ccf83e9559887ffbe1acb9235835b994a08 100644
+index 862ba1b54724bf1e502127e368f8a2fffbd5a37a..096a336ecd69fe6778d6268b28fba99b84d3ef9a 100644
 --- a/crates/ui-egui/locales/uk-formats.json
 +++ b/crates/ui-egui/locales/uk-formats.json
 @@ -74,8 +74,8 @@
@@ -51142,11 +51159,13 @@ index 862ba1b54724bf1e502127e368f8a2fffbd5a37a..963b7ccf83e9559887ffbe1acb923583
    "Lightroom catalog inspected: {photos} photos, {collections} collections, {missing} missing": "Каталог Lightroom перевірено: фото — {photos}, колекцій — {collections}, відсутні — {missing}",
    "Lightroom import complete: {imported} photos added": "Імпорт Lightroom завершено: додано фото — {imported}",
    "Lightroom import complete: {imported} photos added, {failed} failed": "Імпорт Lightroom завершено: додано фото — {imported}, помилок — {failed}",
-@@ -154,7 +154,7 @@
+@@ -153,8 +153,8 @@
+   "{name} opened for editing; it is stacked with the original": "{name} відкрито для редагування й об’єднано в стос з оригіналом",
    "{name} — double-click to reset it": "{name} — подвійне клацання для скидання",
    "{n} change{} couldn't be written to disk: {e}\nIf you quit now, {} lost.": "Змін не вдалося записати на диск: {n}{0:.0}: {e}\nЯкщо вийти зараз, їх буде втрачено.{1:.0}",
-   "{n} change{} saved in memory but not written to disk: {e}\nLightCraft retries automatically; quitting now would lose {}.": "Змін збережено в пам’яті, але не записано на диск: {n}{:.0}: {e}\nLightCraft повторює спроби автоматично; вихід зараз призведе до їхньої втрати.{:.0}",
+-  "{n} change{} saved in memory but not written to disk: {e}\nLightCraft retries automatically; quitting now would lose {}.": "Змін збережено в пам’яті, але не записано на диск: {n}{:.0}: {e}\nLightCraft повторює спроби автоматично; вихід зараз призведе до їхньої втрати.{:.0}",
 -  "{n} change{} saved in memory but not written to disk: {e} — KIO Light will retry": "Змін збережено в пам’яті, але не записано на диск: {n}{:.0}: {e} — KIO Light повторить спробу",
++  "{n} change{} saved in memory but not written to disk: {e}\nBogo Light retries automatically; quitting now would lose {}.": "Змін збережено в пам’яті, але не записано на диск: {n}{:.0}: {e}\nBogo Light повторює спроби автоматично; вихід зараз призведе до їхньої втрати.{:.0}",
 +  "{n} change{} saved in memory but not written to disk: {e} — Bogo Light will retry": "Змін збережено в пам’яті, але не записано на диск: {n}{:.0}: {e} — Bogo Light повторить спробу",
    "{n} found · {sel} selected": "Знайдено: {n} · вибрано: {sel}",
    "{n} photos": "Фото: {n}",
@@ -51446,7 +51465,7 @@ index 057aeaf99c29bc6ab2302017d69a45f504f93141..d74aa4350d542c1c6f46163e7bc26587
    "Files with the same content as another file in this import: only the first is imported.": "Файли з тим самим вмістом, що й інший файл цього імпорту: імпортується лише перший."
  }
 diff --git a/crates/ui-egui/locales/zh-hans-formats.json b/crates/ui-egui/locales/zh-hans-formats.json
-index 57db546b6adb29f040a1b744374e644963c85713..1d6f829a698a3e7ac5e4bf5d690dde830773f511 100644
+index 57db546b6adb29f040a1b744374e644963c85713..8d71efebea13e6fcba51bbb4280837f827ed6575 100644
 --- a/crates/ui-egui/locales/zh-hans-formats.json
 +++ b/crates/ui-egui/locales/zh-hans-formats.json
 @@ -35,8 +35,8 @@
@@ -51460,6 +51479,15 @@ index 57db546b6adb29f040a1b744374e644963c85713..1d6f829a698a3e7ac5e4bf5d690dde83
    "Matches: {}": "匹配项：{0}",
    "Merging… {stage} {:.0}%": "合成中… {stage} {0:.0}%",
    "Move {what} to Recently Deleted?": "将 {what} 移到最近删除？",
+@@ -86,7 +86,7 @@
+   "{name} Off": "已关闭 {name}",
+   "{name} On": "已开启 {name}",
+   "{name} — double-click to reset it": "{name} — 双击可重置",
+-  "{n} change{} saved in memory but not written to disk: {e}\nLightCraft retries automatically; quitting now would lose {}.": "{n} 项更改已保存在内存中，但尚未写入磁盘：{e}\nLightCraft 会自动重试；现在退出将丢失这些更改。{0:.0}{1:.0}",
++  "{n} change{} saved in memory but not written to disk: {e}\nBogo Light retries automatically; quitting now would lose {}.": "{n} 项更改已保存在内存中，但尚未写入磁盘：{e}\nBogo Light 会自动重试；现在退出将丢失这些更改。{0:.0}{1:.0}",
+   "{n} found · {sel} selected": "找到 {n} 张 · 已选 {sel} 张",
+   "{n} photos": "{n} 张照片",
+   "{n} photos in {} are hidden by the filters above": "{0} 中的 {n} 张照片被上方的过滤器隐藏",
 @@ -179,7 +179,7 @@
    "{label} {index} of {n}": "{label} {index}/{n}",
    "{name} opened for editing; it is stacked with the original": "已打开 {name} 进行编辑；它已与原始照片堆叠在一起",
@@ -51651,7 +51679,7 @@ index 86d7fec22328e1dfba785bd88d2245e9a4481ff4..17f10bf16bebcc7e93fab429a84fc135
    "Files with the same content as another file in this import: only the first is imported.": "与本次导入中另一个文件内容相同的文件：只导入第一个。"
  }
 diff --git a/crates/ui-egui/locales/zh-hant-formats.json b/crates/ui-egui/locales/zh-hant-formats.json
-index 9913957f11d973135a4a5eba07620db364d82193..d78332d43f5d396a8aef40a94f5615163fa30899 100644
+index 9913957f11d973135a4a5eba07620db364d82193..3dd3a5b07867ea68568c8d4df0613cb68d660b14 100644
 --- a/crates/ui-egui/locales/zh-hant-formats.json
 +++ b/crates/ui-egui/locales/zh-hant-formats.json
 @@ -49,8 +49,8 @@
@@ -51665,6 +51693,15 @@ index 9913957f11d973135a4a5eba07620db364d82193..d78332d43f5d396a8aef40a94f561516
    "Matches: {}": "符合條件：{}",
    "Merging… {stage} {:.0}%": "正在合併… {stage} {:.0}%",
    "Move {what} to Recently Deleted?": "要將{what}移至「最近刪除」嗎？",
+@@ -106,7 +106,7 @@
+   "{name} Off": "關閉{name}",
+   "{name} On": "開啟{name}",
+   "{name} — double-click to reset it": "{name} — 按兩下可重設",
+-  "{n} change{} saved in memory but not written to disk: {e}\nLightCraft retries automatically; quitting now would lose {}.": "{n} 項變更{:.0}已保留在記憶體，但尚未寫入磁碟：{e}\nLightCraft 會自動重試；現在結束程式會遺失{}。",
++  "{n} change{} saved in memory but not written to disk: {e}\nBogo Light retries automatically; quitting now would lose {}.": "{n} 項變更{:.0}已保留在記憶體，但尚未寫入磁碟：{e}\nBogo Light 會自動重試；現在結束程式會遺失{}。",
+   "{n} found · {sel} selected": "找到 {n} 張 · 已選取 {sel} 張",
+   "{n} photos": "{n} 張照片",
+   "{n} photos in {} are hidden by the filters above": "{}中的 {n} 張照片被上方篩選條件隱藏",
 @@ -179,7 +179,7 @@
    "{label} {index} of {n}": "{label} {index}/{n}",
    "{name} opened for editing; it is stacked with the original": "已開啟 {name} 進行編輯；它已與原始照片堆疊在一起",
@@ -51948,6 +51985,24 @@ index 8499b1c161ab0f717f87e84136f56624bd123b65..d76244d6aa8318f0eb3b88b5f0e3ba06
              }
          });
          let mut app = crate::LightcraftApp::new(lightcraft_engine::Session::with_demo(), Default::default());
+diff --git a/crates/ui-egui/src/import.rs b/crates/ui-egui/src/import.rs
+index a1a720a8e074fce47385e8adaddb43b0d34202a2..28d5b254a14b3f968559f3d09de096310f81027e 100644
+--- a/crates/ui-egui/src/import.rs
++++ b/crates/ui-egui/src/import.rs
+@@ -1306,10 +1306,10 @@ fn candidate_cell(app: &mut LightcraftApp, ui: &mut egui::Ui, d: &mut ImportDial
+     }
+     // checkbox
+     let cb = Rect::from_min_size(img.min + vec2(6.0, 6.0), vec2(16.0, 16.0));
+-    p.rect(cb, 3.0, if on { t.accent } else { Color32::from_black_alpha(150) }, Stroke::new(1.0, Color32::from_gray(200)), StrokeKind::Inside);
++    p.rect(cb, 3.0, if on { t.pressed } else { Color32::from_black_alpha(150) }, Stroke::new(1.0, Color32::from_gray(200)), StrokeKind::Inside);
+     if on {
+-        p.line_segment([cb.left_center() + vec2(3.5, 0.5), cb.center_bottom() + vec2(-1.0, -4.0)], Stroke::new(2.0, Color32::WHITE));
+-        p.line_segment([cb.center_bottom() + vec2(-1.0, -4.0), cb.right_top() + vec2(-3.5, 4.0)], Stroke::new(2.0, Color32::WHITE));
++        p.line_segment([cb.left_center() + vec2(3.5, 0.5), cb.center_bottom() + vec2(-1.0, -4.0)], Stroke::new(2.0, t.text));
++        p.line_segment([cb.center_bottom() + vec2(-1.0, -4.0), cb.right_top() + vec2(-3.5, 4.0)], Stroke::new(2.0, t.text));
+     }
+     let in_trash = c.existing.is_some_and(|id| app.session.catalog.photo(lightcraft_catalog::PhotoId(id)).is_some_and(|p| p.deleted));
+     let badge = match (&c.duplicate, &c.error) {
 diff --git a/crates/ui-egui/src/lib.rs b/crates/ui-egui/src/lib.rs
 index e5fd38eeb96edb038a5b4a58a13ea5c3d55f563c..2a79dfc25b85e9bdd4b44d2b0208c503d18bb1e6 100644
 --- a/crates/ui-egui/src/lib.rs
@@ -52093,6 +52148,30 @@ index db412d8e055d7c78e6c6e0b1972593b9df315aae..508295d732f965fe096308b9fa080ae9
          "app.exportPrevious" => match app.session.last_export.clone() {
              Some(prev) => crate::control::export_active(app, &lightcraft_engine::export::ExportOptions::known_keys_only(&prev)),
              None => Err("nothing exported yet — use Export…".into()),
+diff --git a/crates/ui-egui/src/merge.rs b/crates/ui-egui/src/merge.rs
+index a603692fa195a7598502775d4ba940feeeae74a5..b9b15e4371e7e6c5f742d0e57e83ae25f622c2b3 100644
+--- a/crates/ui-egui/src/merge.rs
++++ b/crates/ui-egui/src/merge.rs
+@@ -313,16 +313,16 @@ pub fn body(app: &mut LightcraftApp, ui: &mut egui::Ui, opts: &mut MergeDialog)
+             }
+             if let Some(task) = &app.merge.preview_task {
+                 let (f, stage) = task.progress.lock().map(|g| g.clone()).unwrap_or_default();
+-                ui.painter().text(
++                crate::theme::media_label(
++                    ui.painter(),
+                     rect.center_bottom() - egui::vec2(0.0, 14.0),
+                     egui::Align2::CENTER_CENTER,
+                     crate::i18n::tr_format!("{stage}… {:.0}%", f * 100.0, stage = stage),
+                     t.font(12.0),
+-                    t.text,
+                 );
+             }
+             if let Some(e) = &app.merge.error {
+-                ui.painter().text(rect.center(), egui::Align2::CENTER_CENTER, e, t.font(13.0), t.text);
++                crate::theme::media_label(ui.painter(), rect.center(), egui::Align2::CENTER_CENTER, e, t.font(13.0));
+             }
+             let info = app.merge.preview.as_ref().map(|p| p.3.clone());
+             if let Some(info) = info {
 diff --git a/crates/ui-egui/src/panels/activity.rs b/crates/ui-egui/src/panels/activity.rs
 index 7b0d449c699cde3ffbb98daf2c4461bb6ce12cc4..58f1680cd24d0f1cd9cfb6bd1751a2d636b0f34e 100644
 --- a/crates/ui-egui/src/panels/activity.rs
@@ -52150,6 +52229,106 @@ index b986b8995e5c6515ed576941cb504d6f5df8e6c8..a65fe97141df52172e97f8c4231f7a75
      paint(ui.painter(), gear_r.shrink(7.0), Icon::Gear, t.icon);
      if gresp.clicked() {
          let _ = app.run("dialog.copySettings", json!({}));
+diff --git a/crates/ui-egui/src/panels/chips.rs b/crates/ui-egui/src/panels/chips.rs
+index d1acd15a59195a274f7e0c8462e8ba23274dd8a0..c5b1518766403154f5989f487a2ba10dbb1965f2 100644
+--- a/crates/ui-egui/src/panels/chips.rs
++++ b/crates/ui-egui/src/panels/chips.rs
+@@ -81,7 +81,7 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui, chips: &[FilterChip]) {
+     }
+     let t = Tokens::get(ui.ctx());
+     let (bar, _) = ui.allocate_exact_size(vec2(ui.available_width(), HEIGHT), Sense::hover());
+-    ui.painter().rect_filled(bar, 0.0, t.canvas);
++    ui.painter().rect_filled(bar, 0.0, t.chrome);
+     register(ui.ctx(), "filterchips", bar);
+     let font = t.font(12.0);
+     let right = bar.right() - 16.0;
+diff --git a/crates/ui-egui/src/panels/compare.rs b/crates/ui-egui/src/panels/compare.rs
+index 4aacfaead615b19712e1683dde81ed3b869df043..592cf25d3df753eac5a24437276e0424933d8e65 100644
+--- a/crates/ui-egui/src/panels/compare.rs
++++ b/crates/ui-egui/src/panels/compare.rs
+@@ -318,30 +318,31 @@ fn photo_tile(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId, slot: Slo
+     let cap_top = (display.bottom() + 2.0).min(img_area.bottom());
+     let cap = Rect::from_min_max(pos2(img.left().max(area.left()), cap_top), pos2(area.right(), cap_top + caption_h));
+     let pt = ui.painter();
++    let caption_ink = crate::theme::readable_ink(t.canvas, t.text);
+     let mut x = cap.left() + 4.0;
+     if !label.is_empty() {
+-        let g = pt.layout_no_wrap(crate::i18n::tr(label).to_string(), t.semibold(12.0), if active { t.text } else { t.text_label });
+-        pt.galley(pos2(x, cap.center().y - g.size().y / 2.0), g.clone(), t.text);
++        let g = pt.layout_no_wrap(crate::i18n::tr(label).to_string(), t.semibold(12.0), caption_ink);
++        pt.galley(pos2(x, cap.center().y - g.size().y / 2.0), g.clone(), caption_ink);
+         x += g.size().x + 10.0;
+     }
+     let name = photo.copy_name.as_ref().map(|c| format!("{} ({c})", photo.file_name)).unwrap_or(photo.file_name.clone());
+-    let g = pt.layout_no_wrap(name, t.font(11.5), t.text_dim);
++    let g = pt.layout_no_wrap(name, t.font(11.5), caption_ink);
+     let name_w = g.size().x;
+     if x + name_w + 110.0 < cap.right() {
+-        pt.galley(pos2(x, cap.center().y - g.size().y / 2.0), g, t.text_dim);
++        pt.galley(pos2(x, cap.center().y - g.size().y / 2.0), g, caption_ink);
+         x += name_w + 10.0;
+     }
+     for i in 0..5u8 {
+         let filled = i < photo.rating;
+         let r = Rect::from_min_size(pos2(x + i as f32 * 13.0, cap.center().y - 6.0), vec2(12.0, 12.0));
+         if r.right() < cap.right() {
+-            paint(pt, r, if filled { Icon::StarFilled } else { Icon::Star }, if filled { t.star } else { t.icon.gamma_multiply(0.6) });
++            paint(pt, r, if filled { Icon::StarFilled } else { Icon::Star }, caption_ink);
+         }
+     }
+     x += 5.0 * 13.0 + 4.0;
+     let fr = Rect::from_min_size(pos2(x, cap.center().y - 7.0), vec2(14.0, 14.0));
+     match photo.flag {
+-        Flag::Pick if fr.right() < cap.right() => paint(pt, fr, Icon::FlagPick, t.pick),
++        Flag::Pick if fr.right() < cap.right() => paint(pt, fr, Icon::FlagPick, caption_ink),
+         Flag::Reject if fr.right() < cap.right() => paint(pt, fr, Icon::FlagReject, t.reject),
+         _ => {}
+     }
+@@ -469,7 +470,13 @@ fn slot_index(s: Slot) -> u8 {
+ pub fn show_compare(app: &mut LightcraftApp, ui: &mut egui::Ui) {
+     let canvas = area_and_filmstrip(app, ui);
+     let Some((sel, cand)) = compare_pair(app) else {
+-        super::empty_message(ui, canvas, "Nothing to compare", "Select two photos, then choose View → Compare (Shift+C)");
++        super::empty_message_on(
++            ui,
++            canvas,
++            "Nothing to compare",
++            "Select two photos, then choose View → Compare (Shift+C)",
++            crate::theme::Tokens::get(ui.ctx()).canvas,
++        );
+         return;
+     };
+     let area = canvas.shrink(18.0);
+@@ -525,7 +532,13 @@ pub fn show_survey(app: &mut LightcraftApp, ui: &mut egui::Ui) {
+     let canvas = area_and_filmstrip(app, ui);
+     let photos = survey_photos(app);
+     if photos.is_empty() {
+-        super::empty_message(ui, canvas, "Nothing to survey", "Select photos, then choose View → Survey (N)");
++        super::empty_message_on(
++            ui,
++            canvas,
++            "Nothing to survey",
++            "Select photos, then choose View → Survey (N)",
++            crate::theme::Tokens::get(ui.ctx()).canvas,
++        );
+         return;
+     }
+     let area = canvas.shrink(14.0);
+@@ -575,7 +588,13 @@ pub fn show_reference(app: &mut LightcraftApp, ui: &mut egui::Ui) {
+     let canvas = area_and_filmstrip(app, ui);
+     let reference = app.ui.reference.map(PhotoId).filter(|r| app.session.catalog.photo(*r).is_some());
+     let (Some(r), Some(active)) = (reference, app.session.active()) else {
+-        super::empty_message(ui, canvas, "No reference photo", "Right-click a photo ▸ Set as Reference Photo, then View → Reference View (Shift+R)");
++        super::empty_message_on(
++            ui,
++            canvas,
++            "No reference photo",
++            "Right-click a photo ▸ Set as Reference Photo, then View → Reference View (Shift+R)",
++            crate::theme::Tokens::get(ui.ctx()).canvas,
++        );
+         return;
+     };
+     let area = canvas.shrink(18.0);
 diff --git a/crates/ui-egui/src/panels/denoise.rs b/crates/ui-egui/src/panels/denoise.rs
 index 18274f53ddbc1274a968cf8390c81331be9e5e8e..9ad4b2235b247effe694c06173c0e665a7f977c1 100644
 --- a/crates/ui-egui/src/panels/denoise.rs
@@ -52173,34 +52352,92 @@ index 18274f53ddbc1274a968cf8390c81331be9e5e8e..9ad4b2235b247effe694c06173c0e665
                      after = tr(after)
                  ))
 diff --git a/crates/ui-egui/src/panels/detail.rs b/crates/ui-egui/src/panels/detail.rs
-index 151d4a57a2ea2b51bb1a4444f6409d8d9afb6c2f..8dfe624ca130ba92911bc16151ef3f4264128e9d 100644
+index 151d4a57a2ea2b51bb1a4444f6409d8d9afb6c2f..7d36326fa96144994c17c94c0bbc45e75da8a3f8 100644
 --- a/crates/ui-egui/src/panels/detail.rs
 +++ b/crates/ui-egui/src/panels/detail.rs
-@@ -2301,12 +2301,32 @@ pub(crate) fn filmstrip(app: &mut LightcraftApp, ui: &mut egui::Ui, r: Rect) {
+@@ -370,7 +370,13 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui) {
+         filmstrip(app, ui, Rect::from_min_max(pos2(full.left(), canvas.bottom()), full.max));
+     }
+     let Some(id) = app.session.active() else {
+-        super::empty_message(ui, canvas, "No photo selected", "Choose a photo in the grid or filmstrip");
++        super::empty_message_on(
++            ui,
++            canvas,
++            "No photo selected",
++            "Choose a photo in the grid or filmstrip",
++            if fullscreen { Color32::BLACK } else { t.canvas },
++        );
+         return;
+     };
+     let Some(photo) = app.session.catalog.photo(id).cloned() else { return };
+@@ -608,6 +614,14 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui) {
+         let label = crate::i18n::tr_format!("Proof Preview · {}", app.ui.proof.space.label());
+         p.text(pos2(canvas.right() - 16.0, canvas.top() + 14.0), Align2::RIGHT_CENTER, label, t.font(12.5), Color32::from_gray(60));
+     }
++    let canvas_background = if fullscreen {
++        Color32::BLACK
++    } else if app.ui.soft_proof {
++        Color32::from_gray(238)
++    } else {
++        t.canvas
++    };
++    let canvas_ink = crate::theme::readable_ink(canvas_background, t.text);
+     let shown;
+     if split {
+         // each view stays in its pane: zoomed in, a photo reaches past it (and would cover the
+@@ -617,11 +631,17 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui) {
+         shown = draw(Slot::Main, img_rect, main_area);
+         // the labels under each photo, or under its pane when the photo reaches past it
+         let label_at = |r: Rect, pane: Rect| pos2(r.left().max(pane.left()), r.bottom().min(pane.bottom()) + 14.0);
+-        p.text(label_at(br, areas[0]), Align2::LEFT_CENTER, crate::i18n::tr("Before"), t.font(12.0), t.text_dim);
+-        p.text(label_at(img_rect, main_area), Align2::LEFT_CENTER, crate::i18n::tr("After"), t.font(12.0), t.text_dim);
++        crate::theme::media_label(&p, label_at(br, areas[0]), Align2::LEFT_CENTER, crate::i18n::tr("Before"), t.font(12.0));
++        crate::theme::media_label(&p, label_at(img_rect, main_area), Align2::LEFT_CENTER, crate::i18n::tr("After"), t.font(12.0));
+     } else if show_before {
+         shown = draw(Slot::Before, img_rect, canvas);
+-        p.text(pos2(img_rect.left() + 8.0, img_rect.top() + 14.0), Align2::LEFT_CENTER, crate::i18n::tr("Before"), t.font(12.0), t.text);
++        crate::theme::media_label(
++            &p,
++            pos2(img_rect.left() + 8.0, img_rect.top() + 14.0),
++            Align2::LEFT_CENTER,
++            crate::i18n::tr("Before"),
++            t.font(12.0),
++        );
+     } else if let Some((_key, label)) = &hover_key
+         && let Some(tex) = app.renderer.textures.get(&Slot::Hover).filter(|t| t.photo == id)
+     {
+@@ -642,12 +662,12 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui) {
+                         Align2::CENTER_CENTER,
+                         crate::i18n::tr("This photo can't be opened"),
+                         t.semibold(14.0),
+-                        t.text,
++                        canvas_ink,
+                     );
+-                    p.text(canvas.center() + vec2(0.0, 12.0), Align2::CENTER_CENTER, e, t.font(12.0), t.text_dim);
++                    p.text(canvas.center() + vec2(0.0, 12.0), Align2::CENTER_CENTER, e, t.font(12.0), canvas_ink);
+                 }
+                 None => {
+-                    p.text(canvas.center(), Align2::CENTER_CENTER, crate::i18n::tr("Rendering…"), t.font(13.0), t.text_dim);
++                    p.text(canvas.center(), Align2::CENTER_CENTER, crate::i18n::tr("Rendering…"), t.font(13.0), canvas_ink);
+                 }
+             }
+         }
+@@ -2266,7 +2286,7 @@ pub(crate) fn filmstrip(app: &mut LightcraftApp, ui: &mut egui::Ui, r: Rect) {
+     let ppp = ui.ctx().pixels_per_point();
+     if ids.is_empty() {
+         let why = if app.session.filter != Default::default() { "No photos match the filters (View → Clear Filters)" } else { "No photos" };
+-        ui.painter().text(r.center(), Align2::CENTER_CENTER, why, t.font(12.5), t.text_dim);
++        ui.painter().text(r.center(), Align2::CENTER_CENTER, why, t.font(12.5), crate::theme::readable_ink(t.canvas, t.text_dim));
+         return;
+     }
+     let mut child = ui.new_child(egui::UiBuilder::new().max_rect(r.shrink2(vec2(0.0, 4.0))));
+@@ -2301,12 +2321,14 @@ pub(crate) fn filmstrip(app: &mut LightcraftApp, ui: &mut egui::Ui, r: Rect) {
              } else {
                  t.canvas
              };
 -            p.rect_filled(cr, 0.0, crate::theme::label_background(base, label, selected));
 +            let label_background = crate::theme::label_background(base, label, selected);
-+            // Catalog labels retain their semantic colors; choose readable ink
-+            // from the actual composed background, including hover/selection.
-+            let luminance = |color: Color32| {
-+                let linear = |value: u8| {
-+                    let c = f32::from(value) / 255.0;
-+                    if c <= 0.04045 { c / 12.92 } else { ((c + 0.055) / 1.055).powf(2.4) }
-+                };
-+                0.2126 * linear(color.r()) + 0.7152 * linear(color.g()) + 0.0722 * linear(color.b())
-+            };
-+            let background_luminance = luminance(label_background);
-+            let primary_luminance = luminance(t.text_dim);
-+            let primary_contrast = (background_luminance.max(primary_luminance) + 0.05) / (background_luminance.min(primary_luminance) + 0.05);
-+            let label_ink = if primary_contrast >= 4.5 {
-+                t.text_dim
-+            } else if 1.05 / (background_luminance + 0.05) >= 4.5 {
-+                Color32::WHITE
-+            } else {
-+                Color32::BLACK
-+            };
++            let label_ink = crate::theme::readable_ink(label_background, t.text_dim);
 +            p.rect_filled(cr, 0.0, label_background);
              let names = app.ui.settings.film_names;
              if let Some(ph) = app.session.catalog.photo(*id).filter(|_| names) {
@@ -52212,6 +52449,26 @@ index 151d4a57a2ea2b51bb1a4444f6409d8d9afb6c2f..8dfe624ca130ba92911bc16151ef3f42
              }
              let img_area = Rect::from_min_max(cr.min + vec2(10.0, 22.0), cr.max - vec2(10.0, 8.0));
              super::grid::request_thumb(app, *id, (256.0 * ppp.min(2.0) / 2.0) as usize * 2, 8);
+@@ -2377,16 +2399,16 @@ fn film_badges(p: &egui::Painter, t: &Tokens, fr: Rect, ph: &lightcraft_catalog:
+     let y = bar.center().y;
+     let mut x = bar.left() + 3.0;
+     for i in 0..ph.rating {
+-        paint(p, Rect::from_min_size(pos2(x + i as f32 * 9.0, y - 4.0), vec2(8.0, 8.0)), Icon::StarFilled, t.star);
++        paint(p, Rect::from_min_size(pos2(x + i as f32 * 9.0, y - 4.0), vec2(8.0, 8.0)), Icon::StarFilled, Color32::WHITE);
+     }
+     x += ph.rating as f32 * 9.0 + 2.0;
+     match ph.flag {
+-        Flag::Pick => paint(p, Rect::from_min_size(pos2(x, y - 5.0), vec2(10.0, 10.0)), Icon::FlagPick, t.pick),
++        Flag::Pick => paint(p, Rect::from_min_size(pos2(x, y - 5.0), vec2(10.0, 10.0)), Icon::FlagPick, Color32::WHITE),
+         Flag::Reject => paint(p, Rect::from_min_size(pos2(x, y - 5.0), vec2(10.0, 10.0)), Icon::FlagReject, t.reject),
+         Flag::None => {}
+     }
+     if edited {
+-        paint(p, Rect::from_min_size(pos2(bar.right() - 13.0, y - 5.0), vec2(10.0, 10.0)), Icon::Sliders, t.text_label);
++        paint(p, Rect::from_min_size(pos2(bar.right() - 13.0, y - 5.0), vec2(10.0, 10.0)), Icon::Sliders, Color32::WHITE);
+     }
+ }
+ 
 diff --git a/crates/ui-egui/src/panels/dialogs.rs b/crates/ui-egui/src/panels/dialogs.rs
 index 20bade39054f04f5334743b5badbe5396f20f333..ff3848916b260d2fcc65ae316200a273c097b34c 100644
 --- a/crates/ui-egui/src/panels/dialogs.rs
@@ -52297,7 +52554,7 @@ index 20bade39054f04f5334743b5badbe5396f20f333..ff3848916b260d2fcc65ae316200a273
          .color(t.text_label),
      );
 diff --git a/crates/ui-egui/src/panels/edit.rs b/crates/ui-egui/src/panels/edit.rs
-index 533354b6c56accd351567aa6cd4a96446b671409..52ee119c034995bf29a047f886db574569667258 100644
+index 533354b6c56accd351567aa6cd4a96446b671409..09cad3359fc13c96bc85fbb9a99a8fed0d50d19e 100644
 --- a/crates/ui-egui/src/panels/edit.rs
 +++ b/crates/ui-egui/src/panels/edit.rs
 @@ -144,7 +144,7 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId) {
@@ -52309,6 +52566,15 @@ index 533354b6c56accd351567aa6cd4a96446b671409..52ee119c034995bf29a047f886db5745
                  ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                      if text_button(ui, "autoSyncOff", crate::i18n::tr("Turn Off"), false).clicked() {
                          let _ = app.run("develop.autoSync", json!({"on": false}));
+@@ -994,7 +994,7 @@ fn curve_editor(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId, d: &Dev
+             egui::Align2::LEFT_TOP,
+             format!("{} / {}", (q.x * 255.0).round(), (q.y * 255.0).round()),
+             t.font(11.0),
+-            t.text_dim,
++            crate::theme::readable_ink(t.canvas, t.text_dim),
+         );
+     }
+     let mut new_pts = None;
 diff --git a/crates/ui-egui/src/panels/faces.rs b/crates/ui-egui/src/panels/faces.rs
 index 0b151fc5e41e90041b45ed8e2871e82e0c2809e5..3cd4acb512a276985a6849a47dcd0ba615ebcb56 100644
 --- a/crates/ui-egui/src/panels/faces.rs
@@ -52370,8 +52636,30 @@ index 0b151fc5e41e90041b45ed8e2871e82e0c2809e5..3cd4acb512a276985a6849a47dcd0ba6
                  register(ui.ctx(), "faces:setup", b.rect);
                  if b.clicked() {
                      outcome = Editor::Setup;
+diff --git a/crates/ui-egui/src/panels/filterbar.rs b/crates/ui-egui/src/panels/filterbar.rs
+index c0962b59f139d79245d493701c7493964494daca..c0499338dcbf1ea6ceb8eae176534b3d6fe688a5 100644
+--- a/crates/ui-egui/src/panels/filterbar.rs
++++ b/crates/ui-egui/src/panels/filterbar.rs
+@@ -134,7 +134,7 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui) {
+         register(ui.ctx(), format!("filter:star{i}"), r);
+         let filled = i <= f.rating;
+         let c = if filled {
+-            t.star
++            t.icon
+         } else if resp.hovered() {
+             t.text_label
+         } else {
+@@ -156,7 +156,7 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui) {
+     ] {
+         let on = f.flag == Some(flag);
+         let color = match flag {
+-            Flag::Pick if on => t.pick,
++            Flag::Pick if on => t.text,
+             Flag::Reject if on => t.reject,
+             _ => Color32::TRANSPARENT,
+         };
 diff --git a/crates/ui-egui/src/panels/grid.rs b/crates/ui-egui/src/panels/grid.rs
-index 52edfa460c240ea839fd0ff39aed7c63abb47b52..d181c8c9f218d97473ae9ef118d3010c2e92c207 100644
+index 52edfa460c240ea839fd0ff39aed7c63abb47b52..c86d18a77023fc9d0ec0a7c5dc9cfceba25efa92 100644
 --- a/crates/ui-egui/src/panels/grid.rs
 +++ b/crates/ui-egui/src/panels/grid.rs
 @@ -153,7 +153,7 @@ fn show_inner(app: &mut LightcraftApp, ui: &mut egui::Ui) {
@@ -52383,7 +52671,43 @@ index 52edfa460c240ea839fd0ff39aed7c63abb47b52..d181c8c9f218d97473ae9ef118d3010c
              let full = crate::i18n::source_title(&app.session);
              let count_w = ui.painter().layout_no_wrap(cnt.clone(), t.font(12.5), t.text_dim).size().x;
              // the title gives way to the count: a long album or folder name is trimmed, in full on hover
-@@ -463,7 +463,7 @@ fn group_header(app: &mut LightcraftApp, ui: &mut egui::Ui, run: &DateRun, ids:
+@@ -182,18 +182,31 @@ fn show_inner(app: &mut LightcraftApp, ui: &mut egui::Ui) {
+                 }
+                 _ => "Remove a filter above, or choose Clear all".to_string(),
+             };
+-            super::empty_message(ui, ui.max_rect(), "No photos match the active filters", &body);
++            super::empty_message_on(ui, ui.max_rect(), "No photos match the active filters", &body, t.grid_bg);
+         } else if app.session.filter != Default::default() {
+-            super::empty_message(
++            super::empty_message_on(
+                 ui,
+                 ui.max_rect(),
+                 "No matching photos",
+                 "A filter is hiding this view's photos: change it, or clear it (View → Clear Filters)",
++                t.grid_bg,
+             );
+         } else if app.session.source == lightcraft_engine::LibrarySource::Folder {
+-            super::empty_message(ui, ui.max_rect(), "No photos in this folder", "Turn on Include subfolders, or pick another folder under Local");
++            super::empty_message_on(
++                ui,
++                ui.max_rect(),
++                "No photos in this folder",
++                "Turn on Include subfolders, or pick another folder under Local",
++                t.grid_bg,
++            );
+         } else {
+-            super::empty_message(ui, ui.max_rect(), "No photos", "Import photos with File → Import Photos… (Cmd+Shift+I), or drop them here");
++            super::empty_message_on(
++                ui,
++                ui.max_rect(),
++                "No photos",
++                "Import photos with File → Import Photos… (Cmd+Shift+I), or drop them here",
++                t.grid_bg,
++            );
+         }
+         return;
+     }
+@@ -463,20 +476,21 @@ fn group_header(app: &mut LightcraftApp, ui: &mut egui::Ui, run: &DateRun, ids:
      }
      let p = ui.painter();
      if pinned {
@@ -52391,8 +52715,68 @@ index 52edfa460c240ea839fd0ff39aed7c63abb47b52..d181c8c9f218d97473ae9ef118d3010c
 +        p.rect_filled(r, 0.0, t.chrome);
          p.hline(r.x_range(), r.bottom(), Stroke::new(1.0, t.divider));
      }
-     let g = p.layout_no_wrap(crate::i18n::date_group_label(&run.key, false), t.semibold(15.0), if resp.hovered() { t.text } else { t.text_label });
-@@ -752,7 +752,7 @@ fn folder_header(app: &mut LightcraftApp, ui: &mut egui::Ui, b: &lightcraft_engi
+-    let g = p.layout_no_wrap(crate::i18n::date_group_label(&run.key, false), t.semibold(15.0), if resp.hovered() { t.text } else { t.text_label });
++    let ink = crate::theme::readable_ink(if pinned { t.chrome } else { t.grid_bg }, t.text);
++    let g = p.layout_no_wrap(crate::i18n::date_group_label(&run.key, false), t.semibold(15.0), ink);
+     let x = r.left() + 8.0;
+     let gw = g.size().x;
+-    p.galley(pos2(x, r.center().y - g.size().y / 2.0), g, t.text);
++    p.galley(pos2(x, r.center().y - g.size().y / 2.0), g, ink);
+     let n = run.count;
+     p.text(
+         pos2(x + gw + 10.0, r.center().y),
+         Align2::LEFT_CENTER,
+         crate::i18n::tr_format!("· {n} photo{}", if n == 1 { "" } else { "s" }, n = n),
+         t.font(12.5),
+-        t.text_dim,
++        ink,
+     );
+     if resp.clicked() {
+         let group: Vec<u64> = ids[run.start..(run.start + run.count).min(ids.len())].iter().map(|p| p.0).collect();
+@@ -609,7 +623,7 @@ fn cell(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId, r: Rect, square
+         }
+         if app.renderer.failure(Slot::Thumb(id)).is_some() {
+             // unreadable / missing file
+-            p.text(ph.center(), Align2::CENTER_CENTER, "!", t.semibold(18.0), t.text_dim);
++            p.text(ph.center(), Align2::CENTER_CENTER, "!", t.semibold(18.0), Color32::WHITE);
+         }
+     }
+     // labels and badges
+@@ -635,10 +649,10 @@ fn cell(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId, r: Rect, square
+         };
+         p.text(pos2(r.left() + 8.0, r.top() + 12.0), Align2::LEFT_CENTER, name, t.font(10.5), t.text_dim);
+         let fmt = photo.format.clone();
+-        let g = p.layout_no_wrap(fmt, t.semibold(9.0), t.text_label);
++        let g = p.layout_no_wrap(fmt, t.semibold(9.0), Color32::WHITE);
+         let br = Rect::from_min_size(pos2(r.right() - g.size().x - 14.0, r.top() + 5.0), g.size() + vec2(8.0, 3.0));
+         p.rect_filled(br, 2.0, Color32::from_gray(26));
+-        p.galley(br.min + vec2(4.0, 1.5), g, t.text_label);
++        p.galley(br.min + vec2(4.0, 1.5), g, Color32::WHITE);
+     }
+     let show_badges = match app.ui.settings.grid_badges {
+         crate::state::GridBadges::Auto => resp.hovered() || selected || photo.rating > 0 || photo.flag != Flag::None || photo.label.is_some(),
+@@ -658,17 +672,17 @@ fn cell(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId, r: Rect, square
+         }
+         let mut x = bar.left() + 6.0;
+         for i in 0..photo.rating {
+-            paint(p, Rect::from_min_size(pos2(x + i as f32 * 13.0, bar.center().y - 6.0), vec2(12.0, 12.0)), Icon::StarFilled, t.star);
++            paint(p, Rect::from_min_size(pos2(x + i as f32 * 13.0, bar.center().y - 6.0), vec2(12.0, 12.0)), Icon::StarFilled, Color32::WHITE);
+         }
+         x += photo.rating as f32 * 13.0 + 4.0;
+         match photo.flag {
+-            Flag::Pick => paint(p, Rect::from_min_size(pos2(x, bar.center().y - 7.0), vec2(14.0, 14.0)), Icon::FlagPick, t.pick),
++            Flag::Pick => paint(p, Rect::from_min_size(pos2(x, bar.center().y - 7.0), vec2(14.0, 14.0)), Icon::FlagPick, Color32::WHITE),
+             Flag::Reject => paint(p, Rect::from_min_size(pos2(x, bar.center().y - 7.0), vec2(14.0, 14.0)), Icon::FlagReject, t.reject),
+             Flag::None => {}
+         }
+         let mut right = bar.right();
+         if photo.is_edited() {
+-            paint(p, Rect::from_min_size(pos2(right - 20.0, bar.center().y - 7.0), vec2(14.0, 14.0)), Icon::Sliders, t.text_label);
++            paint(p, Rect::from_min_size(pos2(right - 20.0, bar.center().y - 7.0), vec2(14.0, 14.0)), Icon::Sliders, Color32::WHITE);
+             right -= 20.0;
+         }
+         if let Some(l) = photo.label {
+@@ -752,7 +766,7 @@ fn folder_header(app: &mut LightcraftApp, ui: &mut egui::Ui, b: &lightcraft_engi
      let t = Tokens::get(ui.ctx());
      // The path/count and actions need independent rows. The frame reserves the actual height,
      // including any wrapped actions, so the grid below never paints under the header.
@@ -52401,8 +52785,92 @@ index 52edfa460c240ea839fd0ff39aed7c63abb47b52..d181c8c9f218d97473ae9ef118d3010c
          ui.set_width(ui.available_width());
          ui.horizontal(|ui| {
              ui.spacing_mut().item_spacing.x = 8.0;
+@@ -868,10 +882,10 @@ pub fn drag_feedback(app: &mut LightcraftApp, ctx: &egui::Context) {
+     let n = ids.len();
+     ctx.set_cursor_icon(egui::CursorIcon::Grabbing);
+     egui::Area::new(egui::Id::new("drag-photos")).order(egui::Order::Tooltip).interactable(false).fixed_pos(pos + vec2(14.0, 10.0)).show(ctx, |ui| {
+-        egui::Frame::NONE.fill(t.accent).corner_radius(10.0).inner_margin(egui::Margin::symmetric(9, 3)).show(ui, |ui| {
++        egui::Frame::NONE.fill(t.pressed).corner_radius(10.0).inner_margin(egui::Margin::symmetric(9, 3)).show(ui, |ui| {
+             ui.label(
+                 egui::RichText::new(crate::i18n::tr_format!("{n} photo{}", if n == 1 { "" } else { "s" }, n = n))
+-                    .color(Color32::WHITE)
++                    .color(t.text)
+                     .font(t.semibold(12.0)),
+             );
+         });
+diff --git a/crates/ui-egui/src/panels/keyword_list.rs b/crates/ui-egui/src/panels/keyword_list.rs
+index 2d691112a44a54dcf343cef4aed5fb825c41f68e..29fcc230301a965d91a9e1804e18cb7a8900e168 100644
+--- a/crates/ui-egui/src/panels/keyword_list.rs
++++ b/crates/ui-egui/src/panels/keyword_list.rs
+@@ -126,8 +126,8 @@ pub fn drag_feedback(app: &mut LightcraftApp, ctx: &egui::Context) {
+     ctx.set_cursor_icon(egui::CursorIcon::Grabbing);
+     let name = keyword.rsplit('|').next().unwrap_or(&keyword).to_string();
+     egui::Area::new(egui::Id::new("drag-keyword")).order(egui::Order::Tooltip).interactable(false).fixed_pos(at + vec2(14.0, 10.0)).show(ctx, |ui| {
+-        egui::Frame::NONE.fill(t.accent).corner_radius(10.0).inner_margin(egui::Margin::symmetric(9, 3)).show(ui, |ui| {
+-            ui.label(egui::RichText::new(name).color(Color32::WHITE).font(t.semibold(12.0)));
++        egui::Frame::NONE.fill(t.pressed).corner_radius(10.0).inner_margin(egui::Margin::symmetric(9, 3)).show(ui, |ui| {
++            ui.label(egui::RichText::new(name).color(t.text).font(t.semibold(12.0)));
+         });
+     });
+ }
+@@ -169,7 +169,7 @@ fn row(app: &mut LightcraftApp, ui: &mut egui::Ui, r: &Row, selection: &[PhotoId
+     let picked = app.ui.keyword_list_selected.as_deref().is_some_and(|k| same(k, &r.path));
+     let inner = Rect::from_min_max(rect.min + vec2(16.0, 0.0), rect.max - vec2(16.0, 0.0));
+     if picked {
+-        ui.painter().rect_filled(inner, 4.0, t.canvas);
++        ui.painter().rect_filled(inner, 4.0, t.pressed);
+     } else if resp.hovered() {
+         ui.painter().rect_filled(inner, 4.0, t.hover.gamma_multiply(0.6));
+     }
+@@ -209,9 +209,9 @@ fn row(app: &mut LightcraftApp, ui: &mut egui::Ui, r: &Row, selection: &[PhotoId
+     let edge = if on { t.text_label } else { t.text_dim.gamma_multiply(0.5) };
+     match state {
+         Tick::All => {
+-            ui.painter().rect_filled(boxr, 2.0, t.accent);
++            ui.painter().rect_filled(boxr, 2.0, t.pressed);
+             let pts = vec![boxr.left_center() + vec2(2.5, 0.0), boxr.center_bottom() + vec2(-1.0, -3.0), boxr.right_top() + vec2(-2.5, 3.0)];
+-            ui.painter().add(egui::Shape::line(pts, Stroke::new(1.6, Color32::WHITE)));
++            ui.painter().add(egui::Shape::line(pts, Stroke::new(1.6, t.text)));
+         }
+         Tick::Some => {
+             ui.painter().rect_stroke(boxr, 2.0, Stroke::new(1.0, edge), StrokeKind::Inside);
+diff --git a/crates/ui-egui/src/panels/left.rs b/crates/ui-egui/src/panels/left.rs
+index fcaab2926e995ea0707ec348b62523abb209b4a5..36945d2b426004768df1f834d59bddeb4ba3e28f 100644
+--- a/crates/ui-egui/src/panels/left.rs
++++ b/crates/ui-egui/src/panels/left.rs
+@@ -100,7 +100,7 @@ fn row_sensed(
+     let edge = r.right().min(visible_right);
+     let inner = Rect::from_min_max(r.min + vec2(8.0, 0.0), pos2((r.right() - 8.0).min(edge - 8.0).max(r.left() + 8.0), r.bottom()));
+     if selected {
+-        ui.painter().rect_filled(inner, 4.0, t.canvas);
++        ui.painter().rect_filled(inner, 4.0, t.pressed);
+         register(ui.ctx(), format!("highlight:{id}"), inner);
+     } else if resp.hovered() {
+         ui.painter().rect_filled(inner, 4.0, t.hover.gamma_multiply(0.6));
+@@ -391,8 +391,8 @@ pub fn section_drag_feedback(app: &mut LightcraftApp, ctx: &egui::Context) {
+     egui::Area::new(egui::Id::new("drag-section")).order(egui::Order::Tooltip).interactable(false).fixed_pos(pos + vec2(14.0, 10.0)).show(
+         ctx,
+         |ui| {
+-            egui::Frame::NONE.fill(t.accent).corner_radius(10.0).inner_margin(egui::Margin::symmetric(9, 3)).show(ui, |ui| {
+-                ui.label(egui::RichText::new(crate::i18n::tr(section.title())).color(egui::Color32::WHITE).font(t.semibold(12.0)));
++            egui::Frame::NONE.fill(t.pressed).corner_radius(10.0).inner_margin(egui::Margin::symmetric(9, 3)).show(ui, |ui| {
++                ui.label(egui::RichText::new(crate::i18n::tr(section.title())).color(t.text).font(t.semibold(12.0)));
+             });
+         },
+     );
+@@ -1494,8 +1494,8 @@ pub fn album_drag_feedback(app: &mut LightcraftApp, ctx: &egui::Context) {
+     let t = Tokens::get(ctx);
+     ctx.set_cursor_icon(egui::CursorIcon::Grabbing);
+     egui::Area::new(egui::Id::new("drag-album")).order(egui::Order::Tooltip).interactable(false).fixed_pos(pos + vec2(14.0, 10.0)).show(ctx, |ui| {
+-        egui::Frame::NONE.fill(t.accent).corner_radius(10.0).inner_margin(egui::Margin::symmetric(9, 3)).show(ui, |ui| {
+-            ui.label(egui::RichText::new(name).color(egui::Color32::WHITE).font(t.semibold(12.0)));
++        egui::Frame::NONE.fill(t.pressed).corner_radius(10.0).inner_margin(egui::Margin::symmetric(9, 3)).show(ui, |ui| {
++            ui.label(egui::RichText::new(name).color(t.text).font(t.semibold(12.0)));
+         });
+     });
+ }
 diff --git a/crates/ui-egui/src/panels/library_problem.rs b/crates/ui-egui/src/panels/library_problem.rs
-index 77a36ac85c15420efe16f8731aff9d8ca9cd5da9..910c33a3a6d68889251c4d70bc70bc0c693370dc 100644
+index 77a36ac85c15420efe16f8731aff9d8ca9cd5da9..b811b896451ca25cfdbb850f4f53f4b45ce9c23a 100644
 --- a/crates/ui-egui/src/panels/library_problem.rs
 +++ b/crates/ui-egui/src/panels/library_problem.rs
 @@ -110,9 +110,9 @@ pub fn show(app: &mut LightcraftApp, ctx: &egui::Context) {
@@ -52417,6 +52885,63 @@ index 77a36ac85c15420efe16f8731aff9d8ca9cd5da9..910c33a3a6d68889251c4d70bc70bc0c
                  ui.label(RichText::new(&problem.path).font(t.semibold(12.5)).color(t.text));
              }
              ui.add(egui::Label::new(RichText::new(&problem.error).color(t.caution)).wrap());
+@@ -174,12 +174,10 @@ pub fn banner(app: &mut LightcraftApp, ui: &mut egui::Ui) {
+                 let r = ui.label(
+                     RichText::new(crate::i18n::tr("Temporary session — your library isn't open, and nothing you do here is saved."))
+                         .font(t.semibold(12.5))
+-                        .color(t.canvas),
++                        .color(crate::theme::readable_ink(t.caution, t.text)),
+                 );
+                 register(ui.ctx(), "indicator:temporarySession", r.rect);
+-                let b = ui.add(
+-                    egui::Button::new(RichText::new(crate::i18n::tr("Open Library…")).color(t.canvas)).fill(egui::Color32::from_black_alpha(40)),
+-                );
++                let b = ui.add(egui::Button::new(RichText::new(crate::i18n::tr("Open Library…")).color(t.text)).fill(t.button));
+                 register(ui.ctx(), "button:libraryReopen", b.rect);
+                 reopen = b.clicked();
+             });
+diff --git a/crates/ui-egui/src/panels/mod.rs b/crates/ui-egui/src/panels/mod.rs
+index a8d99aed288ce8d17f1c757818bd2ac8c6e9b7b6..201b4a8112d5555ba40258115640e1e0794fe0b3 100644
+--- a/crates/ui-egui/src/panels/mod.rs
++++ b/crates/ui-egui/src/panels/mod.rs
+@@ -82,7 +82,7 @@ pub fn toast(app: &mut LightcraftApp, ctx: &egui::Context) {
+     let painter = ctx.layer_painter(egui::LayerId::new(egui::Order::Foreground, egui::Id::new("toast")));
+     // long messages (a save warning, the web build's notices) wrap within the canvas
+     let wrap = (canvas.width() - 80.0).clamp(200.0, 720.0);
+-    let (background, foreground) = label.map(crate::theme::label_toast_colors).unwrap_or((egui::Color32::from_black_alpha(200), t.text));
++    let (background, foreground) = label.map(crate::theme::label_toast_colors).unwrap_or((t.button, t.text));
+     let foreground = foreground.gamma_multiply(fade);
+     let galley = painter.layout(text, t.font(14.0), foreground, wrap);
+     let size = vec2(galley.size().x + 40.0, (galley.size().y + 22.0).max(40.0));
+@@ -94,8 +94,26 @@ pub fn toast(app: &mut LightcraftApp, ctx: &egui::Context) {
+ 
+ /// Paint a centred, dimmed message (empty states).
+ pub fn empty_message(ui: &egui::Ui, rect: Rect, title: &str, body: &str) {
++    let t = Tokens::get(ui.ctx());
++    empty_message_on(ui, rect, title, body, t.chrome);
++}
++
++/// The caller supplies the real canvas or chrome surface; its colors are not changed.
++pub fn empty_message_on(ui: &egui::Ui, rect: Rect, title: &str, body: &str, background: egui::Color32) {
+     let t = Tokens::get(ui.ctx());
+     let p = ui.painter();
+-    p.text(rect.center() - vec2(0.0, 12.0), Align2::CENTER_CENTER, crate::i18n::tr(title), t.semibold(18.0), t.text_label);
+-    p.text(rect.center() + vec2(0.0, 14.0), Align2::CENTER_CENTER, crate::i18n::tr(body), t.font(13.0), t.text_dim);
++    p.text(
++        rect.center() - vec2(0.0, 12.0),
++        Align2::CENTER_CENTER,
++        crate::i18n::tr(title),
++        t.semibold(18.0),
++        crate::theme::readable_ink(background, t.text_label),
++    );
++    p.text(
++        rect.center() + vec2(0.0, 14.0),
++        Align2::CENTER_CENTER,
++        crate::i18n::tr(body),
++        t.font(13.0),
++        crate::theme::readable_ink(background, t.text_dim),
++    );
+ }
 diff --git a/crates/ui-egui/src/panels/notices.rs b/crates/ui-egui/src/panels/notices.rs
 index a0f0c5d03b11d9440c60cb40688b31724ed5e94e..f62324431aba8b871997e3213723b3fc768c5678 100644
 --- a/crates/ui-egui/src/panels/notices.rs
@@ -52430,6 +52955,188 @@ index a0f0c5d03b11d9440c60cb40688b31724ed5e94e..f62324431aba8b871997e3213723b3fc
              .to_string();
      if cfg!(target_os = "linux") {
          text.push(' ');
+diff --git a/crates/ui-egui/src/panels/people.rs b/crates/ui-egui/src/panels/people.rs
+index 6fdf032f30726c6cc5fef00eea42a21d7f40699f..b2787666bd36913122f7c79045e3e5d70789a701 100644
+--- a/crates/ui-egui/src/panels/people.rs
++++ b/crates/ui-egui/src/panels/people.rs
+@@ -65,8 +65,13 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui) {
+     let thumb = app.ui.thumb_size;
+     let people = app.caches.people(&app.session.catalog, &app.session.filter);
+     let (head, _) = ui.allocate_exact_size(vec2(ui.available_width(), HEADER_H), Sense::hover());
+-    let title =
+-        ui.painter().text(pos2(head.left() + PAD, head.center().y), Align2::LEFT_CENTER, crate::i18n::tr("Named People"), t.semibold(15.0), t.text);
++    let title = ui.painter().text(
++        pos2(head.left() + PAD, head.center().y),
++        Align2::LEFT_CENTER,
++        crate::i18n::tr("Named People"),
++        t.semibold(15.0),
++        crate::theme::readable_ink(t.grid_bg, t.text),
++    );
+     // the person page last left (a face opened from it, or its back button): one click returns to it
+     if let Some(last) = app.ui.last_person.clone().filter(|n| people.iter().any(|p| &p.name == n)) {
+         let label = fit(ui.painter(), &format!("{last} ›"), t.font(13.0), 240.0);
+@@ -78,7 +83,13 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui) {
+             let _ = app.run("view.person", json!({"name": last}));
+         }
+     }
+-    ui.painter().text(pos2(head.right() - PAD, head.center().y), Align2::RIGHT_CENTER, people.len().to_string(), t.font(13.0), t.text_dim);
++    ui.painter().text(
++        pos2(head.right() - PAD, head.center().y),
++        Align2::RIGHT_CENTER,
++        people.len().to_string(),
++        t.font(13.0),
++        crate::theme::readable_ink(t.grid_bg, t.text_dim),
++    );
+     // until face recognition is set up: what it takes, and a button that does the next step
+     super::faces::setup_banner(app, ui);
+     // the filters narrowing the list (a date, a keyword…), removable here
+@@ -93,7 +104,7 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui) {
+         } else {
+             ("No named people in these photos", "Remove a filter above, or choose Clear all")
+         };
+-        super::empty_message(ui, ui.available_rect_before_wrap(), title, body);
++        super::empty_message_on(ui, ui.available_rect_before_wrap(), title, body, t.grid_bg);
+         return;
+     }
+     let ppp = ui.ctx().pixels_per_point();
+@@ -120,7 +131,7 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui) {
+                 Align2::LEFT_CENTER,
+                 "No named people yet. Name the faces below to start.",
+                 t.font(13.0),
+-                t.text_dim,
++                crate::theme::readable_ink(t.grid_bg, t.text_dim),
+             );
+         }
+         let mut shown = 0;
+@@ -178,9 +189,9 @@ fn card(app: &mut LightcraftApp, ui: &mut egui::Ui, person: &Person, r: Rect, ed
+     }
+     // a long name must not run past the card
+     let name = fit(p, &person.name, t.semibold(13.0), edge);
+-    p.text(pos2(r.left() + 2.0, face.bottom() + 14.0), Align2::LEFT_CENTER, name, t.semibold(13.0), t.text);
++    p.text(pos2(r.left() + 2.0, face.bottom() + 14.0), Align2::LEFT_CENTER, name, t.semibold(13.0), crate::theme::readable_ink(t.grid_bg, t.text));
+     let photos = crate::i18n::tr_format!("{n} photo{}", if person.count == 1 { "" } else { "s" }, n = person.count);
+-    p.text(pos2(r.left() + 2.0, face.bottom() + 32.0), Align2::LEFT_CENTER, photos, t.font(12.0), t.text_dim);
++    p.text(pos2(r.left() + 2.0, face.bottom() + 32.0), Align2::LEFT_CENTER, photos, t.font(12.0), crate::theme::readable_ink(t.grid_bg, t.text_dim));
+     if resp.on_hover_text(crate::i18n::tr_format!("{} — show their photos", person.name)).clicked() {
+         let _ = app.run("view.person", json!({"name": person.name}));
+     }
+diff --git a/crates/ui-egui/src/panels/person.rs b/crates/ui-egui/src/panels/person.rs
+index 9ebf09a6480b1e98fc049ad1b3b7ba32f5ffd17b..99da7ef413be1555e0a5c398f78e23e58e91698a 100644
+--- a/crates/ui-egui/src/panels/person.rs
++++ b/crates/ui-egui/src/panels/person.rs
+@@ -98,9 +98,9 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui, name: &str) {
+         if back.clicked() {
+             let _ = app.run("view.people", json!({}));
+         }
+-        ui.label(RichText::new(&shown_name).font(t.semibold(15.0)).color(t.text));
++        ui.label(RichText::new(&shown_name).font(t.semibold(15.0)).color(crate::theme::readable_ink(t.grid_bg, t.text)));
+         let count = if page.total == 1 { "1 face".to_string() } else { format!("{} faces", page.total) };
+-        ui.label(RichText::new(count).color(t.text_dim));
++        ui.label(RichText::new(count).color(crate::theme::readable_ink(t.grid_bg, t.text_dim)));
+         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+             ui.add_space(PAD - 4.0);
+             let photos = ui.button("Show photos").on_hover_text("Their photos in the grid");
+@@ -113,11 +113,12 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui, name: &str) {
+     });
+     ui.add_space(6.0);
+     if page.total == 0 {
+-        super::empty_message(
++        super::empty_message_on(
+             ui,
+             ui.available_rect_before_wrap(),
+             "No faces by that name",
+             "They may have been renamed or removed. Go back to People",
++            t.grid_bg,
+         );
+         return;
+     }
+@@ -168,12 +169,18 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui, name: &str) {
+         }
+         // the "More" section
+         let heading = pos2(area.left() + PAD, area.top() + more_top + 14.0);
+-        ui.painter().text(heading, Align2::LEFT_CENTER, "More", t.semibold(15.0), t.text);
++        ui.painter().text(heading, Align2::LEFT_CENTER, "More", t.semibold(15.0), crate::theme::readable_ink(t.grid_bg, t.text));
+         let sub = match &note {
+             Some(n) => n.clone(),
+             None => format!("Faces that look like {shown_name}. Click one to confirm it, or × to hide it."),
+         };
+-        ui.painter().text(pos2(area.left() + PAD, area.top() + more_top + 36.0), Align2::LEFT_CENTER, sub, t.font(12.0), t.text_dim);
++        ui.painter().text(
++            pos2(area.left() + PAD, area.top() + more_top + 36.0),
++            Align2::LEFT_CENTER,
++            sub,
++            t.font(12.0),
++            crate::theme::readable_ink(t.grid_bg, t.text_dim),
++        );
+         if !recognising {
+             let r = Rect::from_min_size(pos2(area.left() + PAD + 330.0, area.top() + more_top + 8.0), vec2(120.0, 24.0));
+             let label = if step == super::faces::Setup::TurnOn { "Turn on" } else { "Open Settings" };
+diff --git a/crates/ui-egui/src/panels/presets.rs b/crates/ui-egui/src/panels/presets.rs
+index 3d90c00c3bf332aac9c9cb534a48c5c20149d1bf..8e4aadbf552573a26cdfde4f2e02f130d2a877b9 100644
+--- a/crates/ui-egui/src/panels/presets.rs
++++ b/crates/ui-egui/src/panels/presets.rs
+@@ -185,7 +185,7 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui) {
+                     }
+                     ui.painter().text(pos2(text_x, r.center().y), Align2::LEFT_CENTER, &name, t.font(13.0), t.text_label);
+                     if fav {
+-                        paint(ui.painter(), Rect::from_center_size(pos2(r.right() - 20.0, r.center().y), vec2(12.0, 12.0)), Icon::StarFilled, t.star);
++                        paint(ui.painter(), Rect::from_center_size(pos2(r.right() - 20.0, r.center().y), vec2(12.0, 12.0)), Icon::StarFilled, t.icon);
+                     }
+                     // resting on a preset previews it in the loupe (no history entry)
+                     if resp.hovered()
+diff --git a/crates/ui-egui/src/panels/profiles.rs b/crates/ui-egui/src/panels/profiles.rs
+index 6294d1e64c28ca14aed8e88d0300a9268c75179f..7dd7afaab4035dfb65c6aa3d63a1b630be3a487b 100644
+--- a/crates/ui-egui/src/panels/profiles.rs
++++ b/crates/ui-egui/src/panels/profiles.rs
+@@ -169,7 +169,7 @@ fn cell_ui(
+     }
+     let applied = d.profile.id == p_id;
+     if applied {
+-        painter.rect_stroke(thumb.expand(1.0), 4.0, Stroke::new(2.0, t.pick), egui::StrokeKind::Outside);
++        painter.rect_stroke(thumb.expand(1.0), 4.0, Stroke::new(2.0, t.accent), egui::StrokeKind::Outside);
+     } else if resp.hovered() {
+         painter.rect_stroke(thumb, 3.0, Stroke::new(1.0, t.text_dim), egui::StrokeKind::Outside);
+     }
+@@ -188,7 +188,7 @@ fn cell_ui(
+     let over_star = resp.hover_pos().is_some_and(|q| star.contains(q));
+     if fav || resp.hovered() {
+         painter.circle_filled(star.center(), 10.0, Color32::from_black_alpha(110));
+-        paint(painter, star.shrink(4.0), if fav { Icon::StarFilled } else { Icon::Star }, if fav || over_star { t.star } else { Color32::WHITE });
++        paint(painter, star.shrink(4.0), if fav { Icon::StarFilled } else { Icon::Star }, Color32::WHITE);
+     }
+     if resp.hovered() && !applied && !over_star {
+         app.hover_preview =
+diff --git a/crates/ui-egui/src/panels/right.rs b/crates/ui-egui/src/panels/right.rs
+index 8d0cc0d3a96755f83bc81bf686a9eacdc9ab41a2..39b18c993c2d5d36af10c2ff65528a09531175b7 100644
+--- a/crates/ui-egui/src/panels/right.rs
++++ b/crates/ui-egui/src/panels/right.rs
+@@ -709,7 +709,7 @@ fn info(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId) {
+                     _ => "Smart preview available",
+                 };
+                 ui.add_space(6.0);
+-                ui.label(egui::RichText::new(crate::i18n::tr(text)).color(if online { t.text_dim } else { t.accent }));
++                ui.label(egui::RichText::new(crate::i18n::tr(text)).color(if online { t.text_dim } else { t.text }));
+             }
+         }
+         ui.add_space(10.0);
+@@ -727,7 +727,7 @@ fn info(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId) {
+ fn camera_card(ui: &mut egui::Ui, p: &lightcraft_catalog::Photo) {
+     let t = Tokens::get(ui.ctx());
+     let m = &p.meta;
+-    egui::Frame::NONE.fill(t.canvas).corner_radius(6.0).inner_margin(egui::Margin::symmetric(12, 10)).show(ui, |ui| {
++    egui::Frame::NONE.fill(t.button).corner_radius(6.0).inner_margin(egui::Margin::symmetric(12, 10)).show(ui, |ui| {
+         ui.set_width(ui.available_width());
+         let dim = |s: &str| egui::RichText::new(s.to_string()).size(12.0).color(t.text_label);
+         if !m.camera.is_empty() {
+@@ -1054,7 +1054,7 @@ fn versions(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId) {
+             let painter = ui.painter().with_clip_rect(r);
+             painter.text(pos2(x, r.top() + 38.0), Align2::LEFT_CENTER, short_time(&v.created), t.font(11.0), t.text_dim);
+             if current {
+-                paint(ui.painter(), Rect::from_center_size(pos2(r.right() - 14.0, r.center().y), vec2(14.0, 14.0)), Icon::Check, t.accent);
++                paint(ui.painter(), Rect::from_center_size(pos2(r.right() - 14.0, r.center().y), vec2(14.0, 14.0)), Icon::Check, t.icon);
+             }
+             // resting on a version shows it in the loupe (nothing is changed)
+             if resp.hovered() && !current {
 diff --git a/crates/ui-egui/src/panels/second.rs b/crates/ui-egui/src/panels/second.rs
 index 6798bde139c1ca2aff355223c2ceb274b695f64c..25a8b25f52410529c985a9db06ea501932736c08 100644
 --- a/crates/ui-egui/src/panels/second.rs
@@ -52444,7 +53151,7 @@ index 6798bde139c1ca2aff355223c2ceb274b695f64c..25a8b25f52410529c985a9db06ea5019
          // (without native windows — web, headless — egui wraps this in a floating window)
          egui::CentralPanel::default().frame(egui::Frame::NONE.fill(Color32::BLACK)).show(ctx, |ui| body(app, ui));
 diff --git a/crates/ui-egui/src/panels/settings.rs b/crates/ui-egui/src/panels/settings.rs
-index 59010aa6434a6dae4f7c704a73468f1b1090706a..e9b68847dd6ad7a13986b1fa4422ddb6c77b6e96 100644
+index 59010aa6434a6dae4f7c704a73468f1b1090706a..f3f8d552ecd2550e4332f2713079f4d3e389cf96 100644
 --- a/crates/ui-egui/src/panels/settings.rs
 +++ b/crates/ui-egui/src/panels/settings.rs
 @@ -238,7 +238,7 @@ fn import_tab(app: &mut LightcraftApp, ui: &mut egui::Ui, t: &Tokens) {
@@ -52492,11 +53199,70 @@ index 59010aa6434a6dae4f7c704a73468f1b1090706a..e9b68847dd6ad7a13986b1fa4422ddb6
                      }
                  });
                  let shown = options.iter().find(|(v, _)| v == value).or(options.first()).map(|(_, k)| *k).unwrap_or_default();
+@@ -748,7 +748,7 @@ fn theme_card<V: PartialEq + Copy>(
+                                     ui.painter(),
+                                     r.rect.shrink(4.0),
+                                     if favorite { crate::icons::Icon::StarFilled } else { crate::icons::Icon::Star },
+-                                    if favorite { t.accent } else { t.text_dim },
++                                    if favorite { t.icon } else { t.text_dim },
+                                 );
+                             }
+                             if r.clicked() {
 diff --git a/crates/ui-egui/src/panels/topbar.rs b/crates/ui-egui/src/panels/topbar.rs
-index dfa95afd353435d0acfa52cb6ec1daa3c674cf84..4bdb102eec79ec91fe6bd6c485b3d4960d4353df 100644
+index dfa95afd353435d0acfa52cb6ec1daa3c674cf84..985214bed510c17214760a9a281a19f17c1f8a82 100644
 --- a/crates/ui-egui/src/panels/topbar.rs
 +++ b/crates/ui-egui/src/panels/topbar.rs
-@@ -162,7 +162,6 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui) {
+@@ -87,13 +87,7 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui) {
+                 ui.memory_mut(|m| m.request_focus(id));
+             }
+             let focused = ui.memory(|m| m.has_focus(id));
+-            ui.painter().rect(
+-                sr,
+-                4.0,
+-                if focused { t.canvas } else { t.field },
+-                Stroke::new(1.0, if focused { t.accent } else { t.field_border }),
+-                StrokeKind::Inside,
+-            );
++            ui.painter().rect(sr, 4.0, t.field, Stroke::new(1.0, if focused { t.accent } else { t.field_border }), StrokeKind::Inside);
+             let mut child =
+                 ui.new_child(egui::UiBuilder::new().max_rect(sr.shrink2(vec2(10.0, 4.0))).layout(egui::Layout::left_to_right(egui::Align::Center)));
+             let empty = app.ui.search.is_empty();
+@@ -121,12 +115,15 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui) {
+             let fresp = ui.interact(fr, egui::Id::new("filter-btn"), Sense::click());
+             register(ui.ctx(), "icon:filter", fr);
+             let filtering = app.session.filter != Default::default() || app.ui.filter_bar;
++            if filtering {
++                ui.painter().rect_filled(fr, 4.0, t.pressed);
++            }
+             paint(
+                 ui.painter(),
+                 fr.shrink(6.0),
+                 Icon::Filter,
+                 if filtering {
+-                    t.accent
++                    t.text
+                 } else if fresp.hovered() {
+                     t.text
+                 } else {
+@@ -138,7 +135,7 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui) {
+             if active > 0 {
+                 let c = fr.right_top() + vec2(-3.0, 8.0);
+                 ui.painter().circle_filled(c, 7.0, t.accent);
+-                ui.painter().text(c, Align2::CENTER_CENTER, active.to_string(), t.semibold(9.5), t.canvas);
++                ui.painter().text(c, Align2::CENTER_CENTER, active.to_string(), t.semibold(9.5), crate::theme::readable_ink(t.accent, t.text));
+             }
+             let fresp = fresp.on_hover_text(if active > 0 {
+                 crate::i18n::tr_format!("Filter bar — {active} active filter{}", if active == 1 { "" } else { "s" }, active = active)
+@@ -153,7 +150,7 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui) {
+             // saving is failing: the cloud icon turns into a warning until a save succeeds
+             let unsaved = app.session.unsaved().map(|(n, e)| {
+                 crate::i18n::tr_format!(
+-                    "{n} change{} saved in memory but not written to disk: {e}\nLightCraft retries automatically; quitting now would lose {}.",
++                    "{n} change{} saved in memory but not written to disk: {e}\nBogo Light retries automatically; quitting now would lose {}.",
+                     if n == 1 { "" } else { "s" },
+                     if n == 1 { "it" } else { "them" },
+                     e = e,
+@@ -162,7 +159,6 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui) {
              });
              let cloud_tip = unsaved.as_deref().unwrap_or("Local library — no cloud account needed");
              for (id, icon, tip, cmd) in [
@@ -52504,6 +53270,80 @@ index dfa95afd353435d0acfa52cb6ec1daa3c674cf84..4bdb102eec79ec91fe6bd6c485b3d496
                  ("cloud", Icon::Cloud, cloud_tip, ""),
                  ("help", Icon::Help, "Keyboard shortcuts", "app.shortcuts"),
                  ("share", Icon::Share, "Export", "dialog.export"),
+@@ -183,7 +179,7 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui) {
+                 if warn {
+                     let c = r.right_top() + vec2(-5.0, 6.0);
+                     ui.painter().circle_filled(c, 6.0, t.reject);
+-                    ui.painter().text(c, Align2::CENTER_CENTER, "!", t.semibold(9.5), t.canvas);
++                    ui.painter().text(c, Align2::CENTER_CENTER, "!", t.semibold(9.5), crate::theme::readable_ink(t.reject, t.text));
+                     register(ui.ctx(), "indicator:unsaved", r);
+                 }
+                 if resp.clicked() && !cmd.is_empty() {
+diff --git a/crates/ui-egui/src/panels/unnamed.rs b/crates/ui-egui/src/panels/unnamed.rs
+index 0b730db7811409a189ad874ef0bd0e787009d1ac..04c0ba22a6b94ada46a02ee3c4749318e6507135 100644
+--- a/crates/ui-egui/src/panels/unnamed.rs
++++ b/crates/ui-egui/src/panels/unnamed.rs
+@@ -130,7 +130,10 @@ pub fn naming_bar(app: &mut LightcraftApp, ui: &mut egui::Ui) {
+     ui.horizontal(|ui| {
+         ui.add_space(super::people::PAD - 4.0);
+         let n = selected.len();
+-        ui.label(RichText::new(if n == 1 { "1 face selected".to_string() } else { format!("{n} faces selected") }).color(t.text));
++        ui.label(
++            RichText::new(if n == 1 { "1 face selected".to_string() } else { format!("{n} faces selected") })
++                .color(crate::theme::readable_ink(t.grid_bg, t.text)),
++        );
+         let hint = suggested.clone().unwrap_or_else(|| "Name…".to_string());
+         let field = crate::text_field::TextField::singleline("field:unnamedName", &mut app.ui.unnamed_name).hint(hint).width(240.0).show(ui);
+         let edit = &field.response;
+@@ -161,7 +164,8 @@ pub fn naming_bar(app: &mut LightcraftApp, ui: &mut egui::Ui) {
+             ui.horizontal(|ui| {
+                 ui.add_space(super::people::PAD - 4.0);
+                 for p in matching {
+-                    let b = ui.add(egui::Button::new(RichText::new(p.as_str()).color(t.text_label)).frame(false));
++                    let b =
++                        ui.add(egui::Button::new(RichText::new(p.as_str()).color(crate::theme::readable_ink(t.grid_bg, t.text_label))).frame(false));
+                     register(ui.ctx(), format!("unnamed:pick:{p}"), b.rect);
+                     if b.clicked() {
+                         submit = Some(p.clone());
+@@ -187,8 +191,8 @@ pub fn section_header(app: &mut LightcraftApp, ui: &mut egui::Ui, list: &Unnamed
+     let t = Tokens::get(ui.ctx());
+     let count = if list.total > list.faces.len() { format!("{} of {}", list.faces.len(), list.total) } else { list.total.to_string() };
+     let p = ui.painter();
+-    p.text(at, Align2::LEFT_CENTER, "Unnamed faces", t.semibold(15.0), t.text);
+-    p.text(pos2(right, at.y), Align2::RIGHT_CENTER, count, t.font(13.0), t.text_dim);
++    p.text(at, Align2::LEFT_CENTER, "Unnamed faces", t.semibold(15.0), crate::theme::readable_ink(t.grid_bg, t.text));
++    p.text(pos2(right, at.y), Align2::RIGHT_CENTER, count, t.font(13.0), crate::theme::readable_ink(t.grid_bg, t.text_dim));
+     let sub = if !list.ready && list.faces.is_empty() {
+         "Turn on face recognition in Settings to find the faces in your photos.".to_string()
+     } else if list.faces.is_empty() && app.caches.faces_pending > 0 {
+@@ -200,7 +204,7 @@ pub fn section_header(app: &mut LightcraftApp, ui: &mut egui::Ui, list: &Unnamed
+     } else {
+         "Click faces to select them, Shift-click for a range, then type a name.".to_string()
+     };
+-    p.text(pos2(at.x, at.y + 24.0), Align2::LEFT_CENTER, sub, t.font(12.0), t.text_dim);
++    p.text(pos2(at.x, at.y + 24.0), Align2::LEFT_CENTER, sub, t.font(12.0), crate::theme::readable_ink(t.grid_bg, t.text_dim));
+     if !list.ready && list.faces.is_empty() {
+         let r = Rect::from_min_size(pos2(at.x, at.y + 38.0), vec2(120.0, 22.0));
+         let b = ui.put(r, egui::Button::new("Open Settings"));
+@@ -245,13 +249,13 @@ pub fn tile(app: &mut LightcraftApp, ui: &mut egui::Ui, list: &Unnamed, i: usize
+         p.image(tex.tex.id(), r, Rect::from_min_max(pos2(0.0, 0.0), pos2(1.0, 1.0)), Color32::WHITE);
+     }
+     if selected {
+-        p.rect_filled(r, 3.0, Color32::from_rgba_unmultiplied(70, 130, 255, 55));
+-        p.rect_stroke(r, 3.0, Stroke::new(2.0, Color32::from_rgb(110, 160, 255)), StrokeKind::Inside);
++        p.rect_filled(r, 3.0, Color32::from_rgba_unmultiplied(0xFF, 0xE7, 0xD4, 55));
++        p.rect_stroke(r, 3.0, Stroke::new(2.0, t.accent), StrokeKind::Inside);
+         // a check at the top left
+         let c = pos2(r.left() + 13.0, r.top() + 13.0);
+-        p.circle_filled(c, 9.0, Color32::from_rgb(70, 130, 255));
+-        p.line_segment([pos2(c.x - 4.0, c.y), pos2(c.x - 1.0, c.y + 3.5)], Stroke::new(1.8, Color32::WHITE));
+-        p.line_segment([pos2(c.x - 1.0, c.y + 3.5), pos2(c.x + 4.5, c.y - 3.5)], Stroke::new(1.8, Color32::WHITE));
++        p.circle_filled(c, 9.0, t.pressed);
++        p.line_segment([pos2(c.x - 4.0, c.y), pos2(c.x - 1.0, c.y + 3.5)], Stroke::new(1.8, t.text));
++        p.line_segment([pos2(c.x - 1.0, c.y + 3.5), pos2(c.x + 4.5, c.y - 3.5)], Stroke::new(1.8, t.text));
+     } else if hovered {
+         p.rect_stroke(r, 3.0, Stroke::new(1.0, Color32::WHITE), StrokeKind::Inside);
+     }
 diff --git a/crates/ui-egui/src/state.rs b/crates/ui-egui/src/state.rs
 index 9a8d07bef3697aa5d2abb812e33aa4f64648bd5e..b0b989bac9926cb9e8e479a61b3ed80bb594f5b3 100644
 --- a/crates/ui-egui/src/state.rs
@@ -52570,10 +53410,47 @@ index 5c4a730a64d1515b2239b3613f405c61bcf07ef7..268333c60681d43bc146e5b90e05018b
  }
  
 diff --git a/crates/ui-egui/src/theme.rs b/crates/ui-egui/src/theme.rs
-index 282f9c70ef21306ad5df6508b9f95c4829a26077..39dba43233dab125d14561d79bc652e9d32b3ce8 100644
+index 282f9c70ef21306ad5df6508b9f95c4829a26077..7110e5163b1c73688cb88df36a9693e84be5af04 100644
 --- a/crates/ui-egui/src/theme.rs
 +++ b/crates/ui-egui/src/theme.rs
-@@ -120,29 +120,29 @@ impl ThemeKind {
+@@ -34,6 +34,36 @@ pub fn label_toast_colors(label: lightcraft_catalog::ColorLabel) -> (Color32, Co
+     (Color32::WHITE.lerp_to_gamma(label_color(label), 0.3), Color32::from_rgb(36, 24, 24))
+ }
+ 
++/// UI ink for an actual opaque surface. Photo, histogram and mask colors stay unchanged.
++pub fn readable_ink(background: Color32, preferred: Color32) -> Color32 {
++    let luminance = |color: Color32| {
++        let linear = |value: u8| {
++            let c = f32::from(value) / 255.0;
++            if c <= 0.04045 { c / 12.92 } else { ((c + 0.055) / 1.055).powf(2.4) }
++        };
++        0.2126 * linear(color.r()) + 0.7152 * linear(color.g()) + 0.0722 * linear(color.b())
++    };
++    let background = luminance(background);
++    let preferred_luminance = luminance(preferred);
++    let contrast = (background.max(preferred_luminance) + 0.05) / (background.min(preferred_luminance) + 0.05);
++    if contrast >= 4.5 {
++        preferred
++    } else if 1.05 / (background + 0.05) >= 4.5 {
++        Color32::WHITE
++    } else {
++        Color32::BLACK
++    }
++}
++
++/// A readable annotation on arbitrary media, preserving its existing text anchor and font.
++pub fn media_label(p: &egui::Painter, position: egui::Pos2, align: egui::Align2, text: impl Into<String>, font: egui::FontId) -> egui::Rect {
++    let galley = p.layout_no_wrap(text.into(), font, Color32::WHITE);
++    let rect = align.anchor_size(position, galley.size());
++    p.rect_filled(rect.expand2(egui::vec2(3.0, 2.0)), 3.0, Color32::from_black_alpha(220));
++    p.galley(rect.min, galley, Color32::WHITE);
++    rect
++}
++
+ #[derive(Clone, Copy, Debug)]
+ pub struct Tokens {
+     /// Top bar, side panels, bottom bar, tool strip.
+@@ -120,29 +150,29 @@ impl ThemeKind {
  impl Default for Tokens {
      fn default() -> Self {
          Tokens {
@@ -52621,7 +53498,7 @@ index 282f9c70ef21306ad5df6508b9f95c4829a26077..39dba43233dab125d14561d79bc652e9
              star: Color32::from_rgb(0xd8, 0xd8, 0xd8),
              pick: Color32::from_rgb(0xf0, 0xf0, 0xf0),
              reject: Color32::from_rgb(0xe0, 0x4a, 0x4a),
-@@ -167,46 +167,46 @@ impl Tokens {
+@@ -167,46 +197,46 @@ impl Tokens {
          match kind {
              ThemeKind::Charcoal => base,
              ThemeKind::Midnight => Tokens {
@@ -52698,7 +53575,7 @@ index 282f9c70ef21306ad5df6508b9f95c4829a26077..39dba43233dab125d14561d79bc652e9
                  star: rgb(0x3a3a3a),
                  pick: rgb(0x2a2a2a),
                  reject: rgb(0xc83434),
-@@ -214,29 +214,29 @@ impl Tokens {
+@@ -214,29 +244,29 @@ impl Tokens {
                  ..base
              },
              ThemeKind::Paper => Tokens {
@@ -52746,17 +53623,22 @@ index 282f9c70ef21306ad5df6508b9f95c4829a26077..39dba43233dab125d14561d79bc652e9
                  star: rgb(0x3a3a3a),
                  pick: rgb(0x2a2a2a),
                  reject: rgb(0xc83434),
-@@ -416,7 +416,7 @@ pub fn apply_kind(ctx: &egui::Context, kind: ThemeKind) {
+@@ -415,10 +445,10 @@ pub fn apply_kind(ctx: &egui::Context, kind: ThemeKind) {
+     v.window_stroke = Stroke::new(1.0, t.button_border);
      v.window_corner_radius = CornerRadius::same(6);
      v.menu_corner_radius = CornerRadius::same(6);
-     v.selection.bg_fill = t.accent.gamma_multiply(0.6);
+-    v.selection.bg_fill = t.accent.gamma_multiply(0.6);
 -    v.selection.stroke = Stroke::new(1.0, t.accent);
++    v.selection.bg_fill = t.pressed;
 +    v.selection.stroke = Stroke::new(1.0, Color32::from_rgb(0x93, 0x44, 0x00));
      v.override_text_color = Some(t.text_label);
-     let (popup, window) = if dark { (140, 160) } else { (50, 60) };
+-    let (popup, window) = if dark { (140, 160) } else { (50, 60) };
++    let (popup, window) = (24, 30);
      v.popup_shadow = egui::epaint::Shadow { offset: [0, 4], blur: 16, spread: 0, color: Color32::from_black_alpha(popup) };
+     v.window_shadow = egui::epaint::Shadow { offset: [0, 8], blur: 30, spread: 0, color: Color32::from_black_alpha(window) };
+     let w = &mut v.widgets;
 diff --git a/crates/ui-egui/src/widgets.rs b/crates/ui-egui/src/widgets.rs
-index 1972e346f2b87ad9e74fb80ef8564cd0712f9935..f5a65cd4b68e90997102adb4e8bb576e8ab016b3 100644
+index 1972e346f2b87ad9e74fb80ef8564cd0712f9935..0142c1bcfc85e616c744ff54578422f6edd43ef1 100644
 --- a/crates/ui-egui/src/widgets.rs
 +++ b/crates/ui-egui/src/widgets.rs
 @@ -47,12 +47,12 @@ pub fn preview_only_variant(reason: &str) -> &str {
@@ -52774,17 +53656,30 @@ index 1972e346f2b87ad9e74fb80ef8564cd0712f9935..f5a65cd4b68e90997102adb4e8bb576e
          preview_only_variant(reason)
      )
  }
-@@ -609,7 +609,12 @@ pub fn stars(ui: &mut Ui, id: &str, rating: u8, size: f32) -> Option<u8> {
+@@ -62,7 +62,7 @@ pub fn preview_only_explanation(reason: &str) -> String {
+ pub fn preview_only_notice(ui: &mut Ui, key: &str, reason: &str) {
+     let t = Tokens::get(ui.ctx());
+     let r = egui::Frame::NONE
+-        .fill(t.canvas)
++        .fill(t.button)
+         .stroke(Stroke::new(1.0, t.caution.gamma_multiply(0.45)))
+         .corner_radius(6.0)
+         .inner_margin(egui::Margin { left: 10, right: 10, top: 8, bottom: 9 })
+@@ -574,7 +574,7 @@ pub fn icon_button(ui: &mut Ui, id: &str, icon: Icon, size: egui::Vec2, active:
+     let c = if !enabled {
+         t.text_disabled
+     } else if active {
+-        t.pick
++        t.icon
+     } else if resp.hovered() {
+         t.text
+     } else {
+@@ -609,7 +609,7 @@ pub fn stars(ui: &mut Ui, id: &str, rating: u8, size: f32) -> Option<u8> {
              ui.painter().rect_filled(r, 4.0, t.hover.gamma_multiply(0.7));
          }
          let filled = star_lit(i, rating, hover_n);
 -        paint(ui.painter(), r.shrink(size * 0.12), if filled { Icon::StarFilled } else { Icon::Star }, if filled { t.star } else { t.icon });
-+        paint(
-+            ui.painter(),
-+            r.shrink(size * 0.12),
-+            if filled { Icon::StarFilled } else { Icon::Star },
-+            if filled && id != "bottom" { t.star } else { t.icon },
-+        );
++        paint(ui.painter(), r.shrink(size * 0.12), if filled { Icon::StarFilled } else { Icon::Star }, t.icon);
      }
      out
  }

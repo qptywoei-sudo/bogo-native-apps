@@ -2172,10 +2172,10 @@
       "baseLock": "manifests/full-native-apps.json",
       "baseLockSha256": "0c71246652db45818401d22d1267c79f84e01294c4e18f12ac83f536c6ed2a58",
       "baseSourceTreeSha256": "ca4bd84dca182c4a7580d41d90c5593804c6302e60c7cce315586d61ed053bac",
-      "sourceTreeSha256": "9db744bbee1d4a1bfb07ae27b83ce3e6d0ecfd3645d9a05a5b2905f915ffed14",
+      "sourceTreeSha256": "9481cb99000b3af701f1efdc317656d68e1da942d4ad9d6311c9db3780f6664b",
       "patch": "patches/bogo/film.patch",
-      "patchSha256": "f64f8e35e7054920a7aa18357aa1e8f129f0266946f38c19463ef135347e8533",
-      "patchBytes": 5404026,
+      "patchSha256": "07a518f6d2da127e88d8e99891fb8b3506ad06c354c38b19c3e107f00f96479e",
+      "patchBytes": 5406581,
       "files": [
         {
           "path": "apps/filmcraft-cli/src/main.rs",
@@ -2549,6 +2549,17 @@
           }
         },
         {
+          "path": "crates/ui-egui/src/dock.rs",
+          "before": {
+            "sha256": "289f781102ae0aa3d38fca2e5b36b9e236af3fec98cfe2a8e506dce04ae1f818",
+            "bytes": 43126
+          },
+          "after": {
+            "sha256": "f490edb538ddbe65168cee96d474134d1ef97b4a7a7321bdf55354eefcaed39a",
+            "bytes": 43133
+          }
+        },
+        {
           "path": "crates/ui-egui/src/dock_shared.rs",
           "before": {
             "sha256": "bd1a3824dec85c4117d44e35b7e36603649ddb5a47ddc8af2ca5fb3bdceb42b5",
@@ -2846,6 +2857,17 @@
           }
         },
         {
+          "path": "crates/ui-egui/src/panels/tools.rs",
+          "before": {
+            "sha256": "2b29312a1694987d1927d9791693f7bd223018410e88fb1fd478640aa12a4fd3",
+            "bytes": 11845
+          },
+          "after": {
+            "sha256": "00e79f6afdd59f5ebd3f2247d573eed43cb2a2da0864829020909cd3d7c6444a",
+            "bytes": 11809
+          }
+        },
+        {
           "path": "crates/ui-egui/src/rtl.rs",
           "before": {
             "sha256": "e45f89cb3f9d3a1e74407a7dff36c5874e1f3e90a483ffaee0a26d02c5630092",
@@ -2863,8 +2885,8 @@
             "bytes": 35461
           },
           "after": {
-            "sha256": "893e6c34910d62564c1a82e4159c110e314696649bcc4598743613e4ff3e8796",
-            "bytes": 35612
+            "sha256": "b533e8e1fb970d7fe61e8bcf5624e4f82ab430a3327f2ed38f3cb7e565eaed69",
+            "bytes": 35706
           }
         },
         {
@@ -3078,10 +3100,10 @@
       "baseLock": "manifests/full-native-apps.json",
       "baseLockSha256": "0c71246652db45818401d22d1267c79f84e01294c4e18f12ac83f536c6ed2a58",
       "baseSourceTreeSha256": "37b75e4199495ab0cc5366682f38dbb599fbe798dba65f961f14a582027b1776",
-      "sourceTreeSha256": "228b53ce015c370be690b061910806bd332a153a207d15d064011103e684ce42",
+      "sourceTreeSha256": "c6fd7605aa3063c9083c47242d9d7ebd3fd69f0952144b692bdcae6d487c26f0",
       "patch": "patches/bogo/light.patch",
-      "patchSha256": "85ff0dcf3ad4989bd363dd019a6bec3e04ba574ea42c2f5de8169d98e6a7c991",
-      "patchBytes": 5621840,
+      "patchSha256": "487423d34b775928252648db2ed85f299a8081367b7dad8137e07c432ebc6fa5",
+      "patchBytes": 5677911,
       "files": [
         {
           "path": "apps/lightcraft-cli/src/main.rs",
@@ -3373,7 +3395,7 @@
             "bytes": 21131
           },
           "after": {
-            "sha256": "2b0d8dedfedd3552c715ec94cd25d88e98731dd242a6a6c898afcb52d50f6a19",
+            "sha256": "62770852e55a42a700ecfd2f4981fe92c50e3e3a286b13578990f48d6d4576ea",
             "bytes": 21141
           }
         },
@@ -3395,7 +3417,7 @@
             "bytes": 20965
           },
           "after": {
-            "sha256": "1d44078a4dda6a56ebf198b441cbd5e6094b1ada7b7e6703be4c91f6e751233f",
+            "sha256": "007b55bee3b534db3dc1c9b90c51d83ef65265f120d3ed53bec69456427fd42a",
             "bytes": 20975
           }
         },
@@ -3417,7 +3439,7 @@
             "bytes": 21679
           },
           "after": {
-            "sha256": "3a4f44712ee13210b7438e5ea773403e08d020f8232a9b9763362b24ed3ae14c",
+            "sha256": "337627bb912985811284161946d4dc19ae461c6dd5cb4792c38408b32f41bf34",
             "bytes": 21689
           }
         },
@@ -3439,7 +3461,7 @@
             "bytes": 23018
           },
           "after": {
-            "sha256": "ce84a505251427ed2cd076e9bbca7bcbdd776d035579418e947cdde2168d3253",
+            "sha256": "b7e0844fe2400632d28260c0ba9c17a68ae0460fbd215a7318d0f5c8ababcacb",
             "bytes": 23028
           }
         },
@@ -3461,7 +3483,7 @@
             "bytes": 21028
           },
           "after": {
-            "sha256": "8925c7b42a535270df947c30c4b23ee3c5523bf3bfd30150e42b80936131405e",
+            "sha256": "67411f049ee99b493544537883b1ff1929d61d4cb1d4c87bf96574fd8ed37880",
             "bytes": 21039
           }
         },
@@ -3483,7 +3505,7 @@
             "bytes": 25564
           },
           "after": {
-            "sha256": "392e4b76c0a7fdc25c0bfd9fd8e08ac4a50c211774098a60a1e1625077d12571",
+            "sha256": "76b8ed9b70e117034c1fab1858dc6bbc58b63d41c26aaf16ea314ba281f58c25",
             "bytes": 25574
           }
         },
@@ -3505,7 +3527,7 @@
             "bytes": 25764
           },
           "after": {
-            "sha256": "485457abf21176a87a5d1d2229f6231d7996defcfbd64015cf88c19dd8f1e1d2",
+            "sha256": "eb180a5972376d475c2ba24acfa3036d4dbcc8e1aca6f6759a6ecc90f840efa4",
             "bytes": 25774
           }
         },
@@ -3527,7 +3549,7 @@
             "bytes": 20520
           },
           "after": {
-            "sha256": "b7f9265457eec6ba038133479fdd72200a74cbd71b7f0766e7f9bc4db61d87e7",
+            "sha256": "0eed6531aa9758131e5ee2c59654df705cc1c78dc5842f7b7e3ad1e06d009a6e",
             "bytes": 20530
           }
         },
@@ -3549,7 +3571,7 @@
             "bytes": 20383
           },
           "after": {
-            "sha256": "6c2967596a333ae7f49290312d4dd6a908da47c8215df81e5e9c9ae1545a0ea9",
+            "sha256": "6baf9046c13a262a58adb4a678b4068f9f7501b7850b1e789b647ced52ee2cb3",
             "bytes": 20393
           }
         },
@@ -3609,6 +3631,17 @@
           }
         },
         {
+          "path": "crates/ui-egui/src/import.rs",
+          "before": {
+            "sha256": "3ae6612049f59d32138e1e3c9264b10642f9ed14b18d13d94cbd1b1a5082edf8",
+            "bytes": 79423
+          },
+          "after": {
+            "sha256": "5753fd7db16b9ae954cf9f75b96b3a361de1e9fbb9a36dab87f1a1bd46bafa20",
+            "bytes": 79408
+          }
+        },
+        {
           "path": "crates/ui-egui/src/lib.rs",
           "before": {
             "sha256": "4a5304225588d079773c861c7b392e5aed86cc4e580e6059a0fadc43cbf8ff49",
@@ -3664,6 +3697,17 @@
           }
         },
         {
+          "path": "crates/ui-egui/src/merge.rs",
+          "before": {
+            "sha256": "2c90b72d514bf37877d23864b2b7c87d9acd020afd41d0d6ca884db4a54af7a9",
+            "bytes": 18145
+          },
+          "after": {
+            "sha256": "464923b687cba2ef89d4d668675d78d2830808a94bc0495f9c7bb6d75d8c9dd7",
+            "bytes": 18173
+          }
+        },
+        {
           "path": "crates/ui-egui/src/panels/activity.rs",
           "before": {
             "sha256": "13f655b195984c37a627daac9fe176c29f7ed7dbbebc3128202321c98d9f8881",
@@ -3686,6 +3730,28 @@
           }
         },
         {
+          "path": "crates/ui-egui/src/panels/chips.rs",
+          "before": {
+            "sha256": "fe6e3d4232c217f82d87201b43bd78e6f067b190bc604d6a9835474fa2911b29",
+            "bytes": 7512
+          },
+          "after": {
+            "sha256": "987b65590cd2616ef0472da44d488fdb81db969e943f2b6197316eb00d836a0b",
+            "bytes": 7512
+          }
+        },
+        {
+          "path": "crates/ui-egui/src/panels/compare.rs",
+          "before": {
+            "sha256": "a8e7c6a8a7f578825fecaba73cafc61ebdc7f6065986a1074c4025d02c4ab239",
+            "bytes": 29485
+          },
+          "after": {
+            "sha256": "eb5df843141a79460b0d994537a6580d37d04db4c7519a7376694a0d9f7df960",
+            "bytes": 29843
+          }
+        },
+        {
           "path": "crates/ui-egui/src/panels/denoise.rs",
           "before": {
             "sha256": "5fd0aca40ca5cb89a66325e8da49f007ed615a78e95b29e27ca2c30975b7b1d7",
@@ -3703,8 +3769,8 @@
             "bytes": 137514
           },
           "after": {
-            "sha256": "6ae4912da1eb2b0adb0c14dccfe6501663dfb40bc2bec01546f78ce328c2dd49",
-            "bytes": 138615
+            "sha256": "46f5e6cf09c31e10a0b2baace555810a07d0137b38a09cd016dc485ad6f05a29",
+            "bytes": 138191
           }
         },
         {
@@ -3725,8 +3791,8 @@
             "bytes": 84022
           },
           "after": {
-            "sha256": "d4010c39ae756cd6d445c2bb29a8c3d0564955f73bd3f971ff630ea76dbe49e3",
-            "bytes": 84020
+            "sha256": "97a82f79ed4f0a56e014cd602c3ae30490568559e3bcc8fea0f963d53a1f57b3",
+            "bytes": 84058
           }
         },
         {
@@ -3741,14 +3807,47 @@
           }
         },
         {
+          "path": "crates/ui-egui/src/panels/filterbar.rs",
+          "before": {
+            "sha256": "125010e7e5313c877eb8deb5ea16efd1bb8adc5fd293604485987f2e3fd72daa",
+            "bytes": 12330
+          },
+          "after": {
+            "sha256": "2bef484faf1b23fae478331cd1415d2e560e9cfadd18078491d23d6263e728d6",
+            "bytes": 12330
+          }
+        },
+        {
           "path": "crates/ui-egui/src/panels/grid.rs",
           "before": {
             "sha256": "06c767bf6324808ad404b8ef67143d26320313a01c7dbd2d134ad1a4a443acc6",
             "bytes": 65095
           },
           "after": {
-            "sha256": "84f7fc4e0cc1be422e9a071cf679ddeb50ea56a4f94a9613358eb578a8b59384",
-            "bytes": 65095
+            "sha256": "e9016382e1602d2fa6a2549ca59bed4960c7387ded19285cec9cee0ed9386bd0",
+            "bytes": 65412
+          }
+        },
+        {
+          "path": "crates/ui-egui/src/panels/keyword_list.rs",
+          "before": {
+            "sha256": "0e00c32814ecf8da3f7e7fb28da8647a3be29fae1af287abe892eac36327b3c9",
+            "bytes": 29161
+          },
+          "after": {
+            "sha256": "443abc504cb0bcf6dd66311fc095ad674500cd35f1207d1550404084baa2262b",
+            "bytes": 29148
+          }
+        },
+        {
+          "path": "crates/ui-egui/src/panels/left.rs",
+          "before": {
+            "sha256": "1d2ca727000fbb2a8fdab9634f63dad78734818fff2b855d456f0c716598f4d9",
+            "bytes": 108074
+          },
+          "after": {
+            "sha256": "3ebab233aea105c2ee4018360f4d3dbf9c975dafde87b401501fbd53ee07a92b",
+            "bytes": 108049
           }
         },
         {
@@ -3758,8 +3857,19 @@
             "bytes": 8320
           },
           "after": {
-            "sha256": "57baf0ed9831e46e2f2a9132740bf63c84046432c1f317649b6a6d8200913c55",
-            "bytes": 8322
+            "sha256": "cf8d328913431c6dba98784b78edc233069923599d032dbe9b9a17cb566504b9",
+            "bytes": 8291
+          }
+        },
+        {
+          "path": "crates/ui-egui/src/panels/mod.rs",
+          "before": {
+            "sha256": "b69ab3d529c87bc27a1ad41b8c79c1576c44d66f70eaee243fa04a2f09392046",
+            "bytes": 4131
+          },
+          "after": {
+            "sha256": "af9168d87eb24a3f768fd485058aeff776e16ebbeb4f527b401912c0dd013c0f",
+            "bytes": 4562
           }
         },
         {
@@ -3771,6 +3881,61 @@
           "after": {
             "sha256": "31d9885562b0ae50ba0a39707e488f5f7f17df60a3ae497c0e86bf4f08105754",
             "bytes": 8287
+          }
+        },
+        {
+          "path": "crates/ui-egui/src/panels/people.rs",
+          "before": {
+            "sha256": "c995056b82158b68c90ba01ec12b82e7e868cc11fb8f3a9aa69ec47c7132f812",
+            "bytes": 11085
+          },
+          "after": {
+            "sha256": "488ac965d07af7005abcc1fd03c4424adff2622e67321b50aa6c04fbed31bdbe",
+            "bytes": 11380
+          }
+        },
+        {
+          "path": "crates/ui-egui/src/panels/person.rs",
+          "before": {
+            "sha256": "9d58c3c7cb9dc6ac0cc469c9a0dc00d74540edff7b81131385602eec5b13f503",
+            "bytes": 14391
+          },
+          "after": {
+            "sha256": "c1a285ee0ab9c5f0a6a74902dfbf6809e3fde9d1ce990508d5d57aff0c03d10b",
+            "bytes": 14644
+          }
+        },
+        {
+          "path": "crates/ui-egui/src/panels/presets.rs",
+          "before": {
+            "sha256": "76c248a3e8ee30a597c7bc59949726a87cce06a4fdda8bf4b779e6354c35aead",
+            "bytes": 20256
+          },
+          "after": {
+            "sha256": "3f6beba2fa5f532fc695bc5442fd079b70ee0ad261aefbdf95d1c03a6eae7495",
+            "bytes": 20256
+          }
+        },
+        {
+          "path": "crates/ui-egui/src/panels/profiles.rs",
+          "before": {
+            "sha256": "2d11d1df41d5a30ba8515b2cbab603df8369d6ab046a2f9203ff73012752d638",
+            "bytes": 9778
+          },
+          "after": {
+            "sha256": "1d3dfac8a0d3450f9c629afa3fdbf79a73d4ca7050449b3f387e3c4dfd5a42a3",
+            "bytes": 9740
+          }
+        },
+        {
+          "path": "crates/ui-egui/src/panels/right.rs",
+          "before": {
+            "sha256": "e499a60d48d166d2ff91b5387e5f8b7edaa3f0daf1f57b239019270b864b18ab",
+            "bytes": 59656
+          },
+          "after": {
+            "sha256": "e423fc60626c7926c2cd55382fb0484e6f5623f309e21eb26ae235cdf5263096",
+            "bytes": 59652
           }
         },
         {
@@ -3791,8 +3956,8 @@
             "bytes": 59777
           },
           "after": {
-            "sha256": "ff8b10302f0cad3e8ded53251a4cfea8f763219e60fe6bd57762e0a533fcb372",
-            "bytes": 59779
+            "sha256": "c0720ada26e77f6a267e66e599bff3873ce993169709a448160d319a26794647",
+            "bytes": 59777
           }
         },
         {
@@ -3802,8 +3967,19 @@
             "bytes": 12678
           },
           "after": {
-            "sha256": "40e3ad4d3294a8309f2c2afacdcc6723b5cac95ed8f9c975d83a446ae89d221c",
-            "bytes": 12570
+            "sha256": "db83d8f04d4584286fe7f077abba6375391fd59d7213e09f68d7da742a0db334",
+            "bytes": 12615
+          }
+        },
+        {
+          "path": "crates/ui-egui/src/panels/unnamed.rs",
+          "before": {
+            "sha256": "1a7814fcf39d2a98714b9547842863c3da61df4638718a56bf820853432d1f6b",
+            "bytes": 14465
+          },
+          "after": {
+            "sha256": "63030ae810030b33a6c03778c835b816367fa9e90a6f603ec44d5a279acd9cc1",
+            "bytes": 14666
           }
         },
         {
@@ -3846,8 +4022,8 @@
             "bytes": 32783
           },
           "after": {
-            "sha256": "938b4c0a60a7d7034131c76f1b5a5759adc96fa6ec151602067c55dc44ea46ac",
-            "bytes": 33866
+            "sha256": "c254cf0a5b7cd4be8b8d77786b59aed7df38e0fc10e985158fd047540a30e338",
+            "bytes": 35177
           }
         },
         {
@@ -3857,8 +4033,8 @@
             "bytes": 43243
           },
           "after": {
-            "sha256": "eab27a6f50d2264dcfc1f0bdf04c50787301be8a37f855016155fec684ab3a50",
-            "bytes": 43322
+            "sha256": "af97d6a46bd1996ea8ce97feb1e66bdb5bb9f638755466dc064f9d80292a1ea6",
+            "bytes": 43215
           }
         },
         {
@@ -4047,10 +4223,10 @@
       "baseLock": "manifests/full-native-apps.json",
       "baseLockSha256": "0c71246652db45818401d22d1267c79f84e01294c4e18f12ac83f536c6ed2a58",
       "baseSourceTreeSha256": "50c345f28ac941ae8d4e7dfa7ecc41dc4b1642d4dd57319b7ddf020ce8db8bfe",
-      "sourceTreeSha256": "7df791fe63b0c2aa5fc2cd5b058aed5e596fee77b231b2e8a4d8422ff3c6b4f2",
+      "sourceTreeSha256": "2a2137a1935ff6fde8943a03eb27a1c0f9f874f61e060d2f3d581b50ac13eb1c",
       "patch": "patches/bogo/pdf.patch",
-      "patchSha256": "c39b481939c24991db03825b10ae8d5553b6919f335cf4bd2161b97932205649",
-      "patchBytes": 6202392,
+      "patchSha256": "e73479c54e3593254cf473ddfd24d3086a27d0221480ebaeb02ee7c90b4d8676",
+      "patchBytes": 6206775,
       "files": [
         {
           "path": "apps/pdfcraft-cli/build.rs",
@@ -4515,8 +4691,8 @@
             "bytes": 14078
           },
           "after": {
-            "sha256": "d1824e83ee60797f7f6b0a74079d2078713645ac4dbcd8b1eef0e22dca226b1a",
-            "bytes": 13104
+            "sha256": "8e660ecea70f22ba0e085e4d1451cbacb32cb424ff379bc407b7c7fca55f60a0",
+            "bytes": 13246
           }
         },
         {
@@ -4790,8 +4966,8 @@
             "bytes": 136363
           },
           "after": {
-            "sha256": "df03e4580632e34ff8bf364408f646b193a288cd4c6a85011a926abf9b6607db",
-            "bytes": 136620
+            "sha256": "811acd6088e7a9aff5f961c37f51debe64d68ab4b0701396064aa80c42b6c095",
+            "bytes": 136384
           }
         },
         {
@@ -4933,8 +5109,8 @@
             "bytes": 57209
           },
           "after": {
-            "sha256": "689dc67e55d107264776973eb00461e5972d30ded8681f28edd4851f5e35f984",
-            "bytes": 57246
+            "sha256": "c47e61965c9957a2d7ecf198287dddbde1ce5f2d9c441b2e00d68447d64a7733",
+            "bytes": 61247
           }
         },
         {
@@ -6628,10 +6804,10 @@
       "baseLock": "manifests/full-native-apps.json",
       "baseLockSha256": "0c71246652db45818401d22d1267c79f84e01294c4e18f12ac83f536c6ed2a58",
       "baseSourceTreeSha256": "58d8ab31fb2c18e3201ca3feb19a808ccc75b8e551709c0569138c8d0282f507",
-      "sourceTreeSha256": "bae16d1ba203dcc53cb8d60ad3a0a325ab2db97fd22fc0f7ef46ee3ad983d04a",
+      "sourceTreeSha256": "cf14abfd80544f53a020627d025745d093a97bea0fee64faa2360703324e113e",
       "patch": "patches/bogo/word.patch",
-      "patchSha256": "7808ca022445474cc0a471264d436293dd84d97c7d5562697c86ddea737018af",
-      "patchBytes": 4611318,
+      "patchSha256": "24ed525ec2158c8f15bbc7e71fbdb452ee1f72a7e611c7e6382b9dd7c01321e4",
+      "patchBytes": 4611779,
       "files": [
         {
           "path": "apps/wordcraft/build.rs",
@@ -6890,8 +7066,8 @@
             "bytes": 32605
           },
           "after": {
-            "sha256": "dafbb67f69d020ba865bf9ff027a62a3f8d3efd5f79c0c09c9112b7898a51f54",
-            "bytes": 32245
+            "sha256": "5aa1882496754eabf35ceec6d8281eb8b05477f34600df0ef8cfdf7e31772224",
+            "bytes": 32244
           }
         },
         {
@@ -7831,10 +8007,10 @@
       "baseLock": "manifests/full-native-apps.json",
       "baseLockSha256": "0c71246652db45818401d22d1267c79f84e01294c4e18f12ac83f536c6ed2a58",
       "baseSourceTreeSha256": "f75f76714c6bfecd468cd4cdd8a03d2a693dcef438762bd8fa987839336d001c",
-      "sourceTreeSha256": "00f53014bb005f7af8b750192e54b9b3d1a92142e860b0cc3387e4ff888e5c1c",
+      "sourceTreeSha256": "df86bf8e1276f3123ef5397477c6fbab94cc751a9ff7f03010f75243ddffffe9",
       "patch": "patches/bogo/deck.patch",
-      "patchSha256": "3029962047c4b1bb9547383431b6e51f2b0e01814f08550ec784007229540ea0",
-      "patchBytes": 4436815,
+      "patchSha256": "d4e04d49578d98c954cc28adfbff897598cee5acf3af424a4e218132edcae53c",
+      "patchBytes": 4441018,
       "files": [
         {
           "path": "apps/deckcraft-cli/src/main.rs",
@@ -8090,8 +8266,8 @@
             "bytes": 54821
           },
           "after": {
-            "sha256": "b1c1203fba5836e9ca3a9894c54612cc5f9e44e47111f9adbda998c02b18d5ca",
-            "bytes": 54539
+            "sha256": "14621f37f9ae959924a5ea2e4326aa9da6e41da55fca2b5f3fbce91f9b86d74d",
+            "bytes": 54670
           }
         },
         {
@@ -8139,14 +8315,25 @@
           }
         },
         {
+          "path": "crates/ui-egui/src/panes.rs",
+          "before": {
+            "sha256": "e443bd02483690c78224f2e5382b7b520fcdffbe050ab2d4479252e0522c2e6c",
+            "bytes": 30378
+          },
+          "after": {
+            "sha256": "ed09d394dc2d74929d781367bd329e07bef05fc8b6f2ed9b78cb55143f1e321d",
+            "bytes": 30414
+          }
+        },
+        {
           "path": "crates/ui-egui/src/ribbon.rs",
           "before": {
             "sha256": "c5dea35f318093f9d66c154e9c0167a4a8714204def2bb261e367203a85446db",
             "bytes": 109359
           },
           "after": {
-            "sha256": "3f29956c25444e8ba6d9ecd23dd672202a4ff15dd7fa5e78ef2968ba0e60edfe",
-            "bytes": 109360
+            "sha256": "283fa7927ef8f463ea417685f01f46196dc6353d1d0b96e497cc6d911fbdc8bd",
+            "bytes": 109630
           }
         },
         {
@@ -8178,8 +8365,8 @@
             "bytes": 11546
           },
           "after": {
-            "sha256": "0489945a652b1f83cc54d5e7b95bb937c76b9d2e863b29169388f0d62c334a77",
-            "bytes": 11657
+            "sha256": "5b04beb2588d02b2cfb28774ff5fd8b66b5b6e11c9968a693e3b953d0a3e74e5",
+            "bytes": 11774
           }
         },
         {
@@ -9009,10 +9196,10 @@
       "baseLock": "manifests/launcher.lock.json",
       "baseLockSha256": "46fa9e82194ee555f1ed72acf5b54709738d3d9db2c4a30b03995850d6e70237",
       "baseSourceTreeSha256": "d0c47781d861fa777ae4c9b931e870f5013b435039791a91b14923583c55b318",
-      "sourceTreeSha256": "7323302a5863a1102f04135b97baa75106cfb2e4a5d90464802a6ba59a6da3e5",
+      "sourceTreeSha256": "bc326c54ecb7eb0ca6dbd8f507d6194f0937e3089b56c73cfc0137d0202041bf",
       "patch": "patches/bogo/launcher.patch",
-      "patchSha256": "a340cb6b7cbc669a3e55065e827117b2a4fb0c4345f240c6b3ba0a225f3461b9",
-      "patchBytes": 11991305,
+      "patchSha256": "5b179b022bf56821ed7d0b55a7ba534403d8ae206e76fc2f6dced4f7ec325320",
+      "patchBytes": 11991382,
       "files": [
         {
           "path": "apps/artcraft-launcher-web/index.html",
@@ -9741,8 +9928,8 @@
             "bytes": 17439
           },
           "after": {
-            "sha256": "283dd80c49aaea51f55c3cd4d289e4f5c5c62b8ab60e6437dafa98bc7612a8bf",
-            "bytes": 16789
+            "sha256": "63e2cac0dd552bcb9ebcc21ae9b83bb985ef248d73b75c329ff4b22a26306323",
+            "bytes": 16865
           }
         },
         {
