@@ -35,7 +35,7 @@ env:
   PYTHONUTF8: '1'
 
 concurrency:
-  group: bogo-native-${{ inputs.app }}-${{ github.ref }}
+  group: bogo-native-${{ inputs.app }}-${{ inputs.platform }}-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
