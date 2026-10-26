@@ -16,6 +16,7 @@ import urllib.request
 import urllib.error
 from unittest.mock import patch
 import zipfile
+import zlib
 
 HERE = Path(__file__).resolve().parent
 SCRIPT = HERE / 'tools-ci-acceptance.py'
@@ -186,9 +187,9 @@ class GuardTests(unittest.TestCase):
         self.assertEqual(m.git_blob(b'hello\n'),'ce013625030ba8dba906f756967f9e9ca394464a')
 
     def test_signed_envelope_is_exact_pinned_asset(self):
-        self.assertEqual(m.ENVELOPE_PIN,(679437642,'Bogo-Tools-4.6.23-candidate-update-envelope.json',2617,'8d965eadd05efe55a08b2fda5ed0bed324680f04bfb92d5831ede18a60777b48'))
+        self.assertEqual(m.ENVELOPE_PIN,(679634075,'Bogo-Tools-4.6.23-candidate-update-envelope.json',2898,'04210060a4ec938bdb31d23e8b4219be80207e9e150e94fb0da9cb7033c2b9f1'))
         self.assertEqual(m.VERSION,'4.6.23')
-        self.assertEqual(m.SOURCE_COMMIT,'0821a5aec13aeb9b6bbb3bd86bab42b482497e4e')
+        self.assertEqual(m.SOURCE_COMMIT,'ffb7307aa1368e411f386f166750ac2353cf8a2e')
         self.assertEqual(m.PUBLIC_KEY,'JjeL9t/8GSrh2XZ25gawQyI475nXr/rU0li4CoEnfos=')
         for pin in [*m.PINS.values(),m.ENVELOPE_PIN]:
             self.assertEqual(len(pin[3]),64);self.assertGreater(pin[2],0)
@@ -230,7 +231,7 @@ class GuardTests(unittest.TestCase):
         self.assertGreater(checked,5)
 
     def test_only_actual_postpackaging_mac_executable_pin_accepted(self):
-        current='0cd2a606507330da1458a5a61995c73f6550bcda46b7a1d01ffb10f3bf952408'
+        current='1354fe9ecc12a21a1d0cb9572e71e581c66abc538d0cf49e0e236175274f63e3'
         historical='e1afd018ddc5915349611b0e899c7de40df0230b3b49bbb380a07e19a944c731'
         self.assertEqual(m.EXE_SHA['macos'],current);self.assertEqual(m.EXE_BYTES['macos'],3666928)
         self.assertEqual(m.executable_metadata(current,3666928,'macos'),{'sha256':current,'bytes':3666928})
@@ -347,6 +348,95 @@ class GuardTests(unittest.TestCase):
         self.assertNotIn('installed==expected',upgrade)
 
 
+class ToolsIcoFrameTests(unittest.TestCase):
+    def setUp(self):
+        self.temp=tempfile.TemporaryDirectory();self.root=Path(self.temp.name)
+
+    def tearDown(self):self.temp.cleanup()
+
+    def png(self,size):
+        def chunk(kind,body):return struct.pack('>I',len(body))+kind+body+struct.pack('>I',zlib.crc32(kind+body)&0xffffffff)
+        pixels=(b'\0'+bytes([252,117,1,255])*size)*size
+        return b'\x89PNG\r\n\x1a\n'+chunk(b'IHDR',struct.pack('>IIBBBBB',size,size,8,6,0,0,0))+chunk(b'IDAT',zlib.compress(pixels))+chunk(b'IEND',b'')
+
+    def ico(self):
+        sizes=[16,20,24,32,40,48,64,128,256];frames=[self.png(v)for v in sizes];offset=150;directory=[]
+        for size,png in zip(sizes,frames):
+            directory.append(struct.pack('<BBBBHHII',size%256,size%256,0,0,0,32,len(png),offset));offset+=len(png)
+        return struct.pack('<HHH',0,1,9)+b''.join(directory)+b''.join(frames)
+
+    def parse(self,raw,label='frames'):
+        p=self.root/(label+'.ico');p.write_bytes(raw)
+        with patch.object(m,'ICO_SHA',hashlib.sha256(raw).hexdigest()):return m.authenticated_tools_ico_frames(p,self.root/label)
+
+    def test_all_nine_declared_png_frames_are_copied_byte_exact_without_render(self):
+        raw=self.ico();frames=self.parse(raw)
+        self.assertEqual(set(frames),{'16','20','24','32','40','48','64','128','256'})
+        for size,row in frames.items():
+            data=Path(row['path']).read_bytes();self.assertEqual(data,raw[row['offset']:row['offset']+row['bytes']])
+            self.assertEqual(row['sha256'],hashlib.sha256(data).hexdigest());self.assertEqual(int(size),row['width'])
+        with self.assertRaises(ValueError):self.parse(raw)
+
+    def test_source_ico_hash_and_plain_path_mandatory(self):
+        p=self.root/'bad.ico';p.write_bytes(self.ico())
+        with self.assertRaisesRegex(ValueError,'authentication'):m.authenticated_tools_ico_frames(p,self.root/'frames')
+        if os.name!='nt':
+            alias=self.root/'alias';alias.symlink_to(p)
+            with patch.object(m,'ICO_SHA',hashlib.sha256(p.read_bytes()).hexdigest()),self.assertRaises(ValueError):m.authenticated_tools_ico_frames(alias,self.root/'frames')
+
+    def test_ico_count_reserved_planes_bits_duplicate_or_missing_resolution_refused(self):
+        raw=self.ico()
+        for label,offset,data in [('reserved',0,struct.pack('<H',1)),('type',2,struct.pack('<H',2)),
+                                  ('count',4,struct.pack('<H',8)),('planes',10,struct.pack('<H',1)),
+                                  ('bits',12,struct.pack('<H',24)),('duplicate',22,bytes([16,16])),
+                                  ('colors',8,b'\x01')]:
+            changed=bytearray(raw);changed[offset:offset+len(data)]=data
+            with self.subTest(label=label),self.assertRaises(ValueError):self.parse(bytes(changed),label)
+
+    def test_ico_offsets_overlap_truncation_header_alias_and_payload_tail_refused(self):
+        raw=self.ico()
+        for label,changed in [('tail',raw+b'unknown'),('truncated',raw[:-1])]:
+            with self.subTest(label=label),self.assertRaises(ValueError):self.parse(changed,label)
+        for label,offset,value in [('header-offset',18,10),('out-of-range',18,len(raw)),('length',14,len(raw)),('overlap',34,150)]:
+            changed=bytearray(raw);struct.pack_into('<I',changed,offset,value)
+            with self.subTest(label=label),self.assertRaises(ValueError):self.parse(bytes(changed),label)
+
+    def test_png_crc_geometry_complete_iend_and_no_trailing_stream_mandatory(self):
+        good=self.png(16);m.validate_tools_frame_png(good,16)
+        cases=[good[:-1],good+b'junk',good[:-12],good[:29]+bytes([good[29]^1])+good[30:],b'not PNG',self.png(20)]
+        for value in cases:
+            with self.subTest(sha=hashlib.sha256(value).hexdigest()),self.assertRaises(ValueError):m.validate_tools_frame_png(value,16)
+
+    def test_valid_crc_cannot_hide_extra_zlib_stream_invalid_filter_or_format(self):
+        def chunk(kind,body):return struct.pack('>I',len(body))+kind+body+struct.pack('>I',zlib.crc32(kind+body)&0xffffffff)
+        header=struct.pack('>IIBBBBB',16,16,8,6,0,0,0);pixels=(b'\0'+bytes([252,117,1,255])*16)*16
+        streams=[zlib.compress(pixels)+zlib.compress(b'unknown tail'),zlib.compress(pixels+b'overflow'),zlib.compress(b'\x05'+pixels[1:])]
+        for compressed in streams:
+            value=b'\x89PNG\r\n\x1a\n'+chunk(b'IHDR',header)+chunk(b'IDAT',compressed)+chunk(b'IEND',b'')
+            with self.assertRaises(ValueError):m.validate_tools_frame_png(value,16)
+        bad_header=struct.pack('>IIBBBBB',16,16,8,2,0,0,0)
+        value=b'\x89PNG\r\n\x1a\n'+chunk(b'IHDR',bad_header)+chunk(b'IDAT',zlib.compress(pixels))+chunk(b'IEND',b'')
+        with self.assertRaises(ValueError):m.validate_tools_frame_png(value,16)
+
+    def test_tools_reader_changes_only_three_expected_blocks_and_keeps_owned_cleanup(self):
+        original='prefix owned-PID RequireOwner and borrowed handle clone\n'+'\n'.join(a for a,b in m.TOOLS_ICO_PS_REPLACEMENTS)+'\nsuffix owned-only DestroyIcon and borrowedHandleNeverDestroyed\n'
+        changed=m.tools_ico_powershell(original);inverse=changed
+        for before,after in reversed(m.TOOLS_ICO_PS_REPLACEMENTS):inverse=inverse.replace(after,before,1)
+        self.assertEqual(inverse,original);self.assertIn('resizing refused',changed)
+        self.assertIn('Copy-Item -LiteralPath $approvedFrame.path',changed)
+        self.assertIn('owned-only DestroyIcon and borrowedHandleNeverDestroyed',changed)
+        for malformed in ('unreviewed source',original+original,original.replace(m.TOOLS_ICO_PS_REPLACEMENTS[0][0],'')):
+            with self.assertRaises(ValueError):m.tools_ico_powershell(malformed)
+
+    def test_tools_requires_exact_pixels_and_same_declared_size_not_tolerance(self):
+        tree=ast.parse(SCRIPT.read_text(encoding='utf-8'))
+        body=ast.get_source_segment(SCRIPT.read_text(encoding='utf-8'),next(n for n in tree.body if isinstance(n,ast.FunctionDef)and n.name=='tools_runtime_icons'))
+        self.assertIn("all(row.get('exact')is True for row in rows)",body)
+        self.assertIn("row['width']==row['height']==frame['width']",body)
+        self.assertIn('collect_icon_handles(hwnd,pid,api)',body);self.assertGreaterEqual(body.count('require_owned(hwnd,pid,api)'),4)
+        self.assertNotIn('runtime_png=',body);self.assertNotIn('check_runtime_icons(',body)
+
+
 class ArchiveTests(unittest.TestCase):
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory();self.root=Path(self.temp.name)
@@ -421,7 +511,7 @@ class ArchiveTests(unittest.TestCase):
         with self.assertRaises(ValueError):m.portable_payload(launcher,self.root/'badmagic',len(payload),sha)
 
     def test_source_binding_requires_every_actual_file_and_git_bytes(self):
-        # Production requires all 440 real entries. This deliberately short tree
+        # Production requires all 441 real entries. This deliberately short tree
         # must fail before any archive can be accepted as complete source.
         archive=self.archive([('file',b'body',0)])
         commit={'sha':m.SOURCE_COMMIT,'tree':{'sha':'a'*40}}
@@ -429,7 +519,7 @@ class ArchiveTests(unittest.TestCase):
         with patch.object(m,'api',side_effect=[commit,tree]),self.assertRaises(ValueError):m.source_binding(archive)
         with patch.object(m,'api',return_value=dict(commit,sha='b'*40)),self.assertRaises(ValueError):m.source_binding(archive)
 
-    def test_source_binding_checks_all_440_bodies_not_just_names(self):
+    def test_source_binding_checks_all_441_bodies_not_just_names(self):
         entries=[('file-'+str(n),('body-'+str(n)).encode(),0) for n in range(m.SOURCE_FILES)]
         archive=self.archive(entries)
         commit={'sha':m.SOURCE_COMMIT,'tree':{'sha':'a'*40}}

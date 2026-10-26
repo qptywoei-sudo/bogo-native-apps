@@ -26,14 +26,14 @@ import time
 import types
 import zipfile
 
-SOURCE_COMMIT = '0821a5aec13aeb9b6bbb3bd86bab42b482497e4e'
-SOURCE_ZIP_SHA256 = '2bc1e8b7faf069f5055b7a16ad656aa5fd366bdb015e0c7dd9ed267c10edf999'
-SOURCE_ZIP_BYTES = 7442659
+SOURCE_COMMIT = 'ffb7307aa1368e411f386f166750ac2353cf8a2e'
+SOURCE_ZIP_SHA256 = 'bde46ce3a1834353aa1107ff6f29241748e29121a5bf88cf659be1c117972ba1'
+SOURCE_ZIP_BYTES = 7444893
 INI_FACTORY_SOURCE_SHA256 = '2b6d16a1ec80403bfba281b4457f4fa01448598951a4dd7a2b00978506b19f46'
 INI_DEFAULT_BYTES = b'[input]\r\nkeyboard=uhid\r\nmouse=uhid\r\n'
 INI_DEFAULT_SHA256 = '85321301107c054874655bcde48dcb4ab6a47f1fc056fabe820320b23be8b321'
-UPDATE_ZIP_SHA256 = '0f4310aee34470d0400cefb1d249bf13e98e9fc8bc50484719ca628315ffe6ed'
-UPDATE_ZIP_BYTES = 411768065
+UPDATE_ZIP_SHA256 = '00c669e4952d67b2798989da2de21d59a43359cfd0d510da0c16312c8b2638d9'
+UPDATE_ZIP_BYTES = 411769682
 MANAGED_FILE_COUNT = 3905
 INI = 'KIOControl.ini'
 CANARY = 'bogo-ci-user-document.txt'
@@ -500,7 +500,7 @@ def verified_fresh_factory(root,source_archive,executable,snapshot,inventory):
     require(not archive.is_symlink() and archive.is_file() and archive.stat().st_size==SOURCE_ZIP_BYTES
             and sha256(archive.read_bytes())==SOURCE_ZIP_SHA256,'Exact r2 corresponding source archive required')
     with zipfile.ZipFile(archive)as z:
-        require(len(z.namelist())==440 and z.namelist().count('windows/GalaxyControl.c')==1,'Exact r2 source members required')
+        require(len(z.namelist())==441 and z.namelist().count('windows/GalaxyControl.c')==1,'Exact r2 source members required')
         source=z.read('windows/GalaxyControl.c');manifest=json.loads(z.read('SOURCE-MANIFEST.json'))
         rows=[r for r in manifest['files']if r['path']=='windows/GalaxyControl.c']
         require(len(rows)==1 and rows[0]['sha256']==sha256(source)==INI_FACTORY_SOURCE_SHA256

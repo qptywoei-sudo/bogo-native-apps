@@ -8,32 +8,32 @@ The existing reviewed bogo_runtime_icons module supplies strict Windows HICON QA
 from __future__ import annotations
 import argparse, base64, ctypes, hashlib, io, json, os, platform, re, shutil
 import stat, struct, subprocess, sys, time, urllib.error, urllib.parse, urllib.request
-import uuid, zipfile
+import uuid, zipfile, zlib
 from pathlib import Path, PurePosixPath
 
 VERSION = '4.6.23'
 REPOSITORY = 'qptywoei-sudo/bogo-native-apps'
-RELEASE_ID = 424757180
+RELEASE_ID = 424823883
 SOURCE_REPO = 'qptywoei-sudo/kio-tools-releases'
-SOURCE_COMMIT = '0821a5aec13aeb9b6bbb3bd86bab42b482497e4e'
-SOURCE_FILES = 440
+SOURCE_COMMIT = 'ffb7307aa1368e411f386f166750ac2353cf8a2e'
+SOURCE_FILES = 441
 MAC_BUNDLE_FILES = 9474
 MASTER_SHA = 'e3196a03cf3d259b5e3662c39206b36339b22986ac910b0e772fb84f7759957b'
 ICO_SHA = '6fc46773734a521752d98e113d45ea9526ce475af5500efec32dab27ca19f72e'
 ICNS_SHA = '83b8e147f108536a5e71745122dd6f57be3f2b52a2d59a57176228479dfe55cf'
 EXE_SHA = {'windows': '4a73a4ae6052804e2bb14ffe1957c447bbedff92a24e6b11c1115cc7c7682ce5',
-           'macos': '0cd2a606507330da1458a5a61995c73f6550bcda46b7a1d01ffb10f3bf952408'}
+           'macos': '1354fe9ecc12a21a1d0cb9572e71e581c66abc538d0cf49e0e236175274f63e3'}
 EXE_BYTES = {'windows':1806336,'macos':3666928}
 # The former e1afd... implementation checkpoint preceded final packaging and
 # signing. Only the exact final executable members of the frozen ZIPs above
 # are accepted here; historical/prepackaging hashes are never a fallback.
 # Asset IDs, names, sizes and hashes were independently read back from this draft.
 PINS = {
- 'source': (679437462, 'Bogo-Tools-4.6.23-source.zip', 7442659, '2bc1e8b7faf069f5055b7a16ad656aa5fd366bdb015e0c7dd9ed267c10edf999'),
- 'windows': (679437480, 'Bogo-Tools-4.6.23-Windows-Portable.zip', 412315535, '123e1c2afd5aa81bbe0bbe84fc256e185a4e02f6a696e2e2afb8715e0f794fbb'),
- 'macos': (679437466, 'Bogo-Tools-4.6.23-Mac-Portable.zip', 434324416, '56ae1c7d65c5d1da475a80e9b62cd5fb852cb9f44d67f85eba3820c608617ed3'),
- 'windows-update': (679437463, 'Bogo-Tools-4.6.23-Windows-Update.zip', 411768065, '0f4310aee34470d0400cefb1d249bf13e98e9fc8bc50484719ca628315ffe6ed'),
- 'macos-update': (679437471, 'Bogo-Tools-4.6.23-Mac-Update.zip', 434627584, '5bd4fac708f46848851a1305b9c641c0f09a945768164b46ee3e2b308566b3ec'),
+ 'source': (679633895, 'Bogo-Tools-4.6.23-source.zip', 7444893, 'bde46ce3a1834353aa1107ff6f29241748e29121a5bf88cf659be1c117972ba1'),
+ 'windows': (679633893, 'Bogo-Tools-4.6.23-Windows-Portable.zip', 412317152, '119e718fa69f99ae992ee6cc37c5b7692eb25e2aa8c90c6810aea30e89d5ca4d'),
+ 'macos': (679633899, 'Bogo-Tools-4.6.23-Mac-Portable.zip', 434326041, 'efea9cbbf5be135b2d5344330fe24e0ebdf6d18452a7975d1c7c9ee5fb9d9a94'),
+ 'windows-update': (679633902, 'Bogo-Tools-4.6.23-Windows-Update.zip', 411769682, '00c669e4952d67b2798989da2de21d59a43359cfd0d510da0c16312c8b2638d9'),
+ 'macos-update': (679633894, 'Bogo-Tools-4.6.23-Mac-Update.zip', 434629209, 'b1bf330367cc1793b167d5261fbb5b21d32a24977b73259891d19060b97754b6'),
 }
 OLD_WINDOWS = ('https://github.com/qptywoei-sudo/kio-tools-releases/releases/download/tools-v4.6.21/KIO-Tools-4.6.21-Windows-Update.zip',
                414591430, 'c753337a986ef2abf4b1a38fbb99ff63ea4218f61e5ea009f3f7fc5dcc4f253b')
@@ -41,8 +41,8 @@ OLD_MACOS = ('https://github.com/qptywoei-sudo/kio-tools-releases/releases/downl
              437990335, 'c489d8ba1029155afcef587475fbb7336b8b40161fb1eb9a6b8664837f68884e')
 # Root supplies a separately pinned QA-only envelope asset after local signing.
 # Candidate URLs are held, not live; this harness never claims their availability.
-ENVELOPE_PIN = (679437642, 'Bogo-Tools-4.6.23-candidate-update-envelope.json', 2617,
-                '8d965eadd05efe55a08b2fda5ed0bed324680f04bfb92d5831ede18a60777b48')
+ENVELOPE_PIN = (679634075, 'Bogo-Tools-4.6.23-candidate-update-envelope.json', 2898,
+                '04210060a4ec938bdb31d23e8b4219be80207e9e150e94fb0da9cb7033c2b9f1')
 PUBLIC_KEY = 'JjeL9t/8GSrh2XZ25gawQyI475nXr/rU0li4CoEnfos='
 MAC_SIGNER_LEAF_SHA1 = '72287f8a5048cd206db014ead6723c75cd459379'
 
@@ -528,10 +528,137 @@ $b=New-Object Drawing.Bitmap($w,$height);$g=[Drawing.Graphics]::FromImage($b);tr
 '''
 
 
+def validate_tools_frame_png(raw, dimension):
+    require(type(raw)is bytes and 0<len(raw)<=4*1024*1024 and raw[:8]==b'\x89PNG\r\n\x1a\n','ICO frame is not a bounded PNG')
+    offset=8;header=False;ended=False;idat=False;closed=False;compressed=bytearray();chunks=0
+    while offset<len(raw):
+        chunks+=1;require(chunks<=4096 and offset+12<=len(raw),'Invalid PNG chunk boundary')
+        length=struct.unpack_from('>I',raw,offset)[0];kind=raw[offset+4:offset+8];end=offset+12+length
+        require(end<=len(raw) and all(65<=v<=90 or 97<=v<=122 for v in kind),'Invalid PNG chunk kind/length')
+        body=raw[offset+8:end-4];crc=struct.unpack_from('>I',raw,end-4)[0]
+        require(zlib.crc32(kind+body)&0xffffffff==crc,'ICO PNG CRC mismatch');offset=end
+        require(header or kind==b'IHDR','ICO PNG must start with IHDR')
+        if kind==b'IHDR':
+            require(not header and length==13,'Duplicate/invalid ICO PNG IHDR')
+            values=struct.unpack('>IIBBBBB',body)
+            require(values==(dimension,dimension,8,6,0,0,0),'ICO PNG dimensions/32-bit RGBA format differ from directory')
+            header=True
+        elif kind==b'IDAT':
+            require(not closed,'ICO PNG IDAT is not contiguous');idat=True;compressed.extend(body)
+        elif kind==b'IEND':
+            require(header and idat and length==0 and offset==len(raw),'ICO PNG IEND missing/has tail')
+            ended=True;break
+        else:
+            if idat:closed=True
+            require(kind[0]&0x20,'Unsupported critical ICO PNG chunk')
+    require(ended,'ICO PNG lacks complete IEND')
+    expected=(dimension*4+1)*dimension;decoder=zlib.decompressobj()
+    try:scanlines=decoder.decompress(compressed,expected+1)
+    except zlib.error as error:raise ValueError('ICO PNG zlib stream invalid')from error
+    require(len(scanlines)==expected and decoder.eof and not decoder.unused_data and not decoder.unconsumed_tail,
+            'ICO PNG compressed geometry/tail differs')
+    require(all(scanlines[row*(dimension*4+1)]<=4 for row in range(dimension)),'ICO PNG row filter invalid')
+
+
+def authenticated_tools_ico_frames(ico, output):
+    ico=Path(ico);output=Path(output)
+    require(ico.is_file() and not ico.is_symlink() and ico.stat().st_size<=4*1024*1024 and digest(ico)==ICO_SHA,
+            'Tools source ICO authentication failed')
+    raw=ico.read_bytes();require(len(raw)>=150 and struct.unpack_from('<HHH',raw)==(0,1,9),'Tools ICO header/count differs')
+    frames={};ranges=[]
+    for index in range(9):
+        w,h,colors,reserved,planes,bits,length,start=struct.unpack_from('<BBBBHHII',raw,6+16*index)
+        width,height=w or 256,h or 256
+        # These exact authenticated PNG-directory entries declare planes=0,
+        # bitCount=32; PNG IHDR below independently requires 8-bit RGBA.
+        require(width==height and width not in frames and colors==reserved==planes==0 and bits==32,
+                'Tools ICO duplicate/non-RGBA frame geometry')
+        require(150<=start<len(raw) and 0<length<=len(raw)-start,'Tools ICO frame offset/bound invalid')
+        body=raw[start:start+length];validate_tools_frame_png(body,width)
+        frames[width]={'raw':body,'offset':start,'bytes':length,'width':width,'height':height,'sha256':hashlib.sha256(body).hexdigest()}
+        ranges.append((start,start+length))
+    require(set(frames)=={16,20,24,32,40,48,64,128,256},'Tools ICO exact nine resolutions differ')
+    ranges.sort();require(ranges[0][0]==150 and ranges[-1][1]==len(raw)
+                         and all(a[1]==b[0] for a,b in zip(ranges,ranges[1:])),'Tools ICO frames overlap/gap or leave a tail')
+    require(not output.exists() and not output.is_symlink(),'Tools ICO frame directory must be fresh');output.mkdir(mode=0o700)
+    rows={}
+    for width,row in sorted(frames.items()):
+        path=output/(str(width)+'-original.png')
+        with path.open('xb')as stream:stream.write(row['raw'])
+        rows[str(width)]={k:v for k,v in row.items()if k!='raw'};rows[str(width)]['path']=str(path)
+    require(digest(ico)==ICO_SHA,'Tools ICO changed during frame readback')
+    return rows
+
+
+TOOLS_ICO_PS_REPLACEMENTS=(
+    ('      $approved = [System.Drawing.Icon]::new([string]$cfg.ico, [System.Drawing.Size]::new($actual.Width, $actual.Height))',
+     '      $approved = $null # Tools reference is exact authenticated ICO PNG bytes, no managed ICO rendering'),
+    ('''    $reference = $approved.ToBitmap()
+    if ($reference.Width -ne $actual.Width -or $reference.Height -ne $actual.Height) { throw 'approved ICO has no same-size rendered frame' }''',
+     '''    if ($cfg.runtimeReference -or $cfg.referenceGenerator) { throw 'Tools accepts authenticated ICO PNG frames only' }
+    if ($actual.Width -ne $actual.Height) { throw 'Tools runtime icon is not square' }
+    $property = $cfg.authenticatedIcoFrames.PSObject.Properties[[string]$actual.Width]
+    if ($null -eq $property) { throw 'Tools ICO has no exact-size PNG frame; resizing refused' }
+    $approvedFrame = $property.Value
+    if ([int]$approvedFrame.width -ne $actual.Width -or [int]$approvedFrame.height -ne $actual.Height) { throw 'Tools declared frame geometry differs' }
+    if ((Get-Item -LiteralPath $approvedFrame.path).Length -ne [long]$approvedFrame.bytes -or (Get-FileHash -Algorithm SHA256 -LiteralPath $approvedFrame.path).Hash.ToLowerInvariant() -ne $approvedFrame.sha256) { throw 'Authenticated Tools ICO PNG frame changed' }'''),
+    ('    $reference.Save($expectedPath, [System.Drawing.Imaging.ImageFormat]::Png)',
+     '''    if (Test-Path -LiteralPath $expectedPath) { throw 'Tools expected image would overwrite existing evidence' }
+    Copy-Item -LiteralPath $approvedFrame.path -Destination $expectedPath -ErrorAction Stop
+    if ((Get-FileHash -Algorithm SHA256 -LiteralPath $expectedPath).Hash.ToLowerInvariant() -ne $approvedFrame.sha256) { throw 'Exact Tools ICO PNG copy changed' }'''),
+)
+
+
+def tools_ico_powershell(original):
+    source=original
+    for before,after in TOOLS_ICO_PS_REPLACEMENTS:
+        require(source.count(before)==1 and after not in source,'Shared icon reader source guard differs')
+        source=source.replace(before,after,1)
+    inverse=source
+    for before,after in reversed(TOOLS_ICO_PS_REPLACEMENTS):inverse=inverse.replace(after,before,1)
+    require(inverse==original,'Tools icon reader changed outside its exact expected-image blocks')
+    return source
+
+
+def tools_runtime_icons(hwnd,pid,ico,output,env):
+    from bogo_runtime_icons import Win32,require_owned,collect_icon_handles,compare_icon_pngs,POWERSHELL
+    require(os.name=='nt','Tools runtime HICON verification requires actual Windows')
+    output=Path(output);require(not output.exists() and not output.is_symlink(),'HICON evidence must be fresh');output.mkdir()
+    frames=authenticated_tools_ico_frames(ico,output/'authenticated-ico-frames');api=Win32();require_owned(hwnd,pid,api)
+    handles=collect_icon_handles(hwnd,pid,api)
+    config={'hwnd':str(hwnd),'pid':pid,'ico':str(ico),'sha256':ICO_SHA,'output':str(output),
+        'authenticatedIcoFrames':frames,'icons':[dict(row,handle=str(row['handle']if row['handle']<1<<63 else row['handle']-(1<<64)))for row in handles]}
+    write_json(output/'config.json',config);reader=tools_ico_powershell(POWERSHELL)
+    (output/'read-icons.ps1').write_text(reader,encoding='utf-8')
+    require_owned(hwnd,pid,api)
+    exe=Path(os.environ.get('SystemRoot',r'C:\Windows'))/'System32/WindowsPowerShell/v1.0/powershell.exe'
+    run=subprocess.run([str(exe),'-NoProfile','-NonInteractive','-File',str(output/'read-icons.ps1'),'-Config',str(output/'config.json')],
+                       env=env,capture_output=True,text=True,encoding='utf-8',errors='replace',timeout=30)
+    (output/'powershell.log').write_text(run.stdout+run.stderr,encoding='utf-8')
+    require(run.returncode==0,'Owned Tools HICON reader failed: '+run.stderr[-600:]);require_owned(hwnd,pid,api)
+    require(digest(ico)==ICO_SHA,'Tools source ICO changed during runtime capture')
+    rows=read_json_utf8(output/'rendered.json');require(isinstance(rows,list) and [r.get('role')for r in rows]==['small2','small','big'],'Tools HICON roles missing/reordered')
+    for row,handle in zip(rows,handles):
+        for key,suffix in [('actual','-actual.png'),('expected','-approved.png')]:
+            path=Path(row[key]);require(path.is_file() and not path.is_symlink() and path.resolve()==output.resolve()/(row['role']+suffix),'HICON receipt escaped owned output')
+        frame=frames.get(str(row['width']));require(frame is not None and row['width']==row['height']==frame['width'],'Tools HICON lacks exact declared ICO frame')
+        require(digest(frame['path'])==frame['sha256'] and digest(row['expected'])==frame['sha256'],'Exact ICO PNG reference changed')
+        comparison=compare_icon_pngs(row['actual'],row['expected'])
+        row.update(comparison);row.update(handleSource=handle['source'],borrowedHandleNeverDestroyed=True,
+            expectedExactSourceIcoFrameSha256=frame['sha256'],expectedExactSourceIcoOffset=frame['offset'])
+    report={'passed':all(row.get('exact')is True for row in rows),'runtimeExecuted':True,'pid':pid,'hwnd':hwnd,
+        'sourceIcoSha256':ICO_SHA,'referencePipeline':'EXACT PNG frame bytes from authenticated source ICO; no resizing/recoloring/managed ICO renderer',
+        'strictExactNormalizedRgbaRequired':True,'sharedRustPngPathUnchanged':True,'icons':rows,
+        'expectedReaderSourceSha256':hashlib.sha256(POWERSHELL.encode('utf-8')).hexdigest(),
+        'toolsReaderSourceSha256':hashlib.sha256(reader.encode('utf-8')).hexdigest(),'sourceGuardInverseExact':True}
+    write_json(output/'runtime-icon-readback.json',report);require_owned(hwnd,pid,api)
+    require(report['passed'],'Tools runtime HICON pixels differ from exact authenticated ICO PNG frame; see runtime-icon-readback.json')
+    return report
+
+
 def windows_probe(executable, pid, source, output, env, label):
     window=windows_window(pid,env); ico=source/'windows/GalaxyControl.ico'; embedded=embedded_icons(executable,ico)
-    from bogo_runtime_icons import check_runtime_icons
-    icons=check_runtime_icons(int(window['hwnd']),pid,ico,ICO_SHA,output/(label+'-hicons'))
+    icons=tools_runtime_icons(int(window['hwnd']),pid,ico,output/(label+'-hicons'),env)
     capture=powershell(WINDOWS_CAPTURE,dict(env,BOGO_HWND=str(window['hwnd']),BOGO_PID=str(pid),BOGO_SCREENSHOT=str(output/(label+'.png'))))
     require((output/(label+'.png')).is_file(),'Own screenshot absent')
     require(capture['paletteCounts']['FFF3E8']>20 and capture['paletteCounts']['FFFAF6']>100,'Actual window does not show required pale Tools chrome')
