@@ -14,6 +14,7 @@ import xml.etree.ElementTree as ET
 import full_native as full
 import launcher_native as launcher
 from bogo_brand import NAMES, PALETTE
+from bogo_release_identity import release_version, approved_promotion_transition, promotion_transition_records
 
 ROOT = full.ROOT
 CATALOG = ROOT / 'manifests/bogo-native-apps.json'
@@ -41,7 +42,7 @@ def load_lock(app):
     row = rows[0]
     legacy = base_lock(app)
     require(row['baseLock'] == ('manifests/launcher.lock.json' if app == 'launcher' else 'manifests/full-native-apps.json') and digest(ROOT / row['baseLock']) == row['baseLockSha256'], 'Legacy input lock changed')
-    require(row['name'] == 'Bogo ' + NAMES[app] and row['version'] == legacy['upstreamVersion'] + '-bogo.1' and row['assetPrefix'] == row['name'].replace(' ', '-'), 'Bogo display/release identity mismatch')
+    require(row['name'] == 'Bogo ' + NAMES[app] and row['version'] == release_version(legacy['upstreamVersion']) and row['assetPrefix'] == row['name'].replace(' ', '-'), 'Bogo display/release identity mismatch')
     require(row['bundleId'] == legacy['bundleId'] and row['legacyVersion'] == legacy['version'], 'Installed native identity changed')
     patch = ROOT / full.common.check_public_path(row['patch'])
     require(row['patch'] == 'patches/bogo/' + app + '.patch' and patch.is_file() and not patch.is_symlink() and patch.stat().st_size == row['patchBytes'] and digest(patch) == row['patchSha256'], 'Bogo overlay bytes changed')
@@ -49,10 +50,18 @@ def load_lock(app):
     require(paths and len(paths) == len(set(paths)), 'Duplicate Bogo overlay path')
     for item in row['files']:
         path = full.common.check_public_path(item['path'])
-        require(not str(path).startswith(('crates/engine/', 'crates/doc/', 'crates/model/', 'vendor/', 'contributors/')) and path.name not in ('Cargo.toml', 'Cargo.lock', 'LICENSE-MIT', 'LICENSE-APACHE', 'NOTICE'), 'Protected Bogo source change refused')
+        relative = path.as_posix()
+        require(relative == item['path'], 'Noncanonical Bogo overlay source path')
+        protected = relative.startswith(('crates/engine/', 'crates/doc/', 'crates/model/', 'vendor/', 'contributors/')) or path.name in ('Cargo.toml', 'Cargo.lock', 'LICENSE-MIT', 'LICENSE-APACHE', 'NOTICE')
+        require(not protected or approved_promotion_transition(app, relative, item['before'], item['after']), 'Protected Bogo source change refused')
         for side in ('before', 'after'):
             identity = item[side]
             require(identity is None or (full.common.HEX.fullmatch(identity['sha256']) and 0 <= identity['bytes'] < 32 * 1024 * 1024), 'Invalid Bogo overlay file identity')
+    transitions = promotion_transition_records(app)
+    require(row.get('retiredPromotionSourceTransitions') == transitions, 'Missing or altered exact promotion-source exception evidence')
+    for transition in transitions:
+        actual = [item for item in row['files'] if item['path'] == transition['path']]
+        require(len(actual) == 1 and actual[0]['before'] == transition['before'] and actual[0]['after'] == transition['after'], 'Promotion-source proof is not present in the actual source overlay')
     lock = copy.deepcopy(legacy)
     lock.update({key: row[key] for key in ('name', 'version', 'assetPrefix')})
     lock.update({'publisher': 'Bogo', 'legacyName': legacy['name'], 'bogoOverlay': row})
@@ -115,6 +124,8 @@ def public_files(lock):
     extra += ['scripts/bogo_packaging.py', 'tests/test_bogo_packaging.py']
     extra += ['docs/bogo-ci-verification.md']
     extra += ['scripts/bogo_chrome_contrast.py', 'tests/test_bogo_chrome_contrast.py']
+    extra += ['scripts/bogo_release_identity.py', 'tests/test_bogo_release_identity.py', 'manifests/bogo-prior-bogo-upgrade-inputs.json']
+    extra += ['scripts/bogo_promotion_removal.py', 'tests/test_bogo_promotion_removal.py', 'scripts/bogo_promotion_four.py', 'tests/test_bogo_promotion_four.py', 'scripts/bogo_promotion_launcher_tests.py', 'tests/test_bogo_promotion_launcher_tests.py']
     extra += ['scripts/bogo_runtime_icons.py', 'tests/test_bogo_runtime_icons.py', 'scripts/bogo_ci_artifact.py', 'tests/test_bogo_ci_artifact.py', 'scripts/bogo_msi_art.py', 'tests/test_bogo_msi_art.py', '.github/workflows/bogo-windows-acceptance.yml']
     extra += ['tools/runtime-icon-reference/' + name for name in ('Cargo.toml', 'Cargo.lock', 'src/main.rs', 'reference-contract.json')]
     extra += ['tools/runtime-icon-reference/application-locks/' + app + '.Cargo.lock' for app in NAMES]

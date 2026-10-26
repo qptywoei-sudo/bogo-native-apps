@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "repository": "qptywoei-sudo/bogo-native-apps",
+  "purpose": "Exact actually published Bogo revision 1 MSI inputs for additional isolated Design/Grid revision 2+ upgrade acceptance; does not replace legacy KIO upgrade checks.",
+  "applications": [
+    {
+      "id": "design",
+      "name": "Bogo Design",
+      "version": "0.8.0-bogo.1",
+      "bundleId": "com.kio.design",
+      "releaseTag": "design-v0.8.0-bogo.1",
+      "releaseId": 424263944,
+      "publishedAtUtc": "2026-10-26T13:17:17Z",
+      "sourceCommit": "676d3653836e38b0b22f0b0e66e839fdc4dabc1e",
+      "productCode": "{DEB13BEF-5428-4ECC-95E2-32CD96588DA8}",
+      "upgradeCode": "{48194C34-8826-5C1A-9A37-764B83BD695E}",
+      "windowsProductVersion": "0.8.0",
+      "windowsMsi": {
+        "filename": "Bogo-Design-0.8.0-bogo.1-windows-x64.msi",
+        "url": "https://github.com/qptywoei-sudo/bogo-native-apps/releases/download/design-v0.8.0-bogo.1/Bogo-Design-0.8.0-bogo.1-windows-x64.msi",
+        "bytes": 56530623,
+        "sha256": "69d9eb651ed07c7d9f372d5ee9af938acc6d698927a5e500043c8e81e34efa6d",
+        "assetId": 678202765
+      }
+    },
+    {
+      "id": "grid",
+      "name": "Bogo Grid",
+      "version": "0.7.0-bogo.1",
+      "bundleId": "com.kio.grid",
+      "releaseTag": "grid-v0.7.0-bogo.1",
+      "releaseId": 424263924,
+      "publishedAtUtc": "2026-10-26T13:19:41Z",
+      "sourceCommit": "676d3653836e38b0b22f0b0e66e839fdc4dabc1e",
+      "productCode": "{4012E3CE-0F8E-49E5-A404-EEF073F92DAA}",
+      "upgradeCode": "{C670EFE0-1FE3-512C-84F0-9804B489A606}",
+      "windowsProductVersion": "0.7.0",
+      "windowsMsi": {
+        "filename": "Bogo-Grid-0.7.0-bogo.1-windows-x64.msi",
+        "url": "https://github.com/qptywoei-sudo/bogo-native-apps/releases/download/grid-v0.7.0-bogo.1/Bogo-Grid-0.7.0-bogo.1-windows-x64.msi",
+        "bytes": 14626090,
+        "sha256": "b574ea1562e9cead555c36a1bd0980a44e774d33903dcde7530e10df1fe01619",
+        "assetId": 678202660
+      }
+    }
+  ]
+}

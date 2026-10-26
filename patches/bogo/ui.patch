@@ -59334,10 +59334,10 @@ index 7d572a0a03480cc53389c0d44c9f37378498cd03..f66288f18a45f4187debfb34d8cb67b8
                      } else {
                          tr("Nothing changed since this was marked ready for dev.")
 diff --git a/crates/ui-egui/src/dialogs.rs b/crates/ui-egui/src/dialogs.rs
-index 9eb9cc2e70e4325097bedec806c46c86849ae522..91565e8c19ebf7ce57106c4aae13c9b89241bec6 100644
+index 9eb9cc2e70e4325097bedec806c46c86849ae522..5a1c30d3d09415e6a3e8d4268793f4a800ddd7f3 100644
 --- a/crates/ui-egui/src/dialogs.rs
 +++ b/crates/ui-egui/src/dialogs.rs
-@@ -82,14 +82,12 @@ fn about_body(ui: &mut egui::Ui, t: &Tokens) {
+@@ -82,21 +82,15 @@ fn about_body(ui: &mut egui::Ui, t: &Tokens) {
          ui.painter().rect_filled(r, CornerRadius::same(10), ACCENT);
          icons::paint(ui.painter(), r.shrink(10.0), Icon::Logo, Color32::WHITE);
          ui.vertical(|ui| {
@@ -59352,9 +59352,17 @@ index 9eb9cc2e70e4325097bedec806c46c86849ae522..91565e8c19ebf7ce57106c4aae13c9b8
 -    ));
 +    ui.label(tr("Independent Bogo fork of FigCraft v0.6.0 by the ArtCraft team. No upstream endorsement."));
      ui.add_space(8.0);
-     ui.hyperlink_to("Upstream FigCraft project", "https://getartcraft.com/apps/figcraft");
-     ui.hyperlink_to(tr("Upstream FigCraft community"), "https://discord.gg/artcraft");
-@@ -128,7 +126,7 @@ pub fn show(app: &mut FigApp, ctx: &Context) {
+-    ui.hyperlink_to("Upstream FigCraft project", "https://getartcraft.com/apps/figcraft");
+-    ui.hyperlink_to(tr("Upstream FigCraft community"), "https://discord.gg/artcraft");
+     ui.add_space(8.0);
+-    ui.label(
+-        RichText::new(tr("Dual-licensed MIT OR Apache-2.0. Made by the ArtCraft team and community.")).color(t.text_secondary).font(regular(11.0)),
+-    );
++    ui.label(RichText::new(tr("Dual-licensed MIT OR Apache-2.0.")).color(t.text_secondary).font(regular(11.0)));
+ }
+ 
+ /// Escape closes the topmost simple dialog (one without menus of its own), before the canvas's
+@@ -128,7 +122,7 @@ pub fn show(app: &mut FigApp, ctx: &Context) {
      let t = Tokens::get(ctx);
      if app.ui.about {
          let mut open = true;
@@ -59363,7 +59371,7 @@ index 9eb9cc2e70e4325097bedec806c46c86849ae522..91565e8c19ebf7ce57106c4aae13c9b8
              ui.set_width(ABOUT_WIDTH);
              tab_strip(ui, &t, &AboutTab::ALL, AboutTab::label, &mut app.ui.about_tab);
              ui.add_space(12.0);
-@@ -168,7 +166,7 @@ pub fn show(app: &mut FigApp, ctx: &Context) {
+@@ -168,7 +162,7 @@ pub fn show(app: &mut FigApp, ctx: &Context) {
              }
              // Where the app registers itself as the opener of invite links (Windows).
              if let Some(on) = app.session.invite_links_on() {
@@ -59372,7 +59380,7 @@ index 9eb9cc2e70e4325097bedec806c46c86849ae522..91565e8c19ebf7ce57106c4aae13c9b8
                      app.run("collab.registerLinks", json!({"on": !on}));
                  }
                  crate::widgets::label(
-@@ -194,7 +192,7 @@ pub fn show(app: &mut FigApp, ctx: &Context) {
+@@ -194,7 +188,7 @@ pub fn show(app: &mut FigApp, ctx: &Context) {
                      app.run("pref.publishServer", json!({"url": url}));
                  }
                  let usual = prefs.publish_server == figcraft_engine::live::DEFAULT_SERVER;
@@ -59394,6 +59402,19 @@ index eab0c6ee933a42216d5323a26aff823615fed051..45afe973f33918c2acf31aced544d9ac
      y += 48.0;
      for (section, icon, label) in Section::ALL {
          let r = Rect::from_min_size(pos2(left.min.x + 8.0, y), vec2(SIDEBAR - 16.0, 32.0));
+diff --git a/crates/ui-egui/src/lib.rs b/crates/ui-egui/src/lib.rs
+index 613f18f98d145df2ce4c969a30754ede192ccf47..33874ab60345a84724750f00c771cb02015b975d 100644
+--- a/crates/ui-egui/src/lib.rs
++++ b/crates/ui-egui/src/lib.rs
+@@ -717,7 +717,7 @@ impl FigApp {
+                     }
+                 }
+                 "preview.close" => self.ui.preview = None,
+-                "open.help" => self.services.open_url("https://getartcraft.com/apps/figcraft"),
++                "open.help" => self.ui.shortcuts_panel = true,
+                 "layers.collapseAll" => layers::collapse_all(self),
+                 "contextMenu" => self.ui.key_menu = true,
+                 "selectArea" => self.start_key_box(),
 diff --git a/crates/ui-egui/src/live.rs b/crates/ui-egui/src/live.rs
 index 8d16d9a0b0579789712b0e317983b3398d86f734..11119bc0133e6326994805c91c53caf288b5b05f 100644
 --- a/crates/ui-egui/src/live.rs

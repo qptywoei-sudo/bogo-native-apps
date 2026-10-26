@@ -53800,8 +53800,143 @@ z%bF&ccSM8T^9Pdc|BjTGeE;of^9D9-T7~8K2dcV-=i~)2-VPI3W|@;e2<RF~ryF}x
 zvqV`4-1`4HAwSUhsbP@h!lQ;fxqPtkWglzTY6GnFhpMlY^$lx~4fFrT|I!M8Oktv*
 X6i_5=eu44<?~mL&@3ro`Nyz^IXhO9Q
 
+diff --git a/crates/engine/src/commands/help.rs b/crates/engine/src/commands/help.rs
+index c6f315f30a1ee94c3f172486f5f74f77d3c6316d..57c9b3e3af48a7b7db11a8c6ba1cbc67737bfd2b 100644
+--- a/crates/engine/src/commands/help.rs
++++ b/crates/engine/src/commands/help.rs
+@@ -1,55 +1,12 @@
+-//! Help menu: community and project links (the frontend opens `Event::OpenUrl`).
++//! Local tutorials remain available; retired project/community links are not commands.
+ 
+-use serde_json::{Value, json};
+-
+-use super::{CommandSpec, always, str_p};
+-use crate::links;
+-use crate::{Event, Result, Session, cmd};
+-
+-fn open(s: &mut Session, url: String) -> Result<Value> {
+-    s.events.push(Event::OpenUrl(url.clone()));
+-    Ok(json!({"url": url}))
+-}
+-
+-fn sibling(s: &mut Session, p: &Value) -> Result<Value> {
+-    let slug = str_p(p, "app").unwrap_or("photocraft").to_ascii_lowercase();
+-    if str_p(p, "kind") == Some("github") { open(s, links::github_of(&slug)) } else { open(s, links::page_of(&slug)) }
+-}
+-
+-/// Help ▸ EffectCraft Help / Scripting Help / Expression Reference / Effect Reference.
+-fn docs(s: &mut Session, p: &Value) -> Result<Value> {
+-    let page = match str_p(p, "page").unwrap_or("help") {
+-        "scripting" => "docs/control-protocol.md",
+-        "expressions" => "docs/expressions.md",
+-        "effects" => "docs/effects.md",
+-        "agents" => "docs/agents.md",
+-        _ => "README.md",
+-    };
+-    open(s, format!("{}/blob/main/{page}", links::GITHUB))
+-}
++use super::{CommandSpec, always};
++use crate::cmd;
+ 
+ pub fn specs() -> Vec<CommandSpec> {
+-    vec![
+-        cmd!("help.docs", "EffectCraft Help...", [], Some("F1"), "{page?: help|scripting|expressions|effects|agents}", always, docs),
+-        cmd!("help.discord", "Join the ArtCraft Discord...", ["Help"], None, "{}", always, |s, _| open(s, links::DISCORD.into())),
+-        cmd!("help.website", "ArtCraft Website", ["Help"], None, "{}", always, |s, _| open(s, links::WEBSITE.into())),
+-        cmd!("help.appPage", "EffectCraft Home Page", ["Help"], None, "{}", always, |s, _| open(s, links::APP_PAGE.into())),
+-        cmd!("help.github", "EffectCraft on GitHub", ["Help"], None, "{}", always, |s, _| open(s, links::GITHUB.into())),
+-        cmd!("help.onlineTutorials", "Online Tutorials...", ["Help"], None, "{}", always, |s, _| open(s, links::APP_PAGE.into())),
+-        cmd!("help.inAppTutorials", "In-App Tutorials...", ["Help"], None, "{} → the Home screen's Learn tab", always, |s, p| super::frontend(
+-            s,
+-            "help.inAppTutorials",
+-            p
+-        )),
+-        cmd!("help.reportIssue", "Provide Feedback...", ["Help"], None, "{}", always, |s, _| open(s, links::ISSUES.into())),
+-        cmd!(
+-            "help.sibling",
+-            "Other ArtCraft Apps",
+-            [],
+-            None,
+-            "{app: photocraft|vectorcraft|filmcraft|lightcraft|pdfcraft|designcraft, kind?: page|github}",
+-            always,
+-            sibling
+-        ),
+-    ]
++    vec![cmd!("help.inAppTutorials", "In-App Tutorials...", ["Help"], None, "{} → the Home screen's Learn tab", always, |s, p| super::frontend(
++        s,
++        "help.inAppTutorials",
++        p
++    ))]
+ }
+diff --git a/crates/engine/src/menus.rs b/crates/engine/src/menus.rs
+index bc486a0c599ec8a45e62724a57c4f6eaf9e0e406..231c27289e7d3ece41e9e06615f0ddee7015bd10 100644
+--- a/crates/engine/src/menus.rs
++++ b/crates/engine/src/menus.rs
+@@ -1230,26 +1230,16 @@ Window
+   VR Comp Editor | window.panel {"panel":"vrCompEditor"}
+   @dynamic:scriptPanels
+ Help
+-  EffectCraft Help... | help.docs {"page":"help"} | F1
+-  Scripting Help... | help.docs {"page":"scripting"}
+-  Expression Reference... | help.docs {"page":"expressions"}
+-  Effect Reference... | help.docs {"page":"effects"}
+   Animation Presets... | anim.browsePresets
+   Keyboard Shortcuts... | app.keyboardShortcuts
+   ---
+   In-App Tutorials... | help.inAppTutorials
+-  Online Tutorials... | help.onlineTutorials
+   ---
+   System Compatibility Report... | help.systemReport
+   Enable Logging | help.enableLogging
+   Reveal Logging File | help.revealLogFile
+   ---
+-  Join the ArtCraft Discord... | help.discord
+-  Provide Feedback... | help.reportIssue
+   ---
+-  ArtCraft Website | help.website
+-  EffectCraft Home Page | help.appPage
+-  EffectCraft on GitHub | help.github
+   Open Demo Project | file.openDemoProject
+   [!mac] ---
+   [!mac] About EffectCraft... | app.about
+diff --git a/crates/engine/src/tests.rs b/crates/engine/src/tests.rs
+index 72133c5d6f36300202298a1d4b22e05d9cbe2df1..bdb7f0b165594b5554d117529327e1edff10b8c4 100644
+--- a/crates/engine/src/tests.rs
++++ b/crates/engine/src/tests.rs
+@@ -379,10 +379,10 @@ fn save_and_open_roundtrip() {
+ #[test]
+ fn help_links_emit_urls() {
+     let mut s = Session::default();
+-    let r = s.execute("help.discord", json!({})).unwrap();
+-    assert_eq!(r["url"], "https://discord.gg/artcraft");
+-    assert!(s.drain_events().iter().any(|e| matches!(e, crate::Event::OpenUrl(u) if u.contains("discord"))));
+-    assert_eq!(s.execute("help.github", json!({})).unwrap()["url"], "https://github.com/storytold/effectcraft");
++    for id in ["help.discord", "help.github", "help.website", "help.appPage", "help.reportIssue", "help.sibling", "help.docs", "help.onlineTutorials"] {
++        assert!(s.execute(id, json!({})).is_err(), "{id}");
++    }
++    assert!(!s.drain_events().iter().any(|event| matches!(event, crate::Event::OpenUrl(_))));
+ }
+ 
+ #[test]
+diff --git a/crates/engine/src/tests_m137.rs b/crates/engine/src/tests_m137.rs
+index 3f4f3dbb01438dfea4014d441eec453dd2d0e5ef..125f73488cbb39033067055467ad07fbb0f489ec 100644
+--- a/crates/engine/src/tests_m137.rs
++++ b/crates/engine/src/tests_m137.rs
+@@ -71,10 +71,10 @@ fn vanishing_point_import_is_disabled_with_a_reason() {
+ fn help_tutorials() {
+     let mut s = Session::default();
+     s.drain_events();
+-    s.execute("help.onlineTutorials", json!({})).unwrap();
++    assert!(s.execute("help.onlineTutorials", json!({})).is_err());
+     s.execute("help.inAppTutorials", json!({})).unwrap();
+     let ev = s.drain_events();
+-    assert!(ev.iter().any(|e| matches!(e, Event::OpenUrl(u) if u == crate::links::APP_PAGE)));
++    assert!(!ev.iter().any(|e| matches!(e, Event::OpenUrl(_))));
+     assert!(ev.iter().any(|e| matches!(e, Event::Frontend { command, .. } if command == "help.inAppTutorials")));
+ }
+ 
 diff --git a/crates/ui-egui/src/header.rs b/crates/ui-egui/src/header.rs
-index a8516468497435ca81a5dd4ae28146b50cbd7435..5c13033e483b0d8fd756f42174946f76209ed04c 100644
+index a8516468497435ca81a5dd4ae28146b50cbd7435..721f423f1a8f03593196601519165cbebd79ee9c 100644
 --- a/crates/ui-egui/src/header.rs
 +++ b/crates/ui-egui/src/header.rs
 @@ -27,9 +27,9 @@ pub fn show(app: &mut EffectcraftApp, ui: &mut egui::Ui, rect: Rect) {
@@ -53816,16 +53951,38 @@ index a8516468497435ca81a5dd4ae28146b50cbd7435..5c13033e483b0d8fd756f42174946f76
          app.dialog = Some(Dialog::About);
      }
      x += 32.0;
-@@ -199,7 +199,7 @@ pub fn show(app: &mut EffectcraftApp, ui: &mut egui::Ui, rect: Rect) {
-     }
-     rx = discord.min.x - 6.0;
-     for (id, icon, tip, cmd) in
+@@ -184,30 +184,6 @@ pub fn show(app: &mut EffectcraftApp, ui: &mut egui::Ui, rect: Rect) {
+ 
+     // Right side: community buttons, workspaces.
+     let mut rx = rect.max.x - 10.0;
+-    // The pill fits its label (icon, gap, text) with even padding: it was a fixed 104 px with the
+-    // text at its left, which left a wide gap on the right (#581).
+-    let label = p.layout_no_wrap(tr("Discord").to_string(), Tokens::semibold(12.0), Color32::WHITE);
+-    let discord = Rect::from_min_max(pos2(rx - (10.0 + 14.0 + 6.0 + label.size().x + 12.0), cy - 13.0), pos2(rx, cy + 13.0));
+-    let dresp = ui.interact(discord, egui::Id::new("hdr-discord"), Sense::click());
+-    let dc = Color32::from_rgb(0x58, 0x65, 0xf2);
+-    p.rect_filled(discord, 13.0, if dresp.hovered() { dc.gamma_multiply(1.2) } else { dc });
+-    icons::paint(&p, Rect::from_center_size(pos2(discord.min.x + 17.0, cy), vec2(14.0, 14.0)), Icon::Chat, Color32::WHITE);
+-    p.galley(pos2(discord.min.x + 30.0, cy - label.size().y / 2.0), label, Color32::WHITE);
+-    app.auto.add("header.discord", discord, "Upstream EffectCraft community");
+-    if dresp.on_hover_text(tr("Upstream EffectCraft community")).clicked() {
+-        let _ = app.session.execute("help.discord", json!({}));
+-    }
+-    rx = discord.min.x - 6.0;
+-    for (id, icon, tip, cmd) in
 -        [("hdr-github", Icon::Code, "KIO Effect on GitHub", "help.github"), ("hdr-web", Icon::Globe, "KIO Effect on getartcraft.com", "help.appPage")]
-+        [("hdr-github", Icon::Code, "Bogo Effect on GitHub", "help.github"), ("hdr-web", Icon::Globe, "Bogo Effect on getartcraft.com", "help.appPage")]
-     {
-         let r = Rect::from_min_max(pos2(rx - 26.0, cy - 13.0), pos2(rx, cy + 13.0));
-         if widgets::icon_button(ui, r, icon, false, &t, egui::Id::new(id)).on_hover_text(tip).clicked() {
-@@ -283,15 +283,18 @@ pub fn show(app: &mut EffectcraftApp, ui: &mut egui::Ui, rect: Rect) {
+-    {
+-        let r = Rect::from_min_max(pos2(rx - 26.0, cy - 13.0), pos2(rx, cy + 13.0));
+-        if widgets::icon_button(ui, r, icon, false, &t, egui::Id::new(id)).on_hover_text(tip).clicked() {
+-            let _ = app.session.execute(cmd, json!({}));
+-        }
+-        app.auto.add(&format!("header.{}", &id[4..]), r, tip);
+-        rx = r.min.x - 4.0;
+-    }
+     // Appearance: Sync with System, Light, Dark (a monitor, sun or moon), one click to the next.
+     let (icon, mode) = match app.session.prefs.appearance.appearance_mode.as_str() {
+         "auto" => (Icon::Monitor, tr("Sync with System")),
+@@ -283,15 +259,18 @@ pub fn show(app: &mut EffectcraftApp, ui: &mut egui::Ui, rect: Rect) {
          let active = app.ui.workspace == name;
          let resp = ui.interact(r, egui::Id::new(("ws", name)), Sense::click());
          let col = if active {
@@ -53847,7 +54004,7 @@ index a8516468497435ca81a5dd4ae28146b50cbd7435..5c13033e483b0d8fd756f42174946f76
          app.auto.add(&format!("header.workspace.{name}"), r, name);
          if resp.clicked() {
 diff --git a/crates/ui-egui/src/i18n.rs b/crates/ui-egui/src/i18n.rs
-index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad2092137b21e6cd 100644
+index 9d78b793864d4b65aff9899aac086c18fc236881..dda96d63b1984bce68a1098cf46653e53266b13c 100644
 --- a/crates/ui-egui/src/i18n.rs
 +++ b/crates/ui-egui/src/i18n.rs
 @@ -278,8 +278,8 @@ pub(crate) fn submenu(app: &EffectcraftApp, source: &str, shown: String) -> Stri
@@ -53883,7 +54040,7 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("file.importPlaceholder", "Placeholder...", "占位符..."),
      ("file.importSolid", "Solid...", "纯色..."),
      ("file.importLottie", "Lottie...", "Lottie..."),
-@@ -889,7 +889,7 @@ const SIMPLIFIED_CHINESE: &[(&str, &str, &str)] = &[
+@@ -889,22 +889,16 @@ const SIMPLIFIED_CHINESE: &[(&str, &str, &str)] = &[
      ("window.panel", "Create Nulls From Paths", "从路径创建空对象"),
      ("window.panel", "VR Comp Editor", "VR 合成编辑器"),
      ("", "Help", "帮助"),
@@ -53892,18 +54049,22 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("help.docs", "Scripting Help...", "脚本帮助..."),
      ("help.docs", "Expression Reference...", "表达式引用..."),
      ("help.docs", "Effect Reference...", "效果参考..."),
-@@ -903,8 +903,8 @@ const SIMPLIFIED_CHINESE: &[(&str, &str, &str)] = &[
-     ("help.discord", "Join the ArtCraft Discord...", "加入 ArtCraft 的 Discord 社区..."),
-     ("help.reportIssue", "Provide Feedback...", "提供反馈..."),
-     ("help.website", "ArtCraft Website", "ArtCraft 网站"),
+     ("anim.browsePresets", "Animation Presets...", "动画预设..."),
+     ("app.keyboardShortcuts", "Keyboard Shortcuts...", "键盘快捷键..."),
+     ("help.inAppTutorials", "In-App Tutorials...", "应用内教程..."),
+-    ("help.onlineTutorials", "Online Tutorials...", "在线教程..."),
+     ("help.systemReport", "System Compatibility Report...", "系统兼容性报告..."),
+     ("help.enableLogging", "Enable Logging", "启用日志记录"),
+     ("help.revealLogFile", "Reveal Logging File", "显示日志记录文件"),
+-    ("help.discord", "Join the ArtCraft Discord...", "加入 ArtCraft 的 Discord 社区..."),
+-    ("help.reportIssue", "Provide Feedback...", "提供反馈..."),
+-    ("help.website", "ArtCraft Website", "ArtCraft 网站"),
 -    ("help.appPage", "KIO Effect Home Page", "KIO Effect 主页"),
 -    ("help.github", "KIO Effect on GitHub", "GitHub 上的 KIO Effect"),
-+    ("help.appPage", "Bogo Effect Home Page", "Bogo Effect 主页"),
-+    ("help.github", "Bogo Effect on GitHub", "GitHub 上的 Bogo Effect"),
      ("file.openDemoProject", "Open Demo Project", "打开示例项目"),
  ];
  
-@@ -912,8 +912,8 @@ const SIMPLIFIED_CHINESE: &[(&str, &str, &str)] = &[
+@@ -912,8 +906,8 @@ const SIMPLIFIED_CHINESE: &[(&str, &str, &str)] = &[
  /// entry per fixed menu row of the engine's menu tree, mirroring `SIMPLIFIED_CHINESE` in the
  /// vocabulary the sibling Craft apps' zh-hant catalogs use.
  const TRADITIONAL_CHINESE: &[(&str, &str, &str)] = &[
@@ -53914,7 +54075,7 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("", "Settings...", "設定..."),
      ("app.settings", "General...", "一般..."),
      ("app.settings", "Startup & Repair...", "啟動和修復..."),
-@@ -932,10 +932,10 @@ const TRADITIONAL_CHINESE: &[(&str, &str, &str)] = &[
+@@ -932,10 +926,10 @@ const TRADITIONAL_CHINESE: &[(&str, &str, &str)] = &[
      ("app.settings", "Video...", "視訊..."),
      ("app.settings", "3D...", "3D..."),
      ("app.settings", "Scripting & Expressions...", "指令碼和運算式..."),
@@ -53927,7 +54088,7 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("", "File", "檔案"),
      ("", "New", "新增"),
      ("file.newProject", "New Project", "新增專案"),
-@@ -958,7 +958,7 @@ const TRADITIONAL_CHINESE: &[(&str, &str, &str)] = &[
+@@ -958,7 +952,7 @@ const TRADITIONAL_CHINESE: &[(&str, &str, &str)] = &[
      ("file.import", "File...", "檔案..."),
      ("file.importMultiple", "Multiple Files...", "多個檔案..."),
      ("file.importTimeline", "Adobe Premiere Pro Project...", "Adobe Premiere Pro 專案..."),
@@ -53936,7 +54097,7 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("file.importPlaceholder", "Placeholder...", "預留位置..."),
      ("file.importSolid", "Solid...", "純色..."),
      ("file.importLottie", "Lottie...", "Lottie..."),
-@@ -1523,7 +1523,7 @@ const TRADITIONAL_CHINESE: &[(&str, &str, &str)] = &[
+@@ -1523,28 +1517,22 @@ const TRADITIONAL_CHINESE: &[(&str, &str, &str)] = &[
      ("window.panel", "Create Nulls From Paths", "從路徑建立空物件"),
      ("window.panel", "VR Comp Editor", "VR 合成編輯器"),
      ("", "Help", "說明"),
@@ -53945,14 +54106,18 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("help.docs", "Scripting Help...", "指令碼說明..."),
      ("help.docs", "Expression Reference...", "運算式參考..."),
      ("help.docs", "Effect Reference...", "效果參考..."),
-@@ -1537,14 +1537,14 @@ const TRADITIONAL_CHINESE: &[(&str, &str, &str)] = &[
-     ("help.discord", "Join the ArtCraft Discord...", "加入 ArtCraft 的 Discord 社群..."),
-     ("help.reportIssue", "Provide Feedback...", "提供意見..."),
-     ("help.website", "ArtCraft Website", "ArtCraft 網站"),
+     ("anim.browsePresets", "Animation Presets...", "動畫預設集..."),
+     ("app.keyboardShortcuts", "Keyboard Shortcuts...", "鍵盤快速鍵..."),
+     ("help.inAppTutorials", "In-App Tutorials...", "應用程式內教學課程..."),
+-    ("help.onlineTutorials", "Online Tutorials...", "線上教學課程..."),
+     ("help.systemReport", "System Compatibility Report...", "系統相容性報告..."),
+     ("help.enableLogging", "Enable Logging", "啟用日誌記錄"),
+     ("help.revealLogFile", "Reveal Logging File", "顯示日誌檔案"),
+-    ("help.discord", "Join the ArtCraft Discord...", "加入 ArtCraft 的 Discord 社群..."),
+-    ("help.reportIssue", "Provide Feedback...", "提供意見..."),
+-    ("help.website", "ArtCraft Website", "ArtCraft 網站"),
 -    ("help.appPage", "KIO Effect Home Page", "KIO Effect 首頁"),
 -    ("help.github", "KIO Effect on GitHub", "GitHub 上的 KIO Effect"),
-+    ("help.appPage", "Bogo Effect Home Page", "Bogo Effect 首頁"),
-+    ("help.github", "Bogo Effect on GitHub", "GitHub 上的 Bogo Effect"),
      ("file.openDemoProject", "Open Demo Project", "開啟範例專案"),
  ];
  
@@ -53964,7 +54129,7 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("", "Settings...", "設定..."),
      ("app.settings", "General...", "一般..."),
      ("app.settings", "Startup & Repair...", "起動と修復..."),
-@@ -1563,10 +1563,10 @@ const JAPANESE: &[(&str, &str, &str)] = &[
+@@ -1563,10 +1551,10 @@ const JAPANESE: &[(&str, &str, &str)] = &[
      ("app.settings", "Video...", "ビデオ..."),
      ("app.settings", "3D...", "3D..."),
      ("app.settings", "Scripting & Expressions...", "スクリプトとエクスプレッション..."),
@@ -53977,7 +54142,7 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("", "File", "ファイル"),
      ("", "New", "新規"),
      ("file.newProject", "New Project", "新規プロジェクト"),
-@@ -1592,7 +1592,7 @@ const JAPANESE: &[(&str, &str, &str)] = &[
+@@ -1592,7 +1580,7 @@ const JAPANESE: &[(&str, &str, &str)] = &[
      ("file.importPlaceholder", "Placeholder...", "プレースホルダー..."),
      ("file.importSolid", "Solid...", "平面..."),
      ("file.importLottie", "Lottie...", "Lottie..."),
@@ -53986,7 +54151,7 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("file.importVanishingPoint", "Vanishing Point (.vpe)...", "Vanishing Point (.vpe)..."),
      ("essential.importTemplate", "Essential Graphics Template...", "エッセンシャルグラフィックステンプレート..."),
      ("", "Import Recent Footage", "最近使用したフッテージを読み込み"),
-@@ -2154,7 +2154,7 @@ const JAPANESE: &[(&str, &str, &str)] = &[
+@@ -2154,22 +2142,16 @@ const JAPANESE: &[(&str, &str, &str)] = &[
      ("window.panel", "Create Nulls From Paths", "パスからヌルを作成"),
      ("window.panel", "VR Comp Editor", "VRコンポジションエディター"),
      ("", "Help", "ヘルプ"),
@@ -53995,18 +54160,22 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("help.docs", "Scripting Help...", "スクリプトヘルプ..."),
      ("help.docs", "Expression Reference...", "エクスプレッションリファレンス..."),
      ("help.docs", "Effect Reference...", "エフェクトリファレンス..."),
-@@ -2168,8 +2168,8 @@ const JAPANESE: &[(&str, &str, &str)] = &[
-     ("help.discord", "Join the ArtCraft Discord...", "ArtCraft Discordに参加..."),
-     ("help.reportIssue", "Provide Feedback...", "フィードバックを送信..."),
-     ("help.website", "ArtCraft Website", "ArtCraftウェブサイト"),
+     ("anim.browsePresets", "Animation Presets...", "アニメーションプリセット..."),
+     ("app.keyboardShortcuts", "Keyboard Shortcuts...", "キーボードショートカット..."),
+     ("help.inAppTutorials", "In-App Tutorials...", "アプリ内チュートリアル..."),
+-    ("help.onlineTutorials", "Online Tutorials...", "オンラインチュートリアル..."),
+     ("help.systemReport", "System Compatibility Report...", "システム互換性レポート..."),
+     ("help.enableLogging", "Enable Logging", "ログ記録を有効化"),
+     ("help.revealLogFile", "Reveal Logging File", "ログファイルを表示"),
+-    ("help.discord", "Join the ArtCraft Discord...", "ArtCraft Discordに参加..."),
+-    ("help.reportIssue", "Provide Feedback...", "フィードバックを送信..."),
+-    ("help.website", "ArtCraft Website", "ArtCraftウェブサイト"),
 -    ("help.appPage", "KIO Effect Home Page", "KIO Effectホームページ"),
 -    ("help.github", "KIO Effect on GitHub", "GitHubのKIO Effect"),
-+    ("help.appPage", "Bogo Effect Home Page", "Bogo Effectホームページ"),
-+    ("help.github", "Bogo Effect on GitHub", "GitHubのBogo Effect"),
      ("file.openDemoProject", "Open Demo Project", "デモプロジェクトを開く"),
  ];
  
-@@ -2177,8 +2177,8 @@ const JAPANESE: &[(&str, &str, &str)] = &[
+@@ -2177,8 +2159,8 @@ const JAPANESE: &[(&str, &str, &str)] = &[
  /// Ukrainian motion-graphics vocabulary. Product names and technical identifiers stay verbatim.
  /// The (command, source) keys match the other catalogs; no proprietary localization was used.
  const UKRAINIAN: &[(&str, &str, &str)] = &[
@@ -54017,7 +54186,7 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("", "Settings...", "Налаштування..."),
      ("app.settings", "General...", "Загальні..."),
      ("app.settings", "Startup & Repair...", "Запуск і відновлення..."),
-@@ -2197,10 +2197,10 @@ const UKRAINIAN: &[(&str, &str, &str)] = &[
+@@ -2197,10 +2179,10 @@ const UKRAINIAN: &[(&str, &str, &str)] = &[
      ("app.settings", "Video...", "Відео..."),
      ("app.settings", "3D...", "3D..."),
      ("app.settings", "Scripting & Expressions...", "Скрипти та вирази..."),
@@ -54030,7 +54199,7 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("", "File", "Файл"),
      ("", "New", "Створити"),
      ("file.newProject", "New Project", "Новий проєкт"),
-@@ -2223,7 +2223,7 @@ const UKRAINIAN: &[(&str, &str, &str)] = &[
+@@ -2223,7 +2205,7 @@ const UKRAINIAN: &[(&str, &str, &str)] = &[
      ("file.import", "File...", "Файл..."),
      ("file.importMultiple", "Multiple Files...", "Кілька файлів..."),
      ("file.importTimeline", "Adobe Premiere Pro Project...", "Проєкт Adobe Premiere Pro..."),
@@ -54039,7 +54208,7 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("file.importPlaceholder", "Placeholder...", "Заповнювач..."),
      ("file.importSolid", "Solid...", "Суцільний колір..."),
      ("file.importLottie", "Lottie...", "Lottie..."),
-@@ -2788,7 +2788,7 @@ const UKRAINIAN: &[(&str, &str, &str)] = &[
+@@ -2788,22 +2770,16 @@ const UKRAINIAN: &[(&str, &str, &str)] = &[
      ("window.panel", "Create Nulls From Paths", "Створення нульових об’єктів із контурів"),
      ("window.panel", "VR Comp Editor", "Редактор композицій VR"),
      ("", "Help", "Довідка"),
@@ -54048,18 +54217,22 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("help.docs", "Scripting Help...", "Довідка зі скриптів..."),
      ("help.docs", "Expression Reference...", "Довідник виразів..."),
      ("help.docs", "Effect Reference...", "Довідник ефектів..."),
-@@ -2802,8 +2802,8 @@ const UKRAINIAN: &[(&str, &str, &str)] = &[
-     ("help.discord", "Join the ArtCraft Discord...", "Приєднатися до Discord ArtCraft..."),
-     ("help.reportIssue", "Provide Feedback...", "Надіслати відгук..."),
-     ("help.website", "ArtCraft Website", "Вебсайт ArtCraft"),
+     ("anim.browsePresets", "Animation Presets...", "Набори анімації..."),
+     ("app.keyboardShortcuts", "Keyboard Shortcuts...", "Клавіатурні скорочення..."),
+     ("help.inAppTutorials", "In-App Tutorials...", "Уроки в програмі..."),
+-    ("help.onlineTutorials", "Online Tutorials...", "Онлайн-уроки..."),
+     ("help.systemReport", "System Compatibility Report...", "Звіт про сумісність системи..."),
+     ("help.enableLogging", "Enable Logging", "Увімкнути журналювання"),
+     ("help.revealLogFile", "Reveal Logging File", "Показати файл журналу"),
+-    ("help.discord", "Join the ArtCraft Discord...", "Приєднатися до Discord ArtCraft..."),
+-    ("help.reportIssue", "Provide Feedback...", "Надіслати відгук..."),
+-    ("help.website", "ArtCraft Website", "Вебсайт ArtCraft"),
 -    ("help.appPage", "KIO Effect Home Page", "Домашня сторінка KIO Effect"),
 -    ("help.github", "KIO Effect on GitHub", "KIO Effect на GitHub"),
-+    ("help.appPage", "Bogo Effect Home Page", "Домашня сторінка Bogo Effect"),
-+    ("help.github", "Bogo Effect on GitHub", "Bogo Effect на GitHub"),
      ("file.openDemoProject", "Open Demo Project", "Відкрити демонстраційний проєкт"),
  ];
  
-@@ -2812,8 +2812,8 @@ const UKRAINIAN: &[(&str, &str, &str)] = &[
+@@ -2812,8 +2788,8 @@ const UKRAINIAN: &[(&str, &str, &str)] = &[
  /// Wording follows Adobe's Spanish After Effects documentation (helpx.adobe.com/es) where it
  /// names the feature, and macOS Spanish for the app menu.
  const SPANISH: &[(&str, &str, &str)] = &[
@@ -54070,7 +54243,7 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("", "Settings...", "Ajustes..."),
      ("app.settings", "General...", "General..."),
      ("app.settings", "Startup & Repair...", "Inicio y reparación..."),
-@@ -2832,10 +2832,10 @@ const SPANISH: &[(&str, &str, &str)] = &[
+@@ -2832,10 +2808,10 @@ const SPANISH: &[(&str, &str, &str)] = &[
      ("app.settings", "Video...", "Vídeo..."),
      ("app.settings", "3D...", "3D..."),
      ("app.settings", "Scripting & Expressions...", "Scripts y expresiones..."),
@@ -54083,7 +54256,7 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("", "File", "Archivo"),
      ("", "New", "Nuevo"),
      ("file.newProject", "New Project", "Nuevo proyecto"),
-@@ -2858,7 +2858,7 @@ const SPANISH: &[(&str, &str, &str)] = &[
+@@ -2858,7 +2834,7 @@ const SPANISH: &[(&str, &str, &str)] = &[
      ("file.import", "File...", "Archivo..."),
      ("file.importMultiple", "Multiple Files...", "Varios archivos..."),
      ("file.importTimeline", "Adobe Premiere Pro Project...", "Proyecto de Adobe Premiere Pro..."),
@@ -54092,7 +54265,7 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("file.importPlaceholder", "Placeholder...", "Marcador de posición..."),
      ("file.importSolid", "Solid...", "Sólido..."),
      ("file.importLottie", "Lottie...", "Lottie..."),
-@@ -3423,7 +3423,7 @@ const SPANISH: &[(&str, &str, &str)] = &[
+@@ -3423,30 +3399,24 @@ const SPANISH: &[(&str, &str, &str)] = &[
      ("window.panel", "Create Nulls From Paths", "Crear nulos a partir de trazados"),
      ("window.panel", "VR Comp Editor", "Editor de composición de RV"),
      ("", "Help", "Ayuda"),
@@ -54101,14 +54274,18 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("help.docs", "Scripting Help...", "Ayuda de scripts..."),
      ("help.docs", "Expression Reference...", "Referencia de expresiones..."),
      ("help.docs", "Effect Reference...", "Referencia de efectos..."),
-@@ -3437,16 +3437,16 @@ const SPANISH: &[(&str, &str, &str)] = &[
-     ("help.discord", "Join the ArtCraft Discord...", "Unirse al Discord de ArtCraft..."),
-     ("help.reportIssue", "Provide Feedback...", "Enviar comentarios..."),
-     ("help.website", "ArtCraft Website", "Sitio web de ArtCraft"),
+     ("anim.browsePresets", "Animation Presets...", "Ajustes preestablecidos de animación..."),
+     ("app.keyboardShortcuts", "Keyboard Shortcuts...", "Métodos abreviados de teclado..."),
+     ("help.inAppTutorials", "In-App Tutorials...", "Tutoriales en la aplicación..."),
+-    ("help.onlineTutorials", "Online Tutorials...", "Tutoriales en línea..."),
+     ("help.systemReport", "System Compatibility Report...", "Informe de compatibilidad del sistema..."),
+     ("help.enableLogging", "Enable Logging", "Habilitar registro"),
+     ("help.revealLogFile", "Reveal Logging File", "Mostrar archivo de registro"),
+-    ("help.discord", "Join the ArtCraft Discord...", "Unirse al Discord de ArtCraft..."),
+-    ("help.reportIssue", "Provide Feedback...", "Enviar comentarios..."),
+-    ("help.website", "ArtCraft Website", "Sitio web de ArtCraft"),
 -    ("help.appPage", "KIO Effect Home Page", "Página de inicio de KIO Effect"),
 -    ("help.github", "KIO Effect on GitHub", "KIO Effect en GitHub"),
-+    ("help.appPage", "Bogo Effect Home Page", "Página de inicio de Bogo Effect"),
-+    ("help.github", "Bogo Effect on GitHub", "Bogo Effect en GitHub"),
      ("file.openDemoProject", "Open Demo Project", "Abrir proyecto de demostración"),
  ];
  
@@ -54122,7 +54299,7 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("", "Settings...", "Configurações..."),
      ("app.settings", "General...", "Geral..."),
      ("app.settings", "Startup & Repair...", "Inicialização e reparo..."),
-@@ -3465,10 +3465,10 @@ const PORTUGUESE: &[(&str, &str, &str)] = &[
+@@ -3465,10 +3435,10 @@ const PORTUGUESE: &[(&str, &str, &str)] = &[
      ("app.settings", "Video...", "Vídeo..."),
      ("app.settings", "3D...", "3D..."),
      ("app.settings", "Scripting & Expressions...", "Scripts e expressões..."),
@@ -54135,7 +54312,7 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("", "File", "Arquivo"),
      ("", "New", "Novo"),
      ("file.newProject", "New Project", "Novo projeto"),
-@@ -3491,7 +3491,7 @@ const PORTUGUESE: &[(&str, &str, &str)] = &[
+@@ -3491,7 +3461,7 @@ const PORTUGUESE: &[(&str, &str, &str)] = &[
      ("file.import", "File...", "Arquivo..."),
      ("file.importMultiple", "Multiple Files...", "Vários arquivos..."),
      ("file.importTimeline", "Adobe Premiere Pro Project...", "Projeto do Adobe Premiere Pro..."),
@@ -54144,7 +54321,7 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("file.importPlaceholder", "Placeholder...", "Espaço reservado..."),
      ("file.importSolid", "Solid...", "Sólido..."),
      ("file.importLottie", "Lottie...", "Lottie..."),
-@@ -4056,7 +4056,7 @@ const PORTUGUESE: &[(&str, &str, &str)] = &[
+@@ -4056,22 +4026,16 @@ const PORTUGUESE: &[(&str, &str, &str)] = &[
      ("window.panel", "Create Nulls From Paths", "Criar nulls a partir de caminhos"),
      ("window.panel", "VR Comp Editor", "Editor de composição VR"),
      ("", "Help", "Ajuda"),
@@ -54153,18 +54330,22 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("help.docs", "Scripting Help...", "Ajuda de scripting..."),
      ("help.docs", "Expression Reference...", "Referência de expressões..."),
      ("help.docs", "Effect Reference...", "Referência de efeitos..."),
-@@ -4070,8 +4070,8 @@ const PORTUGUESE: &[(&str, &str, &str)] = &[
-     ("help.discord", "Join the ArtCraft Discord...", "Entrar no Discord do ArtCraft..."),
-     ("help.reportIssue", "Provide Feedback...", "Enviar comentários..."),
-     ("help.website", "ArtCraft Website", "Site do ArtCraft"),
+     ("anim.browsePresets", "Animation Presets...", "Predefinições de animação..."),
+     ("app.keyboardShortcuts", "Keyboard Shortcuts...", "Atalhos de teclado..."),
+     ("help.inAppTutorials", "In-App Tutorials...", "Tutoriais no aplicativo..."),
+-    ("help.onlineTutorials", "Online Tutorials...", "Tutoriais online..."),
+     ("help.systemReport", "System Compatibility Report...", "Relatório de compatibilidade do sistema..."),
+     ("help.enableLogging", "Enable Logging", "Ativar registro em log"),
+     ("help.revealLogFile", "Reveal Logging File", "Revelar arquivo de log"),
+-    ("help.discord", "Join the ArtCraft Discord...", "Entrar no Discord do ArtCraft..."),
+-    ("help.reportIssue", "Provide Feedback...", "Enviar comentários..."),
+-    ("help.website", "ArtCraft Website", "Site do ArtCraft"),
 -    ("help.appPage", "KIO Effect Home Page", "Página inicial do KIO Effect"),
 -    ("help.github", "KIO Effect on GitHub", "KIO Effect no GitHub"),
-+    ("help.appPage", "Bogo Effect Home Page", "Página inicial do Bogo Effect"),
-+    ("help.github", "Bogo Effect on GitHub", "Bogo Effect no GitHub"),
      ("file.openDemoProject", "Open Demo Project", "Abrir projeto de demonstração"),
  ];
  
-@@ -4086,8 +4086,8 @@ const RUSSIAN: &[(&str, &str, &str)] = &[
+@@ -4086,8 +4050,8 @@ const RUSSIAN: &[(&str, &str, &str)] = &[
      ("", "Side", "Боковая грань"),
      ("", "Back", "Задняя грань"),
      ("layer.addTextAnimator", "Color", "Цвет"),
@@ -54175,7 +54356,7 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("", "Settings...", "Настройки..."),
      ("app.settings", "General...", "Общие..."),
      ("app.settings", "Startup & Repair...", "Запуск и восстановление..."),
-@@ -4106,10 +4106,10 @@ const RUSSIAN: &[(&str, &str, &str)] = &[
+@@ -4106,10 +4070,10 @@ const RUSSIAN: &[(&str, &str, &str)] = &[
      ("app.settings", "Video...", "Видео..."),
      ("app.settings", "3D...", "3D..."),
      ("app.settings", "Scripting & Expressions...", "Скрипты и выражения..."),
@@ -54188,7 +54369,7 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("", "File", "Файл"),
      ("", "New", "Создать"),
      ("file.newProject", "New Project", "Новый проект"),
-@@ -4132,7 +4132,7 @@ const RUSSIAN: &[(&str, &str, &str)] = &[
+@@ -4132,7 +4096,7 @@ const RUSSIAN: &[(&str, &str, &str)] = &[
      ("file.import", "File...", "Файл..."),
      ("file.importMultiple", "Multiple Files...", "Несколько файлов..."),
      ("file.importTimeline", "Adobe Premiere Pro Project...", "Проект Adobe Premiere Pro..."),
@@ -54197,7 +54378,7 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("file.importPlaceholder", "Placeholder...", "Заполнитель..."),
      ("file.importSolid", "Solid...", "Сплошной цвет..."),
      ("file.importLottie", "Lottie...", "Lottie..."),
-@@ -4691,7 +4691,7 @@ const RUSSIAN: &[(&str, &str, &str)] = &[
+@@ -4691,22 +4655,16 @@ const RUSSIAN: &[(&str, &str, &str)] = &[
      ("window.panel", "Create Nulls From Paths", "Создание нулевых объектов из контуров"),
      ("window.panel", "VR Comp Editor", "Редактор VR-композиций"),
      ("", "Help", "Справка"),
@@ -54206,18 +54387,22 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("help.docs", "Scripting Help...", "Справка по скриптам..."),
      ("help.docs", "Expression Reference...", "Справочник по выражениям..."),
      ("help.docs", "Effect Reference...", "Справочник по эффектам..."),
-@@ -4705,8 +4705,8 @@ const RUSSIAN: &[(&str, &str, &str)] = &[
-     ("help.discord", "Join the ArtCraft Discord...", "Присоединяйтесь к Discord ArtCraft..."),
-     ("help.reportIssue", "Provide Feedback...", "Оставить отзыв..."),
-     ("help.website", "ArtCraft Website", "Сайт ArtCraft"),
+     ("anim.browsePresets", "Animation Presets...", "Заготовки анимации..."),
+     ("app.keyboardShortcuts", "Keyboard Shortcuts...", "Сочетания клавиш..."),
+     ("help.inAppTutorials", "In-App Tutorials...", "Уроки в приложении..."),
+-    ("help.onlineTutorials", "Online Tutorials...", "Онлайн-уроки..."),
+     ("help.systemReport", "System Compatibility Report...", "Отчет о совместимости системы..."),
+     ("help.enableLogging", "Enable Logging", "Включить ведение журнала"),
+     ("help.revealLogFile", "Reveal Logging File", "Показать файл журнала"),
+-    ("help.discord", "Join the ArtCraft Discord...", "Присоединяйтесь к Discord ArtCraft..."),
+-    ("help.reportIssue", "Provide Feedback...", "Оставить отзыв..."),
+-    ("help.website", "ArtCraft Website", "Сайт ArtCraft"),
 -    ("help.appPage", "KIO Effect Home Page", "Главная страница KIO Effect"),
 -    ("help.github", "KIO Effect on GitHub", "KIO Effect на GitHub"),
-+    ("help.appPage", "Bogo Effect Home Page", "Главная страница Bogo Effect"),
-+    ("help.github", "Bogo Effect on GitHub", "Bogo Effect на GitHub"),
      ("file.openDemoProject", "Open Demo Project", "Открыть демонстрационный проект"),
  ];
  
-@@ -4719,8 +4719,8 @@ const FRENCH: &[(&str, &str, &str)] = &[
+@@ -4719,8 +4677,8 @@ const FRENCH: &[(&str, &str, &str)] = &[
      ("", "Side", "Côté"),
      ("", "Back", "Arrière"),
      ("layer.addTextAnimator", "Color", "Couleur"),
@@ -54228,7 +54413,7 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("", "Settings...", "Préférences..."),
      ("app.settings", "General...", "Général..."),
      ("app.settings", "Startup & Repair...", "Démarrage et réparation..."),
-@@ -4739,10 +4739,10 @@ const FRENCH: &[(&str, &str, &str)] = &[
+@@ -4739,10 +4697,10 @@ const FRENCH: &[(&str, &str, &str)] = &[
      ("app.settings", "Video...", "Vidéo..."),
      ("app.settings", "3D...", "3D..."),
      ("app.settings", "Scripting & Expressions...", "Scripts et expressions..."),
@@ -54241,7 +54426,7 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("", "File", "Fichier"),
      ("", "New", "Nouveau"),
      ("file.newProject", "New Project", "Nouveau projet"),
-@@ -4765,7 +4765,7 @@ const FRENCH: &[(&str, &str, &str)] = &[
+@@ -4765,7 +4723,7 @@ const FRENCH: &[(&str, &str, &str)] = &[
      ("file.import", "File...", "Fichier..."),
      ("file.importMultiple", "Multiple Files...", "Plusieurs fichiers..."),
      ("file.importTimeline", "Adobe Premiere Pro Project...", "Projet Adobe Premiere Pro..."),
@@ -54250,7 +54435,7 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("file.importPlaceholder", "Placeholder...", "Espace réservé..."),
      ("file.importSolid", "Solid...", "Solide..."),
      ("file.importLottie", "Lottie...", "Lottie..."),
-@@ -5324,7 +5324,7 @@ const FRENCH: &[(&str, &str, &str)] = &[
+@@ -5324,22 +5282,16 @@ const FRENCH: &[(&str, &str, &str)] = &[
      ("window.panel", "Create Nulls From Paths", "Créer des nuls à partir des tracés"),
      ("window.panel", "VR Comp Editor", "Éditeur de composition VR"),
      ("", "Help", "Aide"),
@@ -54259,18 +54444,22 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("help.docs", "Scripting Help...", "Aide sur les scripts..."),
      ("help.docs", "Expression Reference...", "Référence des expressions..."),
      ("help.docs", "Effect Reference...", "Référence des effets..."),
-@@ -5338,8 +5338,8 @@ const FRENCH: &[(&str, &str, &str)] = &[
-     ("help.discord", "Join the ArtCraft Discord...", "Rejoindre le Discord ArtCraft..."),
-     ("help.reportIssue", "Provide Feedback...", "Envoyer des commentaires..."),
-     ("help.website", "ArtCraft Website", "Site web ArtCraft"),
+     ("anim.browsePresets", "Animation Presets...", "Programmes d’animation..."),
+     ("app.keyboardShortcuts", "Keyboard Shortcuts...", "Raccourcis clavier..."),
+     ("help.inAppTutorials", "In-App Tutorials...", "Tutoriels dans l’application..."),
+-    ("help.onlineTutorials", "Online Tutorials...", "Tutoriels en ligne..."),
+     ("help.systemReport", "System Compatibility Report...", "Rapport de compatibilité du système..."),
+     ("help.enableLogging", "Enable Logging", "Activer la journalisation"),
+     ("help.revealLogFile", "Reveal Logging File", "Révéler le fichier journal"),
+-    ("help.discord", "Join the ArtCraft Discord...", "Rejoindre le Discord ArtCraft..."),
+-    ("help.reportIssue", "Provide Feedback...", "Envoyer des commentaires..."),
+-    ("help.website", "ArtCraft Website", "Site web ArtCraft"),
 -    ("help.appPage", "KIO Effect Home Page", "Page d’accueil KIO Effect"),
 -    ("help.github", "KIO Effect on GitHub", "KIO Effect sur GitHub"),
-+    ("help.appPage", "Bogo Effect Home Page", "Page d’accueil Bogo Effect"),
-+    ("help.github", "Bogo Effect on GitHub", "Bogo Effect sur GitHub"),
      ("file.openDemoProject", "Open Demo Project", "Ouvrir le projet de démonstration"),
  ];
  
-@@ -5352,8 +5352,8 @@ const GERMAN: &[(&str, &str, &str)] = &[
+@@ -5352,8 +5304,8 @@ const GERMAN: &[(&str, &str, &str)] = &[
      ("", "Side", "Seite"),
      ("", "Back", "Rückseite"),
      ("layer.addTextAnimator", "Color", "Farbe"),
@@ -54281,7 +54470,7 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("", "Settings...", "Voreinstellungen..."),
      ("app.settings", "General...", "Allgemein..."),
      ("app.settings", "Startup & Repair...", "Start und Reparatur..."),
-@@ -5372,10 +5372,10 @@ const GERMAN: &[(&str, &str, &str)] = &[
+@@ -5372,10 +5324,10 @@ const GERMAN: &[(&str, &str, &str)] = &[
      ("app.settings", "Video...", "Video..."),
      ("app.settings", "3D...", "3D..."),
      ("app.settings", "Scripting & Expressions...", "Skripting und Ausdrücke..."),
@@ -54294,7 +54483,7 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("", "File", "Datei"),
      ("", "New", "Neu"),
      ("file.newProject", "New Project", "Neues Projekt"),
-@@ -5398,7 +5398,7 @@ const GERMAN: &[(&str, &str, &str)] = &[
+@@ -5398,7 +5350,7 @@ const GERMAN: &[(&str, &str, &str)] = &[
      ("file.import", "File...", "Datei..."),
      ("file.importMultiple", "Multiple Files...", "Mehrere Dateien..."),
      ("file.importTimeline", "Adobe Premiere Pro Project...", "Adobe Premiere Pro-Projekt..."),
@@ -54303,7 +54492,7 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("file.importPlaceholder", "Placeholder...", "Platzhalter..."),
      ("file.importSolid", "Solid...", "Farbfläche..."),
      ("file.importLottie", "Lottie...", "Lottie..."),
-@@ -5957,7 +5957,7 @@ const GERMAN: &[(&str, &str, &str)] = &[
+@@ -5957,22 +5909,16 @@ const GERMAN: &[(&str, &str, &str)] = &[
      ("window.panel", "Create Nulls From Paths", "Null-Objekte aus Pfaden erstellen"),
      ("window.panel", "VR Comp Editor", "VR-Kompositionseditor"),
      ("", "Help", "Hilfe"),
@@ -54312,18 +54501,22 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("help.docs", "Scripting Help...", "Hilfe zu Skripts..."),
      ("help.docs", "Expression Reference...", "Ausdrucksreferenz..."),
      ("help.docs", "Effect Reference...", "Effektreferenz..."),
-@@ -5971,8 +5971,8 @@ const GERMAN: &[(&str, &str, &str)] = &[
-     ("help.discord", "Join the ArtCraft Discord...", "ArtCraft-Discord beitreten..."),
-     ("help.reportIssue", "Provide Feedback...", "Feedback senden..."),
-     ("help.website", "ArtCraft Website", "ArtCraft-Website"),
+     ("anim.browsePresets", "Animation Presets...", "Animations-Presets..."),
+     ("app.keyboardShortcuts", "Keyboard Shortcuts...", "Tastenkürzel..."),
+     ("help.inAppTutorials", "In-App Tutorials...", "In-App-Tutorials..."),
+-    ("help.onlineTutorials", "Online Tutorials...", "Online-Tutorials..."),
+     ("help.systemReport", "System Compatibility Report...", "Bericht zur Systemkompatibilität..."),
+     ("help.enableLogging", "Enable Logging", "Protokollierung aktivieren"),
+     ("help.revealLogFile", "Reveal Logging File", "Protokolldatei anzeigen"),
+-    ("help.discord", "Join the ArtCraft Discord...", "ArtCraft-Discord beitreten..."),
+-    ("help.reportIssue", "Provide Feedback...", "Feedback senden..."),
+-    ("help.website", "ArtCraft Website", "ArtCraft-Website"),
 -    ("help.appPage", "KIO Effect Home Page", "KIO Effect-Startseite"),
 -    ("help.github", "KIO Effect on GitHub", "KIO Effect auf GitHub"),
-+    ("help.appPage", "Bogo Effect Home Page", "Bogo Effect-Startseite"),
-+    ("help.github", "Bogo Effect on GitHub", "Bogo Effect auf GitHub"),
      ("file.openDemoProject", "Open Demo Project", "Demoprojekt öffnen"),
  ];
  
-@@ -5985,8 +5985,8 @@ const CZECH: &[(&str, &str, &str)] = &[
+@@ -5985,8 +5931,8 @@ const CZECH: &[(&str, &str, &str)] = &[
      ("", "Side", "Boční strana"),
      ("", "Back", "Zadní strana"),
      ("layer.addTextAnimator", "Color", "Barva"),
@@ -54334,7 +54527,7 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("", "Settings...", "Nastavení..."),
      ("app.settings", "General...", "Obecné..."),
      ("app.settings", "Startup & Repair...", "Spuštění a oprava..."),
-@@ -6005,10 +6005,10 @@ const CZECH: &[(&str, &str, &str)] = &[
+@@ -6005,10 +5951,10 @@ const CZECH: &[(&str, &str, &str)] = &[
      ("app.settings", "Video...", "Video..."),
      ("app.settings", "3D...", "3D..."),
      ("app.settings", "Scripting & Expressions...", "Skripty a výrazy..."),
@@ -54347,7 +54540,7 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("", "File", "Soubor"),
      ("", "New", "Nový"),
      ("file.newProject", "New Project", "Nový projekt"),
-@@ -6031,7 +6031,7 @@ const CZECH: &[(&str, &str, &str)] = &[
+@@ -6031,7 +5977,7 @@ const CZECH: &[(&str, &str, &str)] = &[
      ("file.import", "File...", "Soubor..."),
      ("file.importMultiple", "Multiple Files...", "Více souborů..."),
      ("file.importTimeline", "Adobe Premiere Pro Project...", "Projekt Adobe Premiere Pro..."),
@@ -54356,7 +54549,7 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("file.importPlaceholder", "Placeholder...", "Zástupný záznam..."),
      ("file.importSolid", "Solid...", "Plná vrstva..."),
      ("file.importLottie", "Lottie...", "Lottie..."),
-@@ -6591,7 +6591,7 @@ const CZECH: &[(&str, &str, &str)] = &[
+@@ -6591,22 +6537,16 @@ const CZECH: &[(&str, &str, &str)] = &[
      ("window.panel", "Create Nulls From Paths", "Vytvořit prázdné objekty z cest"),
      ("window.panel", "VR Comp Editor", "Editor kompozice VR"),
      ("", "Help", "Nápověda"),
@@ -54365,31 +54558,47 @@ index 9d78b793864d4b65aff9899aac086c18fc236881..30416a46e2206db1969dbc92ad209213
      ("help.docs", "Scripting Help...", "Nápověda ke skriptování..."),
      ("help.docs", "Expression Reference...", "Referenční příručka výrazů..."),
      ("help.docs", "Effect Reference...", "Referenční příručka efektů..."),
-@@ -6605,8 +6605,8 @@ const CZECH: &[(&str, &str, &str)] = &[
-     ("help.discord", "Join the ArtCraft Discord...", "Připojit se na Discord ArtCraft..."),
-     ("help.reportIssue", "Provide Feedback...", "Poskytnout zpětnou vazbu..."),
-     ("help.website", "ArtCraft Website", "Web ArtCraft"),
+     ("anim.browsePresets", "Animation Presets...", "Přednastavení animace..."),
+     ("app.keyboardShortcuts", "Keyboard Shortcuts...", "Klávesové zkratky..."),
+     ("help.inAppTutorials", "In-App Tutorials...", "Výukové lekce v aplikaci..."),
+-    ("help.onlineTutorials", "Online Tutorials...", "Výukové lekce online..."),
+     ("help.systemReport", "System Compatibility Report...", "Zpráva o kompatibilitě systému..."),
+     ("help.enableLogging", "Enable Logging", "Povolit protokolování"),
+     ("help.revealLogFile", "Reveal Logging File", "Zobrazit soubor protokolu"),
+-    ("help.discord", "Join the ArtCraft Discord...", "Připojit se na Discord ArtCraft..."),
+-    ("help.reportIssue", "Provide Feedback...", "Poskytnout zpětnou vazbu..."),
+-    ("help.website", "ArtCraft Website", "Web ArtCraft"),
 -    ("help.appPage", "KIO Effect Home Page", "Domovská stránka KIO Effect"),
 -    ("help.github", "KIO Effect on GitHub", "KIO Effect na GitHubu"),
-+    ("help.appPage", "Bogo Effect Home Page", "Domovská stránka Bogo Effect"),
-+    ("help.github", "Bogo Effect on GitHub", "Bogo Effect na GitHubu"),
      ("file.openDemoProject", "Open Demo Project", "Otevřít ukázkový projekt"),
  ];
  
 diff --git a/crates/ui-egui/src/i18n/ui.rs b/crates/ui-egui/src/i18n/ui.rs
-index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1febbe95c3 100644
+index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..fd74ff5df477849fe54b24ba8e2fb720f303fe5d 100644
 --- a/crates/ui-egui/src/i18n/ui.rs
 +++ b/crates/ui-egui/src/i18n/ui.rs
-@@ -100,7 +100,7 @@ const JAPANESE: &[(&str, &str)] = &[
-         "A clean-room, open-source compositor for motion graphics and visual effects: native on macOS, Windows and Linux, and in the browser. Part of the ArtCraft family of creative apps.",
-         "モーショングラフィックスとビジュアルエフェクト向けの、クリーンルーム方式で開発されたオープンソースのコンポジットソフトウェアです。macOS、Windows、Linuxでネイティブに動作し、ブラウザーでも使えます。ArtCraftクリエイティブアプリファミリーの一員です。",
-     ),
+@@ -96,11 +96,7 @@ const JAPANESE: &[(&str, &str)] = &[
+     ("(missing)", "（見つかりません）"),
+     ("360 View Orientation", "360度ビューの方向"),
+     ("3:2 Pulldown: {}", "3:2プルダウン：{}"),
+-    (
+-        "A clean-room, open-source compositor for motion graphics and visual effects: native on macOS, Windows and Linux, and in the browser. Part of the ArtCraft family of creative apps.",
+-        "モーショングラフィックスとビジュアルエフェクト向けの、クリーンルーム方式で開発されたオープンソースのコンポジットソフトウェアです。macOS、Windows、Linuxでネイティブに動作し、ブラウザーでも使えます。ArtCraftクリエイティブアプリファミリーの一員です。",
+-    ),
 -    ("About KIO Effect", "KIO Effectについて"),
 +    ("About Bogo Effect", "Bogo Effectについて"),
      ("About...", "情報..."),
      ("Active", "使用中"),
      ("Active Camera", "アクティブカメラ"),
-@@ -225,7 +225,7 @@ const JAPANESE: &[(&str, &str)] = &[
+@@ -204,7 +200,6 @@ const JAPANESE: &[(&str, &str)] = &[
+     ("Delete selected project items", "選択したプロジェクト項目を削除"),
+     ("Delete this template", "このテンプレートを削除"),
+     ("Depth of Field", "被写界深度"),
+-    ("Discord", "Discord"),
+     ("Distribute Layers:", "レイヤーの分布:"),
+     ("Don't Recover", "復元しない"),
+     ("Don't Save", "保存しない"),
+@@ -225,7 +220,7 @@ const JAPANESE: &[(&str, &str)] = &[
      ("Edit Gradient…", "グラデーションを編集…"),
      ("Edit Target: {}", "編集対象：{}"),
      ("Edit in the Timeline", "タイムラインで編集"),
@@ -54398,7 +54607,23 @@ index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1f
      ("Effects & Presets options", "エフェクト＆プリセットのオプション"),
      ("Copy Presets Folder Path", "プリセットフォルダーのパスをコピー"),
      ("Effects: {}", "エフェクト：{}"),
-@@ -534,7 +534,7 @@ const JAPANESE: &[(&str, &str)] = &[
+@@ -278,7 +273,6 @@ const JAPANESE: &[(&str, &str)] = &[
+     ("Install from File…", "ファイルからインストール…"),
+     ("Intensity", "強度"),
+     ("Inverted", "反転"),
+-    ("Join the ArtCraft community on Discord", "DiscordでArtCraftコミュニティに参加"),
+     ("Key: {}", "キー：{}"),
+     ("LEARN", "学習"),
+     ("Label", "ラベル"),
+@@ -318,7 +312,6 @@ const JAPANESE: &[(&str, &str)] = &[
+     ("Models folder: {}", "モデルフォルダー：{}"),
+     ("Modifiers:", "修飾キー:"),
+     ("More", "その他"),
+-    ("More ArtCraft apps", "ほかのArtCraftアプリ"),
+     ("More tutorials", "ほかのチュートリアル"),
+     ("Motion Blur", "モーションブラー"),
+     ("Motion Blur: {}", "モーションブラー：{}"),
+@@ -534,7 +527,7 @@ const JAPANESE: &[(&str, &str)] = &[
      ("Variable Font Axes", "可変フォントの軸"),
      ("Video Codec: {}", "ビデオコーデック：{}"),
      ("View:", "表示:"),
@@ -54407,7 +54632,15 @@ index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1f
      ("Width:", "幅:"),
      ("You can undo this.", "この操作は取り消せます。"),
      ("You can't undo this.", "この操作は取り消せません。"),
-@@ -604,8 +604,8 @@ const JAPANESE: &[(&str, &str)] = &[
+@@ -588,7 +581,6 @@ const JAPANESE: &[(&str, &str)] = &[
+     ("Import PDF / Illustrator File", "PDF / Illustratorファイルを読み込み"),
+     ("Import Photoshop File", "Photoshopファイルを読み込み"),
+     ("Interpret Unlabeled Alpha As", "ラベルなしアルファの解釈"),
+-    ("Join the ArtCraft Discord", "ArtCraftのDiscordに参加"),
+     ("Mercury GPU Acceleration ({})", "Mercury GPUアクセラレーション（{}）"),
+     ("Mercury Software Only", "Mercuryソフトウェアのみ"),
+     ("OCIO (built-in ACES config)", "OCIO（組み込みACES設定）"),
+@@ -604,8 +596,8 @@ const JAPANESE: &[(&str, &str)] = &[
      ("New Project", "新規プロジェクト"),
      ("Open Project…", "プロジェクトを開く…"),
      ("Templates", "テンプレート"),
@@ -54418,7 +54651,7 @@ index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1f
      ("Motion graphics and visual effects · version {}", "モーショングラフィックスとビジュアルエフェクト · バージョン{}"),
      ("New Composition", "新規コンポジション"),
      ("Open Demo Project", "デモプロジェクトを開く"),
-@@ -627,7 +627,7 @@ const JAPANESE: &[(&str, &str)] = &[
+@@ -627,7 +619,7 @@ const JAPANESE: &[(&str, &str)] = &[
      ("{} hours ago", "{}時間前"),
      ("{} day ago", "{}日前"),
      ("{} days ago", "{}日前"),
@@ -54427,16 +54660,28 @@ index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1f
      ("After Effects project", "After Effectsプロジェクト"),
      ("Lottie animation", "Lottieアニメーション"),
      ("Project", "プロジェクト"),
-@@ -650,7 +650,7 @@ const SIMPLIFIED_CHINESE: &[(&str, &str)] = &[
-         "A clean-room, open-source compositor for motion graphics and visual effects: native on macOS, Windows and Linux, and in the browser. Part of the ArtCraft family of creative apps.",
-         "一款从零编写、开源的动态图形与视觉效果合成软件：原生支持 macOS、Windows 和 Linux，也可在浏览器中运行。属于 ArtCraft 创意应用家族。",
-     ),
+@@ -646,11 +638,7 @@ const SIMPLIFIED_CHINESE: &[(&str, &str)] = &[
+     ("(missing)", "（缺失）"),
+     ("360 View Orientation", "360 视图方向"),
+     ("3:2 Pulldown: {}", "3:2 折叠：{}"),
+-    (
+-        "A clean-room, open-source compositor for motion graphics and visual effects: native on macOS, Windows and Linux, and in the browser. Part of the ArtCraft family of creative apps.",
+-        "一款从零编写、开源的动态图形与视觉效果合成软件：原生支持 macOS、Windows 和 Linux，也可在浏览器中运行。属于 ArtCraft 创意应用家族。",
+-    ),
 -    ("About KIO Effect", "关于 KIO Effect"),
 +    ("About Bogo Effect", "关于 Bogo Effect"),
      ("About...", "关于..."),
      ("Active", "使用中"),
      ("Active Camera", "活动摄像机"),
-@@ -769,7 +769,7 @@ const SIMPLIFIED_CHINESE: &[(&str, &str)] = &[
+@@ -748,7 +736,6 @@ const SIMPLIFIED_CHINESE: &[(&str, &str)] = &[
+     ("Delete selected project items", "删除所选的项目项"),
+     ("Delete this template", "删除此模板"),
+     ("Depth of Field", "景深"),
+-    ("Discord", "Discord"),
+     ("Distribute Layers:", "分布图层："),
+     ("Don't Recover", "不恢复"),
+     ("Don't Save", "不保存"),
+@@ -769,7 +756,7 @@ const SIMPLIFIED_CHINESE: &[(&str, &str)] = &[
      ("Edit Gradient…", "编辑渐变…"),
      ("Edit Target: {}", "编辑目标：{}"),
      ("Edit in the Timeline", "在时间轴中编辑"),
@@ -54445,7 +54690,23 @@ index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1f
      ("Effects & Presets options", "效果和预设选项"),
      ("Copy Presets Folder Path", "复制预设文件夹路径"),
      ("Effects: {}", "效果：{}"),
-@@ -1072,7 +1072,7 @@ const SIMPLIFIED_CHINESE: &[(&str, &str)] = &[
+@@ -822,7 +809,6 @@ const SIMPLIFIED_CHINESE: &[(&str, &str)] = &[
+     ("Install from File…", "从文件安装…"),
+     ("Intensity", "强度"),
+     ("Inverted", "反转"),
+-    ("Join the ArtCraft community on Discord", "加入 ArtCraft 的 Discord 社区"),
+     ("Key: {}", "按键：{}"),
+     ("LEARN", "学习"),
+     ("Label", "标签"),
+@@ -862,7 +848,6 @@ const SIMPLIFIED_CHINESE: &[(&str, &str)] = &[
+     ("Models folder: {}", "模型文件夹：{}"),
+     ("Modifiers:", "修饰键："),
+     ("More", "更多"),
+-    ("More ArtCraft apps", "更多 ArtCraft 应用"),
+     ("More tutorials", "更多教程"),
+     ("Motion Blur", "运动模糊"),
+     ("Motion Blur: {}", "运动模糊：{}"),
+@@ -1072,7 +1057,7 @@ const SIMPLIFIED_CHINESE: &[(&str, &str)] = &[
      ("Variable Font Axes", "可变字体轴"),
      ("Video Codec: {}", "视频编解码器：{}"),
      ("View:", "视图："),
@@ -54454,7 +54715,15 @@ index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1f
      ("Width:", "宽度："),
      ("You can undo this.", "您可以撤销此操作。"),
      ("You can't undo this.", "此操作无法撤销。"),
-@@ -1150,8 +1150,8 @@ const SIMPLIFIED_CHINESE: &[(&str, &str)] = &[
+@@ -1133,7 +1118,6 @@ const SIMPLIFIED_CHINESE: &[(&str, &str)] = &[
+     ("Import PDF / Illustrator File", "导入 PDF / Illustrator 文件"),
+     ("Import Photoshop File", "导入 Photoshop 文件"),
+     ("Interpret Unlabeled Alpha As", "将未标记的 Alpha 解释为"),
+-    ("Join the ArtCraft Discord", "加入 ArtCraft Discord"),
+     ("Mercury GPU Acceleration ({})", "Mercury GPU 加速（{}）"),
+     ("Mercury Software Only", "仅 Mercury 软件"),
+     ("OCIO (built-in ACES config)", "OCIO（内置 ACES 配置）"),
+@@ -1150,8 +1134,8 @@ const SIMPLIFIED_CHINESE: &[(&str, &str)] = &[
      ("New Project", "新建项目"),
      ("Open Project…", "打开项目…"),
      ("Templates", "模板"),
@@ -54465,7 +54734,7 @@ index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1f
      ("Motion graphics and visual effects · version {}", "动态图形和视觉效果 · 版本 {}"),
      ("New Composition", "新建合成"),
      ("Open Demo Project", "打开示例项目"),
-@@ -1173,7 +1173,7 @@ const SIMPLIFIED_CHINESE: &[(&str, &str)] = &[
+@@ -1173,7 +1157,7 @@ const SIMPLIFIED_CHINESE: &[(&str, &str)] = &[
      ("{} hours ago", "{} 小时前"),
      ("{} day ago", "{} 天前"),
      ("{} days ago", "{} 天前"),
@@ -54474,7 +54743,7 @@ index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1f
      ("After Effects project", "After Effects 项目"),
      ("Lottie animation", "Lottie 动画"),
      ("Project", "项目"),
-@@ -1194,8 +1194,8 @@ const SIMPLIFIED_CHINESE: &[(&str, &str)] = &[
+@@ -1194,8 +1178,8 @@ const SIMPLIFIED_CHINESE: &[(&str, &str)] = &[
      ("Create Split Layers Above Original Layer", "在原始图层上方创建拆分图层"),
      ("Use System Color Picker", "使用系统拾色器"),
      (
@@ -54485,7 +54754,7 @@ index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1f
      ),
      ("Startup & Repair", "启动和修复"),
      ("Show Home Screen When Launching", "启动时显示主屏幕"),
-@@ -1204,8 +1204,8 @@ const SIMPLIFIED_CHINESE: &[(&str, &str)] = &[
+@@ -1204,8 +1188,8 @@ const SIMPLIFIED_CHINESE: &[(&str, &str)] = &[
      ("Window Graphics", "窗口图形"),
      ("Automatic", "自动"),
      (
@@ -54496,7 +54765,7 @@ index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1f
      ),
      ("Repair", "修复"),
      ("Reset Settings", "重置设置"),
-@@ -1362,7 +1362,7 @@ const SIMPLIFIED_CHINESE: &[(&str, &str)] = &[
+@@ -1362,7 +1346,7 @@ const SIMPLIFIED_CHINESE: &[(&str, &str)] = &[
      ),
      ("Match System", "跟随系统"),
      ("Default", "默认"),
@@ -54505,16 +54774,28 @@ index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1f
      ("Total Offset", "总偏移"),
      ("Per Layer", "每个图层"),
      ("Track", "跟踪"),
-@@ -1382,7 +1382,7 @@ const TRADITIONAL_CHINESE: &[(&str, &str)] = &[
-         "A clean-room, open-source compositor for motion graphics and visual effects: native on macOS, Windows and Linux, and in the browser. Part of the ArtCraft family of creative apps.",
-         "一款從零編寫、開源的動態圖形與視覺效果合成軟件：原生支援 macOS、Windows 和 Linux，也可在瀏覽器中執行。屬於 ArtCraft 創意應用家族。",
-     ),
+@@ -1378,11 +1362,7 @@ const TRADITIONAL_CHINESE: &[(&str, &str)] = &[
+     ("(missing)", "（缺少）"),
+     ("360 View Orientation", "360 檢視方向"),
+     ("3:2 Pulldown: {}", "3:2 摺疊：{}"),
+-    (
+-        "A clean-room, open-source compositor for motion graphics and visual effects: native on macOS, Windows and Linux, and in the browser. Part of the ArtCraft family of creative apps.",
+-        "一款從零編寫、開源的動態圖形與視覺效果合成軟件：原生支援 macOS、Windows 和 Linux，也可在瀏覽器中執行。屬於 ArtCraft 創意應用家族。",
+-    ),
 -    ("About KIO Effect", "關於 KIO Effect"),
 +    ("About Bogo Effect", "關於 Bogo Effect"),
      ("About...", "關於..."),
      ("Active", "使用中"),
      ("Active Camera", "活動攝影機"),
-@@ -1501,7 +1501,7 @@ const TRADITIONAL_CHINESE: &[(&str, &str)] = &[
+@@ -1480,7 +1460,6 @@ const TRADITIONAL_CHINESE: &[(&str, &str)] = &[
+     ("Delete selected project items", "刪除所選的專案項"),
+     ("Delete this template", "刪除此範本"),
+     ("Depth of Field", "景深"),
+-    ("Discord", "Discord"),
+     ("Distribute Layers:", "分佈圖層："),
+     ("Don't Recover", "不恢復"),
+     ("Don't Save", "不儲存"),
+@@ -1501,7 +1480,7 @@ const TRADITIONAL_CHINESE: &[(&str, &str)] = &[
      ("Edit Gradient…", "編輯漸變…"),
      ("Edit Target: {}", "編輯目標：{}"),
      ("Edit in the Timeline", "在時間軸中編輯"),
@@ -54523,7 +54804,23 @@ index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1f
      ("Effects & Presets options", "效果和預設集選項"),
      ("Copy Presets Folder Path", "複製預設集資料夾路徑"),
      ("Effects: {}", "效果：{}"),
-@@ -1804,7 +1804,7 @@ const TRADITIONAL_CHINESE: &[(&str, &str)] = &[
+@@ -1554,7 +1533,6 @@ const TRADITIONAL_CHINESE: &[(&str, &str)] = &[
+     ("Install from File…", "從文件安裝…"),
+     ("Intensity", "強度"),
+     ("Inverted", "反轉"),
+-    ("Join the ArtCraft community on Discord", "加入 ArtCraft 的 Discord 社區"),
+     ("Key: {}", "按鍵：{}"),
+     ("LEARN", "學習"),
+     ("Label", "標籤"),
+@@ -1594,7 +1572,6 @@ const TRADITIONAL_CHINESE: &[(&str, &str)] = &[
+     ("Models folder: {}", "模型資料夾：{}"),
+     ("Modifiers:", "修飾鍵："),
+     ("More", "更多"),
+-    ("More ArtCraft apps", "更多 ArtCraft 應用"),
+     ("More tutorials", "更多教學"),
+     ("Motion Blur", "運動模糊"),
+     ("Motion Blur: {}", "動態模糊：{}"),
+@@ -1804,7 +1781,7 @@ const TRADITIONAL_CHINESE: &[(&str, &str)] = &[
      ("Variable Font Axes", "可變字型軸"),
      ("Video Codec: {}", "視訊轉碼器：{}"),
      ("View:", "檢視："),
@@ -54532,7 +54829,15 @@ index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1f
      ("Width:", "寬度："),
      ("You can undo this.", "您可以復原此操作。"),
      ("You can't undo this.", "此操作無法復原。"),
-@@ -1877,8 +1877,8 @@ const TRADITIONAL_CHINESE: &[(&str, &str)] = &[
+@@ -1860,7 +1837,6 @@ const TRADITIONAL_CHINESE: &[(&str, &str)] = &[
+     ("Import PDF / Illustrator File", "Import PDF / Illustrator File"),
+     ("Import Photoshop File", "Import Photoshop File"),
+     ("Interpret Unlabeled Alpha As", "Interpret Unlabeled Alpha As"),
+-    ("Join the ArtCraft Discord", "加入 ArtCraft Discord"),
+     ("Mercury GPU Acceleration ({})", "Mercury GPU Acceleration ({})"),
+     ("Mercury Software Only", "Mercury Software Only"),
+     ("OCIO (built-in ACES config)", "OCIO (built-in ACES config)"),
+@@ -1877,8 +1853,8 @@ const TRADITIONAL_CHINESE: &[(&str, &str)] = &[
      ("New Project", "新增專案"),
      ("Open Project…", "開啟專案…"),
      ("Templates", "範本"),
@@ -54543,7 +54848,7 @@ index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1f
      ("Motion graphics and visual effects · version {}", "動態圖形與視覺效果 · 版本 {}"),
      ("New Composition", "新增合成"),
      ("Open Demo Project", "開啟範例專案"),
-@@ -1900,7 +1900,7 @@ const TRADITIONAL_CHINESE: &[(&str, &str)] = &[
+@@ -1900,7 +1876,7 @@ const TRADITIONAL_CHINESE: &[(&str, &str)] = &[
      ("{} hours ago", "{} 小時前"),
      ("{} day ago", "{} 天前"),
      ("{} days ago", "{} 天前"),
@@ -54552,7 +54857,7 @@ index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1f
      ("After Effects project", "After Effects 專案"),
      ("Lottie animation", "Lottie 動畫"),
      ("Project", "專案"),
-@@ -1921,8 +1921,8 @@ const TRADITIONAL_CHINESE: &[(&str, &str)] = &[
+@@ -1921,8 +1897,8 @@ const TRADITIONAL_CHINESE: &[(&str, &str)] = &[
      ("Create Split Layers Above Original Layer", "在原始圖層上方建立分割圖層"),
      ("Use System Color Picker", "使用系統檢色器"),
      (
@@ -54563,7 +54868,7 @@ index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1f
      ),
      ("Startup & Repair", "啟動和修復"),
      ("Show Home Screen When Launching", "啟動時顯示首頁畫面"),
-@@ -1931,8 +1931,8 @@ const TRADITIONAL_CHINESE: &[(&str, &str)] = &[
+@@ -1931,8 +1907,8 @@ const TRADITIONAL_CHINESE: &[(&str, &str)] = &[
      ("Window Graphics", "視窗圖形"),
      ("Automatic", "自動"),
      (
@@ -54574,7 +54879,7 @@ index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1f
      ),
      ("Repair", "修復"),
      ("Reset Settings", "重設設定"),
-@@ -2089,7 +2089,7 @@ const TRADITIONAL_CHINESE: &[(&str, &str)] = &[
+@@ -2089,7 +2065,7 @@ const TRADITIONAL_CHINESE: &[(&str, &str)] = &[
      ),
      ("Match System", "跟隨系統"),
      ("Default", "預設"),
@@ -54583,16 +54888,28 @@ index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1f
      ("Total Offset", "總偏移"),
      ("Per Layer", "每個圖層"),
      ("Track", "追蹤"),
-@@ -2111,7 +2111,7 @@ const UKRAINIAN: &[(&str, &str)] = &[
-         "A clean-room, open-source compositor for motion graphics and visual effects: native on macOS, Windows and Linux, and in the browser. Part of the ArtCraft family of creative apps.",
-         "Незалежно розроблена програма з відкритим кодом для компонування анімованої графіки та візуальних ефектів: працює на macOS, Windows і Linux, а також у браузері. Належить до родини творчих програм ArtCraft.",
-     ),
+@@ -2107,11 +2083,7 @@ const UKRAINIAN: &[(&str, &str)] = &[
+     ("(missing)", "(відсутній)"),
+     ("360 View Orientation", "Орієнтація огляду 360°"),
+     ("3:2 Pulldown: {}", "Перетворення кадрів 3:2: {}"),
+-    (
+-        "A clean-room, open-source compositor for motion graphics and visual effects: native on macOS, Windows and Linux, and in the browser. Part of the ArtCraft family of creative apps.",
+-        "Незалежно розроблена програма з відкритим кодом для компонування анімованої графіки та візуальних ефектів: працює на macOS, Windows і Linux, а також у браузері. Належить до родини творчих програм ArtCraft.",
+-    ),
 -    ("About KIO Effect", "Про KIO Effect"),
 +    ("About Bogo Effect", "Про Bogo Effect"),
      ("About...", "Про програму..."),
      ("Active", "Активна"),
      ("Active Camera", "Активна камера"),
-@@ -2236,7 +2236,7 @@ const UKRAINIAN: &[(&str, &str)] = &[
+@@ -2215,7 +2187,6 @@ const UKRAINIAN: &[(&str, &str)] = &[
+     ("Delete selected project items", "Видалити виділені елементи проєкту"),
+     ("Delete this template", "Видалити цей шаблон"),
+     ("Depth of Field", "Глибина різкості"),
+-    ("Discord", "Discord"),
+     ("Distribute Layers:", "Розподілити шари:"),
+     ("Don't Recover", "Не відновлювати"),
+     ("Don't Save", "Не зберігати"),
+@@ -2236,7 +2207,7 @@ const UKRAINIAN: &[(&str, &str)] = &[
      ("Edit Gradient…", "Редагувати градієнт…"),
      ("Edit Target: {}", "Ціль редагування: {}"),
      ("Edit in the Timeline", "Редагувати на шкалі часу"),
@@ -54601,7 +54918,23 @@ index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1f
      ("Effects & Presets options", "Параметри ефектів і наборів"),
      ("Copy Presets Folder Path", "Копіювати шлях до папки наборів"),
      ("Effects: {}", "Ефекти: {}"),
-@@ -2550,7 +2550,7 @@ const UKRAINIAN: &[(&str, &str)] = &[
+@@ -2289,7 +2260,6 @@ const UKRAINIAN: &[(&str, &str)] = &[
+     ("Install from File…", "Встановити з файлу…"),
+     ("Intensity", "Інтенсивність"),
+     ("Inverted", "Інвертовано"),
+-    ("Join the ArtCraft community on Discord", "Приєднайтеся до спільноти ArtCraft у Discord"),
+     ("Key: {}", "Клавіша: {}"),
+     ("LEARN", "НАВЧАННЯ"),
+     ("Label", "Мітка"),
+@@ -2329,7 +2299,6 @@ const UKRAINIAN: &[(&str, &str)] = &[
+     ("Models folder: {}", "Тека моделей: {}"),
+     ("Modifiers:", "Модифікатори:"),
+     ("More", "Більше"),
+-    ("More ArtCraft apps", "Інші програми ArtCraft"),
+     ("More tutorials", "Інші уроки"),
+     ("Motion Blur", "Розмиття руху"),
+     ("Motion Blur: {}", "Розмиття руху: {}"),
+@@ -2550,7 +2519,7 @@ const UKRAINIAN: &[(&str, &str)] = &[
      ("Variable Font Axes", "Осі змінного шрифту"),
      ("Video Codec: {}", "Відеокодек: {}"),
      ("View:", "Вигляд:"),
@@ -54610,7 +54943,15 @@ index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1f
      ("Width:", "Ширина:"),
      ("You can undo this.", "Це можна скасувати."),
      ("You can't undo this.", "Це не можна скасувати."),
-@@ -2629,8 +2629,8 @@ const UKRAINIAN: &[(&str, &str)] = &[
+@@ -2612,7 +2581,6 @@ const UKRAINIAN: &[(&str, &str)] = &[
+     ("Import PDF / Illustrator File", "Імпорт файлу PDF / Illustrator"),
+     ("Import Photoshop File", "Імпорт файлу Photoshop"),
+     ("Interpret Unlabeled Alpha As", "Інтерпретувати непозначену альфу як"),
+-    ("Join the ArtCraft Discord", "Приєднатися до Discord ArtCraft"),
+     ("Mercury GPU Acceleration ({})", "Прискорення Mercury GPU ({})"),
+     ("Mercury Software Only", "Лише програмний Mercury"),
+     ("OCIO (built-in ACES config)", "OCIO (вбудована конфігурація ACES)"),
+@@ -2629,8 +2597,8 @@ const UKRAINIAN: &[(&str, &str)] = &[
      ("New Project", "Новий проєкт"),
      ("Open Project…", "Відкрити проєкт…"),
      ("Templates", "Шаблони"),
@@ -54621,7 +54962,7 @@ index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1f
      ("Motion graphics and visual effects · version {}", "Анімована графіка та візуальні ефекти · версія {}"),
      ("New Composition", "Нова композиція"),
      ("Open Demo Project", "Відкрити демонстраційний проєкт"),
-@@ -2654,7 +2654,7 @@ const UKRAINIAN: &[(&str, &str)] = &[
+@@ -2654,7 +2622,7 @@ const UKRAINIAN: &[(&str, &str)] = &[
      ("{} hours ago", "{} год тому"),
      ("{} day ago", "{} дн. тому"),
      ("{} days ago", "{} дн. тому"),
@@ -54630,16 +54971,28 @@ index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1f
      ("After Effects project", "Проєкт After Effects"),
      ("Lottie animation", "Анімація Lottie"),
      ("Project", "Проєкт"),
-@@ -2674,7 +2674,7 @@ const PORTUGUESE: &[(&str, &str)] = &[
-         "A clean-room, open-source compositor for motion graphics and visual effects: native on macOS, Windows and Linux, and in the browser. Part of the ArtCraft family of creative apps.",
-         "Um compositor de código aberto, desenvolvido em clean-room, para motion graphics e efeitos visuais: nativo no macOS, Windows e Linux, e no navegador. Parte da família de aplicativos criativos ArtCraft.",
-     ),
+@@ -2670,11 +2638,7 @@ const PORTUGUESE: &[(&str, &str)] = &[
+     ("(missing)", "(ausente)"),
+     ("360 View Orientation", "Orientação da vista 360°"),
+     ("3:2 Pulldown: {}", "Pulldown 3:2: {}"),
+-    (
+-        "A clean-room, open-source compositor for motion graphics and visual effects: native on macOS, Windows and Linux, and in the browser. Part of the ArtCraft family of creative apps.",
+-        "Um compositor de código aberto, desenvolvido em clean-room, para motion graphics e efeitos visuais: nativo no macOS, Windows e Linux, e no navegador. Parte da família de aplicativos criativos ArtCraft.",
+-    ),
 -    ("About KIO Effect", "Sobre o KIO Effect"),
 +    ("About Bogo Effect", "Sobre o Bogo Effect"),
      ("About...", "Sobre..."),
      ("Active Camera", "Câmera ativa"),
      ("Adapt Feature On Every Frame", "Adaptar o recurso em cada quadro"),
-@@ -2788,7 +2788,7 @@ const PORTUGUESE: &[(&str, &str)] = &[
+@@ -2767,7 +2731,6 @@ const PORTUGUESE: &[(&str, &str)] = &[
+     ("Delete selected project items", "Excluir itens de projeto selecionados"),
+     ("Delete this template", "Excluir este modelo"),
+     ("Depth of Field", "Profundidade de campo"),
+-    ("Discord", "Discord"),
+     ("Distribute Layers:", "Distribuir camadas:"),
+     ("Don't Recover", "Não recuperar"),
+     ("Don't Save", "Não salvar"),
+@@ -2788,7 +2751,7 @@ const PORTUGUESE: &[(&str, &str)] = &[
      ("Edit Gradient…", "Editar gradiente…"),
      ("Edit Target: {}", "Editar destino: {}"),
      ("Edit in the Timeline", "Editar na linha do tempo"),
@@ -54648,7 +55001,23 @@ index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1f
      ("Effects & Presets options", "Opções de Efeitos e predefinições"),
      ("Copy Presets Folder Path", "Copiar caminho da pasta de predefinições"),
      ("Effects: {}", "Efeitos: {}"),
-@@ -3086,7 +3086,7 @@ const PORTUGUESE: &[(&str, &str)] = &[
+@@ -2839,7 +2802,6 @@ const PORTUGUESE: &[(&str, &str)] = &[
+     ("Install from File…", "Instalar a partir de arquivo…"),
+     ("Intensity", "Intensidade"),
+     ("Inverted", "Invertido"),
+-    ("Join the ArtCraft community on Discord", "Entre na comunidade ArtCraft no Discord"),
+     ("Key: {}", "Tecla: {}"),
+     ("LEARN", "APRENDER"),
+     ("Label", "Rótulo"),
+@@ -2876,7 +2838,6 @@ const PORTUGUESE: &[(&str, &str)] = &[
+     ("Models folder: {}", "Pasta de modelos: {}"),
+     ("Modifiers:", "Modificadores:"),
+     ("More", "Mais"),
+-    ("More ArtCraft apps", "Mais aplicativos ArtCraft"),
+     ("More tutorials", "Mais tutoriais"),
+     ("Motion Blur", "Desfoque de movimento"),
+     ("Motion Blur: {}", "Desfoque de movimento: {}"),
+@@ -3086,7 +3047,7 @@ const PORTUGUESE: &[(&str, &str)] = &[
      ("Variable Font Axes", "Eixos da fonte variável"),
      ("Video Codec: {}", "Codec de vídeo: {}"),
      ("View:", "Exibição:"),
@@ -54657,16 +55026,28 @@ index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1f
      ("Width:", "Largura:"),
      ("You can undo this.", "Você pode desfazer isto."),
      ("Your changes will be lost if you don't save them.", "Suas alterações serão perdidas se você não as salvar."),
-@@ -3117,7 +3117,7 @@ const CZECH: &[(&str, &str)] = &[
-         "A clean-room, open-source compositor for motion graphics and visual effects: native on macOS, Windows and Linux, and in the browser. Part of the ArtCraft family of creative apps.",
-         "Kompoziční nástroj s otevřeným zdrojovým kódem pro pohyblivou grafiku a vizuální efekty, vyvinutý nezávisle metodou clean-room. Běží nativně na macOS, Windows a Linuxu i v prohlížeči. Patří do rodiny kreativních aplikací ArtCraft.",
-     ),
+@@ -3113,11 +3074,7 @@ const CZECH: &[(&str, &str)] = &[
+     ("(missing)", "(chybí)"),
+     ("360 View Orientation", "Orientace zobrazení 360°"),
+     ("3:2 Pulldown: {}", "Převod 3:2 pulldown: {}"),
+-    (
+-        "A clean-room, open-source compositor for motion graphics and visual effects: native on macOS, Windows and Linux, and in the browser. Part of the ArtCraft family of creative apps.",
+-        "Kompoziční nástroj s otevřeným zdrojovým kódem pro pohyblivou grafiku a vizuální efekty, vyvinutý nezávisle metodou clean-room. Běží nativně na macOS, Windows a Linuxu i v prohlížeči. Patří do rodiny kreativních aplikací ArtCraft.",
+-    ),
 -    ("About KIO Effect", "O aplikaci KIO Effect"),
 +    ("About Bogo Effect", "O aplikaci Bogo Effect"),
      ("About...", "O aplikaci…"),
      ("Active", "Aktivní"),
      ("Active Camera", "Aktivní kamera"),
-@@ -3238,7 +3238,7 @@ const CZECH: &[(&str, &str)] = &[
+@@ -3217,7 +3174,6 @@ const CZECH: &[(&str, &str)] = &[
+     ("Delete selected project items", "Odstranit vybrané položky projektu"),
+     ("Delete this template", "Odstranit tuto šablonu"),
+     ("Depth of Field", "Hloubka ostrosti"),
+-    ("Discord", "Discord"),
+     ("Distribute Layers:", "Rozmístit vrstvy:"),
+     ("Don't Recover", "Neobnovovat"),
+     ("Don't Save", "Neukládat"),
+@@ -3238,7 +3194,7 @@ const CZECH: &[(&str, &str)] = &[
      ("Edit Gradient…", "Upravit přechod…"),
      ("Edit Target: {}", "Upravit cíl: {}"),
      ("Edit in the Timeline", "Upravit na časové ose"),
@@ -54675,7 +55056,23 @@ index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1f
      ("Effects & Presets options", "Možnosti efektů a přednastavení"),
      ("Copy Presets Folder Path", "Kopírovat cestu ke složce přednastavení"),
      ("Effects: {}", "Efekty: {}"),
-@@ -3541,7 +3541,7 @@ const CZECH: &[(&str, &str)] = &[
+@@ -3290,7 +3246,6 @@ const CZECH: &[(&str, &str)] = &[
+     ("Install from File…", "Nainstalovat ze souboru…"),
+     ("Intensity", "Intenzita"),
+     ("Inverted", "Invertovaná"),
+-    ("Join the ArtCraft community on Discord", "Připojit se ke komunitě ArtCraft na Discordu"),
+     ("Key: {}", "Klávesa: {}"),
+     ("LEARN", "VÝUKA"),
+     ("Label", "Štítek"),
+@@ -3329,7 +3284,6 @@ const CZECH: &[(&str, &str)] = &[
+     ("Models folder: {}", "Složka modelů: {}"),
+     ("Modifiers:", "Modifikátory:"),
+     ("More", "Další"),
+-    ("More ArtCraft apps", "Další aplikace ArtCraft"),
+     ("More tutorials", "Další výukové lekce"),
+     ("Motion Blur", "Rozostření pohybem"),
+     ("Motion Blur: {}", "Rozostření pohybem: {}"),
+@@ -3541,7 +3495,7 @@ const CZECH: &[(&str, &str)] = &[
      ("Variable Font Axes", "Osy variabilního písma"),
      ("Video Codec: {}", "Video kodek: {}"),
      ("View:", "Zobrazení:"),
@@ -54684,7 +55081,15 @@ index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1f
      ("Width:", "Šířka:"),
      ("You can undo this.", "Tuto akci lze vrátit zpět."),
      ("Your changes will be lost if you don't save them.", "Pokud změny neuložíte, budou ztraceny."),
-@@ -3610,8 +3610,8 @@ const CZECH: &[(&str, &str)] = &[
+@@ -3594,7 +3548,6 @@ const CZECH: &[(&str, &str)] = &[
+     ("Import PDF / Illustrator File", "Importovat soubor PDF / Illustrator"),
+     ("Import Photoshop File", "Importovat soubor Photoshop"),
+     ("Interpret Unlabeled Alpha As", "Interpretovat neoznačenou alfu jako"),
+-    ("Join the ArtCraft Discord", "Připojit se na Discord ArtCraft"),
+     ("Mercury GPU Acceleration ({})", "GPU akcelerace Mercury ({})"),
+     ("Mercury Software Only", "Pouze softwarové zpracování Mercury"),
+     ("OCIO (built-in ACES config)", "OCIO (vestavěná konfigurace ACES)"),
+@@ -3610,8 +3563,8 @@ const CZECH: &[(&str, &str)] = &[
      ("New Project", "Nový projekt"),
      ("Open Project…", "Otevřít projekt…"),
      ("Templates", "Šablony"),
@@ -54695,7 +55100,7 @@ index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1f
      ("Motion graphics and visual effects · version {}", "Pohyblivá grafika a vizuální efekty · verze {}"),
      ("New Composition", "Nová kompozice"),
      ("Open Demo Project", "Otevřít ukázkový projekt"),
-@@ -3633,7 +3633,7 @@ const CZECH: &[(&str, &str)] = &[
+@@ -3633,7 +3586,7 @@ const CZECH: &[(&str, &str)] = &[
      ("{} hours ago", "Před {} hodinami"),
      ("{} day ago", "Před {} dnem"),
      ("{} days ago", "Před {} dny"),
@@ -54704,16 +55109,28 @@ index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1f
      ("After Effects project", "Projekt After Effects"),
      ("Lottie animation", "Animace Lottie"),
      ("Project", "Projekt"),
-@@ -3666,7 +3666,7 @@ const SPANISH: &[(&str, &str)] = &[
-         "A clean-room, open-source compositor for motion graphics and visual effects: native on macOS, Windows and Linux, and in the browser. Part of the ArtCraft family of creative apps.",
-         "Un compositor de código abierto y desarrollado en sala limpia para gráficos en movimiento y efectos visuales: nativo en macOS, Windows y Linux, y en el navegador. Forma parte de la familia de aplicaciones creativas ArtCraft.",
-     ),
+@@ -3662,11 +3615,7 @@ const SPANISH: &[(&str, &str)] = &[
+     ("(missing)", "(ausente)"),
+     ("360 View Orientation", "Orientación de la vista 360°"),
+     ("3:2 Pulldown: {}", "Pulldown 3:2: {}"),
+-    (
+-        "A clean-room, open-source compositor for motion graphics and visual effects: native on macOS, Windows and Linux, and in the browser. Part of the ArtCraft family of creative apps.",
+-        "Un compositor de código abierto y desarrollado en sala limpia para gráficos en movimiento y efectos visuales: nativo en macOS, Windows y Linux, y en el navegador. Forma parte de la familia de aplicaciones creativas ArtCraft.",
+-    ),
 -    ("About KIO Effect", "Acerca de KIO Effect"),
 +    ("About Bogo Effect", "Acerca de Bogo Effect"),
      ("About...", "Acerca de..."),
      ("Active", "Activo"),
      ("Active Camera", "Cámara activa"),
-@@ -3794,7 +3794,7 @@ const SPANISH: &[(&str, &str)] = &[
+@@ -3773,7 +3722,6 @@ const SPANISH: &[(&str, &str)] = &[
+     ("Delete selected project items", "Eliminar elementos del proyecto seleccionados"),
+     ("Delete this template", "Eliminar esta plantilla"),
+     ("Depth of Field", "Profundidad de campo"),
+-    ("Discord", "Discord"),
+     ("Distribute Layers:", "Distribuir capas:"),
+     ("Don't Recover", "No recuperar"),
+     ("Don't Save", "No guardar"),
+@@ -3794,7 +3742,7 @@ const SPANISH: &[(&str, &str)] = &[
      ("Edit Gradient…", "Editar degradado…"),
      ("Edit Target: {}", "Destino de la edición: {}"),
      ("Edit in the Timeline", "Editar en la cronología"),
@@ -54722,7 +55139,23 @@ index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1f
      ("Effects & Presets options", "Opciones de Efectos y ajustes preestablecidos"),
      ("Effects: {}", "Efectos: {}"),
      ("Empty folder", "Carpeta vacía"),
-@@ -4102,7 +4102,7 @@ const SPANISH: &[(&str, &str)] = &[
+@@ -3846,7 +3794,6 @@ const SPANISH: &[(&str, &str)] = &[
+     ("Install from File…", "Instalar desde archivo…"),
+     ("Intensity", "Intensidad"),
+     ("Inverted", "Invertida"),
+-    ("Join the ArtCraft community on Discord", "Únete a la comunidad de ArtCraft en Discord"),
+     ("Key: {}", "Tecla: {}"),
+     ("LEARN", "APRENDER"),
+     ("Label", "Etiqueta"),
+@@ -3885,7 +3832,6 @@ const SPANISH: &[(&str, &str)] = &[
+     ("Models folder: {}", "Carpeta de modelos: {}"),
+     ("Modifiers:", "Modificadores:"),
+     ("More", "Más"),
+-    ("More ArtCraft apps", "Más aplicaciones de ArtCraft"),
+     ("More tutorials", "Más tutoriales"),
+     ("Motion Blur", "Desenfoque de movimiento"),
+     ("Motion Blur: {}", "Desenfoque de movimiento: {}"),
+@@ -4102,7 +4048,7 @@ const SPANISH: &[(&str, &str)] = &[
      ("Variable Font Axes", "Ejes de fuente variable"),
      ("Video Codec: {}", "Códec de vídeo: {}"),
      ("View:", "Vista:"),
@@ -54731,7 +55164,15 @@ index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1f
      ("Width:", "Ancho:"),
      ("You can undo this.", "Puedes deshacer esto."),
      ("Your changes will be lost if you don't save them.", "Tus cambios se perderán si no los guardas."),
-@@ -4171,8 +4171,8 @@ const SPANISH: &[(&str, &str)] = &[
+@@ -4155,7 +4101,6 @@ const SPANISH: &[(&str, &str)] = &[
+     ("Import PDF / Illustrator File", "Importar archivo PDF / Illustrator"),
+     ("Import Photoshop File", "Importar archivo de Photoshop"),
+     ("Interpret Unlabeled Alpha As", "Interpretar alfa sin etiquetar como"),
+-    ("Join the ArtCraft Discord", "Únete al Discord de ArtCraft"),
+     ("Mercury GPU Acceleration ({})", "Aceleración por GPU Mercury ({})"),
+     ("Mercury Software Only", "Solo software Mercury"),
+     ("OCIO (built-in ACES config)", "OCIO (configuración ACES integrada)"),
+@@ -4171,8 +4116,8 @@ const SPANISH: &[(&str, &str)] = &[
      ("New Project", "Nuevo proyecto"),
      ("Open Project…", "Abrir proyecto…"),
      ("Templates", "Plantillas"),
@@ -54742,7 +55183,7 @@ index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1f
      ("Motion graphics and visual effects · version {}", "Gráficos en movimiento y efectos visuales · versión {}"),
      ("New Composition", "Nueva composición"),
      ("Open Demo Project", "Abrir proyecto de demostración"),
-@@ -4194,7 +4194,7 @@ const SPANISH: &[(&str, &str)] = &[
+@@ -4194,7 +4139,7 @@ const SPANISH: &[(&str, &str)] = &[
      ("{} hours ago", "Hace {} horas"),
      ("{} day ago", "Hace {} día"),
      ("{} days ago", "Hace {} días"),
@@ -54751,7 +55192,7 @@ index 93721425f6527ecc93d8f22f1a72fc24ed6c47f9..f7865bd2a75cb891e48d5a5ccc19bf1f
      ("After Effects project", "Proyecto de After Effects"),
      ("Lottie animation", "Animación de Lottie"),
      ("Project", "Proyecto"),
-@@ -4490,7 +4490,7 @@ mod tests {
+@@ -4490,7 +4435,7 @@ mod tests {
                  }
              }
          }
@@ -54805,7 +55246,7 @@ index 0989efbc377ce5c384fc545a2bf65cb81ed1bff7..b17ffd2257b2ee5c3c3819de8484fd77
  
      #[test]
 diff --git a/crates/ui-egui/src/panels/dialogs.rs b/crates/ui-egui/src/panels/dialogs.rs
-index b44ef5c8146e9e846f545a1fdd902836dc3e35c9..3ef007ef1cb30e77f8f9b6a0f8ebf005d56c60bc 100644
+index b44ef5c8146e9e846f545a1fdd902836dc3e35c9..1ac09cd0e0c2600287495160ae292c554488bfb0 100644
 --- a/crates/ui-egui/src/panels/dialogs.rs
 +++ b/crates/ui-egui/src/panels/dialogs.rs
 @@ -274,7 +274,7 @@ fn about(app: &mut EffectcraftApp, ctx: &egui::Context, t: &Tokens) {
@@ -54826,21 +55267,52 @@ index b44ef5c8146e9e846f545a1fdd902836dc3e35c9..3ef007ef1cb30e77f8f9b6a0f8ebf005
      p.text(
          r.min + vec2(90.0, 62.0),
          Align2::LEFT_CENTER,
-@@ -336,12 +336,12 @@ fn about_main(app: &mut EffectcraftApp, ui: &mut egui::Ui, t: &Tokens, cmd: &mut
+@@ -336,45 +336,7 @@ fn about_main(app: &mut EffectcraftApp, ui: &mut egui::Ui, t: &Tokens, cmd: &mut
          t.text_dim,
      );
      ui.add_space(12.0);
 -    ui.label(tr("Independent KIO fork of EffectCraft v0.10.0 by the ArtCraft team. No upstream endorsement."));
-+    ui.label(tr("Independent Bogo fork of EffectCraft v0.10.0 by the ArtCraft team. No upstream endorsement."));
      ui.add_space(14.0);
-     let links: [(Icon, &str, &str, &'static str); 4] = [
-         (Icon::Chat, "Upstream EffectCraft community", effectcraft_engine::links::DISCORD, "help.discord"),
-         (Icon::Globe, "Upstream ArtCraft website", effectcraft_engine::links::WEBSITE, "help.website"),
+-    let links: [(Icon, &str, &str, &'static str); 4] = [
+-        (Icon::Chat, "Upstream EffectCraft community", effectcraft_engine::links::DISCORD, "help.discord"),
+-        (Icon::Globe, "Upstream ArtCraft website", effectcraft_engine::links::WEBSITE, "help.website"),
 -        (Icon::Sparkle, "KIO Effect home page", effectcraft_engine::links::APP_PAGE, "help.appPage"),
-+        (Icon::Sparkle, "Bogo Effect home page", effectcraft_engine::links::APP_PAGE, "help.appPage"),
-         (Icon::Code, "Source code on GitHub", effectcraft_engine::links::GITHUB, "help.github"),
-     ];
-     for (icon, label, url, c) in links {
+-        (Icon::Code, "Source code on GitHub", effectcraft_engine::links::GITHUB, "help.github"),
+-    ];
+-    for (icon, label, url, c) in links {
+-        let (r, resp) = ui.allocate_exact_size(vec2(ui.available_width(), 30.0), Sense::click());
+-        let p = ui.painter();
+-        let discord = c == "help.discord";
+-        p.rect_filled(
+-            r,
+-            6.0,
+-            if discord {
+-                Color32::from_rgb(0x58, 0x65, 0xf2)
+-            } else if resp.hovered() {
+-                t.hover
+-            } else {
+-                t.field_bg
+-            },
+-        );
+-        let foreground = if discord { Color32::WHITE } else { t.text };
+-        icons::paint(p, Rect::from_center_size(pos2(r.min.x + 18.0, r.center().y), vec2(15.0, 15.0)), icon, foreground);
+-        p.text(pos2(r.min.x + 36.0, r.center().y), Align2::LEFT_CENTER, tr(label), Tokens::medium(12.5), foreground);
+-        p.text(
+-            pos2(r.max.x - 12.0, r.center().y),
+-            Align2::RIGHT_CENTER,
+-            url,
+-            Tokens::ui(11.0),
+-            if discord { Color32::from_white_alpha(200) } else { t.text_dim },
+-        );
+-        app.auto.add(&format!("about.{c}"), r, label);
+-        if resp.clicked() {
+-            *cmd = Some(c);
+-        }
+-        ui.add_space(4.0);
+-    }
+ }
+ 
+ fn comp_settings(app: &mut EffectcraftApp, ctx: &egui::Context, t: &Tokens, existing: bool) {
 diff --git a/crates/ui-egui/src/panels/effect_controls.rs b/crates/ui-egui/src/panels/effect_controls.rs
 index 4ba2c77180f14d94a8adb0e73b44e22aa5ef62e9..351115cefdb7c38aabefee303a6aafa062983b81 100644
 --- a/crates/ui-egui/src/panels/effect_controls.rs
@@ -54868,7 +55340,7 @@ index 2e99c7d39c90ae7ceb67a8d49135a9e0caf5eba8..54733546439e718cc884df0a7df4389c
                      }
                      let src = essential::source_prop(&app.session.project, cid, c).map(|(l, p)| (l.id.0, l.layer_time(app.session.time()), p.clone()));
 diff --git a/crates/ui-egui/src/panels/home.rs b/crates/ui-egui/src/panels/home.rs
-index 414bce258e8dc94fc21f878abe0755be4c6d47af..e130495a5e1ce51850304f8ea494146777cdf350 100644
+index 414bce258e8dc94fc21f878abe0755be4c6d47af..9c3ef27d1bbe96af29459f5758bc983710bb9bbb 100644
 --- a/crates/ui-egui/src/panels/home.rs
 +++ b/crates/ui-egui/src/panels/home.rs
 @@ -116,7 +116,7 @@ pub fn format_size(bytes: u64) -> String {
@@ -54880,18 +55352,59 @@ index 414bce258e8dc94fc21f878abe0755be4c6d47af..e130495a5e1ce51850304f8ea4941467
          Some("aep" | "aepx") => "After Effects project",
          Some("json" | "lottie") => "Lottie animation",
          _ => "Project",
-@@ -274,8 +274,8 @@ fn rail_ui(app: &mut EffectcraftApp, ui: &mut egui::Ui, p: &egui::Painter, rail:
-     let links = [
-         (Icon::Chat, "Join the ArtCraft Discord", "help.discord"),
-         (Icon::Globe, "getartcraft.com", "help.website"),
+@@ -270,51 +270,6 @@ fn rail_ui(app: &mut EffectcraftApp, ui: &mut egui::Ui, p: &egui::Painter, rail:
+         }
+         y += 38.0;
+     }
+-    // Community links at the foot (below the pages when the window is short).
+-    let links = [
+-        (Icon::Chat, "Join the ArtCraft Discord", "help.discord"),
+-        (Icon::Globe, "getartcraft.com", "help.website"),
 -        (Icon::Globe, "KIO Effect home page", "help.appPage"),
 -        (Icon::Code, "KIO Effect on GitHub", "help.github"),
-+        (Icon::Globe, "Bogo Effect home page", "help.appPage"),
-+        (Icon::Code, "Bogo Effect on GitHub", "help.github"),
-     ];
-     let sib = effectcraft_engine::links::SIBLINGS;
-     let sib_rows = sib.len().div_ceil(2) as f32;
-@@ -329,7 +329,7 @@ fn home_page(
+-    ];
+-    let sib = effectcraft_engine::links::SIBLINGS;
+-    let sib_rows = sib.len().div_ceil(2) as f32;
+-    let foot_h = 22.0 + links.len() as f32 * 30.0 + 22.0 + sib_rows * 26.0;
+-    let mut cy = (rail.max.y - 16.0 - foot_h).max(y + 16.0);
+-    p.line_segment([pos2(x0, cy - 10.0), pos2(x0 + w, cy - 10.0)], Stroke::new(1.0, t.separator));
+-    p.text(pos2(x0, cy + 6.0), Align2::LEFT_CENTER, tr("Community"), Tokens::semibold(12.0), t.text_dim);
+-    cy += 22.0;
+-    for (icon, label, cmd) in links {
+-        let r = Rect::from_min_size(pos2(x0, cy), vec2(w, 26.0));
+-        let resp = ui.interact(r, egui::Id::new(("home-link", cmd)), Sense::click());
+-        let discord = cmd == "help.discord";
+-        if discord {
+-            p.rect_filled(r, 13.0, Color32::from_rgb(0x58, 0x65, 0xf2));
+-        } else if resp.hovered() {
+-            p.rect_filled(r, 13.0, t.hover);
+-        }
+-        let col = if discord { Color32::WHITE } else { t.text };
+-        icons::paint(p, Rect::from_center_size(pos2(r.min.x + 16.0, r.center().y), vec2(13.0, 13.0)), icon, col);
+-        p.text(pos2(r.min.x + 30.0, r.center().y), Align2::LEFT_CENTER, tr(label), Tokens::medium(12.0), col);
+-        app.auto.add(&format!("home.{cmd}"), r, label);
+-        if resp.clicked() {
+-            let _ = app.session.execute(cmd, json!({}));
+-        }
+-        cy += 30.0;
+-    }
+-    p.text(pos2(x0, cy + 8.0), Align2::LEFT_CENTER, tr("More ArtCraft apps"), Tokens::ui(11.0), t.text_faint);
+-    cy += 20.0;
+-    let sw = (w - 6.0) / 2.0;
+-    for (i, (name, slug)) in sib.iter().enumerate() {
+-        let r = Rect::from_min_size(pos2(x0 + (i % 2) as f32 * (sw + 6.0), cy + (i / 2) as f32 * 26.0), vec2(sw, 22.0));
+-        let resp = ui.interact(r, egui::Id::new(("sib", *slug)), Sense::click());
+-        p.rect_filled(r, 11.0, if resp.hovered() { t.hover } else { t.field_bg });
+-        p.text(r.center(), Align2::CENTER_CENTER, *name, Tokens::ui(11.0), t.text);
+-        app.auto.add(&format!("home.sibling.{slug}"), r, name);
+-        if resp.clicked() {
+-            let _ = app.session.execute("help.sibling", json!({"app": slug}));
+-        }
+-    }
+ }
+ 
+ /// The Home page: the welcome, quick-start tiles and the recent projects table.
+@@ -329,7 +284,7 @@ fn home_page(
      let t = app.tokens;
      let (x0, w) = (area.min.x, area.width());
      let mut y = area.min.y;
@@ -54900,7 +55413,7 @@ index 414bce258e8dc94fc21f878abe0755be4c6d47af..e130495a5e1ce51850304f8ea4941467
      y += 40.0;
      p.text(
          pos2(x0, y + 8.0),
-@@ -532,7 +532,7 @@ mod tests {
+@@ -532,7 +487,7 @@ mod tests {
          assert_eq!(format_ago(now, now - 30 * 86_400), "2026-08-22");
          assert_eq!(format_ago(now, now + 100), "Just now");
          assert_eq!((format_size(900), format_size(13_000), format_size(3_500_000)), ("900 B".into(), "13 KB".into(), "3.3 MB".into()));
@@ -54909,7 +55422,7 @@ index 414bce258e8dc94fc21f878abe0755be4c6d47af..e130495a5e1ce51850304f8ea4941467
      }
  
      /// The Home screen's own text goes through the interface catalog (#574): the Opened and Kind
-@@ -545,7 +545,7 @@ mod tests {
+@@ -545,7 +500,7 @@ mod tests {
          crate::i18n::set_current("zh-hant");
          let tw = (format_ago(now, now - 60), kind_of("x"));
          crate::i18n::set_current("en");
@@ -54918,6 +55431,15 @@ index 414bce258e8dc94fc21f878abe0755be4c6d47af..e130495a5e1ce51850304f8ea4941467
          assert_eq!(tw, ("1 分鐘前".into(), "專案"));
          assert_eq!(tr("Filter recent files"), "Filter recent files");
      }
+@@ -569,8 +524,6 @@ mod tests {
+             "home.file.open",
+             "home.app.newComp",
+             "home.file.openDemoProject",
+-            "home.help.discord",
+-            "home.help.github",
+             "home.recent.0",
+             "home.filter",
+             "home.file.import",
 diff --git a/crates/ui-egui/src/panels/learn.rs b/crates/ui-egui/src/panels/learn.rs
 index f69f08cf23e18c9779a0272c26f9fae415e7ee2a..2b06296718eb4d7106a0a064d177749e68c036d2 100644
 --- a/crates/ui-egui/src/panels/learn.rs
@@ -55258,6 +55780,24 @@ index 94d0a093f3d8cc77d6a37028905779cc81e08ee9..3c2b34529c484f2e1cb5db249d3de37e
      h.run_steps(2);
      assert_eq!(key_times(&h, id), vec![0.0, 1.0, 3.0]);
  }
+diff --git a/crates/ui-egui/tests/ui_panels.rs b/crates/ui-egui/tests/ui_panels.rs
+index 15439a02bd23f8e1278763c423a9087d78b2fde3..6ef04763bcc1b3428a3b0a54143202682732066c 100644
+--- a/crates/ui-egui/tests/ui_panels.rs
++++ b/crates/ui-egui/tests/ui_panels.rs
+@@ -42,10 +42,9 @@ fn click(h: &mut Harness<'_, EffectcraftApp>, id: &str) {
+ #[test]
+ fn discord_pill_fits_its_label() {
+     let h = harness();
+-    let e = h.state().auto.find("header.discord").expect("the Discord pill").clone();
+-    let text = h.ctx.fonts_mut(|f| f.layout_no_wrap("Discord".into(), effectcraft_ui_egui::theme::Tokens::semibold(12.0), egui::Color32::WHITE).size().x);
+-    // Padding 10, the 14 px icon, a 6 px gap, the text, padding 12.
+-    assert!((e.rect[2] - (text + 42.0)).abs() < 0.5, "{} for a {text} px label", e.rect[2]);
++    for id in ["header.discord", "header.github", "header.web"] {
++        assert!(h.state().auto.find(id).is_none(), "{id}");
++    }
+ }
+ 
+ #[test]
 diff --git a/crates/ui-egui/tests/ui_timeline_shapes.rs b/crates/ui-egui/tests/ui_timeline_shapes.rs
 index 84d23e8a53dc66e35c10108efe29d30019246d49..4050c27674992f0ac01f7b772a95afd84f36d1d1 100644
 --- a/crates/ui-egui/tests/ui_timeline_shapes.rs

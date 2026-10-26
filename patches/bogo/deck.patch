@@ -1,3 +1,40 @@
+diff --git a/apps/deckcraft-cli/src/main.rs b/apps/deckcraft-cli/src/main.rs
+index fd1d96ea228e417d780e170df27f86a2dd71164b..8c58717bd4f279708399b577ecde5fde61dfe5d1 100644
+--- a/apps/deckcraft-cli/src/main.rs
++++ b/apps/deckcraft-cli/src/main.rs
+@@ -10,7 +10,7 @@
+ //! deckcraft-cli describe ID                     # one command
+ //! deckcraft-cli app [--port PORT] COMMAND [JSON] | --method METHOD [JSON]   # drive the running app
+ //! deckcraft-cli mcp [--connect PORT] [--sample] # MCP server over stdio
+-//! deckcraft-cli links | --version
++//! deckcraft-cli --version
+ //! ```
+ #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
+ #![forbid(unsafe_code)]
+@@ -42,7 +42,7 @@ const USAGE: &str = "usage: deckcraft-cli info FILE
+        deckcraft-cli describe COMMAND
+        deckcraft-cli app [--port PORT] COMMAND [JSON] | --method METHOD [JSON]
+        deckcraft-cli mcp [--connect PORT] [--sample]
+-       deckcraft-cli links | --version";
++       deckcraft-cli --version";
+ 
+ fn main() -> ExitCode {
+     let args: Vec<String> = std::env::args().skip(1).collect();
+@@ -72,14 +72,8 @@ fn main() -> ExitCode {
+         Some("describe") => report(describe(rest.first().map(String::as_str))),
+         Some("app") => report(app(rest)),
+         Some("mcp") => report(mcp(rest)),
+-        Some("links") => {
+-            use deckcraft_engine::links::*;
+-            outln!("Discord   {DISCORD}\nWebsite   {WEBSITE}\nApp page  {APP_PAGE}\nGitHub    {GITHUB}");
+-            ExitCode::SUCCESS
+-        }
+         _ => {
+             eprintln!("{USAGE}");
+-            eprintln!("\nCommunity: {}  ·  {}", deckcraft_engine::links::DISCORD, deckcraft_engine::links::APP_PAGE);
+             ExitCode::FAILURE
+         }
+     }
 diff --git a/apps/deckcraft/build.rs b/apps/deckcraft/build.rs
 index 8347156c7185be46bd91a8029ced51838776d7b2..387776ce7ff6baf9e0f1d3b71f6ebff0d184b3f6 100644
 --- a/apps/deckcraft/build.rs
@@ -50467,8 +50504,38 @@ zf1I?<b;HgNhC&L3GkqHL^!_8BjUt}`4gmqDMC5Ewqt+We;1Jl0tW{s?ve#>g^&X&<
 zHle3un3g{xyR9%Jba-#ym1~a<bsyT7gv)04o6R693M^KQrdSEiC(M~?QDDG>;&q_w
 u_{$u70KNW&i2eWNfeqk)HWHW5>?gP>g5F&tx@a7doLg3Rf3Cmonfz}xTliA|
 
+diff --git a/crates/mcp/src/server.rs b/crates/mcp/src/server.rs
+index 576e0b4a8aaf2edae4104ec8a8ab515162d09efd..fc3a32a8714d52e034ab92287bb05d0e5ad170cc 100644
+--- a/crates/mcp/src/server.rs
++++ b/crates/mcp/src/server.rs
+@@ -18,7 +18,7 @@ const INVALID_PARAMS: i64 = -32602;
+ const INTERNAL_ERROR: i64 = -32603;
+ const RESOURCE_NOT_FOUND: i64 = -32002;
+ 
+-const INSTRUCTIONS: &str = "DeckCraft is a presentation app (a PowerPoint clone). Coordinates are points on the \
++const INSTRUCTIONS: &str = "Bogo Deck is a presentation app (a PowerPoint clone). Coordinates are points on the \
+ current slide (y down; the default 16:9 slide is 960×540). Every action is a command: find ids and parameters with \
+ list_commands and run them with run_command (or several with batch). Typical flow: new_presentation → add_slide \
+ {layout:\"titleAndContent\", title, body} → add_shape / add_text_box / insert_picture / insert_chart → \
+@@ -135,13 +135,10 @@ impl Server {
+                 Ok(json!({
+                     "protocolVersion": version,
+                     "capabilities": {"tools": {}, "resources": {}},
+-                    "serverInfo": {"name": "deckcraft", "title": "DeckCraft", "version": env!("CARGO_PKG_VERSION"), "websiteUrl": deckcraft_engine::links::APP_PAGE},
++                    "serverInfo": {"name": "deckcraft", "title": "Bogo Deck", "version": env!("CARGO_PKG_VERSION")},
+                     "instructions": format!(
+-                        "{INSTRUCTIONS} Backend: {}. Community: {} (Discord), {} (app page), {} (source). The `app.links` command returns these links.",
+-                        self.backend.describe(),
+-                        deckcraft_engine::links::DISCORD,
+-                        deckcraft_engine::links::APP_PAGE,
+-                        deckcraft_engine::links::GITHUB
++                        "{INSTRUCTIONS} Backend: {}.",
++                        self.backend.describe()
+                     ),
+                 }))
+             }
 diff --git a/crates/ui-egui/src/backstage.rs b/crates/ui-egui/src/backstage.rs
-index b5ed06306963b7e3b74710655c7c52c3300f29db..bc49929127322ddeac961eafc04c1be8f5a00cd8 100644
+index b5ed06306963b7e3b74710655c7c52c3300f29db..543e6c5d7b66c9e3f7b2f258cc677cd02b8d1e42 100644
 --- a/crates/ui-egui/src/backstage.rs
 +++ b/crates/ui-egui/src/backstage.rs
 @@ -208,7 +208,7 @@ impl Backstage {
@@ -50516,7 +50583,15 @@ index b5ed06306963b7e3b74710655c7c52c3300f29db..bc49929127322ddeac961eafc04c1be8
      });
      ui.add_space(18.0);
      ui.horizontal(|ui| {
-@@ -732,7 +732,7 @@ fn info(app: &mut SlideApp, ui: &mut Ui, bs: &mut Backstage) {
+@@ -665,7 +665,6 @@ fn home(app: &mut SlideApp, ui: &mut Ui, bs: &mut Backstage, out: &mut Outcome)
+         });
+     }
+     ui.add_space(30.0);
+-    ui.hyperlink_to("Upstream DeckCraft community", deckcraft_engine::links::DISCORD);
+ }
+ 
+ /// New: a blank presentation, then every theme with a search box.
+@@ -732,7 +731,7 @@ fn info(app: &mut SlideApp, ui: &mut Ui, bs: &mut Backstage) {
      let path = v.get("path").and_then(Value::as_str).map(str::to_string);
      let title = v.get("title").and_then(Value::as_str).unwrap_or("").to_string();
      let dirty = v.get("dirty").and_then(Value::as_bool).unwrap_or(false);
@@ -50525,7 +50600,7 @@ index b5ed06306963b7e3b74710655c7c52c3300f29db..bc49929127322ddeac961eafc04c1be8
      match &path {
          Some(p) => dim(ui, p),
          None => dim(ui, "Not saved yet"),
-@@ -925,9 +925,9 @@ fn print(app: &mut SlideApp, ui: &mut Ui, bs: &mut Backstage) {
+@@ -925,9 +924,9 @@ fn print(app: &mut SlideApp, ui: &mut Ui, bs: &mut Backstage) {
              dim(
                  ui,
                  if app.services.pick_save.is_some() {
@@ -50537,7 +50612,7 @@ index b5ed06306963b7e3b74710655c7c52c3300f29db..bc49929127322ddeac961eafc04c1be8
                  },
              );
              ui.add_space(14.0);
-@@ -1211,7 +1211,7 @@ fn account(app: &mut SlideApp, ui: &mut Ui) {
+@@ -1211,7 +1210,7 @@ fn account(app: &mut SlideApp, ui: &mut Ui) {
              });
              ui.add_space(16.0);
              heading(ui, "User Information");
@@ -50546,7 +50621,7 @@ index b5ed06306963b7e3b74710655c7c52c3300f29db..bc49929127322ddeac961eafc04c1be8
          });
          ui.add_space(40.0);
          ui.vertical(|ui| {
-@@ -1219,7 +1219,7 @@ fn account(app: &mut SlideApp, ui: &mut Ui) {
+@@ -1219,7 +1218,7 @@ fn account(app: &mut SlideApp, ui: &mut Ui) {
              ui.horizontal(|ui| {
                  let (r, _) = ui.allocate_exact_size(vec2(40.0, 40.0), Sense::hover());
                  crate::dialogs::paint_logo(ui.painter(), r);
@@ -50555,7 +50630,7 @@ index b5ed06306963b7e3b74710655c7c52c3300f29db..bc49929127322ddeac961eafc04c1be8
              });
              dim(ui, &crate::dialogs::version_line());
              dim(ui, "Open source under MIT OR Apache-2.0. Not affiliated with Microsoft.");
-@@ -1227,8 +1227,8 @@ fn account(app: &mut SlideApp, ui: &mut Ui) {
+@@ -1227,15 +1226,13 @@ fn account(app: &mut SlideApp, ui: &mut Ui) {
              if task(
                  ui,
                  Icon::Help,
@@ -50566,6 +50641,13 @@ index b5ed06306963b7e3b74710655c7c52c3300f29db..bc49929127322ddeac961eafc04c1be8
                  "The version, the people and models who built it, and where to find us.",
                  true,
              ) {
+                 let _ = app.run("app.about", json!({}));
+             }
+-            ui.hyperlink_to("Join our community on Discord", deckcraft_engine::links::DISCORD);
+-            ui.hyperlink_to("Source on GitHub", deckcraft_engine::links::GITHUB);
+         });
+     });
+ }
 diff --git a/crates/ui-egui/src/backstage_tests.rs b/crates/ui-egui/src/backstage_tests.rs
 index 729236a0e64315e281cff357dbb07cf84d881ddc..db0ee9476c7a575c0591bb8bb9932b8153a10db1 100644
 --- a/crates/ui-egui/src/backstage_tests.rs
@@ -50580,7 +50662,7 @@ index 729236a0e64315e281cff357dbb07cf84d881ddc..db0ee9476c7a575c0591bb8bb9932b81
      for (p, marker) in checks {
          h.state_mut().run("app.backstage", json!({"page": p.id()})).unwrap();
 diff --git a/crates/ui-egui/src/dialogs.rs b/crates/ui-egui/src/dialogs.rs
-index 760bc0efbf0ad37bbc528c4957350d6e372c0667..a816214aeb95d14fe9a7e005d029e172f51b2667 100644
+index 760bc0efbf0ad37bbc528c4957350d6e372c0667..cd63eab65f7adb21b44da449d2c99109e9754cd5 100644
 --- a/crates/ui-egui/src/dialogs.rs
 +++ b/crates/ui-egui/src/dialogs.rs
 @@ -43,7 +43,7 @@ fn title(id: &str) -> &'static str {
@@ -50603,7 +50685,7 @@ index 760bc0efbf0ad37bbc528c4957350d6e372c0667..a816214aeb95d14fe9a7e005d029e172
      }
  }
  
-@@ -785,11 +785,11 @@ pub fn about(_app: &mut SlideApp, ui: &mut Ui) {
+@@ -785,13 +785,11 @@ pub fn about(_app: &mut SlideApp, ui: &mut Ui) {
      ui.vertical_centered(|ui| {
          let (r, _) = ui.allocate_exact_size(vec2(64.0, 64.0), Sense::hover());
          paint_logo(ui.painter(), r);
@@ -50613,12 +50695,13 @@ index 760bc0efbf0ad37bbc528c4957350d6e372c0667..a816214aeb95d14fe9a7e005d029e172
          ui.add_space(6.0);
          ui.label("Presentations and slide shows, rebuilt from scratch in pure Rust.");
 -        ui.label("Independent KIO fork. Original DeckCraft v0.7.0 by the ArtCraft team.");
-+        ui.label("Independent Bogo fork. Original DeckCraft v0.7.0 by the ArtCraft team.");
          ui.add_space(6.0);
-         ui.hyperlink_to("Upstream DeckCraft community", deckcraft_engine::links::DISCORD);
+-        ui.hyperlink_to("Upstream DeckCraft community", deckcraft_engine::links::DISCORD);
          ui.hyperlink_to("Upstream DeckCraft project", deckcraft_engine::links::APP_PAGE);
+         ui.hyperlink_to("Source on GitHub", deckcraft_engine::links::GITHUB);
+         ui.add_space(6.0);
 diff --git a/crates/ui-egui/src/lib.rs b/crates/ui-egui/src/lib.rs
-index 7df2def7cd19f7ce5850e59a9586c0db5d3cbbd8..0163267ee2e8770d2349354527a5f0b09edb4d25 100644
+index 7df2def7cd19f7ce5850e59a9586c0db5d3cbbd8..51a902c269060967a405f95bba7abf1e7536422c 100644
 --- a/crates/ui-egui/src/lib.rs
 +++ b/crates/ui-egui/src/lib.rs
 @@ -158,7 +158,7 @@ pub const UI_COMMANDS: &[(&str, &str, Option<&str>, &str)] = &[
@@ -50630,7 +50713,15 @@ index 7df2def7cd19f7ce5850e59a9586c0db5d3cbbd8..0163267ee2e8770d2349354527a5f0b0
      ("app.palette", "Command Palette", Some("Cmd+Shift+P"), "{}"),
      ("app.preferences", "Preferences…", Some("Cmd+,"), "{}"),
      ("app.openDialog", "Open…", None, "{purpose?}"),
-@@ -366,7 +366,7 @@ impl SlideApp {
+@@ -168,7 +168,6 @@ pub const UI_COMMANDS: &[(&str, &str, Option<&str>, &str)] = &[
+     ("app.saveAsDialog", "Save As…", None, "{}"),
+     ("app.exportDialog", "Export…", None, "{}"),
+     ("app.dialog", "Open Dialog", None, "{id}"),
+-    ("app.links", "Community Links", None, "{}"),
+ ];
+ 
+ pub struct Perf {
+@@ -366,7 +365,7 @@ impl SlideApp {
              "outline" | "txt" => ("txt", "outline", false),
              "deckcraft" => ("deckcraft", "deckcraft", false),
              other => {
@@ -50639,7 +50730,18 @@ index 7df2def7cd19f7ce5850e59a9586c0db5d3cbbd8..0163267ee2e8770d2349354527a5f0b0
                  return false;
              }
          };
-@@ -705,7 +705,7 @@ impl SlideApp {
+@@ -545,10 +544,6 @@ impl SlideApp {
+                 let d = p.get("id").and_then(Value::as_str).ok_or("missing `id`")?;
+                 self.dialog = Some(dialogs::Dialog::new(d));
+             }
+-            "app.links" => {
+-                use deckcraft_engine::links::*;
+-                return Ok(json!({"discord": DISCORD, "website": WEBSITE, "apps": APPS, "appPage": APP_PAGE, "github": GITHUB}));
+-            }
+             _ => return Err(format!("unknown UI command `{id}`")),
+         }
+         Ok(Value::Null)
+@@ -705,7 +700,7 @@ impl SlideApp {
          } else if lower.ends_with(".txt") || lower.ends_with(".md") {
              "slide.fromOutline"
          } else {

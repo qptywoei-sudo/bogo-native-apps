@@ -50936,7 +50936,7 @@ index 5aacbbd56bf3f37e67ab7531a478ea5855a94aef..88ef8c946458431d00c68b6cd0998ee7
                      }
                      if ui.button("Session Info").clicked() {
 diff --git a/crates/ui-egui/src/panels.rs b/crates/ui-egui/src/panels.rs
-index 8506df4590df12606c98952f26b67a3bf4ffd0ce..3421f2f1b00c5b12959d7618845236351b1447c7 100644
+index 8506df4590df12606c98952f26b67a3bf4ffd0ce..cdb95e40d0506c2945c61a1039995173f7ea42bd 100644
 --- a/crates/ui-egui/src/panels.rs
 +++ b/crates/ui-egui/src/panels.rs
 @@ -196,7 +196,13 @@ pub fn clip_list(app: &mut SoundApp, ui: &mut Ui) {
@@ -50963,7 +50963,7 @@ index 8506df4590df12606c98952f26b67a3bf4ffd0ce..3421f2f1b00c5b12959d761884523635
          let mut tab = ui.data_mut(|d| d.get_temp::<u8>(tab_id)).unwrap_or(0);
          ui.horizontal(|ui| {
              for (i, l) in (0u8..).zip(["About", "Contributors", "Models"]) {
-@@ -609,9 +615,9 @@ fn about(app: &mut SoundApp, ctx: &egui::Context) {
+@@ -609,12 +615,9 @@ fn about(app: &mut SoundApp, ctx: &egui::Context) {
              1 => crate::credits::contributors_ui(ui),
              2 => crate::credits::models_ui(ui),
              _ => {
@@ -50971,10 +50971,12 @@ index 8506df4590df12606c98952f26b67a3bf4ffd0ce..3421f2f1b00c5b12959d761884523635
 +                ui.label(egui::RichText::new("Bogo Sound").font(bold(22.0)));
                  ui.label(format!("Version {}", env!("CARGO_PKG_VERSION")));
 -                ui.label("Independent KIO fork of SoundCraft v0.7.0 by the ArtCraft team. No upstream endorsement.");
-+                ui.label("Independent Bogo fork of SoundCraft v0.7.0 by the ArtCraft team. No upstream endorsement.");
                  ui.label("Dual-licensed MIT OR Apache-2.0. Made with Rust and egui.");
-                 ui.hyperlink_to("Upstream SoundCraft project", "https://getartcraft.com/apps/soundcraft");
-                 ui.hyperlink_to("Upstream SoundCraft community", "https://discord.gg/artcraft");
+-                ui.hyperlink_to("Upstream SoundCraft project", "https://getartcraft.com/apps/soundcraft");
+-                ui.hyperlink_to("Upstream SoundCraft community", "https://discord.gg/artcraft");
+             }
+         }
+     });
 diff --git a/crates/ui-egui/src/theme.rs b/crates/ui-egui/src/theme.rs
 index 0cf5b9bd60658e45a851b44703e65690967eeccb..fe356ad60721d97435d6f3b7bdd322710e73e433 100644
 --- a/crates/ui-egui/src/theme.rs

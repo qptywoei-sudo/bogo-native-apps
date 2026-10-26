@@ -34,6 +34,93 @@ def canonical_guid(value):
     return str(uuid.UUID(value[1:-1] if value.startswith('{') else value)).upper()
 
 
+PRIOR_BOGO_VERSIONS = {'design': '0.8.0-bogo.1', 'grid': '0.7.0-bogo.1'}
+PRIOR_BOGO_REPOSITORY = 'qptywoei-sudo/bogo-native-apps'
+
+
+def prior_bogo_required(lock):
+    if lock['id'] not in PRIOR_BOGO_VERSIONS:
+        return False
+    version = re.fullmatch(r'([0-9]+\.[0-9]+\.[0-9]+)-bogo\.([1-9][0-9]*)', lock['version'])
+    require(version is not None and version[1] == lock['upstreamVersion'], 'Invalid current Bogo upgrade target version')
+    return int(version[2]) >= 2
+
+
+def prior_bogo_input(lock, pins):
+    """Closed, separately branded inputs; these never substitute the fourteen KIO pins."""
+    require(isinstance(pins, dict) and type(pins.get('schema')) is int and pins['schema'] == 1 and pins.get('repository') == PRIOR_BOGO_REPOSITORY, 'Prior Bogo pins require the exact published repository/schema')
+    rows = pins.get('applications')
+    require(isinstance(rows, list) and len(rows) == 2 and {row.get('id') for row in rows if isinstance(row, dict)} == set(PRIOR_BOGO_VERSIONS), 'Prior Bogo pins require exactly Design and Grid without duplicates')
+    for row in rows:
+        app = row['id']
+        name, version = 'Bogo ' + app.title(), PRIOR_BOGO_VERSIONS[app]
+        require(row.get('name') == name and row.get('version') == version and row.get('bundleId') == 'com.kio.' + app, 'Prior Bogo product/version/bundle identity differs')
+        require(row.get('releaseTag') == app + '-v' + version and row.get('windowsProductVersion') == version.split('-bogo.')[0], 'Prior Bogo release/MSI version differs')
+        require(canonical_guid(row.get('productCode')) != canonical_guid(row.get('upgradeCode')), 'Prior Bogo ProductCode must differ from its UpgradeCode')
+        pin = row.get('windowsMsi')
+        filename = name.replace(' ', '-') + '-' + version + '-windows-x64.msi'
+        require(isinstance(pin, dict) and pin.get('filename') == filename and pin.get('url') == 'https://github.com/' + PRIOR_BOGO_REPOSITORY + '/releases/download/' + row['releaseTag'] + '/' + filename, 'Prior Bogo MSI must use its exact immutable published app URL')
+        require(type(pin.get('bytes')) is int and 1_000_000 <= pin['bytes'] < 2 * 1024**3 and isinstance(pin.get('sha256'), str) and re.fullmatch(r'[a-f0-9]{64}', pin['sha256']), 'Invalid prior Bogo MSI size/SHA-256 pin')
+    if not prior_bogo_required(lock):
+        return None
+    row = next(row for row in rows if row['id'] == lock['id'])
+    require(row['name'] == lock['name'] and row['bundleId'] == lock['bundleId'] and canonical_guid(row['upgradeCode']) == canonical_guid(lock['bogoOverlay']['windowsInstallerIdentity']['upgradeCode']), 'Prior Bogo pin differs from the current preserved app identity')
+    return row
+
+
+def validate_prior_bogo_msi(row, previous, current, lock):
+    require(previous['ProductName'] == lock['name'] == row['name'] and previous['Manufacturer'] == 'Bogo', 'Published prior MSI is not the exact Bogo product/publisher')
+    require(previous['ProductVersion'] == row['windowsProductVersion'] and canonical_guid(previous['ProductCode']) == canonical_guid(row['productCode']), 'Published prior Bogo MSI version/ProductCode differs from its observed pin')
+    require(current['ProductName'] == lock['name'] and current['Manufacturer'] == 'Bogo', 'Current MSI product/publisher differs')
+    require(canonical_guid(previous['UpgradeCode']) == canonical_guid(current['UpgradeCode']) == canonical_guid(row['upgradeCode']), 'Actual Bogo-to-Bogo MSI UpgradeCode continuity failed')
+    require(canonical_guid(previous['ProductCode']) != canonical_guid(current['ProductCode']), 'Bogo-to-Bogo upgrade requires a genuine distinct current ProductCode')
+
+
+def prepare_prior_bogo_upgrade(lock, output, current_properties):
+    pins = json.loads((bogo.ROOT / 'manifests/bogo-prior-bogo-upgrade-inputs.json').read_text(encoding='utf-8'))
+    row = prior_bogo_input(lock, pins)
+    if row is None:
+        return None
+    path = output / 'verified-prior-bogo1.msi'
+    require(not path.exists(), 'Existing prior Bogo MSI input is preserved')
+    urllib.request.urlretrieve(row['windowsMsi']['url'], path)
+    require(path.stat().st_size == row['windowsMsi']['bytes'] and digest(path) == row['windowsMsi']['sha256'], 'Downloaded prior Bogo MSI differs from its actual published size/SHA-256 pin')
+    previous = msi_properties(path)
+    validate_prior_bogo_msi(row, previous, current_properties, lock)
+    require(product_state(previous['ProductCode']) == -1, 'Refusing upgrade smoke against a pre-existing published Bogo installation')
+    return {'row': row, 'path': path, 'properties': previous}
+
+
+def installed_gui_binary(destination, lock, expected_binary):
+    binaries = [path for path in destination.rglob('*.exe') if path.name in (lock['name'] + '.exe', lock['binaries']['app'] + '.exe')]
+    binaries = [path for path in binaries if file_version(path)['ProductName'] == lock['name']]
+    require(len(binaries) == 1, 'Cannot identify the actual newly installed GUI executable')
+    installed = binaries[0]
+    require(digest(installed) == expected_binary['sha256'] and installed.stat().st_size == expected_binary['bytes'], 'Installed MSI GUI differs from the authenticated new native build provenance')
+    return installed
+
+
+def require_preserved_canaries(sentinels):
+    require(all(path.exists() and digest(path) == sha for path, sha in sentinels), 'Synthetic existing profile/work data changed')
+
+
+def require_legacy_upgrade_before_supplemental(report, current_properties):
+    original = report.get('actualMsiUpgrade', {})
+    require(type(original.get('oldInstallExit')) is int and original['oldInstallExit'] in (0, 3010) and type(original.get('upgradeExit')) is int and original['upgradeExit'] in (0, 3010) and all(original.get(key) is True for key in ('sameUpgradeCode', 'oldProductRemoved', 'newProductInstalled', 'legacyCustomInstallDirectoryPreservedWithoutOverride')), 'Original KIO-to-current upgrade must pass before the supplemental Bogo phase')
+    require(canonical_guid(original.get('bogo', {}).get('ProductCode')) == canonical_guid(current_properties.get('ProductCode')), 'Supplemental phase current product differs from the original KIO upgrade result')
+
+
+def require_prior_bogo_completion(lock, report):
+    if not prior_bogo_required(lock):
+        return
+    phase = report.get('priorBogoUpgrade', {})
+    require(phase.get('status') == 'passed' and phase.get('fromVersion') == PRIOR_BOGO_VERSIONS[lock['id']] and phase.get('toVersion') == lock['version'], 'Required published Bogo1-to-current actual MSI upgrade phase is missing/incomplete')
+    require_legacy_upgrade_before_supplemental(report, phase.get('currentMsi', {}))
+    require(all(phase.get(key) is True for key in ('sameUpgradeCode', 'priorProductRemoved', 'newProductInstalled', 'customInstallDirectoryPreservedWithoutOverride', 'profileAndWorkCanariesPreserved')), 'Required Bogo-to-Bogo upgrade continuity evidence is incomplete')
+    installed_sha = phase.get('installedExecutableSha256')
+    require(isinstance(installed_sha, str) and re.fullmatch(r'[a-f0-9]{64}', installed_sha) and installed_sha == report.get('installedExe', {}).get('sha256') and report.get('installedGui', {}).get('started') is True and report.get('installedGui', {}).get('runtimeIcons', {}).get('passed') is True, 'Required Bogo-upgraded executable was not verified by the existing installed GUI/icon phase')
+
+
 def ico_frames(data):
     require(len(data) >= 6 and struct.unpack_from('<HH', data) == (0, 1), 'Invalid source ICO header')
     count = struct.unpack_from('<H', data, 4)[0]
@@ -369,6 +456,65 @@ def ephemeral_output(output, explicit):
     return output
 
 
+def actual_prior_bogo_upgrade(prepared, lock, current, current_properties, expected_binary, output, report, installed_codes, sentinels, explicit):
+    """Additional install path, after the original KIO upgrade; reuses its final GUI checks."""
+    phase_output = ephemeral_output(output / 'prior-bogo-upgrade', explicit)
+    phase_output.mkdir()
+    row, previous = prepared['row'], prepared['properties']
+    phase = {'status': 'running', 'repository': PRIOR_BOGO_REPOSITORY, 'fromVersion': row['version'], 'toVersion': lock['version'], 'publishedMsiInput': row['windowsMsi'], 'priorMsi': previous, 'currentMsi': current_properties}
+    report['priorBogoUpgrade'] = phase
+    try:
+        require_legacy_upgrade_before_supplemental(report, current_properties)
+        validate_prior_bogo_msi(row, previous, current_properties, lock)
+        require(product_state(previous['ProductCode']) == -1 and product_state(current_properties['ProductCode']) == 5, 'Bogo supplemental phase must start after the owned legacy-to-current upgrade, without an existing prior Bogo product')
+        require_preserved_canaries(sentinels)
+        phase['removeOwnedCurrentAfterLegacyUpgradeExit'] = msi_run(['/x', current_properties['ProductCode']], phase_output / 'remove-current-after-legacy-upgrade.log')
+        require(product_state(current_properties['ProductCode']) == -1, 'Owned current product remains before genuine prior Bogo install')
+        destination = phase_output / 'installed'
+        installed_codes.append(previous['ProductCode'])
+        phase['priorInstallExit'] = msi_run(['/i', str(prepared['path']), 'INSTALLFOLDER=' + str(destination), 'DESKTOPSHORTCUT=1', 'INSTALLDESKTOPSHORTCUT=1'], phase_output / 'prior-bogo1-install.log')
+        require(product_state(previous['ProductCode']) == 5, 'Published prior Bogo MSI did not reach installed state')
+        old_binaries = [path for path in destination.rglob('*.exe') if path.name == lock['name'] + '.exe']
+        require(len(old_binaries) == 1 and file_version(old_binaries[0])['ProductName'] == lock['name'], 'Cannot identify the genuine installed prior Bogo executable/name')
+        phase['priorInstalledExecutable'] = {'path': str(old_binaries[0]), 'sha256': digest(old_binaries[0]), 'versionInfo': file_version(old_binaries[0])}
+        work = destination / 'qa-existing-user-work.txt'
+        require(not work.exists(), 'Unexpected prior synthetic work fixture')
+        work.write_bytes(b'Bogo1 synthetic existing user work; preserve exact bytes through upgrade\n')
+        sentinels.append((work, digest(work)))
+        phase['upgradeExit'] = msi_run(['/i', str(current)], phase_output / 'prior-bogo1-to-current-upgrade.log')
+        require(product_state(current_properties['ProductCode']) == 5 and product_state(previous['ProductCode']) == -1, 'Actual Bogo1-to-current MSI upgrade did not replace the prior Bogo product')
+        installed = installed_gui_binary(destination, lock, expected_binary)
+        require_preserved_canaries(sentinels)
+        phase.update({'status': 'passed', 'sameUpgradeCode': True, 'priorProductRemoved': True, 'newProductInstalled': True, 'customInstallDirectoryPreservedWithoutOverride': True, 'profileAndWorkCanariesPreserved': True, 'installDirectory': str(destination), 'installedExecutable': str(installed), 'installedExecutableSha256': digest(installed), 'guiAndIconScope': 'verified once by the following existing installed GUI/HICON phase; portable execution remains unchanged'})
+        return installed
+    except Exception as error:
+        phase.update({'status': 'failed', 'error': str(error)})
+        raise
+
+
+def cleanup_owned_products(installed_codes, output, report):
+    """Only codes appended after pre-existing-install refusal; continue cleanup on failures."""
+    report['cleanup'] = []
+    for code in reversed(installed_codes):
+        cleanup = {'productCode': code}
+        report['cleanup'].append(cleanup)
+        try:
+            cleanup['stateBefore'] = product_state(code)
+            if cleanup['stateBefore'] == -1:
+                cleanup['result'] = 'already-unregistered'
+                continue
+            result = msi_run(['/x', code], output / ('uninstall-' + code.strip('{}') + '.log'))
+            cleanup.update({'exitCode': result, 'stateAfter': product_state(code)})
+            require(cleanup['stateAfter'] == -1, 'Owned MSI registration remains after cleanup')
+        except Exception as error:
+            cleanup['error'] = str(error)
+            report['status'] = 'failed'
+            try:
+                cleanup['stateAfter'] = product_state(code)
+            except Exception as readback_error:
+                cleanup['stateReadbackError'] = str(readback_error)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--app', choices=tuple(bogo.NAMES), required=True)
@@ -405,6 +551,9 @@ def main():
         require(canonical_guid(prior['UpgradeCode']) == canonical_guid(new['UpgradeCode']) == canonical_guid(old['upgradeCode']), 'Actual old/new MSI UpgradeCode continuity failed')
         require(canonical_guid(prior['ProductCode']) != canonical_guid(new['ProductCode']), 'A real new MSI ProductCode is required')
         require(product_state(prior['ProductCode']) == -1 and product_state(new['ProductCode']) == -1, 'Refusing smoke against a pre-existing Windows installation')
+        prepared_prior_bogo = prepare_prior_bogo_upgrade(lock, output, new)
+        if prepared_prior_bogo is not None:
+            report['scope'] += '; additional genuine published Bogo1-to-current MSI upgrade, final GUI checked once'
         destination = output / 'installed'
         appdata = child_environment(output / 'isolated-user')
         sentinels = []
@@ -420,12 +569,11 @@ def main():
         new_exit = msi_run(['/i', str(current)], output / 'new-upgrade.log')
         require(product_state(new['ProductCode']) == 5 and product_state(prior['ProductCode']) == -1, 'Actual old-to-Bogo MSI upgrade did not replace the old product')
         report['actualMsiUpgrade'] = {'legacy': prior, 'bogo': new, 'oldInstallExit': old_exit, 'upgradeExit': new_exit, 'sameUpgradeCode': True, 'oldProductRemoved': True, 'newProductInstalled': True, 'installDirectory': str(destination)}
-        binaries = [path for path in destination.rglob('*.exe') if path.name in (lock['name'] + '.exe', lock['binaries']['app'] + '.exe')]
-        binaries = [path for path in binaries if file_version(path)['ProductName'] == lock['name']]
-        require(len(binaries) == 1, 'Cannot identify the actual newly installed GUI executable')
-        installed = binaries[0]
-        require(digest(installed) == expected_binary['sha256'] and installed.stat().st_size == expected_binary['bytes'], 'Installed MSI GUI differs from the authenticated new native build provenance')
+        installed = installed_gui_binary(destination, lock, expected_binary)
         report['actualMsiUpgrade']['legacyCustomInstallDirectoryPreservedWithoutOverride'] = True
+        if prepared_prior_bogo is not None:
+            report['actualMsiUpgrade']['installedExecutableSha256BeforeSupplementalPhase'] = digest(installed)
+            installed = actual_prior_bogo_upgrade(prepared_prior_bogo, lock, current, new, expected_binary, output, report, installed_codes, sentinels, args.allow_ephemeral_install)
         report['shortcuts'] = shortcuts(lock['name'], old['name'], installed, bogo.ROOT / 'assets/bogo-program-icons' / (args.app + '.ico'), output, msi_shortcuts(current), new['ProductCode'])
         report['installedExe'] = {'path': str(installed), 'sha256': digest(installed), 'pe': pe_identity(installed), 'versionInfo': file_version(installed), 'icon': extract_primary_icon(installed, bogo.ROOT / 'assets/bogo-program-icons' / (args.app + '.ico'), output / 'installed-primary-icon.ico')}
         report['installedGui'] = gui_startup(installed, appdata, output / 'installed-gui.log', args.app, runtime_png, runtime_png_sha256)
@@ -440,28 +588,15 @@ def main():
         binary = candidates[0]
         report['portableExe'] = {'path': str(binary), 'sha256': digest(binary), 'pe': pe_identity(binary), 'versionInfo': file_version(binary), 'icon': extract_primary_icon(binary, bogo.ROOT / 'assets/bogo-program-icons' / (args.app + '.ico'), output / 'portable-primary-icon.ico')}
         report['portableGui'] = gui_startup(binary, child_environment(output / 'portable-user'), output / 'portable-gui.log', args.app, runtime_png, runtime_png_sha256)
-        require(all(path.exists() and digest(path) == sha for path, sha in sentinels), 'Synthetic existing profile data changed')
+        require_preserved_canaries(sentinels)
         report['syntheticProfileCanariesPreserved'] = True
         report['profileScope'] = 'isolated APPDATA/LOCALAPPDATA continuity fixtures in disposable VM; real-user profile migration is separately source-audited'
+        require_prior_bogo_completion(lock, report)
         report['status'] = 'passed'
     except Exception as error:
         report['status'], report['error'] = 'failed', str(error)
     finally:
-        report['cleanup'] = []
-        for code in reversed(installed_codes):
-            state = product_state(code)
-            cleanup = {'productCode': code, 'stateBefore': state}
-            report['cleanup'].append(cleanup)
-            if state != -1:
-                try:
-                    result = msi_run(['/x', code], output / ('uninstall-' + code.strip('{}') + '.log'))
-                    cleanup.update({'exitCode': result, 'stateAfter': product_state(code)})
-                    require(cleanup['stateAfter'] == -1, 'Owned MSI registration remains after cleanup')
-                except Exception as error:
-                    cleanup.update({'error': str(error), 'stateAfter': product_state(code)})
-                    report['status'] = 'failed'
-            else:
-                cleanup['result'] = 'already-unregistered'
+        cleanup_owned_products(installed_codes, output, report)
         (output / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
     print(json.dumps({'app': args.app, 'status': report['status'], 'report': str(output / 'report.json'), 'error': report.get('error')}))
     return 0 if report['status'] == 'passed' else 1

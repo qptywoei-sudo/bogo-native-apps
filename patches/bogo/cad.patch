@@ -306,18 +306,18 @@ index b859af8d0ba5f5340c2d1afab6b237d5ab9e1c16..0b44816caab8c59480847e4b80fd8246
              }
              app.system_languages = std::env::var("CADCRAFT_LOCALE").map(|s| vec![s]).unwrap_or_else(|_| sys_locale::get_locales().collect());
 diff --git a/apps/cadcraft/src/native_menu.rs b/apps/cadcraft/src/native_menu.rs
-index 35b296efb150b966a43b858d3c68aa86fe377d4b..3d1be4c839454a9161f62062f2872a2f5c17230c 100644
+index 35b296efb150b966a43b858d3c68aa86fe377d4b..559b6bde1a6bac05dbc166d51adab1b347ea8bb0 100644
 --- a/apps/cadcraft/src/native_menu.rs
 +++ b/apps/cadcraft/src/native_menu.rs
-@@ -36,15 +36,15 @@ impl NativeMenu {
+@@ -36,27 +36,25 @@ impl NativeMenu {
          let language = app.language();
          let mut submenus = Vec::new();
          let mut counter = 0usize;
 -        let app_menu = Submenu::new("KIO Cad", true);
 -        let about = MenuItem::with_id("cc-about", i18n::tr(language, "About KIO Cad"), true, None);
+-        let discord = MenuItem::with_id("cc-discord", i18n::tr(language, "Join the ArtCraft Discord…"), true, None);
 +        let app_menu = Submenu::new("Bogo CAD", true);
 +        let about = MenuItem::with_id("cc-about", i18n::tr(language, "About Bogo CAD"), true, None);
-         let discord = MenuItem::with_id("cc-discord", i18n::tr(language, "Join the ArtCraft Discord…"), true, None);
          let predefined = vec![
              ("Services", PredefinedMenuItem::services(Some(i18n::tr(language, "Services")))),
 -            ("Hide KIO Cad", PredefinedMenuItem::hide(Some(i18n::tr(language, "Hide KIO Cad")))),
@@ -329,15 +329,33 @@ index 35b296efb150b966a43b858d3c68aa86fe377d4b..3d1be4c839454a9161f62062f2872a2f
          ];
          // The Mac place for preferences: CADCraft ▸ Settings… (⌘,) opens the Options dialog.
          let settings = MenuItem::with_id("cc-settings", i18n::tr(language, "Settings..."), true, accel("Cmd+Comma"));
-@@ -55,7 +55,7 @@ impl NativeMenu {
+-        let _ = app_menu.append_items(&[&about, &discord, &PredefinedMenuItem::separator(), &settings, &PredefinedMenuItem::separator()]);
++        let _ = app_menu.append_items(&[&about, &PredefinedMenuItem::separator(), &settings, &PredefinedMenuItem::separator()]);
+         for (label, item) in &predefined {
+             let _ = app_menu.append(item);
+             if ["Services", "Show All"].contains(label) {
                  let _ = app_menu.append(&PredefinedMenuItem::separator());
              }
          }
 -        items.insert("cc-about".into(), ("ui.dialog.about".into(), "About KIO Cad".into(), about));
+-        items.insert("cc-discord".into(), ("ui.discord".into(), "Join the ArtCraft Discord…".into(), discord));
 +        items.insert("cc-about".into(), ("ui.dialog.about".into(), "About Bogo CAD".into(), about));
-         items.insert("cc-discord".into(), ("ui.discord".into(), "Join the ArtCraft Discord…".into(), discord));
          items.insert("cc-settings".into(), ("options".into(), "Settings...".into(), settings));
          let _ = menu.append(&app_menu);
+         for (title, entries) in menus::tree(app) {
+@@ -90,11 +88,7 @@ impl NativeMenu {
+     pub fn poll(&mut self, app: &mut CadApp, ctx: &egui::Context) {
+         while let Ok(ev) = MenuEvent::receiver().try_recv() {
+             if let Some((cmd, _, _)) = self.items.get(ev.id.as_ref()) {
+-                if cmd == "ui.discord" {
+-                    ctx.open_url(egui::OpenUrl::new_tab("https://discord.gg/artcraft"));
+-                } else {
+-                    menus::activate(app, &cmd.clone());
+-                }
++                menus::activate(app, &cmd.clone());
+                 ctx.request_repaint();
+             }
+         }
 diff --git a/apps/cadcraft/src/workspace.rs b/apps/cadcraft/src/workspace.rs
 index ffa52864e3a8492d7bc1cdd870938969ec1f18e8..6872e46bf6fc9ed631c60642510fba6b70519304 100644
 --- a/apps/cadcraft/src/workspace.rs
@@ -63439,7 +63457,7 @@ index 10ade01f2cc187847444924230e35b38787903d5..fa92a913d53862561fe5679905e552bb
          ui.label(format!("Save changes to {title}?"));
          ui.label(RichText::new("Your changes will be lost if you don't save them.").color(t.text_dim));
 diff --git a/crates/ui-egui/src/dialogs.rs b/crates/ui-egui/src/dialogs.rs
-index a610ec6ae3b4be82bc77c61192270bc0d904628c..25c4ae972817fcd7245fd282794daefbbe4a5666 100644
+index a610ec6ae3b4be82bc77c61192270bc0d904628c..83e869186c7efc9607fd4ed74f3341af6fd7d29f 100644
 --- a/crates/ui-egui/src/dialogs.rs
 +++ b/crates/ui-egui/src/dialogs.rs
 @@ -300,8 +300,8 @@ fn units(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) {
@@ -63453,7 +63471,7 @@ index a610ec6ae3b4be82bc77c61192270bc0d904628c..25c4ae972817fcd7245fd282794daefb
          .open(open)
          .default_size(vec2(640.0, 420.0))
          .collapsible(false)
-@@ -320,11 +320,14 @@ fn about(ctx: &egui::Context, open: &mut bool) {
+@@ -320,13 +320,10 @@ fn about(ctx: &egui::Context, open: &mut bool) {
                  1 => crate::credits::contributors_ui(ui),
                  2 => crate::credits::models_ui(ui),
                  _ => {
@@ -63463,13 +63481,221 @@ index a610ec6ae3b4be82bc77c61192270bc0d904628c..25c4ae972817fcd7245fd282794daefb
                      ui.label(crate::tl!("Computer-aided design and drafting: an open-source, clean-room CAD application written in pure Rust."));
                      ui.add_space(6.0);
 -                    ui.label(RichText::new(crate::tl!("Independent KIO fork of CADCraft v0.7.0 by the ArtCraft team. No upstream endorsement.")).color(t.text_dim));
-+                    ui.label(
-+                        RichText::new(crate::tl!("Independent Bogo fork of CADCraft v0.7.0 by the ArtCraft team. No upstream endorsement."))
-+                            .color(t.text_dim),
-+                    );
-                     ui.hyperlink_to("Upstream CADCraft project", "https://getartcraft.com/apps/cadcraft");
-                     ui.hyperlink_to(crate::tl!("Upstream CADCraft community"), "https://discord.gg/artcraft");
+-                    ui.hyperlink_to("Upstream CADCraft project", "https://getartcraft.com/apps/cadcraft");
+-                    ui.hyperlink_to(crate::tl!("Upstream CADCraft community"), "https://discord.gg/artcraft");
                      ui.add_space(6.0);
+                     ui.label(RichText::new(crate::tl!("MIT OR Apache-2.0. Not affiliated with Autodesk, Inc.")).small().color(t.text_faint));
+                 }
+diff --git a/crates/ui-egui/src/i18n/ar.tsv b/crates/ui-egui/src/i18n/ar.tsv
+index dd250520cddd0b98e38f7eded924c8692fb93db3..c985ae66458779c5837cb36c8e409feb3e0e191d 100644
+--- a/crates/ui-egui/src/i18n/ar.tsv
++++ b/crates/ui-egui/src/i18n/ar.tsv
+@@ -473,8 +473,6 @@
+ 	Jogged	متعرج
+ 	Jogged Linear	خطي متعرج
+ 	Join	وصل
+-	Join the ArtCraft Discord…	الانضمام إلى Discord الخاص بـ ArtCraft…
+-	Join us on Discord	انضم إلينا على Discord
+ 	Keep an editable copy of this table in the drawing	الإبقاء على نسخة قابلة للتحرير من هذا الجدول في الرسم
+ 	Keep the system cursor visible over the drawing area	إبقاء مؤشر النظام مرئياً فوق منطقة الرسم
+ 	Language	اللغة
+@@ -635,7 +633,6 @@
+ 	Offset	الإزاحة
+ 	On	تشغيل
+ 	On/Off	تشغيل/إيقاف
+-	One of the Crafting Apps by the ArtCraft team and community.	أحد تطبيقات Crafting من فريق ArtCraft والمجتمع.
+ 	Only in this drawing: {n}	في هذا الرسم فقط: {n}
+ 	Only in {name}: {n}	في {name} فقط: {n}
+ 	Open	فتح
+diff --git a/crates/ui-egui/src/i18n/cs.tsv b/crates/ui-egui/src/i18n/cs.tsv
+index 1c94d73f6ac2a40c50169507fc36f6bb967c9291..9fb6cb4d753d6334c418520027b3e92a35de5a81 100644
+--- a/crates/ui-egui/src/i18n/cs.tsv
++++ b/crates/ui-egui/src/i18n/cs.tsv
+@@ -434,8 +434,6 @@
+ 	Jogged	Zalomená
+ 	Jogged Linear	Zalomená lineární
+ 	Join	Spojit
+-	Join the ArtCraft Discord…	Připojit se na Discord ArtCraft…
+-	Join us on Discord	Připojte se k nám na Discordu
+ 	Isometric Plane	Izometrická rovina
+ 	Isometric snap	Izometrické uchopení
+ 	Language	Jazyk
+@@ -575,7 +573,6 @@
+ 	Offset	Ekvidistanta
+ 	On	Zapnuto
+ 	On/Off	Zapnout/Vypnout
+-	One of the Crafting Apps by the ArtCraft team and community.	Jedna z aplikací Crafting Apps od týmu ArtCraft a komunity.
+ 	Only in this drawing: {n}	Pouze v tomto výkresu: {n}
+ 	Only in {name}: {n}	Pouze v {name}: {n}
+ 	Open (⌘O)	Otevřít (⌘O)
+diff --git a/crates/ui-egui/src/i18n/de.tsv b/crates/ui-egui/src/i18n/de.tsv
+index bd1f77dacc32d07a567aebebcbd8f8414284be61..fe02c7cfb2a4b43900c6a4b160aba90c95ff7457 100644
+--- a/crates/ui-egui/src/i18n/de.tsv
++++ b/crates/ui-egui/src/i18n/de.tsv
+@@ -361,8 +361,6 @@
+ 	Isolate Layer	Layer isolieren
+ 	Isometric Drafting	Isometrisches Zeichnen
+ 	Join	Verbinden
+-	Join the ArtCraft Discord…	Dem ArtCraft-Discord beitreten…
+-	Join us on Discord	Treten Sie uns auf Discord bei
+ 	Language	Sprache
+ 	Last	Letzter
+ 	Last commit	Letzter Commit
+@@ -490,7 +488,6 @@
+ 	Offset	Versatz
+ 	On	Ein
+ 	On/Off	Ein/Aus
+-	One of the Crafting Apps by the ArtCraft team and community.	Eine der Crafting Apps vom ArtCraft-Team und seiner Community.
+ 	Open (⌘O)	Öffnen (⌘O)
+ 	Open Sample Drawing	Beispielzeichnung öffnen
+ 	Open sample drawing	Beispielzeichnung öffnen
+diff --git a/crates/ui-egui/src/i18n/es.tsv b/crates/ui-egui/src/i18n/es.tsv
+index f4ad00852b308ace85376c5c87f48ab815f7793a..64f3bc20098abe9f70317478ceab2599501bd58d 100644
+--- a/crates/ui-egui/src/i18n/es.tsv
++++ b/crates/ui-egui/src/i18n/es.tsv
+@@ -455,8 +455,6 @@
+ 	Jogged	Con recodo
+ 	Jogged Linear	Lineal con recodo
+ 	Join	Unir
+-	Join the ArtCraft Discord…	Únete al Discord de ArtCraft…
+-	Join us on Discord	Únete a nosotros en Discord
+ 	Keep the system cursor visible over the drawing area	Mantener visible el cursor del sistema sobre el área de dibujo
+ 	Language	Idioma
+ 	Largest array	Matriz más grande
+@@ -608,7 +606,6 @@
+ 	Offset	Desfase
+ 	On	Activado
+ 	On/Off	Activar/desactivar
+-	One of the Crafting Apps by the ArtCraft team and community.	Una de las Crafting Apps del equipo y la comunidad de ArtCraft.
+ 	Only in this drawing: {n}	Solo en este dibujo: {n}
+ 	Only in {name}: {n}	Solo en {name}: {n}
+ 	Open	Abrir
+diff --git a/crates/ui-egui/src/i18n/fr.tsv b/crates/ui-egui/src/i18n/fr.tsv
+index eeb6a216b7be575c0b0e980d9adf426463211524..e8c862bfaeec3b1e18b2eebc7b6cbbbd588f307d 100644
+--- a/crates/ui-egui/src/i18n/fr.tsv
++++ b/crates/ui-egui/src/i18n/fr.tsv
+@@ -356,8 +356,6 @@
+ 	Isolate Layer	Isoler le calque
+ 	Isometric Drafting	Dessin isométrique
+ 	Join	Rejoindre
+-	Join the ArtCraft Discord…	Rejoindre le Discord d'ArtCraft…
+-	Join us on Discord	Rejoignez-nous sur Discord
+ 	Language	Langue
+ 	Last	Dernier
+ 	Last commit	Dernière révision
+@@ -485,7 +483,6 @@
+ 	Offset	Décalage
+ 	On	Activé
+ 	On/Off	Activer/Désactiver
+-	One of the Crafting Apps by the ArtCraft team and community.	L'une des applications Crafting Apps de l'équipe et de la communauté ArtCraft.
+ 	Open (⌘O)	Ouvrir (⌘O)
+ 	Open Sample Drawing	Ouvrir un dessin d'exemple
+ 	Open sample drawing	Ouvrir un dessin d'exemple
+diff --git a/crates/ui-egui/src/i18n/it.tsv b/crates/ui-egui/src/i18n/it.tsv
+index d95d32355a668a6947d64bcff56fda78933d7c60..92aededea97a55aae05546f2d465ec6c1e08ed18 100644
+--- a/crates/ui-egui/src/i18n/it.tsv
++++ b/crates/ui-egui/src/i18n/it.tsv
+@@ -441,8 +441,6 @@ menu	Modify	Edita
+ 	Jogged	Spezzata
+ 	Jogged Linear	Lineare spezzata
+ 	Join	Unisci
+-	Join the ArtCraft Discord…	Unisciti al Discord di ArtCraft…
+-	Join us on Discord	Unisciti a noi su Discord
+ 	Isometric Plane	Piano isometrico
+ 	Isometric snap	Snap isometrico
+ 	Language	Lingua
+@@ -582,7 +580,6 @@ menu	Modify	Edita
+ 	Offset	Offset
+ 	On	Attivato
+ 	On/Off	Attiva/Disattiva
+-	One of the Crafting Apps by the ArtCraft team and community.	Una delle Crafting App del team e della comunità ArtCraft.
+ 	Only in this drawing: {n}	Solo in questo disegno: {n}
+ 	Only in {name}: {n}	Solo in {name}: {n}
+ 	Open (⌘O)	Apri (⌘O)
+diff --git a/crates/ui-egui/src/i18n/ko.tsv b/crates/ui-egui/src/i18n/ko.tsv
+index d60c7e19e4592ecdbd824a6c812924a934285956..1abfd95751ad5d9f16ca6b9fd5daa688c025cfd2 100644
+--- a/crates/ui-egui/src/i18n/ko.tsv
++++ b/crates/ui-egui/src/i18n/ko.tsv
+@@ -436,8 +436,6 @@
+ 	Jogged	꺾어진 반지름
+ 	Jogged Linear	꺾어진 선형
+ 	Join	결합
+-	Join the ArtCraft Discord…	ArtCraft Discord 참여하기…
+-	Join us on Discord	Discord에서 함께하기
+ 	Isometric Plane	등각 평면
+ 	Isometric snap	등각 스냅
+ 	Language	언어
+@@ -577,7 +575,6 @@
+ 	Offset	간격띄우기
+ 	On	켜기
+ 	On/Off	켜기/끄기
+-	One of the Crafting Apps by the ArtCraft team and community.	ArtCraft 팀과 커뮤니티가 만드는 Crafting Apps 제품군의 하나입니다.
+ 	Only in this drawing: {n}	이 도면에만 있음: {n}개
+ 	Only in {name}: {n}	{name}에만 있음: {n}개
+ 	Open (⌘O)	열기(⌘O)
+diff --git a/crates/ui-egui/src/i18n/pt_br.tsv b/crates/ui-egui/src/i18n/pt_br.tsv
+index 0d0e3f71bca5a05b97581cfee004f13f1bfe030e..a326044d7d5dbfcedcca0f5f38f96ba8f9cff74a 100644
+--- a/crates/ui-egui/src/i18n/pt_br.tsv
++++ b/crates/ui-egui/src/i18n/pt_br.tsv
+@@ -455,8 +455,6 @@
+ 	Jogged	Com desvio
+ 	Jogged Linear	Linear com desvio
+ 	Join	Unir
+-	Join the ArtCraft Discord…	Entrar no Discord do ArtCraft…
+-	Join us on Discord	Junte-se a nós no Discord
+ 	Keep the system cursor visible over the drawing area	Manter o cursor do sistema visível sobre a área de desenho
+ 	Language	Idioma
+ 	Largest array	Matriz maior
+@@ -608,7 +606,6 @@
+ 	Offset	Deslocar
+ 	On	Ativado
+ 	On/Off	Ativar/desativar
+-	One of the Crafting Apps by the ArtCraft team and community.	Um dos Crafting Apps da equipe e da comunidade ArtCraft.
+ 	Only in this drawing: {n}	Somente neste desenho: {n}
+ 	Only in {name}: {n}	Somente em {name}: {n}
+ 	Open	Abrir
+diff --git a/crates/ui-egui/src/i18n/ru.tsv b/crates/ui-egui/src/i18n/ru.tsv
+index f6b1ae73157e2cd7a3519a1c6e6ed1c38c822c48..0ef112ae456703973223c8b5d8d8effe2fa3d965 100644
+--- a/crates/ui-egui/src/i18n/ru.tsv
++++ b/crates/ui-egui/src/i18n/ru.tsv
+@@ -356,8 +356,6 @@
+ 	Isolate Layer	Изолировать слой
+ 	Isometric Drafting	Изометрическое черчение
+ 	Join	Объединить
+-	Join the ArtCraft Discord…	Присоединяйтесь к Discord ArtCraft…
+-	Join us on Discord	Присоединяйтесь к нам в Discord
+ 	Language	Язык
+ 	Last	Последний
+ 	Last commit	Последний коммит
+@@ -485,7 +483,6 @@
+ 	Offset	Смещение
+ 	On	Включено
+ 	On/Off	Включить/выключить
+-	One of the Crafting Apps by the ArtCraft team and community.	Одна из программ Crafting Apps от команды и сообщества ArtCraft.
+ 	Open (⌘O)	Открыть (⌘O)
+ 	Open Sample Drawing	Открыть образец чертежа
+ 	Open sample drawing	Открыть образец чертежа
+diff --git a/crates/ui-egui/src/i18n/sv.tsv b/crates/ui-egui/src/i18n/sv.tsv
+index 8a2e5ebdbf64b26082bb3f9d389e0787130de4a3..4d829105e4b57bb92638f1a35aef49a472d37f5b 100644
+--- a/crates/ui-egui/src/i18n/sv.tsv
++++ b/crates/ui-egui/src/i18n/sv.tsv
+@@ -459,8 +459,6 @@
+ 	Jogged	Bruten
+ 	Jogged Linear	Brutet linjärt
+ 	Join	Foga samman
+-	Join the ArtCraft Discord…	Gå med i ArtCrafts Discord…
+-	Join us on Discord	Gå med i ArtCrafts community på Discord
+ 	Keep the system cursor visible over the drawing area	Visa systemets muspekare över ritytan
+ 	Language	Språk
+ 	Largest array	Största mönster
+@@ -612,7 +610,6 @@
+ 	Offset	Förskjut
+ 	On	På
+ 	On/Off	På/av
+-	One of the Crafting Apps by the ArtCraft team and community.	En av Crafting Apps, gjord av ArtCraft-teamet och dess community.
+ 	Only in this drawing: {n}	Bara i den här ritningen: {n}
+ 	Only in {name}: {n}	Bara i {name}: {n}
+ 	Open	Öppna
 diff --git a/crates/ui-egui/src/i18n/tests.rs b/crates/ui-egui/src/i18n/tests.rs
 index 1d52896bbc905119863de53318137c5f0ca8a609..e3aa32c9f6f535d6c3ada2828e54b76287fa8e81 100644
 --- a/crates/ui-egui/src/i18n/tests.rs
@@ -63519,6 +63745,48 @@ index 1d52896bbc905119863de53318137c5f0ca8a609..e3aa32c9f6f535d6c3ada2828e54b762
          ("blocks", "Block"),
          ("layers", "Hantera lageregenskaper"),
          ("qselect", "Snabbmarkering"),
+diff --git a/crates/ui-egui/src/i18n/uk.tsv b/crates/ui-egui/src/i18n/uk.tsv
+index adce43ae73ba42f228030431ea056e1af40da8c7..6eab0446c882c8af9435c2fbe75448cf15376b61 100644
+--- a/crates/ui-egui/src/i18n/uk.tsv
++++ b/crates/ui-egui/src/i18n/uk.tsv
+@@ -443,8 +443,6 @@
+ 	Jogged	Зі зламом
+ 	Jogged Linear	Лінійний зі зламом
+ 	Join	Об'єднати
+-	Join the ArtCraft Discord…	Приєднатися до Discord ArtCraft…
+-	Join us on Discord	Приєднуйтеся до нас у Discord
+ 	Isometric Plane	Ізометрична площина
+ 	Isometric snap	Ізометрична крокова прив'язка
+ 	Language	Мова
+@@ -585,7 +583,6 @@
+ 	Offset	Зміщення
+ 	On	Увімкнено
+ 	On/Off	Увімкнути/вимкнути
+-	One of the Crafting Apps by the ArtCraft team and community.	Одна з програм Crafting Apps від команди та спільноти ArtCraft.
+ 	Only in this drawing: {n}	Лише в цьому кресленні: {n}
+ 	Only in {name}: {n}	Лише в {name}: {n}
+ 	Open (⌘O)	Відкрити (⌘O)
+diff --git a/crates/ui-egui/src/i18n/zh.tsv b/crates/ui-egui/src/i18n/zh.tsv
+index af691a8414d618f08212e57519179fe3ae37df94..0bc88ac0c216a301d487f73531365717042b4b16 100644
+--- a/crates/ui-egui/src/i18n/zh.tsv
++++ b/crates/ui-egui/src/i18n/zh.tsv
+@@ -357,8 +357,6 @@
+ 	Isolate Layer	隔离图层
+ 	Isometric Drafting	等轴测制图
+ 	Join	合并
+-	Join the ArtCraft Discord…	加入 ArtCraft Discord…
+-	Join us on Discord	在 Discord 上加入我们
+ 	Language	语言
+ 	Last	最后
+ 	Last commit	最后提交
+@@ -486,7 +484,6 @@
+ 	Offset	偏移
+ 	On	开启
+ 	On/Off	开/关
+-	One of the Crafting Apps by the ArtCraft team and community.	由 ArtCraft 团队和社区打造的 Crafting 系列应用之一。
+ 	Open (⌘O)	打开 (⌘O)
+ 	Open Sample Drawing	打开示例图形
+ 	Open sample drawing	打开示例图形
 diff --git a/crates/ui-egui/src/lib.rs b/crates/ui-egui/src/lib.rs
 index f275ce0868b1eb263d3ec2ccdeb618a622df7384..98d2b04177787b54ed91bea421ec763f38ae8bb0 100644
 --- a/crates/ui-egui/src/lib.rs

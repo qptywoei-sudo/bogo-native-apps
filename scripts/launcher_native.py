@@ -119,7 +119,13 @@ def binary_paths(lock, folder, kind):
 
 def check_versions(lock, binaries, env):
     value = run([binaries['app'], '--version'], env=env, capture=True, timeout=60)
-    require(value == 'artcraft-launcher ' + lock['upstreamVersion'], 'Wrong Launcher native binary version')
+    if lock.get('bogoOverlay') is not None:
+        from bogo_release_identity import release_version
+        require(lock['id'] == 'launcher' and lock['name'] == 'Bogo Launcher' and lock['publisher'] == 'Bogo' and lock['version'] == release_version(lock['upstreamVersion']), 'Wrong Bogo Launcher release identity')
+        expected = 'Bogo Launcher ' + lock['version']
+    else:
+        expected = 'artcraft-launcher ' + lock['upstreamVersion']
+    require(value == expected, 'Wrong Launcher native binary version')
     return {'app': value}
 
 

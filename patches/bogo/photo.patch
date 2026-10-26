@@ -49891,7 +49891,7 @@ index caf88785a78dd90f25f62254d0d813d2702acb43..6adaf4b4a7b34f3cac7f6002ebaee6a8
          let template = "{message} ({note})";
          crate::i18n::fmt(tl!(template), &[("message", &loaded), ("note", &note)])
 diff --git a/crates/ui-egui/src/canvas.rs b/crates/ui-egui/src/canvas.rs
-index 81e6c84685ddd1789995883cc8e9fe4d8e74a72e..69dde3a396d896a5f466a81520406b07495cec20 100644
+index 81e6c84685ddd1789995883cc8e9fe4d8e74a72e..016279880986cec803945eb20ad48c68057a8be5 100644
 --- a/crates/ui-egui/src/canvas.rs
 +++ b/crates/ui-egui/src/canvas.rs
 @@ -2629,6 +2629,9 @@ pub fn mode_label(doc: &Document) -> &'static str {
@@ -49913,7 +49913,18 @@ index 81e6c84685ddd1789995883cc8e9fe4d8e74a72e..69dde3a396d896a5f466a81520406b07
                  let by = ui.painter().layout_no_wrap(tl!("open source").into(), egui::FontId::proportional(13.0), t.text_faint);
                  let total = title.size().x + by.size().x + 10.0;
                  ui.add_space(((card.width() - total) / 2.0).max(0.0));
-@@ -5594,7 +5597,7 @@ pub fn extra_windows(app: &mut PhotocraftApp, ctx: &egui::Context) {
+@@ -2675,10 +2678,6 @@ fn start_screen(app: &mut PhotocraftApp, ui: &mut egui::Ui) {
+                 ui.add_space(22.0);
+                 home_recent(app, ui, &recent);
+             }
+-            ui.add_space(26.0);
+-            crate::links::discord_button(app, ui, 190.0);
+-            ui.add_space(10.0);
+-            crate::links::link_row(app, ui);
+         });
+     });
+ }
+@@ -5594,7 +5593,7 @@ pub fn extra_windows(app: &mut PhotocraftApp, ctx: &egui::Context) {
      let wins = app.ui.windows.clone();
      for w in wins.into_iter().filter(|w| w.open) {
          let Some(st) = app.session.documents().get(w.document) else { continue };
@@ -49945,19 +49956,26 @@ index 39b2072b507134aea1cd5377de6726d3e646fe6a..7e68a311f7781db348228d31645e0936
  
      #[test]
 diff --git a/crates/ui-egui/src/dialogs.rs b/crates/ui-egui/src/dialogs.rs
-index 7fcb333b2b93dea12076c897c98877b48a8d3d97..542921d938e02da93230251b1a5cf6c4ff78c21f 100644
+index 7fcb333b2b93dea12076c897c98877b48a8d3d97..96697874fa7c197ff26b5fe4b860916fd32bd529 100644
 --- a/crates/ui-egui/src/dialogs.rs
 +++ b/crates/ui-egui/src/dialogs.rs
-@@ -503,7 +503,7 @@ fn about_tab_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: &str) {
+@@ -503,14 +503,8 @@ fn about_tab_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, tab: &str) {
          "contributors" => crate::credits::contributors_ui(app, ui),
          "models" => crate::credits::models_ui(ui),
          _ => {
 -            ui.label(tl!("KIO Photo — an open-source, native image editor written in Rust."));
 +            ui.label(tl!("Bogo Photo — an open-source, native image editor written in Rust."));
              ui.label(crate::i18n::fmt(tl!("Version {version}"), &[("version", &photocraft_engine::build_info::long_version())]));
-             ui.add_space(12.0);
-             ui.vertical_centered(|ui| {
-@@ -535,7 +535,7 @@ pub fn title(d: &Dialog) -> String {
+-            ui.add_space(12.0);
+-            ui.vertical_centered(|ui| {
+-                crate::links::discord_button(app, ui, 220.0);
+-                ui.add_space(8.0);
+-                crate::links::link_row(app, ui);
+-            });
+             ui.add_space(10.0);
+             ui.weak("egui · wgpu · photocraft-engine");
+         }
+@@ -535,7 +529,7 @@ pub fn title(d: &Dialog) -> String {
      match d.kind {
          DialogKind::NewDocument => "New Document".into(),
          DialogKind::About if d.fields.get("systemInfo").and_then(Value::as_bool) == Some(true) => "System Info".into(),
@@ -50033,32 +50051,33 @@ index 2f770977cd25e26f1993bb36cafe724c3ead06db..d7c34b6d84eed90f795013d2e39ef1dd
                  ui.label(&reason);
              });
 diff --git a/crates/ui-egui/src/i18n/cs.tsv b/crates/ui-egui/src/i18n/cs.tsv
-index f863d54a04860265026707a7b406f2d79fd99c6f..23ca96a4e8ca364960843ef5d8062638848330d5 100644
+index f863d54a04860265026707a7b406f2d79fd99c6f..79244706ff6ffb9a6355a023a0278e36e65d6009 100644
 --- a/crates/ui-egui/src/i18n/cs.tsv
 +++ b/crates/ui-egui/src/i18n/cs.tsv
-@@ -16,7 +16,7 @@
+@@ -16,7 +16,6 @@
  # particular not the Czech localisation of Adobe Photoshop. Add entries the same way.
  # Conventions: menus are nouns (Soubor, Úpravy, Obraz ...), commands are infinitives (Otevřít…,
  # Uložit jako…), sentence case as in the English source. Product and technology names
 -# (KIO Photo, ArtCraft, OpenType, CMYK, Lab ...) stay in Latin letters; the trailing "…" of
-+# (Bogo Photo, ArtCraft, OpenType, CMYK, Lab ...) stay in Latin letters; the trailing "…" of
  # dialog commands is kept.
  
  # Channel Options and New Spot Channel (#3761)
-@@ -793,9 +793,9 @@
+@@ -793,11 +792,9 @@
  	Timeline	Časová osa
  	Tool Presets	Přednastavení nástrojů
  	Tools	Nástroje
 -	About KIO Photo	O aplikaci KIO Photo
 -	KIO Photo Website	Web KIO Photo
 -	KIO Photo on GitHub	KIO Photo na GitHubu
+-	ArtCraft Website	Web ArtCraft
+-	Join the ArtCraft Discord…	Připojit se k Discordu ArtCraft…
 +	About Bogo Photo	O aplikaci Bogo Photo
 +	Bogo Photo Website	Web Bogo Photo
 +	Bogo Photo on GitHub	Bogo Photo na GitHubu
- 	ArtCraft Website	Web ArtCraft
- 	Join the ArtCraft Discord…	Připojit se k Discordu ArtCraft…
  	Report an Issue…	Nahlásit problém…
-@@ -857,7 +857,7 @@
+ 	WIA Support…	Podpora WIA…
+ 	Apply	Použít
+@@ -857,7 +854,7 @@
  	All Caps	Verzálky
  	All Slices	Všechny řezy
  	All User Slices	Všechny uživatelské řezy
@@ -50067,7 +50086,15 @@ index f863d54a04860265026707a7b406f2d79fd99c6f..23ca96a4e8ca364960843ef5d8062638
  	Alt	Alt
  	Always use pressure for opacity	Vždy použít přítlak pro krytí
  	Always use pressure for size	Vždy použít přítlak pro velikost
-@@ -1108,8 +1108,8 @@
+@@ -1088,7 +1085,6 @@
+ 	Diffusion	Difuze
+ 	Discard the embedded profile (don't color manage)	Zahodit vložený profil (bez správy barev)
+ 	Discontiguous	Nesouvislé
+-	Discord	Discord
+ 	Dismiss	Zavřít
+ 	Display P3	Display P3
+ 	Display Text	Zobrazený text
+@@ -1108,8 +1104,8 @@
  	Drop an image or PSD anywhere to open it.	Přetáhněte sem obrázek nebo PSD a otevře se.
  	Native file drag-and-drop is unavailable	Nativní přetahování souborů ve Waylandu není dostupné
  	Native file drag-and-drop is not supported on Wayland yet. Use File › Open, or copy the image in your file manager and paste it with {paste}.	Nativní přetahování souborů ve Waylandu zatím není podporováno. Použijte Soubor › Otevřít, nebo obrázek zkopírujte ve správci souborů a vložte ho pomocí {paste}.
@@ -50078,7 +50105,15 @@ index f863d54a04860265026707a7b406f2d79fd99c6f..23ca96a4e8ca364960843ef5d8062638
  	Edit › Paste	Úpravy › Vložit
  	Duplicate Layers…	Duplikovat vrstvy…
  	Duplicate style	Duplikovat styl
-@@ -1357,9 +1357,9 @@
+@@ -1223,7 +1219,6 @@
+ 	Invert All	Invertovat vše
+ 	Invert has no settings.	Invertovat nemá žádná nastavení.
+ 	Italic	Kurzíva
+-	Join us on Discord	Přidejte se k nám na Discordu
+ 	Justify all	Do bloku vše
+ 	Justify last centered	Do bloku, poslední řádek na střed
+ 	Justify last left	Do bloku, poslední řádek vlevo
+@@ -1357,9 +1352,9 @@
  	Perspective Warp is not active	Perspektivní deformace není aktivní
  	Perspective Warp: draw planes along the image's perspective, then switch to Warp	Perspektivní deformace: nakreslete roviny podle perspektivy obrazu a pak přepněte na deformaci
  	Photo Filter	Fotografický filtr
@@ -50091,7 +50126,7 @@ index f863d54a04860265026707a7b406f2d79fd99c6f..23ca96a4e8ca364960843ef5d8062638
  	Pin Depth:	Hloubka špendlíku:
  	Pixel Length:	Délka v pixelech:
  	Pixels/Centimeter	Pixely/centimetr
-@@ -1435,11 +1435,11 @@
+@@ -1435,11 +1430,11 @@
  	Import Shortcuts…	Importovat zkratky…
  	Load a keyboard shortcut set saved as .kys	Načíst sadu klávesových zkratek uloženou jako .kys
  	Imported {n} shortcuts from {file}. Click OK to keep them.	Importováno zkratek: {n} ze souboru {file}. Klepnutím na OK je ponecháte.
@@ -50105,7 +50140,15 @@ index f863d54a04860265026707a7b406f2d79fd99c6f..23ca96a4e8ca364960843ef5d8062638
  	Edit › Keyboard Shortcuts › Reset All to Defaults undoes an import.	Úpravy › Klávesové zkratky › Obnovit vše na výchozí import vrátí zpět.
  	Don't Import	Neimportovat
  	The keyboard shortcut set was not imported: {error}	Sada klávesových zkratek nebyla importována: {error}
-@@ -1669,7 +1669,7 @@
+@@ -1632,7 +1627,6 @@
+ 	Apple Watch 45mm	Apple Watch 45 mm
+ 	Aqua	Akvamarínové
+ 	Art & Illustration	Umění a ilustrace
+-	ArtCraft	ArtCraft
+ 	Background Eraser Tool	Nástroj guma pozadí
+ 	Bevel & Emboss	Úkos a reliéf
+ 	Blend Mode	Režim prolnutí
+@@ -1669,7 +1663,7 @@
  	Current Tool	Aktuální nástroj
  	Custom Shape Tool	Nástroj vlastní tvar
  	Cyans	Azurové
@@ -50114,7 +50157,7 @@ index f863d54a04860265026707a7b406f2d79fd99c6f..23ca96a4e8ca364960843ef5d8062638
  	Delete Workspace	Odstranit pracovní prostor
  	Diamond	Kosočtverec
  	Dimensions:	Rozměry:
-@@ -1780,7 +1780,7 @@
+@@ -1780,7 +1774,7 @@
  	Pen Tool	Nástroj pero
  	Convert Point Tool	Nástroj převést bod
  	Photo	Fotografie
@@ -50123,7 +50166,7 @@ index f863d54a04860265026707a7b406f2d79fd99c6f..23ca96a4e8ca364960843ef5d8062638
  	Picas	Pica
  	Pillow Emboss	Polštářový reliéf
  	Pixel Replacement	Nahrazení pixelů
-@@ -2116,7 +2116,7 @@
+@@ -2116,7 +2110,7 @@
  	System Info	Informace o systému
  	More panels	Další panely
  	More documents	Další dokumenty
@@ -50132,7 +50175,7 @@ index f863d54a04860265026707a7b406f2d79fd99c6f..23ca96a4e8ca364960843ef5d8062638
  	Graphics	Grafika
  	Reset GPU Backend	Obnovit grafický backend
  	Applies at next launch.	Projeví se při příštím spuštění.
-@@ -2241,7 +2241,7 @@
+@@ -2241,7 +2235,7 @@
  	Automatic uses GPU acceleration when available and falls back to CPU rendering on errors.	Automatický režim používá dostupnou GPU a při chybě přejde na CPU.
  	Switched to CPU rendering	Přepnuto na vykreslování CPU
  	GPU acceleration could not continue. Your documents are unchanged.	Akcelerace GPU nemohla pokračovat. Dokumenty zůstaly nezměněny.
@@ -50141,7 +50184,7 @@ index f863d54a04860265026707a7b406f2d79fd99c6f..23ca96a4e8ca364960843ef5d8062638
  	Retry GPU requires a restart. Save your work first.	Opakování GPU vyžaduje restart. Nejprve uložte práci.
  	Keep Using CPU	Pokračovat s CPU
  	Retry GPU	Zkusit GPU znovu
-@@ -2484,7 +2484,7 @@ fontWeight	Italic	Kurzíva
+@@ -2484,7 +2478,7 @@ fontWeight	Italic	Kurzíva
  	Color to Alpha…	Barva na alfu…
  	Transparency Threshold	Práh průhlednosti
  	Opacity Threshold	Práh krytí
@@ -50150,7 +50193,7 @@ index f863d54a04860265026707a7b406f2d79fd99c6f..23ca96a4e8ca364960843ef5d8062638
  
  	Rasterize svg groups deeper than	Rasterizovat skupiny SVG hlubší než tato úroveň
  	0 turns this threshold off; SVG groups nested deeper than 100 levels are always rasterized.	0 vypne tento práh; skupiny SVG vnořené hlouběji než 100 úrovní se rastrují vždy.
-@@ -3203,7 +3203,7 @@ cameraData	Lens	Objektiv
+@@ -3203,7 +3197,7 @@ cameraData	Lens	Objektiv
  	Pyramids	Pyramidy
  	Quick Selection	Rychlý výběr
  	Quit	Ukončit
@@ -50159,7 +50202,7 @@ index f863d54a04860265026707a7b406f2d79fd99c6f..23ca96a4e8ca364960843ef5d8062638
  	Quit {app}	Ukončit {app}
  	RGB	RGB
  	Radial Blur	Radiální rozostření
-@@ -3610,9 +3610,9 @@ curves	Smooth	Vyhladit
+@@ -3610,9 +3604,9 @@ curves	Smooth	Vyhladit
  	{message} (notes: {n}; {warning})	{message} (poznámky: {n}; {warning})
  @plural	{warning} (+{n} more brush preset warning)|{warning} (+{n} more brush preset warnings)	{warning} (+{n} další upozornění k přednastavení štětců)|{warning} (+{n} další upozornění k přednastavení štětců)|{warning} (+{n} dalších upozornění k přednastavení štětců)
  	Preferences can't be saved	Předvolby nelze uložit
@@ -50171,7 +50214,15 @@ index f863d54a04860265026707a7b406f2d79fd99c6f..23ca96a4e8ca364960843ef5d8062638
  	GPU device was lost; using the CPU renderer.	Spojení se zařízením GPU bylo ztraceno; používá se vykreslování pomocí CPU.
  	GPU error; using the CPU renderer.	Chyba GPU; používá se vykreslování pomocí CPU.
  @plural	{what} with {n} warning|{what} with {n} warnings	{what} ({n} upozornění)|{what} ({n} upozornění)|{what} ({n} upozornění)
-@@ -3727,7 +3727,7 @@ navigator	Zoom	Zvětšení
+@@ -3691,7 +3685,6 @@ navigator	Zoom	Zvětšení
+ 	on	zapnuto
+ 	off	vypnuto
+ 	This adjustment ({key}) is kept as imported and can't be edited yet.	Tato úprava ({key}) se uchovává v importované podobě a zatím ji nelze měnit.
+-	Join the ArtCraft Discord ({url})	Přidejte se na Discord ArtCraft ({url})
+ 	{index} of {total}	{index} z {total}
+ @plural	{n} step|{n} steps	{n} krok|{n} kroky|{n} kroků
+ 	{shortcut} assigned.	Zkratka {shortcut} přiřazena.
+@@ -3727,7 +3720,7 @@ navigator	Zoom	Zvětšení
  	{name} (Photoshop)	{name} (Photoshop)
  	{message} ({note})	{message} ({note})
  @plural	Loaded {n} action from {file}|Loaded {n} actions from {file}	Načtena {n} akce ze souboru {file}|Načteny {n} akce ze souboru {file}|Načteno {n} akcí ze souboru {file}
@@ -50181,32 +50232,33 @@ index f863d54a04860265026707a7b406f2d79fd99c6f..23ca96a4e8ca364960843ef5d8062638
  @plural	{n} step with no Photoshop equivalent left out|{n} steps with no Photoshop equivalent left out	Vynechán {n} krok bez obdoby v Photoshopu|Vynechány {n} kroky bez obdoby v Photoshopu|Vynecháno {n} kroků bez obdoby v Photoshopu
  
 diff --git a/crates/ui-egui/src/i18n/de.tsv b/crates/ui-egui/src/i18n/de.tsv
-index 29974baeda21d402935ea66352a92e465af775e7..09ae45c8be79709b2c15c2f88ef2e5269281fc3b 100644
+index 29974baeda21d402935ea66352a92e465af775e7..f4f5c7bc48cfcacb631f415e011351ecd55b1cb3 100644
 --- a/crates/ui-egui/src/i18n/de.tsv
 +++ b/crates/ui-egui/src/i18n/de.tsv
-@@ -12,7 +12,7 @@
+@@ -12,7 +12,6 @@
  # Clean-room: every entry was written from the plain meaning of the English label using ordinary
  # German image-editing vocabulary (Ebene, Maske, Auswahl, Weichzeichnen ...). No proprietary
  # localisation resource, string table or product UI was consulted or copied; add entries the same
 -# way. Product and technology names (KIO Photo, ArtCraft, OpenType, CMYK, Lab ...) stay in Latin
-+# way. Product and technology names (Bogo Photo, ArtCraft, OpenType, CMYK, Lab ...) stay in Latin
  # letters; the trailing "…" of dialog commands is kept. Plural rule: one|other (n != 1 -> other).
  
  # Channel Options and New Spot Channel (#3761)
-@@ -782,9 +782,9 @@
+@@ -782,11 +781,9 @@
  	Timeline	Zeitleiste
  	Tool Presets	Werkzeugvorgaben
  	Tools	Werkzeuge
 -	About KIO Photo	Über KIO Photo
 -	KIO Photo Website	KIO Photo-Website
 -	KIO Photo on GitHub	KIO Photo auf GitHub
+-	ArtCraft Website	ArtCraft-Website
+-	Join the ArtCraft Discord…	ArtCraft-Discord beitreten…
 +	About Bogo Photo	Über Bogo Photo
 +	Bogo Photo Website	Bogo Photo-Website
 +	Bogo Photo on GitHub	Bogo Photo auf GitHub
- 	ArtCraft Website	ArtCraft-Website
- 	Join the ArtCraft Discord…	ArtCraft-Discord beitreten…
  	Report an Issue…	Problem melden…
-@@ -837,7 +837,7 @@
+ 	WIA Support…	WIA-Unterstützung…
+ 	Apply	Anwenden
+@@ -837,7 +834,7 @@
  	All Caps	Großbuchstaben
  	All Slices	Alle Slices
  	All User Slices	Alle Benutzer-Slices
@@ -50215,7 +50267,15 @@ index 29974baeda21d402935ea66352a92e465af775e7..09ae45c8be79709b2c15c2f88ef2e526
  	Alt	Alt
  	Always use pressure for opacity	Druck immer für Deckkraft verwenden
  	Always use pressure for size	Druck immer für Größe verwenden
-@@ -1091,8 +1091,8 @@
+@@ -1071,7 +1068,6 @@
+ 	Diffusion	Diffusion
+ 	Discard the embedded profile (don't color manage)	Eingebettetes Profil verwerfen (keine Farbverwaltung)
+ 	Discontiguous	Nicht benachbart
+-	Discord	Discord
+ 	Dismiss	Ausblenden
+ 	Display P3	Display P3
+ 	Display Text	Text anzeigen
+@@ -1091,8 +1087,8 @@
  	Drop an image or PSD anywhere to open it.	Ziehe ein Bild oder PSD an eine beliebige Stelle, um es zu öffnen.
  	Native file drag-and-drop is unavailable	Natives Ziehen und Ablegen von Dateien ist nicht verfügbar
  	Native file drag-and-drop is not supported on Wayland yet. Use File › Open, or copy the image in your file manager and paste it with {paste}.	Natives Ziehen und Ablegen von Dateien wird unter Wayland noch nicht unterstützt. Nutze Datei › Öffnen oder kopiere das Bild im Dateimanager und füge es mit {paste} ein.
@@ -50226,7 +50286,15 @@ index 29974baeda21d402935ea66352a92e465af775e7..09ae45c8be79709b2c15c2f88ef2e526
  	Edit › Paste	Bearbeiten › Einfügen
  	Duplicate Layers…	Ebenen duplizieren…
  	Duplicate style	Stil duplizieren
-@@ -1340,9 +1340,9 @@
+@@ -1206,7 +1202,6 @@
+ 	Invert All	Alle invertieren
+ 	Invert has no settings.	Invertieren hat keine Einstellungen.
+ 	Italic	Kursiv
+-	Join us on Discord	Tritt unserem Discord bei
+ 	Justify all	Alles im Blocksatz
+ 	Justify last centered	Letzte Zeile zentriert
+ 	Justify last left	Letzte Zeile links
+@@ -1340,9 +1335,9 @@
  	Perspective Warp is not active	Perspektivische Verkrümmung ist nicht aktiv
  	Perspective Warp: draw planes along the image's perspective, then switch to Warp	Perspektivische Verkrümmung: zeichne Flächen entlang der Bildperspektive, wechsle dann zu Verkrümmen
  	Photo Filter	Foto-Filter
@@ -50239,7 +50307,7 @@ index 29974baeda21d402935ea66352a92e465af775e7..09ae45c8be79709b2c15c2f88ef2e526
  	Pin Depth:	Pin-Tiefe:
  	Pixel Length:	Pixel-Länge:
  	Pixels/Centimeter	Pixel/Zentimeter
-@@ -1418,11 +1418,11 @@
+@@ -1418,11 +1413,11 @@
  	Import Shortcuts…	Tastaturbefehle importieren…
  	Load a keyboard shortcut set saved as .kys	Einen als .kys gespeicherten Tastaturbefehlssatz laden
  	Imported {n} shortcuts from {file}. Click OK to keep them.	{n} Tastaturbefehle aus {file} importiert. Mit OK übernehmen.
@@ -50253,7 +50321,15 @@ index 29974baeda21d402935ea66352a92e465af775e7..09ae45c8be79709b2c15c2f88ef2e526
  	Edit › Keyboard Shortcuts › Reset All to Defaults undoes an import.	Bearbeiten › Tastaturbefehle › Alles auf Standardwerte zurücksetzen macht einen Import rückgängig.
  	Don't Import	Nicht importieren
  	The keyboard shortcut set was not imported: {error}	Der Tastaturbefehlssatz wurde nicht importiert: {error}
-@@ -1647,7 +1647,7 @@
+@@ -1611,7 +1606,6 @@
+ 	Apple Watch 45mm	Apple Watch 45 mm
+ 	Aqua	Aqua
+ 	Art & Illustration	Kunst & Illustration
+-	ArtCraft	ArtCraft
+ 	Background Eraser Tool	Hintergrund-Radiergummi-Werkzeug
+ 	Bevel & Emboss	Abgeflachte Kante & Relief
+ 	Blend Mode	Fusionsmodus
+@@ -1647,7 +1641,7 @@
  	Current Tool	Aktuelles Werkzeug
  	Custom Shape Tool	Werkzeug für benutzerdefinierte Formen
  	Cyans	Cyantöne
@@ -50262,7 +50338,7 @@ index 29974baeda21d402935ea66352a92e465af775e7..09ae45c8be79709b2c15c2f88ef2e526
  	Delete Workspace	Arbeitsbereich löschen
  	Diamond	Raute
  	Dimensions:	Abmessungen:
-@@ -1758,7 +1758,7 @@
+@@ -1758,7 +1752,7 @@
  	Pen Tool	Stift-Werkzeug
  	Convert Point Tool	Punkt-umwandeln-Werkzeug
  	Photo	Foto
@@ -50271,7 +50347,7 @@ index 29974baeda21d402935ea66352a92e465af775e7..09ae45c8be79709b2c15c2f88ef2e526
  	Picas	Pica
  	Pillow Emboss	Polsterrelief
  	Pixel Replacement	Pixelersatz
-@@ -2086,7 +2086,7 @@
+@@ -2086,7 +2080,7 @@
  	System Info	Systeminformationen
  	More panels	Weitere Bedienfelder
  	More documents	Weitere Dokumente
@@ -50280,7 +50356,7 @@ index 29974baeda21d402935ea66352a92e465af775e7..09ae45c8be79709b2c15c2f88ef2e526
  	Graphics	Grafik
  	Reset GPU Backend	GPU-Backend zurücksetzen
  	Applies at next launch.	Wird beim nächsten Start angewendet.
-@@ -2290,7 +2290,7 @@
+@@ -2290,7 +2284,7 @@
  	Automatic uses GPU acceleration when available and falls back to CPU rendering on errors.	Automatisch nutzt GPU-Beschleunigung, wenn verfügbar, und fällt bei Fehlern auf CPU-Rendering zurück.
  	Switched to CPU rendering	Auf CPU-Rendering umgeschaltet
  	GPU acceleration could not continue. Your documents are unchanged.	GPU-Beschleunigung konnte nicht fortgesetzt werden. Deine Dokumente sind unverändert.
@@ -50289,7 +50365,7 @@ index 29974baeda21d402935ea66352a92e465af775e7..09ae45c8be79709b2c15c2f88ef2e526
  	Retry GPU requires a restart. Save your work first.	GPU erneut versuchen erfordert einen Neustart. Speichere zuerst deine Arbeit.
  	Keep Using CPU	CPU weiter verwenden
  	Retry GPU	GPU erneut versuchen
-@@ -2524,7 +2524,7 @@ fontWeight	Italic	Kursiv
+@@ -2524,7 +2518,7 @@ fontWeight	Italic	Kursiv
  	Color to Alpha…	Farbe zu Alpha…
  	Transparency Threshold	Transparenz-Schwellenwert
  	Opacity Threshold	Deckkraft-Schwellenwert
@@ -50298,7 +50374,15 @@ index 29974baeda21d402935ea66352a92e465af775e7..09ae45c8be79709b2c15c2f88ef2e526
  
  	Rasterize svg groups deeper than	SVG-Gruppen ab dieser Tiefe rastern
  	0 turns this threshold off; SVG groups nested deeper than 100 levels are always rasterized.	0 schaltet diese Schwelle aus; SVG-Gruppen, die tiefer als 100 Ebenen verschachtelt sind, werden immer gerastert.
-@@ -3117,7 +3117,7 @@ curves	Smooth	Glätten
+@@ -2749,7 +2743,6 @@ curves	Smooth	Glätten
+ 	Medium Blue	Mittelblau
+ 	Light Gray	Hellgrau
+ # Status messages, system info and tool names
+-	Join the ArtCraft Discord ({url})	Dem ArtCraft-Discord beitreten ({url})
+ 	Nothing to paste: the clipboard holds no image	Nichts einzufügen: Die Zwischenablage enthält kein Bild
+ 	Graphics adapter: {adapter}	Grafikadapter: {adapter}
+ 	Backend: {backend} ({type})	Backend: {backend} ({type})
+@@ -3117,7 +3110,7 @@ curves	Smooth	Glätten
  	{name} (Photoshop)	{name} (Photoshop)
  	{message} ({note})	{message} ({note})
  @plural	Loaded {n} action from {file}|Loaded {n} actions from {file}	{n} Aktion aus {file} geladen|{n} Aktionen aus {file} geladen
@@ -50308,7 +50392,7 @@ index 29974baeda21d402935ea66352a92e465af775e7..09ae45c8be79709b2c15c2f88ef2e526
  @plural	{n} step with no Photoshop equivalent left out|{n} steps with no Photoshop equivalent left out	{n} Schritt ohne Photoshop-Entsprechung ausgelassen|{n} Schritte ohne Photoshop-Entsprechung ausgelassen
  
 diff --git a/crates/ui-egui/src/i18n/el.tsv b/crates/ui-egui/src/i18n/el.tsv
-index da165a6bfec83a209fa240628d84210273f2e768..79f8d10fbe42bcaf4fab5956959e2f0aaeab7944 100644
+index da165a6bfec83a209fa240628d84210273f2e768..c2253776188ea18133cd1e77745ed68b406eeea1 100644
 --- a/crates/ui-egui/src/i18n/el.tsv
 +++ b/crates/ui-egui/src/i18n/el.tsv
 @@ -1,4 +1,4 @@
@@ -50364,7 +50448,15 @@ index da165a6bfec83a209fa240628d84210273f2e768..79f8d10fbe42bcaf4fab5956959e2f0a
  	Retry GPU requires a restart. Save your work first.	Η νέα προσπάθεια χρήσης GPU απαιτεί επανεκκίνηση. Αποθηκεύστε πρώτα την εργασία σας.
  	Keep Using CPU	Συνέχεια με CPU
  	Retry GPU	Νέα προσπάθεια χρήσης GPU
-@@ -2040,7 +2040,7 @@
+@@ -1239,7 +1239,6 @@
+ 	Custom Pixel Aspect Ratio	Προσαρμοσμένη αναλογία εικονοστοιχείων
+ 	32-bit Preview Options	Επιλογές προεπισκόπησης 32 bit
+ 	New Guide	Νέος οδηγός
+-	Join the ArtCraft Discord	Συμμετοχή στο Discord του ArtCraft
+ 	Report an Issue	Αναφορά προβλήματος
+ 	Load Files into Stack	Φόρτωση αρχείων σε στοίβα
+ 	Statistics	Στατιστικά
+@@ -2040,7 +2039,7 @@
  	All Caps	Όλα κεφαλαία
  	All Slices	Όλες οι τομές
  	All User Slices	Όλες οι τομές χρήστη
@@ -50373,7 +50465,24 @@ index da165a6bfec83a209fa240628d84210273f2e768..79f8d10fbe42bcaf4fab5956959e2f0a
  	Alternates for Current Selection	Εναλλακτικοί χαρακτήρες για την τρέχουσα επιλογή
  	Altitude	Υψόμετρο
  	Always	Πάντα
-@@ -2728,7 +2728,7 @@
+@@ -2061,7 +2060,6 @@
+ 	Arc	Τόξο
+ 	Arch	Καμάρα
+ 	Art & Illustration	Τέχνη και εικονογράφηση
+-	ArtCraft Website	Ιστότοπος ArtCraft
+ 	Artboard Background Color	Χρώμα φόντου πίνακα σχεδίασης
+ 	Artboard Guides	Οδηγοί πίνακα σχεδίασης
+ 	Artboard from Group	Πίνακας σχεδίασης από ομάδα
+@@ -2565,8 +2563,6 @@
+ 	Iris Blur…	Θόλωση ίριδας…
+ 	Italic	Πλάγια
+ 	Jag	Οδοντωτό
+-	Join the ArtCraft Discord…	Συμμετοχή στο Discord του ArtCraft…
+-	Join us on Discord	Ελάτε στην κοινότητά μας στο Discord
+ 	Jpeg quality	Ποιότητα JPEG
+ 	Justification	Πλήρης στοίχιση
+ 	Justify	Πλήρης στοίχιση
+@@ -2728,7 +2724,7 @@
  	Move to	Μετακίνηση σε
  	NTSC Colors	Χρώματα NTSC
  	Name:	Όνομα:
@@ -50382,7 +50491,7 @@ index da165a6bfec83a209fa240628d84210273f2e768..79f8d10fbe42bcaf4fab5956959e2f0a
  	Nearest Neighbor	Πλησιέστερος γείτονας
  	Nearest Neighbor (hard edges)	Πλησιέστερος γείτονας (σκληρές ακμές)
  	Nearest neighbor	Πλησιέστερος γείτονας
-@@ -2806,8 +2806,8 @@
+@@ -2806,8 +2802,8 @@
  	Performance	Επιδόσεις
  	Perspective Warp	Παραμόρφωση προοπτικής
  	Photo	Φωτογραφία
@@ -50393,7 +50502,7 @@ index da165a6bfec83a209fa240628d84210273f2e768..79f8d10fbe42bcaf4fab5956959e2f0a
  	Photocopy	Φωτοαντίγραφο
  	Photography	Φωτογραφία
  	Photomerge	Συγχώνευση φωτογραφιών
-@@ -2930,11 +2930,11 @@
+@@ -2930,11 +2926,11 @@
  	Import Shortcuts…	Εισαγωγή συντομεύσεων…
  	Load a keyboard shortcut set saved as .kys	Φόρτωση ενός σετ συντομεύσεων πληκτρολογίου αποθηκευμένου ως .kys
  	Imported {n} shortcuts from {file}. Click OK to keep them.	Εισήχθησαν {n} συντομεύσεις από το {file}. Πατήστε OK για να τις κρατήσετε.
@@ -50407,7 +50516,7 @@ index da165a6bfec83a209fa240628d84210273f2e768..79f8d10fbe42bcaf4fab5956959e2f0a
  	Edit › Keyboard Shortcuts › Reset All to Defaults undoes an import.	Το Επεξεργασία › Συντομεύσεις πληκτρολογίου › Επαναφορά όλων στις προεπιλογές αναιρεί μια εισαγωγή.
  	Don't Import	Χωρίς εισαγωγή
  	The keyboard shortcut set was not imported: {error}	Το σετ συντομεύσεων πληκτρολογίου δεν εισήχθη: {error}
-@@ -3162,7 +3162,7 @@
+@@ -3162,7 +3158,7 @@
  	Text Position:	Θέση κειμένου:
  	Texture Each Tip	Υφή σε κάθε αποτύπωμα πινέλου
  	Texturizer	Εφαρμογή υφής
@@ -50416,7 +50525,23 @@ index da165a6bfec83a209fa240628d84210273f2e768..79f8d10fbe42bcaf4fab5956959e2f0a
  	Thin	Λεπτό
  	Threshold Level	Στάθμη κατωφλίου
  	Thumbnail size (smallest: list)	Μέγεθος μικρογραφίας (μικρότερο: λίστα)
-@@ -3444,7 +3444,7 @@ cameraRaw	Yellow	Κίτρινο
+@@ -3406,7 +3402,6 @@ cameraRaw	Yellow	Κίτρινο
+ 	Add to Swatches	Προσθήκη στα δείγματα χρωμάτων
+ 	Alt	Alt
+ 	Anamorphic 2:1 (2)	Αναμορφικό 2:1 (2)
+-	ArtCraft	ArtCraft
+ 	Blend If:	Ανάμειξη υπό όρους:
+ 	Channels:	Κανάλια:
+ 	Click a red pupil to neutralize it	Κάντε κλικ σε μια κόκκινη κόρη για να την εξουδετερώσετε
+@@ -3421,7 +3416,6 @@ cameraRaw	Yellow	Κίτρινο
+ 	D1/DV PAL Widescreen (1.46)	D1/DV PAL ευρεία οθόνη (1.46)
+ 	DVCPRO HD 1080/HDV 1080 (1.5)	DVCPRO HD 1080/HDV 1080 (1.5)
+ 	Darken Amount	Ποσότητα σκουρέματος
+-	Discord	Discord
+ 	Display P3	Display P3
+ 	Edit › Paste	Επεξεργασία › Επικόλληση
+ 	Edits that change the whole document, such as a layer's blend mode, opacity or visibility, redraw all of it.	Οι αλλαγές που επηρεάζουν όλο το έγγραφο, όπως η λειτουργία ανάμειξης, η αδιαφάνεια ή η ορατότητα ενός επιπέδου, το επανασχεδιάζουν ολόκληρο.
+@@ -3444,7 +3438,7 @@ cameraRaw	Yellow	Κίτρινο
  	New Swatch Group…	Νέα ομάδα δειγμάτων χρωμάτων…
  	New Swatch…	Νέο δείγμα χρώματος…
  	OpenType	OpenType
@@ -50425,7 +50550,7 @@ index da165a6bfec83a209fa240628d84210273f2e768..79f8d10fbe42bcaf4fab5956959e2f0a
  	Pupil Size	Μέγεθος κόρης
  	Replace Swatches…	Αντικατάσταση δειγμάτων χρωμάτων…
  	Reset Swatches	Επαναφορά δειγμάτων χρωμάτων
-@@ -3487,7 +3487,7 @@ cameraRaw	Yellow	Κίτρινο
+@@ -3487,7 +3481,7 @@ cameraRaw	Yellow	Κίτρινο
  	Color…	Χρώμα…
  	Cone (Inverted)	Κώνος (αντεστραμμένος)
  	Could not open	Δεν ήταν δυνατό το άνοιγμα
@@ -50434,7 +50559,7 @@ index da165a6bfec83a209fa240628d84210273f2e768..79f8d10fbe42bcaf4fab5956959e2f0a
  	Diagonal (Descending)	Διαγώνιος (φθίνουσα)
  	Contour Editor	Επεξεργαστής περιγράμματος
  	Anti-aliased	Εξομάλυνση
-@@ -3532,8 +3532,8 @@ cameraRaw	Yellow	Κίτρινο
+@@ -3532,8 +3526,8 @@ cameraRaw	Yellow	Κίτρινο
  	Red Eye Tool	Κόκκινα μάτια (Red Eye Tool)
  	Seafoam	Θαλασσί
  	Srgb	sRGB
@@ -50445,7 +50570,7 @@ index da165a6bfec83a209fa240628d84210273f2e768..79f8d10fbe42bcaf4fab5956959e2f0a
  	Vulkan	Vulkan
  	WebP (lossless)	WebP (χωρίς απώλειες)
  	Webp	WebP
-@@ -3586,7 +3586,7 @@ fontWeight	Thin	Πολύ λεπτά
+@@ -3586,7 +3580,7 @@ fontWeight	Thin	Πολύ λεπτά
  	Color to Alpha…	Χρώμα σε άλφα…
  	Transparency Threshold	Κατώφλι διαφάνειας
  	Opacity Threshold	Κατώφλι αδιαφάνειας
@@ -50454,7 +50579,7 @@ index da165a6bfec83a209fa240628d84210273f2e768..79f8d10fbe42bcaf4fab5956959e2f0a
  
  	Rasterize svg groups deeper than	Ραστεροποίηση ομάδων SVG πέρα από αυτό το βάθος
  	0 turns this threshold off; SVG groups nested deeper than 100 levels are always rasterized.	Το 0 απενεργοποιεί αυτό το όριο· ομάδες SVG με ένθεση βαθύτερη από 100 επίπεδα ραστεροποιούνται πάντα.
-@@ -3817,7 +3817,7 @@ curves	Smooth	Εξομάλυνση
+@@ -3817,7 +3811,7 @@ curves	Smooth	Εξομάλυνση
  	{name} (Photoshop)	{name} (Photoshop)
  	{message} ({note})	{message} ({note})
  @plural	Loaded {n} action from {file}|Loaded {n} actions from {file}	Φορτώθηκε {n} ενέργεια από το {file}|Φορτώθηκαν {n} ενέργειες από το {file}
@@ -50464,32 +50589,33 @@ index da165a6bfec83a209fa240628d84210273f2e768..79f8d10fbe42bcaf4fab5956959e2f0a
  @plural	{n} step with no Photoshop equivalent left out|{n} steps with no Photoshop equivalent left out	Παραλείφθηκε {n} βήμα χωρίς αντίστοιχο στο Photoshop|Παραλείφθηκαν {n} βήματα χωρίς αντίστοιχο στο Photoshop
  
 diff --git a/crates/ui-egui/src/i18n/es.tsv b/crates/ui-egui/src/i18n/es.tsv
-index 99961d42f60656b8ea9ee3bb4a1f916eba8e33c5..1ffa8d0e41b1c1a2f6c35190a92502bad94d3138 100644
+index 99961d42f60656b8ea9ee3bb4a1f916eba8e33c5..1ac436741e3bd8c55b9bd43660ce4ed7dec7dedd 100644
 --- a/crates/ui-egui/src/i18n/es.tsv
 +++ b/crates/ui-egui/src/i18n/es.tsv
-@@ -9,7 +9,7 @@
+@@ -9,7 +9,6 @@
  # Clean-room: every entry was written from the plain meaning of the English label using ordinary
  # Spanish computing vocabulary (capa, pincel, selección, lienzo ...). No proprietary localisation
  # resource, string table or product UI was consulted or copied; add entries the same way.
 -# Product and technology names (KIO Photo, ArtCraft, OpenType, CMYK, Lab ...) stay in Latin
-+# Product and technology names (Bogo Photo, ArtCraft, OpenType, CMYK, Lab ...) stay in Latin
  # letters; the trailing "…" of dialog commands is kept.
  
  # Channel Options and New Spot Channel (#3761)
-@@ -789,9 +789,9 @@
+@@ -789,11 +788,9 @@
  	Timeline	Línea de tiempo
  	Tool Presets	Ajustes preestablecidos de herramienta
  	Tools	Herramientas
 -	About KIO Photo	Acerca de KIO Photo
 -	KIO Photo Website	Sitio web de KIO Photo
 -	KIO Photo on GitHub	KIO Photo en GitHub
+-	ArtCraft Website	Sitio web de ArtCraft
+-	Join the ArtCraft Discord…	Únase al Discord de ArtCraft…
 +	About Bogo Photo	Acerca de Bogo Photo
 +	Bogo Photo Website	Sitio web de Bogo Photo
 +	Bogo Photo on GitHub	Bogo Photo en GitHub
- 	ArtCraft Website	Sitio web de ArtCraft
- 	Join the ArtCraft Discord…	Únase al Discord de ArtCraft…
  	Report an Issue…	Informar de un problema…
-@@ -846,7 +846,7 @@
+ 	WIA Support…	Compatibilidad con WIA…
+ 	Apply	Aplicar
+@@ -846,7 +843,7 @@
  	All Caps	Todo en mayúsculas
  	All Slices	Todos los sectores
  	All User Slices	Todos los sectores de usuario
@@ -50498,7 +50624,15 @@ index 99961d42f60656b8ea9ee3bb4a1f916eba8e33c5..1ffa8d0e41b1c1a2f6c35190a92502ba
  	Alt	Alt
  	Always use pressure for opacity	Usar siempre la presión para la opacidad
  	Always use pressure for size	Usar siempre la presión para el tamaño
-@@ -1097,8 +1097,8 @@
+@@ -1077,7 +1074,6 @@
+ 	Diffusion	Difusión
+ 	Discard the embedded profile (don't color manage)	Descartar el perfil incrustado (no gestionar el color)
+ 	Discontiguous	No contiguo
+-	Discord	Discord
+ 	Dismiss	Descartar
+ 	Display P3	Display P3
+ 	Display Text	Texto de visualización
+@@ -1097,8 +1093,8 @@
  	Drop an image or PSD anywhere to open it.	Suelte una imagen o un PSD en cualquier lugar para abrirlo.
  	Native file drag-and-drop is unavailable	Arrastrar y soltar archivos de forma nativa no está disponible en Wayland
  	Native file drag-and-drop is not supported on Wayland yet. Use File › Open, or copy the image in your file manager and paste it with {paste}.	Arrastrar y soltar archivos de forma nativa aún no es compatible con Wayland. Use Archivo › Abrir, o copie la imagen en su gestor de archivos y péguela con {paste}.
@@ -50509,7 +50643,15 @@ index 99961d42f60656b8ea9ee3bb4a1f916eba8e33c5..1ffa8d0e41b1c1a2f6c35190a92502ba
  	Edit › Paste	Edición › Pegar
  	Duplicate Layers…	Duplicar capas…
  	Duplicate style	Duplicar estilo
-@@ -1346,9 +1346,9 @@
+@@ -1212,7 +1208,6 @@
+ 	Invert All	Invertir todo
+ 	Invert has no settings.	Invertir no tiene ajustes.
+ 	Italic	Cursiva
+-	Join us on Discord	Únase a nuestro Discord
+ 	Justify all	Justificar todo
+ 	Justify last centered	Justificar última centrada
+ 	Justify last left	Justificar última a la izquierda
+@@ -1346,9 +1341,9 @@
  	Perspective Warp is not active	La deformación de perspectiva no está activa
  	Perspective Warp: draw planes along the image's perspective, then switch to Warp	Deformación de perspectiva: dibuje planos siguiendo la perspectiva de la imagen y luego cambie a Deformar
  	Photo Filter	Filtro de fotografía
@@ -50522,7 +50664,7 @@ index 99961d42f60656b8ea9ee3bb4a1f916eba8e33c5..1ffa8d0e41b1c1a2f6c35190a92502ba
  	Pin Depth:	Profundidad de la chincheta:
  	Pixel Length:	Longitud en píxeles:
  	Pixels/Centimeter	Píxeles/centímetro
-@@ -1424,11 +1424,11 @@
+@@ -1424,11 +1419,11 @@
  	Import Shortcuts…	Importar métodos abreviados…
  	Load a keyboard shortcut set saved as .kys	Cargar un conjunto de métodos abreviados de teclado guardado como .kys
  	Imported {n} shortcuts from {file}. Click OK to keep them.	Se importaron {n} métodos abreviados de {file}. Haga clic en Aceptar para conservarlos.
@@ -50536,7 +50678,15 @@ index 99961d42f60656b8ea9ee3bb4a1f916eba8e33c5..1ffa8d0e41b1c1a2f6c35190a92502ba
  	Edit › Keyboard Shortcuts › Reset All to Defaults undoes an import.	Edición › Métodos abreviados de teclado › Restablecer todo a los valores predeterminados deshace una importación.
  	Don't Import	No importar
  	The keyboard shortcut set was not imported: {error}	No se importó el conjunto de métodos abreviados de teclado: {error}
-@@ -1656,7 +1656,7 @@
+@@ -1619,7 +1614,6 @@
+ 	Apple Watch 45mm	Apple Watch 45mm
+ 	Aqua	Aqua
+ 	Art & Illustration	Arte e ilustración
+-	ArtCraft	ArtCraft
+ 	Background Eraser Tool	Herramienta Borrador de fondos
+ 	Bevel & Emboss	Bisel y relieve
+ 	Blend Mode	Modo de fusión
+@@ -1656,7 +1650,7 @@
  	Current Tool	Herramienta actual
  	Custom Shape Tool	Herramienta Forma personalizada
  	Cyans	Cianes
@@ -50545,7 +50695,7 @@ index 99961d42f60656b8ea9ee3bb4a1f916eba8e33c5..1ffa8d0e41b1c1a2f6c35190a92502ba
  	Delete Workspace	Eliminar espacio de trabajo
  	Diamond	Diamante
  	Dimensions:	Dimensiones:
-@@ -1767,7 +1767,7 @@
+@@ -1767,7 +1761,7 @@
  	Pen Tool	Herramienta Pluma
  	Convert Point Tool	Herramienta Convertir punto
  	Photo	Fotografía
@@ -50554,7 +50704,7 @@ index 99961d42f60656b8ea9ee3bb4a1f916eba8e33c5..1ffa8d0e41b1c1a2f6c35190a92502ba
  	Picas	Picas
  	Pillow Emboss	Relieve en almohadilla
  	Pixel Replacement	Sustitución de píxeles
-@@ -2103,7 +2103,7 @@
+@@ -2103,7 +2097,7 @@
  	System Info	Información del sistema
  	More panels	Más paneles
  	More documents	Más documentos
@@ -50563,7 +50713,7 @@ index 99961d42f60656b8ea9ee3bb4a1f916eba8e33c5..1ffa8d0e41b1c1a2f6c35190a92502ba
  	Graphics	Gráficos
  	Reset GPU Backend	Restablecer el backend de GPU
  	Applies at next launch.	Se aplicará en el próximo inicio.
-@@ -2313,7 +2313,7 @@
+@@ -2313,7 +2307,7 @@
  	Automatic uses GPU acceleration when available and falls back to CPU rendering on errors.	Automático utiliza la GPU cuando está disponible y cambia a la CPU si hay errores.
  	Switched to CPU rendering	Se cambió al renderizado por CPU
  	GPU acceleration could not continue. Your documents are unchanged.	La aceleración GPU no pudo continuar. Los documentos no han cambiado.
@@ -50572,7 +50722,7 @@ index 99961d42f60656b8ea9ee3bb4a1f916eba8e33c5..1ffa8d0e41b1c1a2f6c35190a92502ba
  	Retry GPU requires a restart. Save your work first.	Reintentar la GPU requiere reiniciar. Guarde primero su trabajo.
  	Keep Using CPU	Seguir usando CPU
  	Retry GPU	Reintentar GPU
-@@ -2553,7 +2553,7 @@ fontWeight	Italic	Cursiva
+@@ -2553,7 +2547,7 @@ fontWeight	Italic	Cursiva
  	Color to Alpha…	Color a alfa…
  	Transparency Threshold	Umbral de transparencia
  	Opacity Threshold	Umbral de opacidad
@@ -50581,7 +50731,7 @@ index 99961d42f60656b8ea9ee3bb4a1f916eba8e33c5..1ffa8d0e41b1c1a2f6c35190a92502ba
  
  	Rasterize svg groups deeper than	Rasterizar grupos SVG con mayor profundidad
  	0 turns this threshold off; SVG groups nested deeper than 100 levels are always rasterized.	0 desactiva este umbral; los grupos SVG anidados a más de 100 niveles siempre se rasterizan.
-@@ -2804,7 +2804,7 @@ curves	Smooth	Suavizar
+@@ -2804,7 +2798,7 @@ curves	Smooth	Suavizar
  	{name} (Photoshop)	{name} (Photoshop)
  	{message} ({note})	{message} ({note})
  @plural	Loaded {n} action from {file}|Loaded {n} actions from {file}	Se cargó {n} acción de {file}|Se cargaron {n} acciones de {file}
@@ -50591,32 +50741,35 @@ index 99961d42f60656b8ea9ee3bb4a1f916eba8e33c5..1ffa8d0e41b1c1a2f6c35190a92502ba
  @plural	{n} step with no Photoshop equivalent left out|{n} steps with no Photoshop equivalent left out	{n} paso sin equivalente en Photoshop omitido|{n} pasos sin equivalente en Photoshop omitidos
  
 diff --git a/crates/ui-egui/src/i18n/fr.tsv b/crates/ui-egui/src/i18n/fr.tsv
-index a0cc9c8462a83b63bd942fd7244c6a21b7adee07..a5cf7abe7a6b630d1c9e81156c8fdac0b3d78616 100644
+index a0cc9c8462a83b63bd942fd7244c6a21b7adee07..2a9a7a5111ad2ee77da8ebe7b053def6948e0b60 100644
 --- a/crates/ui-egui/src/i18n/fr.tsv
 +++ b/crates/ui-egui/src/i18n/fr.tsv
-@@ -15,7 +15,7 @@
+@@ -15,8 +15,7 @@
  # particular not the French localisation of Adobe Photoshop. Add entries the same way.
  # Conventions: menus are nouns (Fichier, Édition, Image ...), commands are infinitives (Ouvrir…,
  # Enregistrer sous…), sentence case. French typography: a no-break space (U+00A0) before
 -# « : ; ? ! » and "%", and inside guillemets « … ». Product and technology names (KIO Photo,
+-# ArtCraft, OpenType, Lab ...) stay as they are; RGB/CMYK read RVB/CMJN; the trailing "…" of
 +# « : ; ? ! » and "%", and inside guillemets « … ». Product and technology names (Bogo Photo,
- # ArtCraft, OpenType, Lab ...) stay as they are; RGB/CMYK read RVB/CMJN; the trailing "…" of
  # dialog commands is kept.
  
-@@ -777,9 +777,9 @@
+ # Channel Options and New Spot Channel (#3761)
+@@ -777,11 +776,9 @@
  	Timeline	Montage
  	Tool Presets	Préréglages d'outils
  	Tools	Outils
 -	About KIO Photo	À propos de KIO Photo
 -	KIO Photo Website	Site web de KIO Photo
 -	KIO Photo on GitHub	KIO Photo sur GitHub
+-	ArtCraft Website	Site web d'ArtCraft
+-	Join the ArtCraft Discord…	Rejoindre le Discord d'ArtCraft…
 +	About Bogo Photo	À propos de Bogo Photo
 +	Bogo Photo Website	Site web de Bogo Photo
 +	Bogo Photo on GitHub	Bogo Photo sur GitHub
- 	ArtCraft Website	Site web d'ArtCraft
- 	Join the ArtCraft Discord…	Rejoindre le Discord d'ArtCraft…
  	Report an Issue…	Signaler un problème…
-@@ -832,7 +832,7 @@
+ 	WIA Support…	Prise en charge de WIA…
+ 	Apply	Appliquer
+@@ -832,7 +829,7 @@
  	All Caps	Tout en capitales
  	All Slices	Toutes les tranches
  	All User Slices	Toutes les tranches utilisateur
@@ -50625,7 +50778,23 @@ index a0cc9c8462a83b63bd942fd7244c6a21b7adee07..a5cf7abe7a6b630d1c9e81156c8fdac0
  	Alt	Alt
  	Always use pressure for opacity	Toujours utiliser la pression pour l'opacité
  	Always use pressure for size	Toujours utiliser la pression pour la taille
-@@ -1326,9 +1326,9 @@
+@@ -1063,7 +1060,6 @@
+ 	Diffusion	Diffusion
+ 	Discard the embedded profile (don't color manage)	Ignorer le profil incorporé (sans gestion des couleurs)
+ 	Discontiguous	Non contigu
+-	Discord	Discord
+ 	Dismiss	Fermer
+ 	Display P3	Display P3
+ 	Display Text	Texte affiché
+@@ -1192,7 +1188,6 @@
+ 	Invert All	Tout inverser
+ 	Invert has no settings.	Inverser n'a aucun réglage.
+ 	Italic	Italique
+-	Join us on Discord	Rejoignez-nous sur Discord
+ 	Justify all	Justifier tout
+ 	Justify last centered	Justifier, dernière ligne centrée
+ 	Justify last left	Justifier, dernière ligne à gauche
+@@ -1326,9 +1321,9 @@
  	Perspective Warp is not active	La déformation de la perspective n'est pas active
  	Perspective Warp: draw planes along the image's perspective, then switch to Warp	Déformation de la perspective : tracez des plans selon la perspective de l'image, puis passez à Déformer
  	Photo Filter	Filtre photo
@@ -50638,7 +50807,7 @@ index a0cc9c8462a83b63bd942fd7244c6a21b7adee07..a5cf7abe7a6b630d1c9e81156c8fdac0
  	Pin Depth:	Profondeur de l'épingle :
  	Pixel Length:	Longueur en pixels :
  	Pixels/Centimeter	Pixels/centimètre
-@@ -1404,11 +1404,11 @@
+@@ -1404,11 +1399,11 @@
  	Import Shortcuts…	Importer des raccourcis…
  	Load a keyboard shortcut set saved as .kys	Charger un jeu de raccourcis clavier enregistré en .kys
  	Imported {n} shortcuts from {file}. Click OK to keep them.	{n} raccourcis importés depuis {file}. Cliquez sur OK pour les conserver.
@@ -50652,7 +50821,15 @@ index a0cc9c8462a83b63bd942fd7244c6a21b7adee07..a5cf7abe7a6b630d1c9e81156c8fdac0
  	Edit › Keyboard Shortcuts › Reset All to Defaults undoes an import.	Édition › Raccourcis clavier › Tout rétablir par défaut annule un import.
  	Don't Import	Ne pas importer
  	The keyboard shortcut set was not imported: {error}	Le jeu de raccourcis clavier n'a pas été importé : {error}
-@@ -1631,7 +1631,7 @@
+@@ -1595,7 +1590,6 @@
+ 	Apple Watch 45mm	Apple Watch 45 mm
+ 	Aqua	Aqua
+ 	Art & Illustration	Art et illustration
+-	ArtCraft	ArtCraft
+ 	Background Eraser Tool	Outil Gomme d'arrière-plan
+ 	Bevel & Emboss	Biseau et relief
+ 	Blend Mode	Mode de fusion
+@@ -1631,7 +1625,7 @@
  	Current Tool	Outil actif
  	Custom Shape Tool	Outil Forme personnalisée
  	Cyans	Cyans
@@ -50661,7 +50838,7 @@ index a0cc9c8462a83b63bd942fd7244c6a21b7adee07..a5cf7abe7a6b630d1c9e81156c8fdac0
  	Delete Workspace	Supprimer l'espace de travail
  	Diamond	Losange
  	Dimensions:	Dimensions :
-@@ -1742,7 +1742,7 @@
+@@ -1742,7 +1736,7 @@
  	Pen Tool	Outil Plume
  	Convert Point Tool	Outil Conversion de point
  	Photo	Photo
@@ -50670,7 +50847,7 @@ index a0cc9c8462a83b63bd942fd7244c6a21b7adee07..a5cf7abe7a6b630d1c9e81156c8fdac0
  	Picas	Picas
  	Pillow Emboss	Relief en coussin
  	Pixel Replacement	Remplacement de pixels
-@@ -2066,7 +2066,7 @@
+@@ -2066,7 +2060,7 @@
  	System Info	Informations système
  	More panels	Autres panneaux
  	More documents	Autres documents
@@ -50679,7 +50856,7 @@ index a0cc9c8462a83b63bd942fd7244c6a21b7adee07..a5cf7abe7a6b630d1c9e81156c8fdac0
  	Graphics	Graphismes
  	Reset GPU Backend	Réinitialiser le moteur GPU
  	Applies at next launch.	Prend effet au prochain démarrage.
-@@ -2648,8 +2648,8 @@
+@@ -2648,8 +2642,8 @@
  	Use Global Light	Utiliser la lumière globale
  	Native file drag-and-drop is unavailable	Le glisser-déposer natif de fichiers n'est pas disponible
  	Native file drag-and-drop is not supported on Wayland yet. Use File › Open, or copy the image in your file manager and paste it with {paste}.	Le glisser-déposer natif de fichiers n'est pas encore pris en charge sous Wayland. Utilisez Fichier › Ouvrir, ou copiez l'image dans votre gestionnaire de fichiers et collez-la avec {paste}.
@@ -50690,7 +50867,7 @@ index a0cc9c8462a83b63bd942fd7244c6a21b7adee07..a5cf7abe7a6b630d1c9e81156c8fdac0
  	Edit › Paste	Édition › Coller
  	Use File › Open, or paste a copied image with {paste}.	Utilisez Fichier › Ouvrir, ou collez une image copiée avec {paste}.
  	Mixer Brush Tool	Outil Pinceau mélangeur
-@@ -2665,7 +2665,7 @@
+@@ -2665,7 +2659,7 @@
  	Automatic uses GPU acceleration when available and falls back to CPU rendering on errors.	Le mode automatique utilise l'accélération GPU lorsqu'elle est disponible et repasse au rendu CPU en cas d'erreur.
  	Switched to CPU rendering	Passage au rendu CPU
  	GPU acceleration could not continue. Your documents are unchanged.	L'accélération GPU n'a pas pu continuer. Vos documents sont intacts.
@@ -50699,7 +50876,7 @@ index a0cc9c8462a83b63bd942fd7244c6a21b7adee07..a5cf7abe7a6b630d1c9e81156c8fdac0
  	Retry GPU requires a restart. Save your work first.	Réessayer le GPU nécessite un redémarrage. Enregistrez votre travail au préalable.
  	Keep Using CPU	Continuer avec le CPU
  	Retry GPU	Réessayer le GPU
-@@ -2901,7 +2901,7 @@ fontWeight	Italic	Italique
+@@ -2901,7 +2895,7 @@ fontWeight	Italic	Italique
  	Color to Alpha…	Couleur vers alpha…
  	Transparency Threshold	Seuil de transparence
  	Opacity Threshold	Seuil d'opacité
@@ -50708,7 +50885,7 @@ index a0cc9c8462a83b63bd942fd7244c6a21b7adee07..a5cf7abe7a6b630d1c9e81156c8fdac0
  
  	Rasterize svg groups deeper than	Pixelliser les groupes SVG au-delà de cette profondeur
  	0 turns this threshold off; SVG groups nested deeper than 100 levels are always rasterized.	0 désactive ce seuil ; les groupes SVG imbriqués sur plus de 100 niveaux sont toujours pixellisés.
-@@ -3121,7 +3121,7 @@ curves	Smooth	Lisser
+@@ -3121,7 +3115,7 @@ curves	Smooth	Lisser
  	{name} (Photoshop)	{name} (Photoshop)
  	{message} ({note})	{message} ({note})
  @plural	Loaded {n} action from {file}|Loaded {n} actions from {file}	{n} action chargée depuis {file}|{n} actions chargées depuis {file}
@@ -50718,19 +50895,18 @@ index a0cc9c8462a83b63bd942fd7244c6a21b7adee07..a5cf7abe7a6b630d1c9e81156c8fdac0
  @plural	{n} step with no Photoshop equivalent left out|{n} steps with no Photoshop equivalent left out	{n} étape sans équivalent Photoshop omise|{n} étapes sans équivalent Photoshop omises
  
 diff --git a/crates/ui-egui/src/i18n/hu.tsv b/crates/ui-egui/src/i18n/hu.tsv
-index bd2ab1557f6ba8a6d91904f7e34716c868be5dfa..ce6e3853605825957f854c1e637f946576d4c9ec 100644
+index bd2ab1557f6ba8a6d91904f7e34716c868be5dfa..e724410df82da702d7929893759c4a1b2a818e3f 100644
 --- a/crates/ui-egui/src/i18n/hu.tsv
 +++ b/crates/ui-egui/src/i18n/hu.tsv
-@@ -12,7 +12,7 @@
+@@ -12,7 +12,6 @@
  # Clean-room: every entry was written from the plain meaning of the English label using ordinary
  # Hungarian image-editing vocabulary (réteg, maszk, kijelölés ...). No proprietary localisation
  # resource, string table or product UI was consulted or copied; add entries the same way.
 -# Product and technology names (KIO Photo, ArtCraft, OpenType, CMYK, Lab ...) stay in Latin
-+# Product and technology names (Bogo Photo, ArtCraft, OpenType, CMYK, Lab ...) stay in Latin
  # letters; the trailing "…" of dialog commands is kept. Plural rule: a count is followed by the
  # singular noun in Hungarian, so every @plural entry has a single form.
  
-@@ -430,7 +430,7 @@
+@@ -430,7 +429,7 @@
  	32-bit Preview Options…	32 bites előnézet beállításai…
  	4-up	4 nézet
  	6-up	6 nézet
@@ -50739,7 +50915,24 @@ index bd2ab1557f6ba8a6d91904f7e34716c868be5dfa..ce6e3853605825957f854c1e637f9465
  	About {app}	Névjegy: {app}
  	Actions	Műveletsorok
  	Activate Panel	Panel aktiválása
-@@ -707,9 +707,9 @@
+@@ -453,7 +452,6 @@
+ 	Artboard Guides	Rajztábla-segédvonalak
+ 	Artboards to Files	Rajztáblák fájlokba
+ 	Artboards to PDF	Rajztáblák PDF-be
+-	ArtCraft Website	ArtCraft-weboldal
+ 	Average	Átlag
+ 	Background From Layer	Háttér a rétegből
+ 	Bitmap…	Bittérkép…
+@@ -613,8 +611,6 @@
+ 	Internet Standard RGB	Internetes szabványos RGB
+ 	Inverse	Megfordítás
+ 	Iris Blur…	Íriszelmosás…
+-	Join the ArtCraft Discord	Csatlakozás az ArtCraft Discordhoz
+-	Join the ArtCraft Discord…	Csatlakozás az ArtCraft Discordhoz…
+ 	Language	Nyelv
+ 	Language Options	Nyelvi beállítások
+ 	Large	Nagy
+@@ -707,9 +703,9 @@
  	Paths	Útvonalak
  	Paths to Illustrator	Útvonalak Illustrator-fájlba
  	Pattern Preview	Mintázat előnézete
@@ -50752,7 +50945,23 @@ index bd2ab1557f6ba8a6d91904f7e34716c868be5dfa..ce6e3853605825957f854c1e637f9465
  	Photography	Fotózás
  	Picture Frame…	Képkeret…
  	Pinch…	Becsípés…
-@@ -2632,7 +2632,7 @@ cameraRaw	Yellow	Sárga
+@@ -1766,7 +1762,6 @@ layerLabel	Magenta	Bíbor
+ 	Delete Tool Preset	Eszköz-előbeállítás törlése
+ 	Delete tool preset	Eszköz-előbeállítás törlése
+ 	Delete Workspace	Munkaterület törlése
+-	Discord	Discord
+ 	Doc: {w} × {h} px	Dok.: {w} × {h} px
+ 	Drag a box or click four corners · drag the corners onto the edges of a skewed shape · {commit} commits · Esc cancels	Húzz egy keretet, vagy kattints a négy sarokra · húzd a sarkokat a ferde alakzat éleire · {commit}: véglegesítés · Esc: megszakítás
+ 	Drag a crop box · drag inside to move · edges resize ({ratio} ratio, {centre} centre) · Space moves while drawing · arrows nudge · X swaps orientation · {commit} commits · Esc cancels	Húzz egy körbevágási keretet · belül húzva mozgatod · az élekkel átméretezed ({ratio}: arány, {centre}: középről) · Space: mozgatás rajzolás közben · nyilak: léptetés · X: tájolás cseréje · {commit}: véglegesítés · Esc: megszakítás
+@@ -1821,7 +1816,6 @@ layerLabel	Magenta	Bíbor
+ 	Intersect with	Metszet ezzel
+ 	Intersect with selection  ({key})	Metszet a kijelöléssel  ({key})
+ 	Invalid panel layout; restored the default dock	Érvénytelen panelelrendezés; az alapértelmezett dokkolás visszaállítva
+-	Join the ArtCraft Discord ({url})	Csatlakozz az ArtCraft Discord-szerveréhez ({url})
+ 	Keyboard Shortcuts	Billentyűparancsok
+ 	Kind	Fajta
+ 	Lasso	Lasszó
+@@ -2632,7 +2626,7 @@ cameraRaw	Yellow	Sárga
  	Advanced	Speciális
  	Adwaita dark	Adwaita sötét
  	All	Mind
@@ -50761,7 +50970,7 @@ index bd2ab1557f6ba8a6d91904f7e34716c868be5dfa..ce6e3853605825957f854c1e637f9465
  	All Slices	Összes szelet
  	All User Slices	Összes felhasználói szelet
  	Always create smart objects when placing	Elhelyezéskor mindig intelligens objektum létrehozása
-@@ -2725,7 +2725,7 @@ cameraRaw	Yellow	Sárga
+@@ -2725,7 +2719,7 @@ cameraRaw	Yellow	Sárga
  	Data	Adatok
  	Date	Dátum
  	Day For Night	Nappali éjszaka
@@ -50770,7 +50979,7 @@ index bd2ab1557f6ba8a6d91904f7e34716c868be5dfa..ce6e3853605825957f854c1e637f9465
  	Default printer	Alapértelmezett nyomtató
  	Default restored.	Alapértelmezés visszaállítva.
  	Defaults	Alapértékek
-@@ -2870,10 +2870,10 @@ cameraRaw	Yellow	Sárga
+@@ -2870,10 +2864,10 @@ cameraRaw	Yellow	Sárga
  	Permission denied	Hozzáférés megtagadva
  	Phone	Telefon
  	Photo	Fotó
@@ -50785,7 +50994,7 @@ index bd2ab1557f6ba8a6d91904f7e34716c868be5dfa..ce6e3853605825957f854c1e637f9465
  	Picas	Pica
  	Pixels	Pixel
  	Pixels/Centimeter	Pixel/centiméter
-@@ -2984,7 +2984,7 @@ cameraRaw	Yellow	Sárga
+@@ -2984,7 +2978,7 @@ cameraRaw	Yellow	Sárga
  	The document does not have an embedded colour profile. Working space: {working}.	A dokumentumnak nincs beágyazott színprofilja. Munkaszíntér: {working}.
  	The document has an embedded colour profile that does not match the working space.\nEmbedded: {embedded}\nWorking: {working}	A dokumentum beágyazott színprofilja eltér a munkaszíntértől.\nBeágyazott: {embedded}\nMunkaszíntér: {working}
  	The keyboard shortcut set was not imported: {error}	A billentyűparancs-készlet importálása nem sikerült: {error}
@@ -50794,7 +51003,7 @@ index bd2ab1557f6ba8a6d91904f7e34716c868be5dfa..ce6e3853605825957f854c1e637f9465
  	This fill layer must be rasterized before proceeding. Its fill content will no longer be editable. Rasterize the layer?	A folytatáshoz a kitöltőréteget raszterizálni kell. A kitöltés tartalma ezután nem lesz szerkeszthető. Raszterizálod a réteget?
  	This layer must be rasterized before proceeding.	A folytatáshoz a réteget raszterizálni kell.
  	This shape layer must be rasterized before proceeding. It will no longer be editable as a shape. Rasterize the shape?	A folytatáshoz az alakzatréteget raszterizálni kell. Ezután alakzatként nem lesz szerkeszthető. Raszterizálod az alakzatot?
-@@ -3020,7 +3020,7 @@ cameraRaw	Yellow	Sárga
+@@ -3020,7 +3014,7 @@ cameraRaw	Yellow	Sárga
  	Y	Y
  	Yes	Igen
  	Your keyboard shortcut set {set} is in use here: {n} shortcuts differ from the defaults. Edit › Keyboard Shortcuts shows them; Reset All to Defaults undoes this.	A billentyűparancs-készleted itt is használatban van: {set}. Ebből {n} billentyűparancs eltér az alapértelmezettől. A Szerkesztés › Billentyűparancsok alatt láthatod őket; az Összes visszaállítása alapértékre paranccsal ez visszavonható.
@@ -50803,7 +51012,23 @@ index bd2ab1557f6ba8a6d91904f7e34716c868be5dfa..ce6e3853605825957f854c1e637f9465
  	{shortcut} assigned.	Billentyűparancs hozzárendelve: {shortcut}
  	{shortcut} is already in use by {commands} and will be removed from it when you click OK.	A billentyűparancs már foglalt: {shortcut}. Jelenlegi parancs: {commands}. Az OK gombra kattintva onnan törlődik.
  
-@@ -3408,7 +3408,7 @@ cameraRaw	Yellow	Sárga
+@@ -3052,7 +3046,6 @@ cameraRaw	Yellow	Sárga
+ 	Arch	Boltív
+ 	Area	Terület
+ 	Artboard Tool	Rajztábla
+-	ArtCraft	ArtCraft
+ 	Ask	Rákérdezés
+ 	Aspect Ratio	Oldalarány
+ 	Assign Profile	Profil hozzárendelése
+@@ -3308,7 +3301,6 @@ cameraRaw	Yellow	Sárga
+ 	Interval	Intervallum
+ 	Invalid {mode} profile	Érvénytelen profil ({mode})
+ 	Its layers don't fit the GPU memory budget. Raising Memory usage in Preferences › Performance raises the budget, up to a quarter of this computer's memory.	A dokumentum rétegei nem férnek el a GPU memóriakeretében. Ha a Beállítások › Teljesítmény alatt növeled a memóriahasználatot, a keret is nő, legfeljebb a számítógép memóriájának negyedéig.
+-	Join us on Discord	Csatlakozz hozzánk a Discordon
+ 	Keep Using CPU	Marad a CPU
+ 	Kernel	Szűrőmag
+ 	Keyboard	Billentyűzet
+@@ -3408,7 +3400,7 @@ cameraRaw	Yellow	Sárga
  	Opened {name}	Megnyitva: {name}
  	Opened {url}	Megnyitva: {url}
  	Opening…	Megnyitás…
@@ -50812,7 +51037,7 @@ index bd2ab1557f6ba8a6d91904f7e34716c868be5dfa..ce6e3853605825957f854c1e637f9465
  	Original Ratio	Eredeti arány
  	Other	Egyéb
  	Out	Végpont
-@@ -3427,9 +3427,9 @@ cameraRaw	Yellow	Sárga
+@@ -3427,9 +3419,9 @@ cameraRaw	Yellow	Sárga
  	Performance	Teljesítmény
  	Perimeter	Kerület
  	Perspective Crop Tool	Perspektivikus körbevágás
@@ -50825,7 +51050,7 @@ index bd2ab1557f6ba8a6d91904f7e34716c868be5dfa..ce6e3853605825957f854c1e637f9465
  	Photomerge	Fotóegyesítés
  	Pick a screen pixel or press Esc to cancel	Válassz egy pixelt a képernyőn, vagy nyomd meg az Esc billentyűt a megszakításhoz
  	Pick screen color	Szín kiválasztása a képernyőről
-@@ -3507,7 +3507,7 @@ cameraRaw	Yellow	Sárga
+@@ -3507,7 +3499,7 @@ cameraRaw	Yellow	Sárga
  	Sample a pixel anywhere on the screen	Mintavétel a képernyő bármely pixeléből
  	Sampler	Színmintavevő
  	Save in background	Mentés a háttérben
@@ -50834,7 +51059,7 @@ index bd2ab1557f6ba8a6d91904f7e34716c868be5dfa..ce6e3853605825957f854c1e637f9465
  	Saved a copy as {path}	Másolat mentve: {path}
  	Saved {name}	Mentve: {name}
  	Saved {path}; image assets: {n} in {dir}	Mentve: {path}; képelemek: {n} ({dir})
-@@ -3595,7 +3595,7 @@ cameraRaw	Yellow	Sárga
+@@ -3595,7 +3587,7 @@ cameraRaw	Yellow	Sárga
  	This session: {reason}	Ebben a munkamenetben: {reason}
  	Tiny	Apró
  	To Center	Középre
@@ -50843,7 +51068,7 @@ index bd2ab1557f6ba8a6d91904f7e34716c868be5dfa..ce6e3853605825957f854c1e637f9465
  	Tool	Eszköz
  	Top Left	Bal felső
  	Top Right	Jobb felső
-@@ -3857,7 +3857,7 @@ cameraRaw	Yellow	Sárga
+@@ -3857,7 +3849,7 @@ cameraRaw	Yellow	Sárga
  	Modify Date	Módosítás dátuma
  	Mouse Controls	Egérvezérlés
  	Mouse Coordinates	Egérkoordináták
@@ -50852,7 +51077,7 @@ index bd2ab1557f6ba8a6d91904f7e34716c868be5dfa..ce6e3853605825957f854c1e637f9465
  	New channel only	Csak új csatorna
  	New document…     ⌘N	Új dokumentum…     ⌘N
  	New Layer from Brush	Új réteg ecsetből
-@@ -3901,7 +3901,7 @@ cameraRaw	Yellow	Sárga
+@@ -3901,7 +3893,7 @@ cameraRaw	Yellow	Sárga
  	Profile Mismatches: Ask When Opening	Profileltérés: rákérdezés megnyitáskor
  	Province / State	Megye / állam
  	Quick Sync	Gyors szinkronizálás
@@ -50861,7 +51086,7 @@ index bd2ab1557f6ba8a6d91904f7e34716c868be5dfa..ce6e3853605825957f854c1e637f9465
  	Recent Items	Legutóbbi elemek
  	Reference point location	Viszonyítási pont helye
  	Rendering…	Renderelés…
-@@ -4022,7 +4022,7 @@ cameraRaw	Yellow	Sárga
+@@ -4022,7 +4014,7 @@ cameraRaw	Yellow	Sárga
  	{name} (Photoshop)	{name} (Photoshop)
  	{message} ({note})	{message} ({note})
  @plural	Loaded {n} action from {file}|Loaded {n} actions from {file}	{n} művelet betöltve. Forrás: {file}
@@ -50871,32 +51096,33 @@ index bd2ab1557f6ba8a6d91904f7e34716c868be5dfa..ce6e3853605825957f854c1e637f9465
  @plural	{n} step with no Photoshop equivalent left out|{n} steps with no Photoshop equivalent left out	{n} Photoshop-megfelelő nélküli lépés kihagyva
  
 diff --git a/crates/ui-egui/src/i18n/id.tsv b/crates/ui-egui/src/i18n/id.tsv
-index 35e973d783a949986ea1609b76843723708b0f2d..14aca8050da0f29bb2a63f01b7653df8810d23f6 100644
+index 35e973d783a949986ea1609b76843723708b0f2d..5cca8c6a9854339fd8e72bbe75f55ccac70aecf9 100644
 --- a/crates/ui-egui/src/i18n/id.tsv
 +++ b/crates/ui-egui/src/i18n/id.tsv
-@@ -9,7 +9,7 @@
+@@ -9,7 +9,6 @@
  # Clean-room: every entry was written from the plain meaning of the English label using ordinary
  # Indonesian computing vocabulary (layer, kuas, seleksi, kanvas ...). No proprietary localisation
  # resource, string table or product UI was consulted or copied; add entries the same way.
 -# Product and technology names (KIO Photo, ArtCraft, OpenType, CMYK, Lab ...) stay in Latin
-+# Product and technology names (Bogo Photo, ArtCraft, OpenType, CMYK, Lab ...) stay in Latin
  # letters; the trailing "…" of dialog commands is kept.
  
  # Channel Options and New Spot Channel (#3761)
-@@ -770,9 +770,9 @@
+@@ -770,11 +769,9 @@
  	Timeline	Timeline
  	Tool Presets	Preset Alat
  	Tools	Alat
 -	About KIO Photo	Tentang KIO Photo
 -	KIO Photo Website	Situs Web KIO Photo
 -	KIO Photo on GitHub	KIO Photo di GitHub
+-	ArtCraft Website	Situs Web ArtCraft
+-	Join the ArtCraft Discord…	Gabung ke Discord ArtCraft…
 +	About Bogo Photo	Tentang Bogo Photo
 +	Bogo Photo Website	Situs Web Bogo Photo
 +	Bogo Photo on GitHub	Bogo Photo di GitHub
- 	ArtCraft Website	Situs Web ArtCraft
- 	Join the ArtCraft Discord…	Gabung ke Discord ArtCraft…
  	Report an Issue…	Laporkan Masalah…
-@@ -825,7 +825,7 @@
+ 	WIA Support…	Dukungan WIA…
+ 	Apply	Terapkan
+@@ -825,7 +822,7 @@
  	All Caps	Huruf Kapital Semua
  	All Slices	Semua Slice
  	All User Slices	Semua Slice Pengguna
@@ -50905,7 +51131,23 @@ index 35e973d783a949986ea1609b76843723708b0f2d..14aca8050da0f29bb2a63f01b7653df8
  	Alt	Alt
  	Alt-click to define a source point to clone from	Alt-klik untuk menentukan titik sumber yang mau di-clone
  	Always use pressure for opacity	Selalu pakai tekanan untuk opasitas
-@@ -1320,9 +1320,9 @@
+@@ -1057,7 +1054,6 @@
+ 	Diffusion	Difusi
+ 	Discard the embedded profile (don't color manage)	Buang profil tertanam (tanpa manajemen warna)
+ 	Discontiguous	Tidak Berdekatan
+-	Discord	Discord
+ 	Dismiss	Tutup
+ 	Display P3	Display P3
+ 	Display Text	Teks Tampilan
+@@ -1186,7 +1182,6 @@
+ 	Invert All	Balikkan Semua
+ 	Invert has no settings.	Invert tidak punya pengaturan.
+ 	Italic	Miring
+-	Join us on Discord	Gabung bareng kami di Discord
+ 	Justify all	Rata penuh semua
+ 	Justify last centered	Rata penuh, baris terakhir di tengah
+ 	Justify last left	Rata penuh, baris terakhir di kiri
+@@ -1320,9 +1315,9 @@
  	Perspective Warp is not active	Perspective Warp tidak aktif
  	Perspective Warp: draw planes along the image's perspective, then switch to Warp	Perspective Warp: gambar bidang mengikuti perspektif gambar, lalu pindah ke Warp
  	Photo Filter	Filter Foto
@@ -50918,7 +51160,7 @@ index 35e973d783a949986ea1609b76843723708b0f2d..14aca8050da0f29bb2a63f01b7653df8
  	Pin Depth:	Kedalaman Pin:
  	Pixel Length:	Panjang Piksel:
  	Pixels/Centimeter	Piksel/Sentimeter
-@@ -1398,11 +1398,11 @@
+@@ -1398,11 +1393,11 @@
  	Import Shortcuts…	Impor Pintasan…
  	Load a keyboard shortcut set saved as .kys	Muat set pintasan keyboard yang disimpan sebagai .kys
  	Imported {n} shortcuts from {file}. Click OK to keep them.	{n} pintasan diimpor dari {file}. Klik OK untuk menyimpannya.
@@ -50932,7 +51174,15 @@ index 35e973d783a949986ea1609b76843723708b0f2d..14aca8050da0f29bb2a63f01b7653df8
  	Edit › Keyboard Shortcuts › Reset All to Defaults undoes an import.	Edit › Pintasan Keyboard › Setel Ulang Semua ke Bawaan membatalkan impor.
  	Don't Import	Jangan Impor
  	The keyboard shortcut set was not imported: {error}	Set pintasan keyboard tidak diimpor: {error}
-@@ -1625,7 +1625,7 @@
+@@ -1589,7 +1584,6 @@
+ 	Apple Watch 45mm	Apple Watch 45mm
+ 	Aqua	Aqua
+ 	Art & Illustration	Seni & Ilustrasi
+-	ArtCraft	ArtCraft
+ 	Background Eraser Tool	Alat Background Eraser
+ 	Bevel & Emboss	Bevel & Emboss
+ 	Blend Mode	Mode Blend
+@@ -1625,7 +1619,7 @@
  	Current Tool	Alat Saat Ini
  	Custom Shape Tool	Alat Bentuk Kustom
  	Cyans	Cyan
@@ -50941,7 +51191,7 @@ index 35e973d783a949986ea1609b76843723708b0f2d..14aca8050da0f29bb2a63f01b7653df8
  	Delete Workspace	Hapus Ruang Kerja
  	Diamond	Diamond
  	Dimensions:	Dimensi:
-@@ -1736,7 +1736,7 @@
+@@ -1736,7 +1730,7 @@
  	Pen Tool	Alat Pen
  	Convert Point Tool	Alat Convert Point
  	Photo	Foto
@@ -50950,7 +51200,7 @@ index 35e973d783a949986ea1609b76843723708b0f2d..14aca8050da0f29bb2a63f01b7653df8
  	Picas	Pica
  	Pillow Emboss	Pillow Emboss
  	Pixel Replacement	Penggantian Piksel
-@@ -2060,7 +2060,7 @@
+@@ -2060,7 +2054,7 @@
  	System Info	Info Sistem
  	More panels	Panel lainnya
  	More documents	Dokumen lainnya
@@ -50959,7 +51209,7 @@ index 35e973d783a949986ea1609b76843723708b0f2d..14aca8050da0f29bb2a63f01b7653df8
  	Graphics	Grafis
  	Reset GPU Backend	Reset Backend GPU
  	Applies at next launch.	Berlaku saat dibuka berikutnya.
-@@ -2637,8 +2637,8 @@
+@@ -2637,8 +2631,8 @@
  	Use Global Light	Gunakan Cahaya Global
  	Native file drag-and-drop is unavailable	Seret dan lepas berkas native tidak tersedia
  	Native file drag-and-drop is not supported on Wayland yet. Use File › Open, or copy the image in your file manager and paste it with {paste}.	Seret dan lepas berkas native belum didukung di Wayland. Gunakan Berkas › Buka, atau salin gambar di pengelola berkas lalu tempel dengan {paste}.
@@ -50970,7 +51220,7 @@ index 35e973d783a949986ea1609b76843723708b0f2d..14aca8050da0f29bb2a63f01b7653df8
  	Edit › Paste	Edit › Tempel
  	Use File › Open, or paste a copied image with {paste}.	Gunakan Berkas › Buka, atau tempel gambar yang disalin dengan {paste}.
  	Mixer Brush Tool	Alat Kuas Pencampur
-@@ -2678,7 +2678,7 @@ cameraRaw	Blending	Pembauran
+@@ -2678,7 +2672,7 @@ cameraRaw	Blending	Pembauran
  	Automatic uses GPU acceleration when available and falls back to CPU rendering on errors.	Mode otomatis memakai akselerasi GPU bila tersedia dan beralih ke rendering CPU jika terjadi galat.
  	Switched to CPU rendering	Beralih ke rendering CPU
  	GPU acceleration could not continue. Your documents are unchanged.	Akselerasi GPU tidak dapat dilanjutkan. Dokumen Anda tidak berubah.
@@ -50979,7 +51229,7 @@ index 35e973d783a949986ea1609b76843723708b0f2d..14aca8050da0f29bb2a63f01b7653df8
  	Retry GPU requires a restart. Save your work first.	Mencoba GPU lagi memerlukan mulai ulang. Simpan pekerjaan Anda terlebih dahulu.
  	Keep Using CPU	Tetap Gunakan CPU
  	Retry GPU	Coba GPU Lagi
-@@ -2888,7 +2888,7 @@ fontWeight	Italic	Miring
+@@ -2888,7 +2882,7 @@ fontWeight	Italic	Miring
  	Color to Alpha…	Warna ke Alpha…
  	Transparency Threshold	Ambang transparansi
  	Opacity Threshold	Ambang opasitas
@@ -50988,7 +51238,7 @@ index 35e973d783a949986ea1609b76843723708b0f2d..14aca8050da0f29bb2a63f01b7653df8
  
  	Rasterize svg groups deeper than	Rasterisasi grup SVG yang lebih dalam dari ini
  	0 turns this threshold off; SVG groups nested deeper than 100 levels are always rasterized.	0 menonaktifkan ambang ini; grup SVG yang bersarang lebih dari 100 tingkat selalu dirasterisasi.
-@@ -3108,7 +3108,7 @@ curves	Smooth	Haluskan
+@@ -3108,7 +3102,7 @@ curves	Smooth	Haluskan
  	{name} (Photoshop)	{name} (Photoshop)
  	{message} ({note})	{message} ({note})
  @plural	Loaded {n} action from {file}|Loaded {n} actions from {file}	{n} tindakan dimuat dari {file}
@@ -50998,32 +51248,33 @@ index 35e973d783a949986ea1609b76843723708b0f2d..14aca8050da0f29bb2a63f01b7653df8
  @plural	{n} step with no Photoshop equivalent left out|{n} steps with no Photoshop equivalent left out	{n} langkah tanpa padanan Photoshop dilewati
  
 diff --git a/crates/ui-egui/src/i18n/it.tsv b/crates/ui-egui/src/i18n/it.tsv
-index 169ecb87eb1a35668f590a62b7be71214c9538f0..0cc9019c471a97adb323555f86162a407727edde 100644
+index 169ecb87eb1a35668f590a62b7be71214c9538f0..09a460d6396c924715c42386c393084f4123be6a 100644
 --- a/crates/ui-egui/src/i18n/it.tsv
 +++ b/crates/ui-egui/src/i18n/it.tsv
-@@ -9,7 +9,7 @@
+@@ -9,7 +9,6 @@
  # Clean-room: every entry was written from the plain meaning of the English label using ordinary
  # Italian computing vocabulary (livello, pennello, selezione, quadro ...). No proprietary localisation
  # resource, string table or product UI was consulted or copied; add entries the same way.
 -# Product and technology names (KIO Photo, ArtCraft, OpenType, CMYK, Lab ...) stay in Latin
-+# Product and technology names (Bogo Photo, ArtCraft, OpenType, CMYK, Lab ...) stay in Latin
  # letters; the trailing … of dialog commands is kept.
  
  # Channel Options and New Spot Channel (#3761)
-@@ -784,9 +784,9 @@
+@@ -784,11 +783,9 @@
  	Timeline	Timeline
  	Tool Presets	Predefiniti strumento
  	Tools	Strumenti
 -	About KIO Photo	Informazioni su KIO Photo
 -	KIO Photo Website	Sito web KIO Photo
 -	KIO Photo on GitHub	KIO Photo su GitHub
+-	ArtCraft Website	Sito web ArtCraft
+-	Join the ArtCraft Discord…	Unisciti al Discord di ArtCraft…
 +	About Bogo Photo	Informazioni su Bogo Photo
 +	Bogo Photo Website	Sito web Bogo Photo
 +	Bogo Photo on GitHub	Bogo Photo su GitHub
- 	ArtCraft Website	Sito web ArtCraft
- 	Join the ArtCraft Discord…	Unisciti al Discord di ArtCraft…
  	Report an Issue…	Segnala un problema…
-@@ -841,7 +841,7 @@
+ 	WIA Support…	Supporto WIA…
+ 	Apply	Applica
+@@ -841,7 +838,7 @@
  	All Caps	Tutto maiuscolo
  	All Slices	Tutte le sezioni
  	All User Slices	Tutte le sezioni utente
@@ -51032,7 +51283,15 @@ index 169ecb87eb1a35668f590a62b7be71214c9538f0..0cc9019c471a97adb323555f86162a40
  	Alt	Alt
  	Always use pressure for opacity	Usa sempre pressione per opacità
  	Always use pressure for size	Usa sempre pressione per dimensione
-@@ -1093,8 +1093,8 @@
+@@ -1075,7 +1072,6 @@
+ 	Diffusion	Diffusione
+ 	Discard the embedded profile (don't color manage)	Scarta profilo incorporato (non gestire colore)
+ 	Discontiguous	Non contiguo
+-	Discord	Discord
+ 	Dismiss	Chiudi
+ 	Display P3	Display P3
+ 	Display Text	Mostra testo
+@@ -1093,8 +1089,8 @@
  	Drop an image or PSD anywhere to open it.	Trascina un'immagine o PSD ovunque per aprirlo.
  	Native file drag-and-drop is unavailable	Il drag-and-drop nativo file non è disponibile su Wayland
  	Native file drag-and-drop is not supported on Wayland yet. Use File › Open, or copy the image in your file manager and paste it with {paste}.	Il drag-and-drop nativo non è ancora supportato su Wayland. Usa File › Apri, oppure copia l'immagine nel file manager e incollala con {paste}.
@@ -51043,7 +51302,15 @@ index 169ecb87eb1a35668f590a62b7be71214c9538f0..0cc9019c471a97adb323555f86162a40
  	Edit › Paste	Modifica › Incolla
  	Duplicate Layers…	Duplica livelli…
  	Duplicate style	Duplica stile
-@@ -1342,9 +1342,9 @@
+@@ -1208,7 +1204,6 @@
+ 	Invert All	Inverti tutto
+ 	Invert has no settings.	Inverti non ha impostazioni.
+ 	Italic	Corsivo
+-	Join us on Discord	Unisciti al nostro Discord
+ 	Justify all	Giustifica tutto
+ 	Justify last centered	Giustifica ultimo centrato
+ 	Justify last left	Giustifica ultimo a sinistra
+@@ -1342,9 +1337,9 @@
  	Perspective Warp is not active	Altera prospettiva non attiva
  	Perspective Warp: draw planes along the image's perspective, then switch to Warp	Altera prospettiva: disegna piani lungo la prospettiva immagine, poi passa ad Altera
  	Photo Filter	Filtro fotografico
@@ -51056,7 +51323,7 @@ index 169ecb87eb1a35668f590a62b7be71214c9538f0..0cc9019c471a97adb323555f86162a40
  	Pin Depth:	Profondità pin:
  	Pixel Length:	Lunghezza pixel:
  	Pixels/Centimeter	Pixel/Centimetro
-@@ -1420,11 +1420,11 @@
+@@ -1420,11 +1415,11 @@
  	Import Shortcuts…	Importa scorciatoie…
  	Load a keyboard shortcut set saved as .kys	Carica un set di scorciatoie da tastiera salvato come .kys
  	Imported {n} shortcuts from {file}. Click OK to keep them.	Importate {n} scorciatoie da {file}. Fai clic su OK per conservarle.
@@ -51070,7 +51337,15 @@ index 169ecb87eb1a35668f590a62b7be71214c9538f0..0cc9019c471a97adb323555f86162a40
  	Edit › Keyboard Shortcuts › Reset All to Defaults undoes an import.	Modifica › Scorciatoie da tastiera › Ripristina tutto ai predefiniti annulla un'importazione.
  	Don't Import	Non importare
  	The keyboard shortcut set was not imported: {error}	Il set di scorciatoie da tastiera non è stato importato: {error}
-@@ -1651,7 +1651,7 @@
+@@ -1615,7 +1610,6 @@
+ 	Apple Watch 45mm	Apple Watch 45mm
+ 	Aqua	Acqua
+ 	Art & Illustration	Arte e illustrazione
+-	ArtCraft	ArtCraft
+ 	Background Eraser Tool	Strumento Gomma per sfondo
+ 	Bevel & Emboss	Smusso e rilievo
+ 	Blend Mode	Metodo di fusione
+@@ -1651,7 +1645,7 @@
  	Current Tool	Strumento corrente
  	Custom Shape Tool	Strumento Forma personale
  	Cyans	Ciano
@@ -51079,7 +51354,7 @@ index 169ecb87eb1a35668f590a62b7be71214c9538f0..0cc9019c471a97adb323555f86162a40
  	Delete Workspace	Elimina area di lavoro
  	Diamond	Diamante
  	Dimensions:	Dimensioni:
-@@ -1762,7 +1762,7 @@
+@@ -1762,7 +1756,7 @@
  	Pen Tool	Strumento Penna
  	Convert Point Tool	Strumento Converti punto
  	Photo	Foto
@@ -51088,7 +51363,7 @@ index 169ecb87eb1a35668f590a62b7be71214c9538f0..0cc9019c471a97adb323555f86162a40
  	Picas	Pica
  	Pillow Emboss	Rilievo cuscino
  	Pixel Replacement	Sostituzione pixel
-@@ -2098,7 +2098,7 @@
+@@ -2098,7 +2092,7 @@
  	System Info	Info sistema
  	More panels	Altri pannelli
  	More documents	Altri documenti
@@ -51097,7 +51372,7 @@ index 169ecb87eb1a35668f590a62b7be71214c9538f0..0cc9019c471a97adb323555f86162a40
  	Graphics	Grafica
  	Reset GPU Backend	Reimposta backend GPU
  	Applies at next launch.	Si applica al prossimo avvio.
-@@ -2312,7 +2312,7 @@
+@@ -2312,7 +2306,7 @@
  	Automatic uses GPU acceleration when available and falls back to CPU rendering on errors.	Automatico usa accelerazione GPU quando disponibile e ripiega su CPU in caso di errori.
  	Switched to CPU rendering	Passato a rendering CPU
  	GPU acceleration could not continue. Your documents are unchanged.	Accelerazione GPU non ha potuto continuare. I documenti sono invariati.
@@ -51106,7 +51381,7 @@ index 169ecb87eb1a35668f590a62b7be71214c9538f0..0cc9019c471a97adb323555f86162a40
  	Retry GPU requires a restart. Save your work first.	Riprovare GPU richiede riavvio. Salva prima il lavoro.
  	Keep Using CPU	Continua su CPU
  	Retry GPU	Riprova GPU
-@@ -2553,7 +2553,7 @@ fontWeight	Italic	Corsivo
+@@ -2553,7 +2547,7 @@ fontWeight	Italic	Corsivo
  	Color to Alpha…	Colore ad alfa…
  	Transparency Threshold	Soglia di trasparenza
  	Opacity Threshold	Soglia di opacità
@@ -51115,7 +51390,7 @@ index 169ecb87eb1a35668f590a62b7be71214c9538f0..0cc9019c471a97adb323555f86162a40
  
  	Rasterize svg groups deeper than	Rasterizza i gruppi SVG oltre questa profondità
  	0 turns this threshold off; SVG groups nested deeper than 100 levels are always rasterized.	0 disattiva questa soglia; i gruppi SVG annidati oltre 100 livelli vengono sempre rasterizzati.
-@@ -3306,7 +3306,7 @@ layerLabel	No Color	Nessun colore
+@@ -3306,7 +3300,7 @@ layerLabel	No Color	Nessun colore
  	Restart Required	Riavvio necessario
  	Restart	Riavvia
  	Quit	Esci
@@ -51124,7 +51399,15 @@ index 169ecb87eb1a35668f590a62b7be71214c9538f0..0cc9019c471a97adb323555f86162a40
  	Close Window	Chiudi finestra
  	New Window	Nuova finestra
  	Open Image	Apri immagine
-@@ -3810,7 +3810,7 @@ layerLabel	No Color	Nessun colore
+@@ -3510,7 +3504,6 @@ layerLabel	No Color	Nessun colore
+ 	Custom Pixel Aspect Ratio	Proporzioni pixel personalizzate
+ 	32-bit Preview Options	Opzioni anteprima 32 bit
+ 	New Guide	Nuova guida
+-	Join the ArtCraft Discord	Unisciti al Discord di ArtCraft
+ 	Report an Issue	Segnala un problema
+ 	Load Files into Stack	Carica file in pila
+ 	Statistics	Statistiche
+@@ -3810,7 +3803,7 @@ layerLabel	No Color	Nessun colore
  	Mezzotint	Mezzatinta
  	Mosaic	Mosaico
  	Motion Blur	Movimento sfocato
@@ -51133,7 +51416,7 @@ index 169ecb87eb1a35668f590a62b7be71214c9538f0..0cc9019c471a97adb323555f86162a40
  	Neon Glow	Bagliore neon
  	New Guide Layout	Nuovo layout guide
  	New Video Layer from File	Nuovo livello video da file
-@@ -3991,9 +3991,9 @@ layerLabel	No Color	Nessun colore
+@@ -3991,9 +3984,9 @@ layerLabel	No Color	Nessun colore
  	Saved {path}; image assets: {n} in {dir}	Salvato: {path}; risorse immagine: {n} in {dir}
  	{message} (notes: {n}; {warning})	{message} (note: {n}; {warning})
  	Preferences can't be saved	Impossibile salvare le preferenze
@@ -51145,7 +51428,15 @@ index 169ecb87eb1a35668f590a62b7be71214c9538f0..0cc9019c471a97adb323555f86162a40
  	GPU device was lost; using the CPU renderer.	Dispositivo GPU perso; uso il rendering su CPU.
  	GPU error; using the CPU renderer.	Errore GPU; uso il rendering su CPU.
  	Couldn't open {name}: {error}	Impossibile aprire {name}: {error}
-@@ -4082,7 +4082,7 @@ navigator	Zoom	Zoom
+@@ -4063,7 +4056,6 @@ navigator	Zoom	Zoom
+ 	on	attivo
+ 	off	disattivo
+ 	This adjustment ({key}) is kept as imported and can't be edited yet.	Questa regolazione ({key}) resta come è stata importata e non si può ancora modificare.
+-	Join the ArtCraft Discord ({url})	Unisciti al Discord di ArtCraft ({url})
+ 	{index} of {total}	{index} di {total}
+ 	{shortcut} assigned.	{shortcut} assegnata.
+ 	{shortcut} is already in use by {commands} and will be removed from it when you click OK.	{shortcut} è già usata da {commands} e verrà rimossa quando fai clic su OK.
+@@ -4082,7 +4074,7 @@ navigator	Zoom	Zoom
  	{name} (Photoshop)	{name} (Photoshop)
  	{message} ({note})	{message} ({note})
  @plural	Loaded {n} action from {file}|Loaded {n} actions from {file}	Caricata {n} azione da {file}|Caricate {n} azioni da {file}
@@ -51155,32 +51446,33 @@ index 169ecb87eb1a35668f590a62b7be71214c9538f0..0cc9019c471a97adb323555f86162a40
  @plural	{n} step with no Photoshop equivalent left out|{n} steps with no Photoshop equivalent left out	Omesso {n} passaggio senza equivalente in Photoshop|Omessi {n} passaggi senza equivalente in Photoshop
  
 diff --git a/crates/ui-egui/src/i18n/ja.tsv b/crates/ui-egui/src/i18n/ja.tsv
-index 02002a186b6bb244b0ebe3f70d35c6e6fcef8905..665c8dbc449bb09f224f8dafd10dd8d662db9e0b 100644
+index 02002a186b6bb244b0ebe3f70d35c6e6fcef8905..cb2264900c41e99f4a9e28cf02949fce3ae574d8 100644
 --- a/crates/ui-egui/src/i18n/ja.tsv
 +++ b/crates/ui-egui/src/i18n/ja.tsv
-@@ -12,7 +12,7 @@
+@@ -12,7 +12,6 @@
  # Clean-room: every entry was written from the plain meaning of the English label using ordinary
  # Japanese computing vocabulary (レイヤー, ぼかし, 選択範囲 ...). No proprietary localisation
  # resource, string table or product UI was consulted or copied; add entries the same way.
 -# Product and technology names (KIO Photo, ArtCraft, OpenType, CMYK, Lab ...) stay in Latin
-+# Product and technology names (Bogo Photo, ArtCraft, OpenType, CMYK, Lab ...) stay in Latin
  # letters; the trailing "…" of dialog commands is kept.
  
  # Channel Options and New Spot Channel (#3761)
-@@ -787,9 +787,9 @@
+@@ -787,11 +786,9 @@
  	Timeline	タイムライン
  	Tool Presets	ツールプリセット
  	Tools	ツール
 -	About KIO Photo	KIO Photo について
 -	KIO Photo Website	KIO Photo の Web サイト
 -	KIO Photo on GitHub	GitHub 上の KIO Photo
+-	ArtCraft Website	ArtCraft の Web サイト
+-	Join the ArtCraft Discord…	ArtCraft の Discord に参加…
 +	About Bogo Photo	Bogo Photo について
 +	Bogo Photo Website	Bogo Photo の Web サイト
 +	Bogo Photo on GitHub	GitHub 上の Bogo Photo
- 	ArtCraft Website	ArtCraft の Web サイト
- 	Join the ArtCraft Discord…	ArtCraft の Discord に参加…
  	Report an Issue…	問題を報告…
-@@ -844,7 +844,7 @@
+ 	WIA Support…	WIA サポート…
+ 	Apply	適用
+@@ -844,7 +841,7 @@
  	All Caps	すべて大文字
  	All Slices	すべてのスライス
  	All User Slices	すべてのユーザースライス
@@ -51189,7 +51481,15 @@ index 02002a186b6bb244b0ebe3f70d35c6e6fcef8905..665c8dbc449bb09f224f8dafd10dd8d6
  	Alt	Alt
  	Alt-click to define a source point to clone from	Alt+クリックでコピー元を指定
  	Always use pressure for opacity	常に筆圧を不透明度に使う
-@@ -1096,8 +1096,8 @@
+@@ -1076,7 +1073,6 @@
+ 	Diffusion	拡散
+ 	Discard the embedded profile (don't color manage)	埋め込みプロファイルを破棄 (カラーマネジメントしない)
+ 	Discontiguous	不連続
+-	Discord	Discord
+ 	Dismiss	閉じる
+ 	Display P3	Display P3
+ 	Display Text	表示テキスト
+@@ -1096,8 +1092,8 @@
  	Drop an image or PSD anywhere to open it.	画像や PSD をここにドロップすると開きます。
  	Native file drag-and-drop is unavailable	Wayland ではネイティブのファイルドラッグ＆ドロップを利用できません
  	Native file drag-and-drop is not supported on Wayland yet. Use File › Open, or copy the image in your file manager and paste it with {paste}.	Wayland ではネイティブのファイルドラッグ＆ドロップはまだ利用できません。[ファイル › 開く] を使うか、ファイルマネージャーで画像をコピーして {paste} で貼り付けてください。
@@ -51200,7 +51500,15 @@ index 02002a186b6bb244b0ebe3f70d35c6e6fcef8905..665c8dbc449bb09f224f8dafd10dd8d6
  	Edit › Paste	[編集 › 貼り付け]
  	Duplicate Layers…	レイヤーを複製…
  	Duplicate style	スタイルを複製
-@@ -1345,9 +1345,9 @@
+@@ -1211,7 +1207,6 @@
+ 	Invert All	すべて反転
+ 	Invert has no settings.	階調の反転には設定がありません。
+ 	Italic	イタリック
+-	Join us on Discord	Discord に参加
+ 	Justify all	均等配置 (最終行も)
+ 	Justify last centered	最終行中央揃えの両端揃え
+ 	Justify last left	最終行左揃えの両端揃え
+@@ -1345,9 +1340,9 @@
  	Perspective Warp is not active	遠近法ワープは有効ではありません
  	Perspective Warp: draw planes along the image's perspective, then switch to Warp	遠近法ワープ: 画像の遠近に沿って面を描き、ワープに切り替えます
  	Photo Filter	写真フィルター
@@ -51213,7 +51521,7 @@ index 02002a186b6bb244b0ebe3f70d35c6e6fcef8905..665c8dbc449bb09f224f8dafd10dd8d6
  	Pin Depth:	ピンの深さ:
  	Pixel Length:	ピクセル長:
  	Pixels/Centimeter	ピクセル/センチメートル
-@@ -1422,11 +1422,11 @@
+@@ -1422,11 +1417,11 @@
  	Import Shortcuts…	ショートカットを読み込む…
  	Load a keyboard shortcut set saved as .kys	.kys として保存されたキーボードショートカットセットを読み込みます
  	Imported {n} shortcuts from {file}. Click OK to keep them.	{file} から {n} 個のショートカットを読み込みました。OK をクリックすると保持されます。
@@ -51227,7 +51535,15 @@ index 02002a186b6bb244b0ebe3f70d35c6e6fcef8905..665c8dbc449bb09f224f8dafd10dd8d6
  	Edit › Keyboard Shortcuts › Reset All to Defaults undoes an import.	編集 › キーボードショートカット › 「すべて既定に戻す」で読み込みを元に戻せます。
  	Don't Import	読み込まない
  	The keyboard shortcut set was not imported: {error}	キーボードショートカットセットは読み込まれませんでした: {error}
-@@ -1653,7 +1653,7 @@
+@@ -1616,7 +1611,6 @@
+ 	Apple Watch 45mm	Apple Watch 45mm
+ 	Aqua	アクア
+ 	Art & Illustration	アート・イラスト
+-	ArtCraft	ArtCraft
+ 	Background Eraser Tool	背景消しゴムツール
+ 	Bevel & Emboss	ベベルとエンボス
+ 	Blend Mode	描画モード
+@@ -1653,7 +1647,7 @@
  	Current Tool	現在のツール
  	Custom Shape Tool	カスタムシェイプツール
  	Cyans	シアン系
@@ -51236,7 +51552,7 @@ index 02002a186b6bb244b0ebe3f70d35c6e6fcef8905..665c8dbc449bb09f224f8dafd10dd8d6
  	Delete Workspace	ワークスペースを削除
  	Diamond	ダイヤモンド形
  	Dimensions:	寸法:
-@@ -1764,7 +1764,7 @@
+@@ -1764,7 +1758,7 @@
  	Pen Tool	ペンツール
  	Convert Point Tool	アンカーポイントの変換ツール
  	Photo	写真
@@ -51245,7 +51561,7 @@ index 02002a186b6bb244b0ebe3f70d35c6e6fcef8905..665c8dbc449bb09f224f8dafd10dd8d6
  	Picas	パイカ
  	Pillow Emboss	ピローエンボス
  	Pixel Replacement	ピクセルの置き換え
-@@ -2100,7 +2100,7 @@
+@@ -2100,7 +2094,7 @@
  	System Info	システム情報
  	More panels	その他のパネル
  	More documents	その他のドキュメント
@@ -51254,7 +51570,7 @@ index 02002a186b6bb244b0ebe3f70d35c6e6fcef8905..665c8dbc449bb09f224f8dafd10dd8d6
  	Graphics	グラフィックス
  	Reset GPU Backend	GPU バックエンドをリセット
  	Applies at next launch.	次回の起動時に適用されます。
-@@ -2221,7 +2221,7 @@
+@@ -2221,7 +2215,7 @@
  	Automatic uses GPU acceleration when available and falls back to CPU rendering on errors.	自動モードは利用可能な場合にGPUを使用し、エラー時はCPU描画に切り替えます。
  	Switched to CPU rendering	CPU 描画に切り替えました
  	GPU acceleration could not continue. Your documents are unchanged.	GPU アクセラレーションを継続できませんでした。ドキュメントは変更されていません。
@@ -51263,7 +51579,15 @@ index 02002a186b6bb244b0ebe3f70d35c6e6fcef8905..665c8dbc449bb09f224f8dafd10dd8d6
  	Retry GPU requires a restart. Save your work first.	GPU の再試行には再起動が必要です。先に作業を保存してください。
  	Keep Using CPU	CPU を使い続ける
  	Retry GPU	GPU を再試行
-@@ -3376,7 +3376,7 @@ fontWeight	Italic	斜体
+@@ -3347,7 +3341,6 @@ fontWeight	Italic	斜体
+ 	Install Plug-in	プラグインをインストール
+ 	Intersect with	共通部分
+ 	Intersect with selection  (⇧⌥)	選択範囲との共通部分  (⇧⌥)
+-	Join the ArtCraft Discord	ArtCraft の Discord に参加
+ 	Keep proportions	縦横比を固定
+ 	Keep view in sync	ビューを同期
+ 	Keeps the current texture when switching presets.	プリセットを切り替えても現在のテクスチャを維持します。
+@@ -3376,7 +3369,7 @@ fontWeight	Italic	斜体
  	Mouse Controls	マウス操作
  	Mouse Coordinates	マウス座標
  	NTSC (1953)	NTSC (1953)
@@ -51272,7 +51596,7 @@ index 02002a186b6bb244b0ebe3f70d35c6e6fcef8905..665c8dbc449bb09f224f8dafd10dd8d6
  	New Brush	新規ブラシ
  	New Channel	新規チャンネル
  	New Layer from Brush	ブラシから新規レイヤー
-@@ -3498,7 +3498,7 @@ fontWeight	Italic	斜体
+@@ -3498,7 +3491,7 @@ fontWeight	Italic	斜体
  	Color to Alpha…	カラーを透明に…
  	Transparency Threshold	透明のしきい値
  	Opacity Threshold	不透明度のしきい値
@@ -51281,7 +51605,7 @@ index 02002a186b6bb244b0ebe3f70d35c6e6fcef8905..665c8dbc449bb09f224f8dafd10dd8d6
  
  	Rasterize svg groups deeper than	この深さを超える SVG グループをラスタライズ
  	0 turns this threshold off; SVG groups nested deeper than 100 levels are always rasterized.	0 でこのしきい値は無効になります。100 階層を超えて入れ子になった SVG グループは常にラスタライズされます。
-@@ -3726,7 +3726,7 @@ curves	Smooth	スムーズ
+@@ -3726,7 +3719,7 @@ curves	Smooth	スムーズ
  	{name} (Photoshop)	{name}（Photoshop）
  	{message} ({note})	{message}（{note}）
  @plural	Loaded {n} action from {file}|Loaded {n} actions from {file}	{file} からアクション {n} 個を読み込みました
@@ -51291,7 +51615,7 @@ index 02002a186b6bb244b0ebe3f70d35c6e6fcef8905..665c8dbc449bb09f224f8dafd10dd8d6
  @plural	{n} step with no Photoshop equivalent left out|{n} steps with no Photoshop equivalent left out	Photoshop に対応するもののない {n} 個のステップを省きました
  
 diff --git a/crates/ui-egui/src/i18n/ko.tsv b/crates/ui-egui/src/i18n/ko.tsv
-index 7757098a2b52800b88ad82e0a684d127508ae0b9..2e5210b83b31d55f840972a3d6ffca5a45bce2b1 100644
+index 7757098a2b52800b88ad82e0a684d127508ae0b9..34ffed0923047328f8712defc1a8c734425a5fb0 100644
 --- a/crates/ui-egui/src/i18n/ko.tsv
 +++ b/crates/ui-egui/src/i18n/ko.tsv
 @@ -2,7 +2,7 @@
@@ -51303,20 +51627,22 @@ index 7757098a2b52800b88ad82e0a684d127508ae0b9..2e5210b83b31d55f840972a3d6ffca5a
  # No proprietary translation resources were consulted or extracted.
  # Licensed MIT OR Apache-2.0. See LICENSE-translations.txt and ATTRIBUTION.md.
  # Product names and technology names retain their spelling.
-@@ -764,9 +764,9 @@
+@@ -764,11 +764,9 @@
  	Timeline	타임라인
  	Tool Presets	도구 사전 설정
  	Tools	도구
 -	About KIO Photo	KIO Photo 정보
 -	KIO Photo Website	KIO Photo 웹사이트
 -	KIO Photo on GitHub	GitHub의 KIO Photo
+-	ArtCraft Website	ArtCraft 웹사이트
+-	Join the ArtCraft Discord…	ArtCraft Discord 참여…
 +	About Bogo Photo	Bogo Photo 정보
 +	Bogo Photo Website	Bogo Photo 웹사이트
 +	Bogo Photo on GitHub	GitHub의 Bogo Photo
- 	ArtCraft Website	ArtCraft 웹사이트
- 	Join the ArtCraft Discord…	ArtCraft Discord 참여…
  	Report an Issue…	문제 신고…
-@@ -819,7 +819,7 @@
+ 	WIA Support…	WIA 지원…
+ 	Apply	적용
+@@ -819,7 +817,7 @@
  	All Caps	모두 대문자
  	All Slices	모든 분할 영역
  	All User Slices	모든 사용자 분할 영역
@@ -51325,7 +51651,23 @@ index 7757098a2b52800b88ad82e0a684d127508ae0b9..2e5210b83b31d55f840972a3d6ffca5a
  	Alt	Alt
  	Alt-click to define a source point to clone from	Alt 키를 누른 채 클릭하여 복제 원본 지점 지정
  	Always use pressure for opacity	불투명도에 항상 필압 사용
-@@ -1317,9 +1317,9 @@
+@@ -1054,7 +1052,6 @@
+ 	Diffusion	확산
+ 	Discard the embedded profile (don't color manage)	포함된 프로파일 버리기(색상 관리 안 함)
+ 	Discontiguous	비인접
+-	Discord	Discord
+ 	Dismiss	닫기
+ 	Display P3	Display P3
+ 	Display Text	표시 텍스트
+@@ -1183,7 +1180,6 @@
+ 	Invert All	모두 반전
+ 	Invert has no settings.	반전에는 설정이 없습니다.
+ 	Italic	기울임꼴
+-	Join us on Discord	Discord 참여
+ 	Justify all	모든 줄 양쪽 정렬
+ 	Justify last centered	마지막 줄 가운데 정렬
+ 	Justify last left	마지막 줄 왼쪽 정렬
+@@ -1317,9 +1313,9 @@
  	Perspective Warp is not active	원근 뒤틀기가 활성화되어 있지 않습니다
  	Perspective Warp: draw planes along the image's perspective, then switch to Warp	원근 뒤틀기: 이미지의 원근에 따라 평면을 그린 다음 뒤틀기로 전환하세요
  	Photo Filter	포토 필터
@@ -51338,7 +51680,7 @@ index 7757098a2b52800b88ad82e0a684d127508ae0b9..2e5210b83b31d55f840972a3d6ffca5a
  	Pin Depth:	핀 깊이:
  	Pixel Length:	픽셀 길이:
  	Pixels/Centimeter	픽셀/센티미터
-@@ -1394,11 +1394,11 @@
+@@ -1394,11 +1390,11 @@
  	Import Shortcuts…	단축키 가져오기…
  	Load a keyboard shortcut set saved as .kys	.kys로 저장된 키보드 단축키 세트 불러오기
  	Imported {n} shortcuts from {file}. Click OK to keep them.	{file}에서 단축키 {n}개를 가져왔습니다. 유지하려면 확인을 클릭하세요.
@@ -51352,7 +51694,15 @@ index 7757098a2b52800b88ad82e0a684d127508ae0b9..2e5210b83b31d55f840972a3d6ffca5a
  	Edit › Keyboard Shortcuts › Reset All to Defaults undoes an import.	편집 › 키보드 단축키 › 모두 기본값으로 재설정으로 가져오기를 되돌릴 수 있습니다.
  	Don't Import	가져오지 않음
  	The keyboard shortcut set was not imported: {error}	키보드 단축키 세트를 가져오지 못했습니다: {error}
-@@ -1625,7 +1625,7 @@
+@@ -1588,7 +1584,6 @@
+ 	Apple Watch 45mm	Apple Watch 45mm
+ 	Aqua	청록
+ 	Art & Illustration	아트 및 일러스트레이션
+-	ArtCraft	ArtCraft
+ 	Background Eraser Tool	배경 지우개 도구
+ 	Bevel & Emboss	경사와 엠보스
+ 	Blend Mode	혼합 모드
+@@ -1625,7 +1620,7 @@
  	Current Tool	현재 도구
  	Custom Shape Tool	사용자 정의 모양 도구
  	Cyans	사이안 계열
@@ -51361,7 +51711,7 @@ index 7757098a2b52800b88ad82e0a684d127508ae0b9..2e5210b83b31d55f840972a3d6ffca5a
  	Delete Workspace	작업 영역 삭제
  	Diamond	다이아몬드
  	Dimensions:	치수:
-@@ -1736,7 +1736,7 @@
+@@ -1736,7 +1731,7 @@
  	Pen Tool	펜 도구
  	Convert Point Tool	기준점 변환 도구
  	Photo	사진
@@ -51370,7 +51720,7 @@ index 7757098a2b52800b88ad82e0a684d127508ae0b9..2e5210b83b31d55f840972a3d6ffca5a
  	Picas	파이카
  	Pillow Emboss	쿠션 엠보스
  	Pixel Replacement	픽셀 대체
-@@ -2060,7 +2060,7 @@
+@@ -2060,7 +2055,7 @@
  	System Info	시스템 정보
  	More panels	추가 패널
  	More documents	추가 문서
@@ -51379,7 +51729,7 @@ index 7757098a2b52800b88ad82e0a684d127508ae0b9..2e5210b83b31d55f840972a3d6ffca5a
  	Graphics	그래픽
  	Reset GPU Backend	GPU 백엔드 초기화
  	Applies at next launch.	다음 실행 시 적용됩니다.
-@@ -2181,8 +2181,8 @@
+@@ -2181,8 +2176,8 @@
  	Use Global Light	전체 조명 사용
  	Native file drag-and-drop is unavailable	파일 드래그 앤 드롭을 사용할 수 없습니다
  	Native file drag-and-drop is not supported on Wayland yet. Use File › Open, or copy the image in your file manager and paste it with {paste}.	Wayland에서는 아직 파일 드래그 앤 드롭을 지원하지 않습니다. 파일 › 열기를 사용하거나, 파일 관리자에서 이미지를 복사한 뒤 {paste}(으)로 붙여넣으세요.
@@ -51390,7 +51740,7 @@ index 7757098a2b52800b88ad82e0a684d127508ae0b9..2e5210b83b31d55f840972a3d6ffca5a
  	Edit › Paste	편집 › 붙여넣기
  	Use File › Open, or paste a copied image with {paste}.	파일 › 열기를 사용하거나, 복사한 이미지를 {paste}(으)로 붙여넣으세요.
  	Invalid {mode} profile	유효하지 않은 {mode} 프로파일
-@@ -2198,7 +2198,7 @@
+@@ -2198,7 +2193,7 @@
  	Automatic uses GPU acceleration when available and falls back to CPU rendering on errors.	자동 모드는 가능한 경우 GPU 가속을 사용하고 오류가 발생하면 CPU 렌더링으로 전환합니다.
  	Switched to CPU rendering	CPU 렌더링으로 전환했습니다
  	GPU acceleration could not continue. Your documents are unchanged.	GPU 가속을 계속할 수 없습니다. 문서는 변경되지 않았습니다.
@@ -51399,7 +51749,15 @@ index 7757098a2b52800b88ad82e0a684d127508ae0b9..2e5210b83b31d55f840972a3d6ffca5a
  	Retry GPU requires a restart. Save your work first.	GPU를 다시 사용하려면 다시 시작해야 합니다. 먼저 작업을 저장하세요.
  	Keep Using CPU	CPU 계속 사용
  	Retry GPU	GPU 다시 사용
-@@ -3064,7 +3064,7 @@ fontWeight	Italic	기울임
+@@ -2674,7 +2669,6 @@ cameraRaw	Color	색상
+ 	Custom Pixel Aspect Ratio	사용자 정의 픽셀 종횡비
+ 	32-bit Preview Options	32비트 미리 보기 옵션
+ 	New Guide	새 안내선
+-	Join the ArtCraft Discord	ArtCraft Discord 참여
+ 	Report an Issue	문제 신고
+ 	WIA Support	WIA 지원
+ 	Load Files into Stack	파일을 스택으로 불러오기
+@@ -3064,7 +3058,7 @@ fontWeight	Italic	기울임
  	Color to Alpha…	색상을 알파로…
  	Transparency Threshold	투명도 한계값
  	Opacity Threshold	불투명도 한계값
@@ -51408,7 +51766,7 @@ index 7757098a2b52800b88ad82e0a684d127508ae0b9..2e5210b83b31d55f840972a3d6ffca5a
  
  	Rasterize svg groups deeper than	이 깊이보다 깊은 SVG 그룹 래스터화
  	0 turns this threshold off; SVG groups nested deeper than 100 levels are always rasterized.	0이면 이 임계값을 끕니다. 100단계보다 깊이 중첩된 SVG 그룹은 항상 래스터화됩니다.
-@@ -3294,7 +3294,7 @@ curves	Smooth	매끄럽게
+@@ -3294,7 +3288,7 @@ curves	Smooth	매끄럽게
  	{name} (Photoshop)	{name} (Photoshop)
  	{message} ({note})	{message} ({note})
  @plural	Loaded {n} action from {file}|Loaded {n} actions from {file}	{file}에서 액션 {n}개를 불러왔습니다
@@ -51440,32 +51798,33 @@ index 87a9ba4484b91161cb0ee4dc523634b6db8dbd9f..e891316c703bfad72f298dd905907de2
                  None,
              );
 diff --git a/crates/ui-egui/src/i18n/nl.tsv b/crates/ui-egui/src/i18n/nl.tsv
-index 74008a63676eec82c2e461267d96e449c1bc6526..5f182e090d88fe53835cf2128ad398ef00a9acc0 100644
+index 74008a63676eec82c2e461267d96e449c1bc6526..2a11c35bcab7c4993e9ffa1e92100e053e7af6df 100644
 --- a/crates/ui-egui/src/i18n/nl.tsv
 +++ b/crates/ui-egui/src/i18n/nl.tsv
-@@ -4,7 +4,7 @@
+@@ -4,7 +4,6 @@
  # Clean-room: every entry was written from the plain meaning of the English label using ordinary
  # Dutch computing vocabulary (laag, selectie, masker, aanpassingslaag, penseel, verloop ...). No
  # proprietary localisation resource, string table or product UI was consulted or copied; add
 -# entries the same way. Product and technology names (KIO Photo, ArtCraft, OpenType, CMYK, Lab ...)
-+# entries the same way. Product and technology names (Bogo Photo, ArtCraft, OpenType, CMYK, Lab ...)
  # stay as they are; the trailing "…" of dialog commands is kept. UI text addresses the user
  # informally ("je") and uses sentence case.
  
-@@ -769,9 +769,9 @@
+@@ -769,11 +768,9 @@
  	Timeline	Tijdlijn
  	Tool Presets	Gereedschapsvoorinstellingen
  	Tools	Gereedschappen
 -	About KIO Photo	Over KIO Photo
 -	KIO Photo Website	Website van KIO Photo
 -	KIO Photo on GitHub	KIO Photo op GitHub
+-	ArtCraft Website	Website van ArtCraft
+-	Join the ArtCraft Discord…	Deelnemen aan de ArtCraft-Discord…
 +	About Bogo Photo	Over Bogo Photo
 +	Bogo Photo Website	Website van Bogo Photo
 +	Bogo Photo on GitHub	Bogo Photo op GitHub
- 	ArtCraft Website	Website van ArtCraft
- 	Join the ArtCraft Discord…	Deelnemen aan de ArtCraft-Discord…
  	Report an Issue…	Probleem melden…
-@@ -824,7 +824,7 @@
+ 	WIA Support…	WIA-ondersteuning…
+ 	Apply	Toepassen
+@@ -824,7 +821,7 @@
  	All Caps	Alleen hoofdletters
  	All Slices	Alle segmenten
  	All User Slices	Alle gebruikerssegmenten
@@ -51474,7 +51833,15 @@ index 74008a63676eec82c2e461267d96e449c1bc6526..5f182e090d88fe53835cf2128ad398ef
  	Alt	Alt
  	Always use pressure for opacity	Altijd druk gebruiken voor dekking
  	Always use pressure for size	Altijd druk gebruiken voor grootte
-@@ -1077,8 +1077,8 @@
+@@ -1057,7 +1054,6 @@
+ 	Diffusion	Diffusie
+ 	Discard the embedded profile (don't color manage)	Het ingesloten profiel negeren (geen kleurbeheer)
+ 	Discontiguous	Niet-aaneengesloten
+-	Discord	Discord
+ 	Dismiss	Sluiten
+ 	Display P3	Display P3
+ 	Display Text	Tekst tonen
+@@ -1077,8 +1073,8 @@
  	Drop an image or PSD anywhere to open it.	Sleep een afbeelding of PSD ergens naartoe om deze te openen.
  	Native file drag-and-drop is unavailable	Bestanden slepen en neerzetten is niet beschikbaar
  	Native file drag-and-drop is not supported on Wayland yet. Use File › Open, or copy the image in your file manager and paste it with {paste}.	Bestanden slepen en neerzetten wordt nog niet ondersteund onder Wayland. Gebruik Bestand › Openen, of kopieer de afbeelding in je bestandsbeheerder en plak deze met {paste}.
@@ -51485,7 +51852,15 @@ index 74008a63676eec82c2e461267d96e449c1bc6526..5f182e090d88fe53835cf2128ad398ef
  	Edit › Paste	Bewerken › Plakken
  	Duplicate Layers…	Lagen dupliceren…
  	Duplicate style	Stijl dupliceren
-@@ -1326,9 +1326,9 @@
+@@ -1192,7 +1188,6 @@
+ 	Invert All	Alles omkeren
+ 	Invert has no settings.	Omkeren heeft geen instellingen.
+ 	Italic	Cursief
+-	Join us on Discord	Doe mee op Discord
+ 	Justify all	Alles uitvullen
+ 	Justify last centered	Uitvullen, laatste regel gecentreerd
+ 	Justify last left	Uitvullen, laatste regel links
+@@ -1326,9 +1321,9 @@
  	Perspective Warp is not active	Perspectiefvervorming is niet actief
  	Perspective Warp: draw planes along the image's perspective, then switch to Warp	Perspectiefvervorming: teken vlakken langs het perspectief van de afbeelding en schakel daarna naar Verbuigen
  	Photo Filter	Fotofilter
@@ -51498,7 +51873,7 @@ index 74008a63676eec82c2e461267d96e449c1bc6526..5f182e090d88fe53835cf2128ad398ef
  	Pin Depth:	Speldiepte:
  	Pixel Length:	Pixellengte:
  	Pixels/Centimeter	Pixels/centimeter
-@@ -1403,11 +1403,11 @@
+@@ -1403,11 +1398,11 @@
  	Import Shortcuts…	Sneltoetsen importeren…
  	Load a keyboard shortcut set saved as .kys	Een als .kys opgeslagen sneltoetsenset laden
  	Imported {n} shortcuts from {file}. Click OK to keep them.	{n} sneltoetsen geïmporteerd uit {file}. Klik op OK om ze te behouden.
@@ -51512,7 +51887,15 @@ index 74008a63676eec82c2e461267d96e449c1bc6526..5f182e090d88fe53835cf2128ad398ef
  	Edit › Keyboard Shortcuts › Reset All to Defaults undoes an import.	Bewerken › Sneltoetsen › Alles terugzetten naar standaard maakt een import ongedaan.
  	Don't Import	Niet importeren
  	The keyboard shortcut set was not imported: {error}	De sneltoetsenset is niet geïmporteerd: {error}
-@@ -1629,7 +1629,7 @@
+@@ -1593,7 +1588,6 @@
+ 	Apple Watch 45mm	Apple Watch 45 mm
+ 	Aqua	Aqua
+ 	Art & Illustration	Kunst en illustratie
+-	ArtCraft	ArtCraft
+ 	Background Eraser Tool	Achtergrondgumgereedschap
+ 	Bevel & Emboss	Schuine kant en reliëf
+ 	Blend Mode	Overvloeimodus
+@@ -1629,7 +1623,7 @@
  	Current Tool	Huidig gereedschap
  	Custom Shape Tool	Gereedschap Aangepaste vorm
  	Cyans	Cyaantinten
@@ -51521,7 +51904,7 @@ index 74008a63676eec82c2e461267d96e449c1bc6526..5f182e090d88fe53835cf2128ad398ef
  	Delete Workspace	Werkruimte verwijderen
  	Diamond	Ruit
  	Dimensions:	Afmetingen:
-@@ -1740,7 +1740,7 @@
+@@ -1740,7 +1734,7 @@
  	Pen Tool	Pengereedschap
  	Convert Point Tool	Punt-converteergereedschap
  	Photo	Foto
@@ -51530,7 +51913,7 @@ index 74008a63676eec82c2e461267d96e449c1bc6526..5f182e090d88fe53835cf2128ad398ef
  	Picas	Pica's
  	Pillow Emboss	Kussenreliëf
  	Pixel Replacement	Pixelvervanging
-@@ -2066,7 +2066,7 @@
+@@ -2066,7 +2060,7 @@
  	System Info	Systeeminformatie
  	More panels	Meer panelen
  	More documents	Meer documenten
@@ -51539,7 +51922,7 @@ index 74008a63676eec82c2e461267d96e449c1bc6526..5f182e090d88fe53835cf2128ad398ef
  	Graphics	Grafisch
  	Reset GPU Backend	GPU-backend herstellen
  	Applies at next launch.	Wordt toegepast bij de volgende start.
-@@ -2268,7 +2268,7 @@
+@@ -2268,7 +2262,7 @@
  	Automatic uses GPU acceleration when available and falls back to CPU rendering on errors.	Automatisch gebruikt GPU-versnelling indien beschikbaar en valt bij fouten terug op CPU-rendering.
  	Switched to CPU rendering	Overgeschakeld naar CPU-rendering
  	GPU acceleration could not continue. Your documents are unchanged.	GPU-versnelling kon niet doorgaan. Je documenten zijn ongewijzigd.
@@ -51548,7 +51931,7 @@ index 74008a63676eec82c2e461267d96e449c1bc6526..5f182e090d88fe53835cf2128ad398ef
  	Retry GPU requires a restart. Save your work first.	GPU opnieuw proberen vereist een herstart. Sla eerst je werk op.
  	Keep Using CPU	CPU blijven gebruiken
  	Retry GPU	GPU opnieuw proberen
-@@ -2652,7 +2652,7 @@ cameraRaw	Color	Kleur
+@@ -2652,7 +2646,7 @@ cameraRaw	Color	Kleur
  	Restart Required	Herstart vereist
  	Restart	Opnieuw starten
  	Quit	Afsluiten
@@ -51557,7 +51940,15 @@ index 74008a63676eec82c2e461267d96e449c1bc6526..5f182e090d88fe53835cf2128ad398ef
  	Close Window	Venster sluiten
  	New Window	Nieuw venster
  	Open Image	Afbeelding openen
-@@ -3421,7 +3421,7 @@ cameraRaw	Color	Kleur
+@@ -3035,7 +3029,6 @@ cameraRaw	Color	Kleur
+ 	Custom Pixel Aspect Ratio	Aangepaste pixelverhouding
+ 	32-bit Preview Options	Voorvertoningsopties 32-bit
+ 	New Guide	Nieuwe hulplijn
+-	Join the ArtCraft Discord	Deelnemen aan de ArtCraft-Discord
+ 	Report an Issue	Probleem melden
+ 	Load Files into Stack	Bestanden in stapel laden
+ 	Statistics	Statistieken
+@@ -3421,7 +3414,7 @@ cameraRaw	Color	Kleur
  	Modify Date	Wijzigingsdatum
  	Mosaic	Mozaïek
  	Motion Blur	Bewegingsonscherpte
@@ -51566,7 +51957,7 @@ index 74008a63676eec82c2e461267d96e449c1bc6526..5f182e090d88fe53835cf2128ad398ef
  	Neon Glow	Neongloed
  	New Guide Layout	Nieuwe hulplijnindeling
  	New Path	Nieuw pad
-@@ -3784,7 +3784,7 @@ cameraData	Lens	Lens
+@@ -3784,7 +3777,7 @@ cameraData	Lens	Lens
  	There is no crop size or ratio to save	Er is geen uitsnijformaat of verhouding om op te slaan
  	Search settings…	Instellingen zoeken…
  	No matching settings	Geen overeenkomende instellingen
@@ -51575,7 +51966,7 @@ index 74008a63676eec82c2e461267d96e449c1bc6526..5f182e090d88fe53835cf2128ad398ef
  	Loading fonts…	Lettertypen laden…
  	Simulate Pressure	Druk simuleren
  	Stroke Path…	Pad omlijnen…
-@@ -3879,7 +3879,7 @@ curves	Smooth	Vloeiend maken
+@@ -3879,7 +3872,7 @@ curves	Smooth	Vloeiend maken
  	{name} (Photoshop)	{name} (Photoshop)
  	{message} ({note})	{message} ({note})
  @plural	Loaded {n} action from {file}|Loaded {n} actions from {file}	{n} handeling geladen uit {file}|{n} handelingen geladen uit {file}
@@ -51585,32 +51976,33 @@ index 74008a63676eec82c2e461267d96e449c1bc6526..5f182e090d88fe53835cf2128ad398ef
  @plural	{n} step with no Photoshop equivalent left out|{n} steps with no Photoshop equivalent left out	{n} stap zonder Photoshop-equivalent weggelaten|{n} stappen zonder Photoshop-equivalent weggelaten
  
 diff --git a/crates/ui-egui/src/i18n/pl.tsv b/crates/ui-egui/src/i18n/pl.tsv
-index 88d4e9dbbdb539d4b0dbbf65cc0460d54d1124d6..9ebda3df187247c14cdefaa4c3e3002fb1506536 100644
+index 88d4e9dbbdb539d4b0dbbf65cc0460d54d1124d6..2885a8be1e67877248f93dda306ed822f7d50c07 100644
 --- a/crates/ui-egui/src/i18n/pl.tsv
 +++ b/crates/ui-egui/src/i18n/pl.tsv
-@@ -13,7 +13,7 @@
+@@ -13,7 +13,6 @@
  # Clean-room: every entry was written from the plain meaning of the English label using ordinary
  # Polish image-editing vocabulary (warstwa, maska, zaznaczenie, pędzel, rozmycie, krycie ...). No
  # proprietary localisation resource, string table or product UI was consulted or copied; add
 -# entries the same way. Product and technology names (KIO Photo, ArtCraft, OpenType, CMYK, Lab ...)
-+# entries the same way. Product and technology names (Bogo Photo, ArtCraft, OpenType, CMYK, Lab ...)
  # stay in Latin letters; the trailing "…" of dialog commands is kept.
  # Conventions: menus are nouns (Plik, Edycja, Obraz ...), commands are infinitives (Otwórz…,
  # Zapisz jako…), sentence case as in the English source. Quotes: „…”.
-@@ -786,9 +786,9 @@
+@@ -786,11 +785,9 @@
  	Timeline	Oś czasu
  	Tool Presets	Ustawienia wstępne narzędzi
  	Tools	Narzędzia
 -	About KIO Photo	O programie KIO Photo
 -	KIO Photo Website	Strona internetowa KIO Photo
 -	KIO Photo on GitHub	KIO Photo na GitHubie
+-	ArtCraft Website	Strona internetowa ArtCraft
+-	Join the ArtCraft Discord…	Dołącz do Discorda ArtCraft…
 +	About Bogo Photo	O programie Bogo Photo
 +	Bogo Photo Website	Strona internetowa Bogo Photo
 +	Bogo Photo on GitHub	Bogo Photo na GitHubie
- 	ArtCraft Website	Strona internetowa ArtCraft
- 	Join the ArtCraft Discord…	Dołącz do Discorda ArtCraft…
  	Report an Issue…	Zgłoś problem…
-@@ -843,7 +843,7 @@
+ 	WIA Support…	Obsługa WIA…
+ 	Apply	Zastosuj
+@@ -843,7 +840,7 @@
  	All Caps	Wszystkie wersaliki
  	All Slices	Wszystkie plasterki
  	All User Slices	Wszystkie plasterki użytkownika
@@ -51619,7 +52011,15 @@ index 88d4e9dbbdb539d4b0dbbf65cc0460d54d1124d6..9ebda3df187247c14cdefaa4c3e3002f
  	Alt	Alt
  	Always use pressure for opacity	Zawsze używaj nacisku do krycia
  	Always use pressure for size	Zawsze używaj nacisku do rozmiaru
-@@ -1095,7 +1095,7 @@
+@@ -1076,7 +1073,6 @@
+ 	Diffusion	Dyfuzja
+ 	Discard the embedded profile (don't color manage)	Odrzuć osadzony profil (bez zarządzania kolorami)
+ 	Discontiguous	Niesąsiadujące
+-	Discord	Discord
+ 	Dismiss	Zamknij
+ 	Display P3	Display P3
+ 	Display Text	Tekst wyświetlany
+@@ -1095,7 +1091,7 @@
  	Draw with the Pen tool (P) or make a work path from a selection.	Rysuj narzędziem Pióro (P) lub utwórz ścieżkę roboczą z zaznaczenia.
  	Drop an image or PSD anywhere to open it.	Upuść obraz lub plik PSD w dowolnym miejscu, aby go otworzyć.
  	Native file drag-and-drop is unavailable	Natywne przeciąganie plików jest niedostępne
@@ -51628,7 +52028,15 @@ index 88d4e9dbbdb539d4b0dbbf65cc0460d54d1124d6..9ebda3df187247c14cdefaa4c3e3002f
  	Duplicate Layers…	Duplikuj warstwy…
  	Duplicate style	Duplikuj styl
  	Edit Toolbar…	Edytuj pasek narzędzi…
-@@ -1341,9 +1341,9 @@
+@@ -1207,7 +1203,6 @@
+ 	Invert All	Odwróć wszystko
+ 	Invert has no settings.	Odwracanie nie ma ustawień.
+ 	Italic	Kursywa
+-	Join us on Discord	Dołącz do nas na Discordzie
+ 	Justify all	Wyjustuj wszystko
+ 	Justify last centered	Wyjustuj, ostatni wiersz wyśrodkowany
+ 	Justify last left	Wyjustuj, ostatni wiersz do lewej
+@@ -1341,9 +1336,9 @@
  	Perspective Warp is not active	Wypaczenie perspektywy nie jest aktywne
  	Perspective Warp: draw planes along the image's perspective, then switch to Warp	Wypaczenie perspektywy: narysuj płaszczyzny zgodnie z perspektywą obrazu, a następnie przełącz na wypaczenie
  	Photo Filter	Filtr fotograficzny
@@ -51641,7 +52049,7 @@ index 88d4e9dbbdb539d4b0dbbf65cc0460d54d1124d6..9ebda3df187247c14cdefaa4c3e3002f
  	Pin Depth:	Głębokość szpilki:
  	Pixel Length:	Długość w pikselach:
  	Pixels/Centimeter	Pikseli/centymetr
-@@ -1418,11 +1418,11 @@
+@@ -1418,11 +1413,11 @@
  	Import Shortcuts…	Importuj skróty…
  	Load a keyboard shortcut set saved as .kys	Wczytaj zestaw skrótów klawiaturowych zapisany jako .kys
  	Imported {n} shortcuts from {file}. Click OK to keep them.	Zaimportowano skrótów: {n} z pliku {file}. Kliknij OK, aby je zachować.
@@ -51655,7 +52063,15 @@ index 88d4e9dbbdb539d4b0dbbf65cc0460d54d1124d6..9ebda3df187247c14cdefaa4c3e3002f
  	Edit › Keyboard Shortcuts › Reset All to Defaults undoes an import.	Edycja › Skróty klawiaturowe › Przywróć wszystkie domyślne cofa import.
  	Don't Import	Nie importuj
  	The keyboard shortcut set was not imported: {error}	Nie zaimportowano zestawu skrótów klawiaturowych: {error}
-@@ -1647,7 +1647,7 @@
+@@ -1610,7 +1605,6 @@
+ 	Apple Watch 45mm	Apple Watch 45 mm
+ 	Aqua	Błękit morski
+ 	Art & Illustration	Sztuka i ilustracja
+-	ArtCraft	ArtCraft
+ 	Background Eraser Tool	Narzędzie Gumka tła
+ 	Bevel & Emboss	Ukos i płaskorzeźba
+ 	Blend Mode	Tryb mieszania
+@@ -1647,7 +1641,7 @@
  	Current Tool	Bieżące narzędzie
  	Custom Shape Tool	Narzędzie Kształt niestandardowy
  	Cyans	Cyjany
@@ -51664,7 +52080,7 @@ index 88d4e9dbbdb539d4b0dbbf65cc0460d54d1124d6..9ebda3df187247c14cdefaa4c3e3002f
  	Delete Workspace	Usuń obszar roboczy
  	Diamond	Romb
  	Dimensions:	Wymiary:
-@@ -1758,7 +1758,7 @@
+@@ -1758,7 +1752,7 @@
  	Pen Tool	Narzędzie Pióro
  	Convert Point Tool	Narzędzie Konwertuj punkt
  	Photo	Zdjęcie
@@ -51673,7 +52089,7 @@ index 88d4e9dbbdb539d4b0dbbf65cc0460d54d1124d6..9ebda3df187247c14cdefaa4c3e3002f
  	Picas	Pikasy
  	Pillow Emboss	Płaskorzeźba poduszkowa
  	Pixel Replacement	Zamiana pikseli
-@@ -2091,7 +2091,7 @@
+@@ -2091,7 +2085,7 @@
  	System Info…	Informacje o systemie…
  	System Info	Informacje o systemie
  	More panels	Więcej paneli
@@ -51682,7 +52098,7 @@ index 88d4e9dbbdb539d4b0dbbf65cc0460d54d1124d6..9ebda3df187247c14cdefaa4c3e3002f
  	Graphics	Grafika
  	Reset GPU Backend	Resetuj backend GPU
  	Applies at next launch.	Zadziała po następnym uruchomieniu.
-@@ -2667,7 +2667,7 @@
+@@ -2667,7 +2661,7 @@
  	Automatic uses GPU acceleration when available and falls back to CPU rendering on errors.	Tryb automatyczny używa akceleracji GPU, gdy jest dostępna, a w razie błędów przełącza się na renderowanie CPU.
  	Switched to CPU rendering	Przełączono na renderowanie CPU
  	GPU acceleration could not continue. Your documents are unchanged.	Akceleracja GPU nie mogła być kontynuowana. Twoje dokumenty nie zostały zmienione.
@@ -51691,7 +52107,15 @@ index 88d4e9dbbdb539d4b0dbbf65cc0460d54d1124d6..9ebda3df187247c14cdefaa4c3e3002f
  	Retry GPU requires a restart. Save your work first.	Ponowna próba z GPU wymaga restartu. Najpierw zapisz swoją pracę.
  	Keep Using CPU	Nadal używaj CPU
  	Retry GPU	Spróbuj ponownie z GPU
-@@ -3394,8 +3394,8 @@ cameraRaw	Roughness	Chropowatość
+@@ -3145,7 +3139,6 @@ cameraRaw	Roughness	Chropowatość
+ 	Custom Pixel Aspect Ratio	Niestandardowe proporcje pikseli
+ 	32-bit Preview Options	Opcje podglądu 32-bitowego
+ 	New Guide	Nowa prowadnica
+-	Join the ArtCraft Discord	Dołącz do Discorda ArtCraft
+ 	Report an Issue	Zgłoś problem
+ 	WIA Support	Obsługa WIA
+ 	Load Files into Stack	Wczytaj pliki do stosu
+@@ -3394,8 +3387,8 @@ cameraRaw	Roughness	Chropowatość
  	Could not open	Nie można otworzyć
  	{path}: the path is not valid Unicode; rename the file and open it again.	{path}: ścieżka nie jest prawidłowym Unicode; zmień nazwę pliku i otwórz go ponownie.
  	Native file drag-and-drop is not supported on Wayland yet. Use File › Open, or copy the image in your file manager and paste it with {paste}.	Natywne przeciąganie i upuszczanie plików nie jest jeszcze obsługiwane w Wayland. Użyj Plik › Otwórz albo skopiuj obraz w menedżerze plików i wklej go za pomocą {paste}.
@@ -51702,7 +52126,7 @@ index 88d4e9dbbdb539d4b0dbbf65cc0460d54d1124d6..9ebda3df187247c14cdefaa4c3e3002f
  	Edit › Paste	Edycja › Wklej
  	Use File › Open, or paste a copied image with {paste}.	Użyj Plik › Otwórz albo wklej skopiowany obraz za pomocą {paste}.
  
-@@ -3500,7 +3500,7 @@ cameraRaw	Roughness	Chropowatość
+@@ -3500,7 +3493,7 @@ cameraRaw	Roughness	Chropowatość
  	Color to Alpha…	Kolor na alfę…
  	Transparency Threshold	Próg przezroczystości
  	Opacity Threshold	Próg krycia
@@ -51711,7 +52135,7 @@ index 88d4e9dbbdb539d4b0dbbf65cc0460d54d1124d6..9ebda3df187247c14cdefaa4c3e3002f
  
  	Rasterize svg groups deeper than	Rasteryzuj grupy SVG głębsze niż ten poziom
  	0 turns this threshold off; SVG groups nested deeper than 100 levels are always rasterized.	0 wyłącza ten próg; grupy SVG zagnieżdżone głębiej niż 100 poziomów są zawsze rasteryzowane.
-@@ -3717,7 +3717,7 @@ curves	Smooth	Wygładź
+@@ -3717,7 +3710,7 @@ curves	Smooth	Wygładź
  	{name} (Photoshop)	{name} (Photoshop)
  	{message} ({note})	{message} ({note})
  @plural	Loaded {n} action from {file}|Loaded {n} actions from {file}	Wczytano {n} operację z {file}|Wczytano {n} operacje z {file}|Wczytano {n} operacji z {file}
@@ -51721,32 +52145,33 @@ index 88d4e9dbbdb539d4b0dbbf65cc0460d54d1124d6..9ebda3df187247c14cdefaa4c3e3002f
  @plural	{n} step with no Photoshop equivalent left out|{n} steps with no Photoshop equivalent left out	Pominięto {n} krok bez odpowiednika w Photoshopie|Pominięto {n} kroki bez odpowiednika w Photoshopie|Pominięto {n} kroków bez odpowiednika w Photoshopie
  
 diff --git a/crates/ui-egui/src/i18n/pt-br.tsv b/crates/ui-egui/src/i18n/pt-br.tsv
-index 18acbaaa2e7c89d4b7127d4d1e0ca6ed93b86111..8dbf068794ff440eff32af9ecacc00e02b2c6342 100644
+index 18acbaaa2e7c89d4b7127d4d1e0ca6ed93b86111..c76af549b2aca8d8c2fe4473ffb5eb58e44be13d 100644
 --- a/crates/ui-egui/src/i18n/pt-br.tsv
 +++ b/crates/ui-egui/src/i18n/pt-br.tsv
-@@ -12,7 +12,7 @@
+@@ -12,7 +12,6 @@
  # Clean-room: every entry was written from the plain meaning of the English label using ordinary
  # Brazilian Portuguese computing vocabulary (camada, desfoque, seleção, demarcador ...). No
  # proprietary localisation resource, string table or product UI was consulted or copied; add
 -# entries the same way. Product and technology names (KIO Photo, ArtCraft, OpenType, CMYK, Lab ...)
-+# entries the same way. Product and technology names (Bogo Photo, ArtCraft, OpenType, CMYK, Lab ...)
  # stay as they are; the trailing "…" of dialog commands is kept.
  
  # Channel Options and New Spot Channel (#3761)
-@@ -771,9 +771,9 @@
+@@ -771,11 +770,9 @@
  	Timeline	Linha do tempo
  	Tool Presets	Predefinições de ferramentas
  	Tools	Ferramentas
 -	About KIO Photo	Sobre o KIO Photo
 -	KIO Photo Website	Site do KIO Photo
 -	KIO Photo on GitHub	KIO Photo no GitHub
+-	ArtCraft Website	Site do ArtCraft
+-	Join the ArtCraft Discord…	Participe do Discord do ArtCraft…
 +	About Bogo Photo	Sobre o Bogo Photo
 +	Bogo Photo Website	Site do Bogo Photo
 +	Bogo Photo on GitHub	Bogo Photo no GitHub
- 	ArtCraft Website	Site do ArtCraft
- 	Join the ArtCraft Discord…	Participe do Discord do ArtCraft…
  	Report an Issue…	Relatar um problema…
-@@ -826,7 +826,7 @@
+ 	WIA Support…	Suporte a WIA…
+ 	Apply	Aplicar
+@@ -826,7 +823,7 @@
  	All Caps	Tudo em maiúsculas
  	All Slices	Todas as fatias
  	All User Slices	Todas as fatias do usuário
@@ -51755,7 +52180,23 @@ index 18acbaaa2e7c89d4b7127d4d1e0ca6ed93b86111..8dbf068794ff440eff32af9ecacc00e0
  	Alt	Alt
  	Always use pressure for opacity	Sempre usar a pressão para a opacidade
  	Always use pressure for size	Sempre usar a pressão para o tamanho
-@@ -1322,9 +1322,9 @@
+@@ -1059,7 +1056,6 @@
+ 	Diffusion	Difusão
+ 	Discard the embedded profile (don't color manage)	Descartar o perfil incorporado (não gerenciar cores)
+ 	Discontiguous	Não contíguo
+-	Discord	Discord
+ 	Dismiss	Dispensar
+ 	Display P3	Display P3
+ 	Display Text	Texto de exibição
+@@ -1188,7 +1184,6 @@
+ 	Invert All	Inverter tudo
+ 	Invert has no settings.	Inverter não tem configurações.
+ 	Italic	Itálico
+-	Join us on Discord	Participe do nosso Discord
+ 	Justify all	Justificar tudo
+ 	Justify last centered	Justificar com a última linha centralizada
+ 	Justify last left	Justificar com a última linha à esquerda
+@@ -1322,9 +1317,9 @@
  	Perspective Warp is not active	A distorção de perspectiva não está ativa
  	Perspective Warp: draw planes along the image's perspective, then switch to Warp	Distorção de perspectiva: desenhe planos seguindo a perspectiva da imagem e depois mude para Deformar
  	Photo Filter	Filtro de fotos
@@ -51768,7 +52209,7 @@ index 18acbaaa2e7c89d4b7127d4d1e0ca6ed93b86111..8dbf068794ff440eff32af9ecacc00e0
  	Pin Depth:	Profundidade do alfinete:
  	Pixel Length:	Comprimento em pixels:
  	Pixels/Centimeter	Pixels/centímetro
-@@ -1400,11 +1400,11 @@
+@@ -1400,11 +1395,11 @@
  	Import Shortcuts…	Importar atalhos…
  	Load a keyboard shortcut set saved as .kys	Carregar um conjunto de atalhos de teclado salvo como .kys
  	Imported {n} shortcuts from {file}. Click OK to keep them.	{n} atalhos importados de {file}. Clique em OK para mantê-los.
@@ -51782,7 +52223,15 @@ index 18acbaaa2e7c89d4b7127d4d1e0ca6ed93b86111..8dbf068794ff440eff32af9ecacc00e0
  	Edit › Keyboard Shortcuts › Reset All to Defaults undoes an import.	Editar › Atalhos de teclado › Redefinir tudo para os padrões desfaz uma importação.
  	Don't Import	Não importar
  	The keyboard shortcut set was not imported: {error}	O conjunto de atalhos de teclado não foi importado: {error}
-@@ -1626,7 +1626,7 @@
+@@ -1590,7 +1585,6 @@
+ 	Apple Watch 45mm	Apple Watch 45mm
+ 	Aqua	Aqua
+ 	Art & Illustration	Arte e ilustração
+-	ArtCraft	ArtCraft
+ 	Background Eraser Tool	Ferramenta Borracha de plano de fundo
+ 	Bevel & Emboss	Chanfro e entalhe
+ 	Blend Mode	Modo de mesclagem
+@@ -1626,7 +1620,7 @@
  	Current Tool	Ferramenta atual
  	Custom Shape Tool	Ferramenta Forma personalizada
  	Cyans	Cianos
@@ -51791,7 +52240,7 @@ index 18acbaaa2e7c89d4b7127d4d1e0ca6ed93b86111..8dbf068794ff440eff32af9ecacc00e0
  	Delete Workspace	Excluir espaço de trabalho
  	Diamond	Diamante
  	Dimensions:	Dimensões:
-@@ -1737,7 +1737,7 @@
+@@ -1737,7 +1731,7 @@
  	Pen Tool	Ferramenta Caneta
  	Convert Point Tool	Ferramenta Converter ponto
  	Photo	Foto
@@ -51800,7 +52249,7 @@ index 18acbaaa2e7c89d4b7127d4d1e0ca6ed93b86111..8dbf068794ff440eff32af9ecacc00e0
  	Picas	Paicas
  	Pillow Emboss	Entalhe almofadado
  	Pixel Replacement	Substituição de pixels
-@@ -2061,7 +2061,7 @@
+@@ -2061,7 +2055,7 @@
  	System Info	Informações do sistema
  	More panels	Mais painéis
  	More documents	Mais documentos
@@ -51809,7 +52258,7 @@ index 18acbaaa2e7c89d4b7127d4d1e0ca6ed93b86111..8dbf068794ff440eff32af9ecacc00e0
  	Graphics	Gráficos
  	Reset GPU Backend	Redefinir backend da GPU
  	Applies at next launch.	Aplica-se na próxima inicialização.
-@@ -2641,8 +2641,8 @@
+@@ -2641,8 +2635,8 @@
  	Use Global Light	Usar luz global
  	Native file drag-and-drop is unavailable	Arrastar e soltar arquivos não está disponível
  	Native file drag-and-drop is not supported on Wayland yet. Use File › Open, or copy the image in your file manager and paste it with {paste}.	O recurso nativo de arrastar e soltar arquivos ainda não funciona no Wayland. Use Arquivo › Abrir ou copie a imagem no gerenciador de arquivos e cole-a com {paste}.
@@ -51820,7 +52269,7 @@ index 18acbaaa2e7c89d4b7127d4d1e0ca6ed93b86111..8dbf068794ff440eff32af9ecacc00e0
  	Edit › Paste	Editar › Colar
  	Use File › Open, or paste a copied image with {paste}.	Use Arquivo › Abrir ou cole uma imagem copiada com {paste}.
  	Mixer Brush Tool	Ferramenta Pincel misturador
-@@ -2658,7 +2658,7 @@
+@@ -2658,7 +2652,7 @@
  	Automatic uses GPU acceleration when available and falls back to CPU rendering on errors.	O modo automático usa a aceleração por GPU quando disponível e volta para a renderização por CPU em caso de erros.
  	Switched to CPU rendering	Renderização alterada para CPU
  	GPU acceleration could not continue. Your documents are unchanged.	A aceleração por GPU não pôde continuar. Seus documentos não foram alterados.
@@ -51829,7 +52278,7 @@ index 18acbaaa2e7c89d4b7127d4d1e0ca6ed93b86111..8dbf068794ff440eff32af9ecacc00e0
  	Retry GPU requires a restart. Save your work first.	Tentar a GPU novamente exige reiniciar. Salve seu trabalho primeiro.
  	Keep Using CPU	Continuar usando a CPU
  	Retry GPU	Tentar a GPU novamente
-@@ -2905,7 +2905,7 @@ fontWeight	Italic	Itálico
+@@ -2905,7 +2899,7 @@ fontWeight	Italic	Itálico
  	Color to Alpha…	Cor para alfa…
  	Transparency Threshold	Limiar de transparência
  	Opacity Threshold	Limiar de opacidade
@@ -51838,7 +52287,7 @@ index 18acbaaa2e7c89d4b7127d4d1e0ca6ed93b86111..8dbf068794ff440eff32af9ecacc00e0
  
  	Rasterize svg groups deeper than	Rasterizar grupos SVG além desta profundidade
  	0 turns this threshold off; SVG groups nested deeper than 100 levels are always rasterized.	0 desativa este limite; grupos SVG aninhados em mais de 100 níveis são sempre rasterizados.
-@@ -3250,7 +3250,7 @@ layerLabel	No Color	Sem cor
+@@ -3250,7 +3244,7 @@ layerLabel	No Color	Sem cor
  	Restart Required	Reinicialização necessária
  	Restart	Reiniciar
  	Quit	Sair
@@ -51847,7 +52296,15 @@ index 18acbaaa2e7c89d4b7127d4d1e0ca6ed93b86111..8dbf068794ff440eff32af9ecacc00e0
  	Close Window	Fechar janela
  	New Window	Nova janela
  	Open Image	Abrir imagem
-@@ -3754,7 +3754,7 @@ layerLabel	No Color	Sem cor
+@@ -3454,7 +3448,6 @@ layerLabel	No Color	Sem cor
+ 	Custom Pixel Aspect Ratio	Proporção de pixel personalizada
+ 	32-bit Preview Options	Opções de visualização de 32 bits
+ 	New Guide	Nova guia
+-	Join the ArtCraft Discord	Entrar no Discord do ArtCraft
+ 	Report an Issue	Relatar um problema
+ 	Load Files into Stack	Carregar arquivos em pilha
+ 	Statistics	Estatísticas
+@@ -3754,7 +3747,7 @@ layerLabel	No Color	Sem cor
  	Mezzotint	Meia-tinta
  	Mosaic	Mosaico
  	Motion Blur	Desfoque de movimento
@@ -51856,7 +52313,7 @@ index 18acbaaa2e7c89d4b7127d4d1e0ca6ed93b86111..8dbf068794ff440eff32af9ecacc00e0
  	Neon Glow	Brilho neon
  	New Guide Layout	Novo layout de guias
  	New Video Layer from File	Nova camada de vídeo a partir de arquivo
-@@ -3909,7 +3909,7 @@ layerLabel	No Color	Sem cor
+@@ -3909,7 +3902,7 @@ layerLabel	No Color	Sem cor
  	{name} (Photoshop)	{name} (Photoshop)
  	{message} ({note})	{message} ({note})
  @plural	Loaded {n} action from {file}|Loaded {n} actions from {file}	{n} ação carregada de {file}|{n} ações carregadas de {file}
@@ -51866,19 +52323,18 @@ index 18acbaaa2e7c89d4b7127d4d1e0ca6ed93b86111..8dbf068794ff440eff32af9ecacc00e0
  @plural	{n} step with no Photoshop equivalent left out|{n} steps with no Photoshop equivalent left out	{n} etapa sem equivalente no Photoshop foi omitida|{n} etapas sem equivalente no Photoshop foram omitidas
  
 diff --git a/crates/ui-egui/src/i18n/ru.tsv b/crates/ui-egui/src/i18n/ru.tsv
-index 94803b16b5ff4af58eadb950f6f87caad2ef948b..1a9be5f6977ac875929e973f70dad60e256f37c6 100644
+index 94803b16b5ff4af58eadb950f6f87caad2ef948b..49dc802433a1f05063b81566f69ea2f24cda51c7 100644
 --- a/crates/ui-egui/src/i18n/ru.tsv
 +++ b/crates/ui-egui/src/i18n/ru.tsv
-@@ -13,7 +13,7 @@
+@@ -13,7 +13,6 @@
  # graphics-editor vocabulary (Слой, Каналы, Маска, Выделение, Кривые ...), matching Photoshop's
  # Russian menu tradition where it is unambiguous. No proprietary localisation resource was
  # consulted or copied; entries are added the same way.
 -# Product and technology names (KIO Photo, ArtCraft, OpenType, CMYK, Lab ...) stay in Latin
-+# Product and technology names (Bogo Photo, ArtCraft, OpenType, CMYK, Lab ...) stay in Latin
  # letters; the trailing "…" of dialog commands is kept; the colon of a label ("Width:") becomes
  # the Russian typographic equivalent, with the space the source carries.
  
-@@ -525,9 +525,9 @@
+@@ -525,12 +524,10 @@
  	Hide All	Скрыть все
  
  # Help
@@ -51889,9 +52345,12 @@ index 94803b16b5ff4af58eadb950f6f87caad2ef948b..1a9be5f6977ac875929e973f70dad60e
 +	Bogo Photo Website	Сайт Bogo Photo
 +	Bogo Photo on GitHub	Bogo Photo на GitHub
  	Report an Issue…	Сообщить о проблеме…
- 	ArtCraft Website	Сайт ArtCraft
- 	Join the ArtCraft Discord…	Discord сообщества ArtCraft…
-@@ -608,11 +608,11 @@
+-	ArtCraft Website	Сайт ArtCraft
+-	Join the ArtCraft Discord…	Discord сообщества ArtCraft…
+ 	System Info…	Информация о системе…
+ 
+ # Tools and options bar
+@@ -608,11 +605,11 @@
  	Import Shortcuts…	Импортировать сочетания клавиш…
  	Load a keyboard shortcut set saved as .kys	Загрузить набор сочетаний клавиш, сохранённый как .kys
  	Imported {n} shortcuts from {file}. Click OK to keep them.	Импортировано сочетаний: {n} из {file}. Нажмите OK, чтобы сохранить их.
@@ -51905,7 +52364,7 @@ index 94803b16b5ff4af58eadb950f6f87caad2ef948b..1a9be5f6977ac875929e973f70dad60e
  	Edit › Keyboard Shortcuts › Reset All to Defaults undoes an import.	Редактирование › Сочетания клавиш › «Сбросить всё к значениям по умолчанию» отменяет импорт.
  	Don't Import	Не импортировать
  	The keyboard shortcut set was not imported: {error}	Набор сочетаний клавиш не импортирован: {error}
-@@ -917,7 +917,7 @@
+@@ -917,7 +914,7 @@
  	Embed Color Profile	Встроить цветовой профиль
  	Assign Profile…	Назначить профиль…
  	Convert to Profile…	Преобразовать в профиль…
@@ -51914,7 +52373,7 @@ index 94803b16b5ff4af58eadb950f6f87caad2ef948b..1a9be5f6977ac875929e973f70dad60e
  	Printer Manages Colors	Принтер управляет цветами
  	(print to the printer)	(печать на принтере)
  	Absolute Colorimetric	Абсолютный колориметрический
-@@ -1507,15 +1507,15 @@
+@@ -1507,15 +1504,15 @@
  	Use File › Open, or paste a copied image with {paste}.	Выберите Файл › Открыть или вставьте скопированное изображение с помощью {paste}.
  	Native file drag-and-drop is unavailable	Нативное перетаскивание файлов в Wayland недоступно
  	Native file drag-and-drop is not supported on Wayland yet. Use File › Open, or copy the image in your file manager and paste it with {paste}.	Нативное перетаскивание файлов в Wayland пока не поддерживается. Откройте файл через Файл › Открыть или скопируйте изображение в файловом менеджере и вставьте его с помощью {paste}.
@@ -51933,16 +52392,18 @@ index 94803b16b5ff4af58eadb950f6f87caad2ef948b..1a9be5f6977ac875929e973f70dad60e
  	Clipboard	Буфер обмена
  	Photo (2 × 3 in)	Фото (2 × 3 дюйма)
  	Photo (4 × 6 in)	Фото (4 × 6 дюйма)
-@@ -1667,7 +1667,7 @@
+@@ -1666,9 +1663,7 @@
+ 	Preserve Transparency	Сохранить прозрачность
  	Reverse	Обратить
  	Align with layer	По слою
- 	Join us on Discord	Мы в Discord
+-	Join us on Discord	Мы в Discord
 -	KIO Photo website	Сайт KIO Photo
+-	ArtCraft	ArtCraft
 +	Bogo Photo website	Сайт Bogo Photo
- 	ArtCraft	ArtCraft
  	GitHub	GitHub
  	No character style	Нет стиля символов
-@@ -1693,9 +1693,9 @@
+ 	No author	Нет автора
+@@ -1693,9 +1688,9 @@
  	Don't Save	Не сохранять
  	No	Нет
  	Yes	Да
@@ -51954,7 +52415,15 @@ index 94803b16b5ff4af58eadb950f6f87caad2ef948b..1a9be5f6977ac875929e973f70dad60e
  	Delete Shortcut	Удалить комбинацию
  	Press keys…	Нажмите клавиши…
  	shortcut	комбинация
-@@ -2177,8 +2177,8 @@
+@@ -2092,7 +2087,6 @@
+ 	Delete tool preset	Удалить набор инструментов
+ 	Depth Jitter	Колебание глубины
+ 	Discontiguous	Несмежные пикселы
+-	Discord	Discord
+ 	Display P3	Display P3
+ 	Display Text	Показывать текст
+ 	Divide…	Деление…
+@@ -2177,8 +2171,8 @@
  	Output:	Выход:
  	Paint Overlay	Перекрытие краской
  	Pattern Size	Размер паттерна
@@ -51965,7 +52434,7 @@ index 94803b16b5ff4af58eadb950f6f87caad2ef948b..1a9be5f6977ac875929e973f70dad60e
  	Position and Size	Положение и размер
  	Preserve Details	Сохранять детали
  	Preserve Luminosity	Сохранять светлоту
-@@ -2503,7 +2503,7 @@
+@@ -2503,7 +2497,7 @@
  	Automatic uses GPU acceleration when available and falls back to CPU rendering on errors.	Автоматический режим использует GPU, когда он доступен, и переходит на CPU при ошибках.
  	Switched to CPU rendering	Включена отрисовка на CPU
  	GPU acceleration could not continue. Your documents are unchanged.	Ускорение GPU остановлено. Документы не изменены.
@@ -51974,7 +52443,7 @@ index 94803b16b5ff4af58eadb950f6f87caad2ef948b..1a9be5f6977ac875929e973f70dad60e
  	Retry GPU requires a restart. Save your work first.	Для повтора GPU нужен перезапуск. Сначала сохраните работу.
  	Keep Using CPU	Продолжить с CPU
  	Retry GPU	Повторить GPU
-@@ -2752,7 +2752,7 @@ fontWeight	Italic	Курсив
+@@ -2752,7 +2746,7 @@ fontWeight	Italic	Курсив
  	Color to Alpha…	Цвет в альфа-канал…
  	Transparency Threshold	Порог прозрачности
  	Opacity Threshold	Порог непрозрачности
@@ -51983,7 +52452,7 @@ index 94803b16b5ff4af58eadb950f6f87caad2ef948b..1a9be5f6977ac875929e973f70dad60e
  
  	Rasterize svg groups deeper than	Растеризовать группы SVG глубже этого уровня
  	0 turns this threshold off; SVG groups nested deeper than 100 levels are always rasterized.	0 отключает этот порог; группы SVG с вложенностью более 100 уровней всегда растрируются.
-@@ -3065,7 +3065,7 @@ curves	Smooth	Сгладить
+@@ -3065,7 +3059,7 @@ curves	Smooth	Сгладить
  	{name} (Photoshop)	{name} (Photoshop)
  	{message} ({note})	{message} ({note})
  @plural	Loaded {n} action from {file}|Loaded {n} actions from {file}	Загружена {n} операция из {file}|Загружены {n} операции из {file}|Загружено {n} операций из {file}
@@ -51993,32 +52462,33 @@ index 94803b16b5ff4af58eadb950f6f87caad2ef948b..1a9be5f6977ac875929e973f70dad60e
  @plural	{n} step with no Photoshop equivalent left out|{n} steps with no Photoshop equivalent left out	Пропущен {n} шаг без эквивалента в Photoshop|Пропущены {n} шага без эквивалента в Photoshop|Пропущено {n} шагов без эквивалента в Photoshop
  
 diff --git a/crates/ui-egui/src/i18n/sr.tsv b/crates/ui-egui/src/i18n/sr.tsv
-index 3fa02000b87474271204f4e03e6333425608150f..8bfc25e918d5e3861240899eb9e8ad9eb295a4fb 100644
+index 3fa02000b87474271204f4e03e6333425608150f..7d6bc1223d38a71b2fea9b919e78028794fccc08 100644
 --- a/crates/ui-egui/src/i18n/sr.tsv
 +++ b/crates/ui-egui/src/i18n/sr.tsv
-@@ -18,7 +18,7 @@
+@@ -18,7 +18,6 @@
  # (Datoteka, Uređivanje, Slika ...), commands are imperatives (Otvori…, Sačuvaj kao…), tools read
  # "Alatka …" (Alatka četkica, Alatka za pomeranje), presets are "šabloni", patterns "šare" and
  # swatches "uzorci boja". Serbian quotation marks „…“ around names. Product and technology names
 -# (KIO Photo, ArtCraft, Camera Raw, OpenType, Lab ...) stay as they are; RGB/CMYK stay as they
-+# (Bogo Photo, ArtCraft, Camera Raw, OpenType, Lab ...) stay as they are; RGB/CMYK stay as they
  # are; the trailing "…" of dialog commands is kept. A count that is not an @plural entry is kept
  # out of noun agreement ("Broj: {n}", "slojeva: {n}") so every number reads correctly.
  
-@@ -766,9 +766,9 @@
+@@ -766,11 +765,9 @@
  	Timeline	Vremenska linija
  	Tool Presets	Šabloni alatki
  	Tools	Alatke
 -	About KIO Photo	O programu KIO Photo
 -	KIO Photo Website	Veb-sajt KIO Photo-a
 -	KIO Photo on GitHub	KIO Photo na GitHub-u
+-	ArtCraft Website	Veb-sajt ArtCraft-a
+-	Join the ArtCraft Discord…	Pridružite se ArtCraft Discord zajednici…
 +	About Bogo Photo	O programu Bogo Photo
 +	Bogo Photo Website	Veb-sajt Bogo Photo-a
 +	Bogo Photo on GitHub	Bogo Photo na GitHub-u
- 	ArtCraft Website	Veb-sajt ArtCraft-a
- 	Join the ArtCraft Discord…	Pridružite se ArtCraft Discord zajednici…
  	Report an Issue…	Prijavi problem…
-@@ -824,7 +824,7 @@
+ 	WIA Support…	WIA podrška…
+ 	Apply	Primeni
+@@ -824,7 +821,7 @@
  	All Caps	Sve velika slova
  	All Slices	Svi isečci
  	All User Slices	Svi korisnički isečci
@@ -52027,7 +52497,23 @@ index 3fa02000b87474271204f4e03e6333425608150f..8bfc25e918d5e3861240899eb9e8ad9e
  	Alt	Alt
  	Always use pressure for opacity	Uvek koristi pritisak za neprozirnost
  	Always use pressure for size	Uvek koristi pritisak za veličinu
-@@ -1305,9 +1305,9 @@
+@@ -1045,7 +1042,6 @@
+ 	Diffusion	Difuzija
+ 	Discard the embedded profile (don't color manage)	Odbaci ugrađeni profil (bez upravljanja bojama)
+ 	Discontiguous	Nesusedno
+-	Discord	Discord
+ 	Dismiss	Odbaci
+ 	Display P3	Display P3
+ 	Display Text	Tekst za prikaz
+@@ -1171,7 +1167,6 @@
+ 	Invert All	Invertuj sve
+ 	Invert has no settings.	Invertovanje nema podešavanja.
+ 	Italic	Kurziv
+-	Join us on Discord	Pridružite nam se na Discordu
+ 	Justify all	Obostrano poravnaj sve redove
+ 	Justify last centered	Obostrano, poslednji red centriran
+ 	Justify last left	Obostrano, poslednji red levo
+@@ -1305,9 +1300,9 @@
  	Perspective Warp is not active	Perspektivno krivljenje nije aktivno
  	Perspective Warp: draw planes along the image's perspective, then switch to Warp	Perspektivno krivljenje: nacrtajte ravni duž perspektive slike, a zatim pređite na krivljenje
  	Photo Filter	Foto-filter
@@ -52040,7 +52526,7 @@ index 3fa02000b87474271204f4e03e6333425608150f..8bfc25e918d5e3861240899eb9e8ad9e
  	Pin Depth:	Dubina čiode:
  	Pixel Length:	Dužina u pikselima:
  	Pixels/Centimeter	Piksela/centimetar
-@@ -1383,11 +1383,11 @@
+@@ -1383,11 +1378,11 @@
  	Import Shortcuts…	Uvezi prečice…
  	Load a keyboard shortcut set saved as .kys	Učitaj skup prečica sačuvan kao .kys
  	Imported {n} shortcuts from {file}. Click OK to keep them.	Uvezeno {n} prečica iz {file}. Kliknite U redu da ih zadržite.
@@ -52054,7 +52540,15 @@ index 3fa02000b87474271204f4e03e6333425608150f..8bfc25e918d5e3861240899eb9e8ad9e
  	Edit › Keyboard Shortcuts › Reset All to Defaults undoes an import.	Uređivanje › Prečice na tastaturi › Vrati sve na podrazumevano poništava uvoz.
  	Don't Import	Nemoj uvesti
  	The keyboard shortcut set was not imported: {error}	Skup prečica nije uvezen: {error}
-@@ -1610,7 +1610,7 @@
+@@ -1574,7 +1569,6 @@
+ 	Apple Watch 45mm	Apple Watch 45 mm
+ 	Aqua	Akva
+ 	Art & Illustration	Umetnost i ilustracija
+-	ArtCraft	ArtCraft
+ 	Background Eraser Tool	Alatka gumica za pozadinu
+ 	Bevel & Emboss	Kosina i reljef
+ 	Blend Mode	Režim stapanja
+@@ -1610,7 +1604,7 @@
  	Current Tool	Tekuća alatka
  	Custom Shape Tool	Alatka za prilagođeni oblik
  	Cyans	Cijan
@@ -52063,7 +52557,7 @@ index 3fa02000b87474271204f4e03e6333425608150f..8bfc25e918d5e3861240899eb9e8ad9e
  	Delete Workspace	Obriši radni prostor
  	Diamond	Romb
  	Dimensions:	Dimenzije:
-@@ -1721,7 +1721,7 @@
+@@ -1721,7 +1715,7 @@
  	Pen Tool	Alatka pero
  	Convert Point Tool	Alatka za pretvaranje tačke
  	Photo	Fotografija
@@ -52072,7 +52566,7 @@ index 3fa02000b87474271204f4e03e6333425608150f..8bfc25e918d5e3861240899eb9e8ad9e
  	Picas	Pike
  	Pillow Emboss	Jastučasti reljef
  	Pixel Replacement	Zamena piksela
-@@ -2045,7 +2045,7 @@
+@@ -2045,7 +2039,7 @@
  	System Info	Informacije o sistemu
  	More panels	Više panela
  	More documents	Više dokumenata
@@ -52081,7 +52575,7 @@ index 3fa02000b87474271204f4e03e6333425608150f..8bfc25e918d5e3861240899eb9e8ad9e
  	Graphics	Grafika
  	Reset GPU Backend	Resetuj GPU pozadinski sistem
  	Applies at next launch.	Primenjuje se pri sledećem pokretanju.
-@@ -2628,8 +2628,8 @@
+@@ -2628,8 +2622,8 @@
  	Use Global Light	Koristi globalno svetlo
  	Native file drag-and-drop is unavailable	Izvorno prevlačenje i otpuštanje datoteka nije dostupno
  	Native file drag-and-drop is not supported on Wayland yet. Use File › Open, or copy the image in your file manager and paste it with {paste}.	Izvorno prevlačenje i otpuštanje datoteka još nije podržano na Wayland-u. Koristite Datoteka › Otvori ili kopirajte sliku u menadžeru datoteka i nalepite je pomoću {paste}.
@@ -52092,7 +52586,7 @@ index 3fa02000b87474271204f4e03e6333425608150f..8bfc25e918d5e3861240899eb9e8ad9e
  	Edit › Paste	Uređivanje › Nalepi
  	Use File › Open, or paste a copied image with {paste}.	Koristite Datoteka › Otvori ili nalepite kopiranu sliku pomoću {paste}.
  	Mixer Brush Tool	Alatka četkica za mešanje
-@@ -2645,7 +2645,7 @@
+@@ -2645,7 +2639,7 @@
  	Automatic uses GPU acceleration when available and falls back to CPU rendering on errors.	Automatski režim koristi GPU ubrzanje kada je dostupno, a u slučaju grešaka prelazi na renderovanje procesorom.
  	Switched to CPU rendering	Prebačeno na renderovanje procesorom
  	GPU acceleration could not continue. Your documents are unchanged.	GPU ubrzanje nije moglo da se nastavi. Vaši dokumenti su nepromenjeni.
@@ -52101,7 +52595,7 @@ index 3fa02000b87474271204f4e03e6333425608150f..8bfc25e918d5e3861240899eb9e8ad9e
  	Retry GPU requires a restart. Save your work first.	Ponovni pokušaj sa GPU-om zahteva ponovno pokretanje. Prvo sačuvajte svoj rad.
  	Keep Using CPU	Nastavi sa CPU-om
  	Retry GPU	Ponovo pokušaj sa GPU-om
-@@ -2877,7 +2877,7 @@ fontWeight	Italic	Kurziv
+@@ -2877,7 +2871,7 @@ fontWeight	Italic	Kurziv
  	Color to Alpha…	Boja u alfu…
  	Transparency Threshold	Prag providnosti
  	Opacity Threshold	Prag neprozirnosti
@@ -52110,7 +52604,7 @@ index 3fa02000b87474271204f4e03e6333425608150f..8bfc25e918d5e3861240899eb9e8ad9e
  
  	Rasterize svg groups deeper than	Rasterizuj SVG grupe dublje od
  	0 turns this threshold off; SVG groups nested deeper than 100 levels are always rasterized.	0 isključuje ovaj prag; SVG grupe ugnežđene dublje od 100 nivoa uvek se rasterizuju.
-@@ -3284,7 +3284,7 @@ layerLabel	No Color	Bez boje
+@@ -3284,7 +3278,7 @@ layerLabel	No Color	Bez boje
  	Restart Required	Potrebno je ponovno pokretanje
  	Restart	Ponovo pokreni
  	Quit	Izađi
@@ -52119,7 +52613,15 @@ index 3fa02000b87474271204f4e03e6333425608150f..8bfc25e918d5e3861240899eb9e8ad9e
  	Close Window	Zatvori prozor
  	New Window	Novi prozor
  	Open Image	Otvori sliku
-@@ -3788,7 +3788,7 @@ layerLabel	No Color	Bez boje
+@@ -3488,7 +3482,6 @@ layerLabel	No Color	Bez boje
+ 	Custom Pixel Aspect Ratio	Prilagođeni odnos stranica piksela
+ 	32-bit Preview Options	Opcije 32-bitnog pregleda
+ 	New Guide	Nova vodilja
+-	Join the ArtCraft Discord	Pridružite se ArtCraft Discord zajednici
+ 	Report an Issue	Prijavi problem
+ 	Load Files into Stack	Učitaj datoteke u stek
+ 	Statistics	Statistika
+@@ -3788,7 +3781,7 @@ layerLabel	No Color	Bez boje
  	Mezzotint	Mecotinta
  	Mosaic	Mozaik
  	Motion Blur	Zamućenje pokreta
@@ -52128,7 +52630,7 @@ index 3fa02000b87474271204f4e03e6333425608150f..8bfc25e918d5e3861240899eb9e8ad9e
  	Neon Glow	Neonski sjaj
  	New Guide Layout	Novi raspored vodilja
  	New Video Layer from File	Novi video sloj iz datoteke
-@@ -3969,9 +3969,9 @@ layerLabel	No Color	Bez boje
+@@ -3969,9 +3962,9 @@ layerLabel	No Color	Bez boje
  	Saved {path}; image assets: {n} in {dir}	Sačuvano: {path}; slikovni resursi: {n} u {dir}
  	{message} (notes: {n}; {warning})	{message} (beleške: {n}; {warning})
  	Preferences can't be saved	Podešavanja ne mogu da se sačuvaju
@@ -52140,7 +52642,15 @@ index 3fa02000b87474271204f4e03e6333425608150f..8bfc25e918d5e3861240899eb9e8ad9e
  	GPU device was lost; using the CPU renderer.	GPU uređaj je izgubljen; koristi se renderovanje procesorom.
  	GPU error; using the CPU renderer.	Greška GPU-a; koristi se renderovanje procesorom.
  	Couldn't open {name}: {error}	Otvaranje {name} nije uspelo: {error}
-@@ -4183,7 +4183,7 @@ shape	Appearance	Izgled
+@@ -4042,7 +4035,6 @@ navigator	Zoom	Uvećanje
+ 	on	uključeno
+ 	off	isključeno
+ 	This adjustment ({key}) is kept as imported and can't be edited yet.	Ova korekcija ({key}) je zadržana onakva kakva je uvezena i još ne može da se uređuje.
+-	Join the ArtCraft Discord ({url})	Pridružite se ArtCraft Discord zajednici ({url})
+ 	{index} of {total}	{index} od {total}
+ 	{shortcut} assigned.	{shortcut} je dodeljena.
+ 	{shortcut} is already in use by {commands} and will be removed from it when you click OK.	{shortcut} već koristi {commands} i biće uklonjena odatle kada kliknete U redu.
+@@ -4183,7 +4175,7 @@ shape	Appearance	Izgled
  	{name} (Photoshop)	{name} (Photoshop)
  	{message} ({note})	{message} ({note})
  @plural	Loaded {n} action from {file}|Loaded {n} actions from {file}	Učitana je {n} radnja iz {file}|Učitane su {n} radnje iz {file}|Učitano je {n} radnji iz {file}
@@ -52150,32 +52660,33 @@ index 3fa02000b87474271204f4e03e6333425608150f..8bfc25e918d5e3861240899eb9e8ad9e
  @plural	{n} step with no Photoshop equivalent left out|{n} steps with no Photoshop equivalent left out	Izostavljen je {n} korak bez ekvivalenta u Photoshopu|Izostavljena su {n} koraka bez ekvivalenta u Photoshopu|Izostavljeno je {n} koraka bez ekvivalenta u Photoshopu
  	Insert Stop…	Umetni zaustavljanje…
 diff --git a/crates/ui-egui/src/i18n/tr.tsv b/crates/ui-egui/src/i18n/tr.tsv
-index 4654f533aff83138c8cba21a98c792f62c9f76ea..2765f83be2c79505d0e0ca4d6a965299a56ecf50 100644
+index 4654f533aff83138c8cba21a98c792f62c9f76ea..bfca1dbf74e08fcce35ee4876126c2441327716f 100644
 --- a/crates/ui-egui/src/i18n/tr.tsv
 +++ b/crates/ui-egui/src/i18n/tr.tsv
-@@ -4,7 +4,7 @@
+@@ -4,7 +4,6 @@
  # Clean-room: every entry was written from the plain meaning of the English label using ordinary
  # Turkish computing vocabulary (katman, seçim, maske, ayar katmanı, fırça, degrade ...). No
  # proprietary localisation resource, string table or product UI was consulted or copied; add
 -# entries the same way. Product and technology names (KIO Photo, ArtCraft, OpenType, CMYK, Lab ...)
-+# entries the same way. Product and technology names (Bogo Photo, ArtCraft, OpenType, CMYK, Lab ...)
  # stay as they are; the trailing "…" of dialog commands is kept.
  #
  # Custom paper dimensions in Print Settings.
-@@ -757,9 +757,9 @@
+@@ -757,11 +756,9 @@
  	Timeline	Zaman çizelgesi
  	Tool Presets	Araç Ön Ayarları
  	Tools	Araçlar
 -	About KIO Photo	KIO Photo Hakkında
 -	KIO Photo Website	KIO Photo Web Sitesi
 -	KIO Photo on GitHub	GitHub'da KIO Photo
+-	ArtCraft Website	ArtCraft Web Sitesi
+-	Join the ArtCraft Discord…	ArtCraft Discord'una katılın…
 +	About Bogo Photo	Bogo Photo Hakkında
 +	Bogo Photo Website	Bogo Photo Web Sitesi
 +	Bogo Photo on GitHub	GitHub'da Bogo Photo
- 	ArtCraft Website	ArtCraft Web Sitesi
- 	Join the ArtCraft Discord…	ArtCraft Discord'una katılın…
  	Report an Issue…	Bir Sorun Bildirin…
-@@ -812,7 +812,7 @@
+ 	WIA Support…	WIA Desteği…
+ 	Apply	Uygula
+@@ -812,7 +809,7 @@
  	All Caps	Tamamı Büyük Harf
  	All Slices	Tüm Dilimler
  	All User Slices	Tüm Kullanıcı Dilimleri
@@ -52184,7 +52695,15 @@ index 4654f533aff83138c8cba21a98c792f62c9f76ea..2765f83be2c79505d0e0ca4d6a965299
  	Alt	Alternatif
  	Always use pressure for opacity	Opaklık için her zaman baskıyı kullanın
  	Always use pressure for size	Her zaman boyuta göre baskı kullanın
-@@ -1056,8 +1056,8 @@
+@@ -1036,7 +1033,6 @@
+ 	Diffusion	Difüzyon
+ 	Discard the embedded profile (don't color manage)	Gömülü profili atın (renk yönetimi yapmayın)
+ 	Discontiguous	bitişik değil
+-	Discord	Discord
+ 	Dismiss	Reddet
+ 	Display P3	Display P3
+ 	Display Text	Metni Görüntüle
+@@ -1056,8 +1052,8 @@
  	Drop an image or PSD anywhere to open it.	Açmak için bir görüntüyü veya PSD'yi herhangi bir yere bırakın.
  	Native file drag-and-drop is unavailable	Yerel dosya sürükle ve bırak özelliği kullanılamıyor
  	Native file drag-and-drop is not supported on Wayland yet. Use File › Open, or copy the image in your file manager and paste it with {paste}.	Yerel dosya sürükle ve bırak özelliği henüz Wayland'de desteklenmiyor. Dosyayı Kullan › Aç veya resmi dosya yöneticinize kopyalayıp {paste} ile yapıştırın.
@@ -52195,7 +52714,15 @@ index 4654f533aff83138c8cba21a98c792f62c9f76ea..2765f83be2c79505d0e0ca4d6a965299
  	Edit › Paste	Düzenle › Yapıştır
  	Duplicate Layers…	Katmanları Çoğalt…
  	Duplicate style	Yinelenen stil
-@@ -1302,9 +1302,9 @@
+@@ -1168,7 +1164,6 @@
+ 	Invert All	Tümünü Ters Çevir
+ 	Invert has no settings.	Tersine çevirmenin hiçbir ayarı yoktur.
+ 	Italic	italik
+-	Join us on Discord	Discord'da bize katılın
+ 	Justify all	Hepsini gerekçelendir
+ 	Justify last centered	Son ortayı iki yana yasla
+ 	Justify last left	Son sola yasla
+@@ -1302,9 +1297,9 @@
  	Perspective Warp is not active	Perspektif Çarpıtma etkin değil
  	Perspective Warp: draw planes along the image's perspective, then switch to Warp	Perspektif Çarpıtma: görüntünün perspektifi boyunca düzlemler çizin, ardından Çarpıtma'ya geçin
  	Photo Filter	Fotoğraf Filtresi
@@ -52208,7 +52735,7 @@ index 4654f533aff83138c8cba21a98c792f62c9f76ea..2765f83be2c79505d0e0ca4d6a965299
  	Pin Depth:	Pim Derinliği:
  	Pixel Length:	Piksel Uzunluğu:
  	Pixels/Centimeter	Piksel/Santimetre
-@@ -1379,11 +1379,11 @@
+@@ -1379,11 +1374,11 @@
  	Import Shortcuts…	Kısayolları İçe Aktar…
  	Load a keyboard shortcut set saved as .kys	.kys olarak kaydedilen bir klavye kısayolu kümesi yükleyin
  	Imported {n} shortcuts from {file}. Click OK to keep them.	{n} kısayolları {file} adresinden içe aktarıldı. Bunları saklamak için Tamam'ı tıklayın.
@@ -52222,7 +52749,15 @@ index 4654f533aff83138c8cba21a98c792f62c9f76ea..2765f83be2c79505d0e0ca4d6a965299
  	Edit › Keyboard Shortcuts › Reset All to Defaults undoes an import.	Düzenle › Klavye Kısayolları › Tümünü Varsayılanlara Sıfırla, içe aktarma işlemini geri alır.
  	Don't Import	İçe Aktarma
  	The keyboard shortcut set was not imported: {error}	Klavye kısayol seti içe aktarılmadı: {error}
-@@ -1605,7 +1605,7 @@
+@@ -1569,7 +1564,6 @@
+ 	Apple Watch 45mm	Apple Watch 45mm
+ 	Aqua	Su
+ 	Art & Illustration	Sanat ve İllüstrasyon
+-	ArtCraft	ArtCraft
+ 	Background Eraser Tool	Arka Plan Silgisi Aracı
+ 	Bevel & Emboss	Eğim Ver ve Kabart
+ 	Blend Mode	Karışım Modu
+@@ -1605,7 +1599,7 @@
  	Current Tool	Güncel Araç
  	Custom Shape Tool	Özel Şekil Aracı
  	Cyans	Camgöbeği
@@ -52231,7 +52766,7 @@ index 4654f533aff83138c8cba21a98c792f62c9f76ea..2765f83be2c79505d0e0ca4d6a965299
  	Delete Workspace	Çalışma Alanını Sil
  	Diamond	Elmas
  	Dimensions:	Boyutlar:
-@@ -1716,7 +1716,7 @@
+@@ -1716,7 +1710,7 @@
  	Pen Tool	Kalem Aracı
  	Convert Point Tool	Nokta Dönüştürme Aracı
  	Photo	Fotoğraf
@@ -52240,7 +52775,7 @@ index 4654f533aff83138c8cba21a98c792f62c9f76ea..2765f83be2c79505d0e0ca4d6a965299
  	Picas	Pikalar
  	Pillow Emboss	Yastık Kabartma
  	Pixel Replacement	Piksel Değiştirme
-@@ -2041,7 +2041,7 @@
+@@ -2041,7 +2035,7 @@
  	System Info	Sistem Bilgisi
  	More panels	Daha fazla panel
  	More documents	Daha fazla belge
@@ -52249,7 +52784,7 @@ index 4654f533aff83138c8cba21a98c792f62c9f76ea..2765f83be2c79505d0e0ca4d6a965299
  	Graphics	Grafik
  	Reset GPU Backend	GPU Arka Uçunu Sıfırla
  	Applies at next launch.	Bir sonraki açılışta geçerlidir.
-@@ -2241,7 +2241,7 @@
+@@ -2241,7 +2235,7 @@
  	Automatic uses GPU acceleration when available and falls back to CPU rendering on errors.	Otomatik, mümkün olduğunda GPU hızlandırmayı kullanır ve hatalarda CPU oluşturmaya geri döner.
  	Switched to CPU rendering	CPU oluşturmaya geçildi
  	GPU acceleration could not continue. Your documents are unchanged.	GPU hızlandırması devam edemedi. Belgeleriniz değişmedi.
@@ -52258,7 +52793,7 @@ index 4654f533aff83138c8cba21a98c792f62c9f76ea..2765f83be2c79505d0e0ca4d6a965299
  	Retry GPU requires a restart. Save your work first.	GPU'yu yeniden dene, yeniden başlatma gerektirir. Öncelikle çalışmanızı kaydedin.
  	Keep Using CPU	CPU'yu Kullanmaya Devam Edin
  	Retry GPU	GPU'yu yeniden dene
-@@ -2623,7 +2623,7 @@ cameraRaw	Color	Renk
+@@ -2623,7 +2617,7 @@ cameraRaw	Color	Renk
  	Restart Required	Yeniden Başlatma Gerekli
  	Restart	Yeniden başlat
  	Quit	Çıkış
@@ -52267,7 +52802,15 @@ index 4654f533aff83138c8cba21a98c792f62c9f76ea..2765f83be2c79505d0e0ca4d6a965299
  	Close Window	Pencereyi Kapat
  	New Window	Yeni Pencere
  	Open Image	Resmi Aç
-@@ -3393,7 +3393,7 @@ cameraRaw	Color	Renk
+@@ -3007,7 +3001,6 @@ cameraRaw	Color	Renk
+ 	Custom Pixel Aspect Ratio	Özel Piksel En Boy Oranı
+ 	32-bit Preview Options	32 bit Önizleme Seçenekleri
+ 	New Guide	Yeni Kılavuz
+-	Join the ArtCraft Discord	ArtCraft Discord'una katılın
+ 	Report an Issue	Sorun Bildir
+ 	Load Files into Stack	Dosyaları Yığına Yükle
+ 	Statistics	İstatistikler
+@@ -3393,7 +3386,7 @@ cameraRaw	Color	Renk
  	Modify Date	Tarihi Değiştir
  	Mosaic	Mozaik
  	Motion Blur	Hareket Bulanıklığı
@@ -52276,7 +52819,7 @@ index 4654f533aff83138c8cba21a98c792f62c9f76ea..2765f83be2c79505d0e0ca4d6a965299
  	Neon Glow	Neon Parıltı
  	New Guide Layout	Yeni Kılavuz Düzeni
  	New Path	Yeni Yol
-@@ -3750,7 +3750,7 @@ cameraData	Lens	Lens
+@@ -3750,7 +3743,7 @@ cameraData	Lens	Lens
  	There is no crop size or ratio to save	Kaydedilecek kırpma boyutu veya oranı yok
  	Search settings…	Arama ayarları…
  	No matching settings	Eşleşen ayar yok
@@ -52285,7 +52828,7 @@ index 4654f533aff83138c8cba21a98c792f62c9f76ea..2765f83be2c79505d0e0ca4d6a965299
  	Loading fonts…	Yazı tipleri yükleniyor…
  	Onion Skin	Soğan Kabuğu
  	Marching Ants	Yürüyen Karıncalar
-@@ -3833,7 +3833,7 @@ cameraData	Lens	Lens
+@@ -3833,7 +3826,7 @@ cameraData	Lens	Lens
  	{name} (Photoshop)	{name} (Photoshop)
  	{message} ({note})	{message} ({note})
  @plural	Loaded {n} action from {file}|Loaded {n} actions from {file}	{file} dosyasından {n} eylem yüklendi
@@ -52295,7 +52838,7 @@ index 4654f533aff83138c8cba21a98c792f62c9f76ea..2765f83be2c79505d0e0ca4d6a965299
  @plural	{n} step with no Photoshop equivalent left out|{n} steps with no Photoshop equivalent left out	Photoshop karşılığı olmayan {n} adım atlandı
  
 diff --git a/crates/ui-egui/src/i18n/uk.tsv b/crates/ui-egui/src/i18n/uk.tsv
-index 1d067c9a3b25afc94c63666804f5ced0ebe7bbca..e8326822cd847a0367390677505158f7cdc70f8a 100644
+index 1d067c9a3b25afc94c63666804f5ced0ebe7bbca..be0a197701d9b8cb641d51228fd83ec47cf87294 100644
 --- a/crates/ui-egui/src/i18n/uk.tsv
 +++ b/crates/ui-egui/src/i18n/uk.tsv
 @@ -4,7 +4,7 @@
@@ -52307,7 +52850,7 @@ index 1d067c9a3b25afc94c63666804f5ced0ebe7bbca..e8326822cd847a0367390677505158f7
  # No proprietary translation resources were used.
  # Licensed MIT OR Apache-2.0. See LICENSE-translations.txt and ATTRIBUTION.md.
  
-@@ -503,9 +503,9 @@
+@@ -503,12 +503,10 @@
  	Hide All	Приховати все
  
  # Help
@@ -52318,9 +52861,12 @@ index 1d067c9a3b25afc94c63666804f5ced0ebe7bbca..e8326822cd847a0367390677505158f7
 +	Bogo Photo Website	Вебсайт Bogo Photo
 +	Bogo Photo on GitHub	Bogo Photo на GitHub
  	Report an Issue…	Повідомити про проблему…
- 	ArtCraft Website	Вебсайт ArtCraft
- 	Join the ArtCraft Discord…	Приєднатися до Discord ArtCraft…
-@@ -586,11 +586,11 @@
+-	ArtCraft Website	Вебсайт ArtCraft
+-	Join the ArtCraft Discord…	Приєднатися до Discord ArtCraft…
+ 	System Info…	Інформація про систему…
+ 
+ # Tools and options bar
+@@ -586,11 +584,11 @@
  	Import Shortcuts…	Імпортувати сполучення клавіш…
  	Load a keyboard shortcut set saved as .kys	Завантажити набір сполучень клавіш, збережений як .kys
  	Imported {n} shortcuts from {file}. Click OK to keep them.	Імпортовано сполучень клавіш: {n} із {file}. Натисніть OK, щоб зберегти їх.
@@ -52334,7 +52880,7 @@ index 1d067c9a3b25afc94c63666804f5ced0ebe7bbca..e8326822cd847a0367390677505158f7
  	Edit › Keyboard Shortcuts › Reset All to Defaults undoes an import.	Редагування › Сполучення клавіш › «Скинути все до стандартних» скасовує імпорт.
  	Don't Import	Не імпортувати
  	The keyboard shortcut set was not imported: {error}	Набір сполучень клавіш не імпортовано: {error}
-@@ -895,7 +895,7 @@
+@@ -895,7 +893,7 @@
  	Embed Color Profile	Вбудувати колірний профіль
  	Assign Profile…	Призначити профіль…
  	Convert to Profile…	Перетворити на профіль…
@@ -52343,7 +52889,7 @@ index 1d067c9a3b25afc94c63666804f5ced0ebe7bbca..e8326822cd847a0367390677505158f7
  	Printer Manages Colors	Принтер керує кольорами
  	(print to the printer)	(друк на принтері)
  	Absolute Colorimetric	Абсолютний колориметричний
-@@ -1488,15 +1488,15 @@
+@@ -1488,15 +1486,15 @@
  	Use File › Open, or paste a copied image with {paste}.	Скористайтеся меню Файл › Відкрити або вставте скопійоване зображення за допомогою {paste}.
  	Native file drag-and-drop is unavailable	Нативне перетягування файлів недоступне
  	Native file drag-and-drop is not supported on Wayland yet. Use File › Open, or copy the image in your file manager and paste it with {paste}.	Нативне перетягування файлів у Wayland ще не підтримується. Скористайтеся меню Файл › Відкрити або скопіюйте зображення у файловому менеджері та вставте його за допомогою {paste}.
@@ -52362,16 +52908,18 @@ index 1d067c9a3b25afc94c63666804f5ced0ebe7bbca..e8326822cd847a0367390677505158f7
  	Clipboard	Буфер обміну
  	Photo (2 × 3 in)	Фото (2 × 3 дюйми)
  	Photo (4 × 6 in)	Фото (4 × 6 дюймів)
-@@ -1648,7 +1648,7 @@
+@@ -1647,9 +1645,7 @@
+ 	Preserve Transparency	Зберігати прозорість
  	Reverse	Зворотний
  	Align with layer	Вирівняти за шаром
- 	Join us on Discord	Приєднуйтеся до нас у Discord
+-	Join us on Discord	Приєднуйтеся до нас у Discord
 -	KIO Photo website	Вебсайт KIO Photo
+-	ArtCraft	ArtCraft
 +	Bogo Photo website	Вебсайт Bogo Photo
- 	ArtCraft	ArtCraft
  	GitHub	GitHub
  	No character style	Без стилю символів
-@@ -1674,9 +1674,9 @@
+ 	No author	Автор відсутній
+@@ -1674,9 +1670,9 @@
  	Don't Save	Не зберігати
  	No	Ні
  	Yes	Так
@@ -52383,7 +52931,15 @@ index 1d067c9a3b25afc94c63666804f5ced0ebe7bbca..e8326822cd847a0367390677505158f7
  	Delete Shortcut	Видалити клавіатурне скорочення
  	Press keys…	Натисніть клавіші…
  	shortcut	клавіатурне скорочення
-@@ -2163,8 +2163,8 @@
+@@ -2078,7 +2074,6 @@
+ 	Delete tool preset	Видалити набір інструмента
+ 	Depth Jitter	Коливання глибини
+ 	Discontiguous	Несуміжні
+-	Discord	Discord
+ 	Display P3	Display P3
+ 	Display Text	Показувати текст
+ 	Divide…	Розділити…
+@@ -2163,8 +2158,8 @@
  	Output:	Вихід:
  	Paint Overlay	Малювати накладання
  	Pattern Size	Розмір візерунка
@@ -52394,7 +52950,7 @@ index 1d067c9a3b25afc94c63666804f5ced0ebe7bbca..e8326822cd847a0367390677505158f7
  	Position and Size	Положення та розмір
  	Preserve Details	Зберігати деталі
  	Preserve Luminosity	Зберігати світність
-@@ -2476,7 +2476,7 @@
+@@ -2476,7 +2471,7 @@
  	Automatic uses GPU acceleration when available and falls back to CPU rendering on errors.	Автоматичний режим використовує прискорення GPU, коли воно доступне, та переходить на рендеринг CPU в разі помилок.
  	Switched to CPU rendering	Перехід на рендеринг CPU
  	GPU acceleration could not continue. Your documents are unchanged.	Прискорення GPU не може продовжувати роботу. Ваші документи не змінено.
@@ -52403,7 +52959,15 @@ index 1d067c9a3b25afc94c63666804f5ced0ebe7bbca..e8326822cd847a0367390677505158f7
  	Retry GPU requires a restart. Save your work first.	Повторна спроба використати GPU потребує перезапуску. Спочатку збережіть роботу.
  	Keep Using CPU	Продовжити з CPU
  	Retry GPU	Повторити спробу з GPU
-@@ -3716,7 +3716,7 @@ cameraData	Lens	Об'єктив
+@@ -3329,7 +3324,6 @@ cameraRaw	Masking	Маскування
+ 	Custom Pixel Aspect Ratio	Довільне співвідношення сторін пікселя
+ 	32-bit Preview Options	Параметри 32-бітного перегляду
+ 	New Guide	Нова напрямна
+-	Join the ArtCraft Discord	Приєднатися до Discord ArtCraft
+ 	Report an Issue	Повідомити про проблему
+ 	WIA Support	Підтримка WIA
+ 	Load Files into Stack	Завантажити файли у стос
+@@ -3716,7 +3710,7 @@ cameraData	Lens	Об'єктив
  	Click: smooth point · Double-click: corner · Drag a point: move · Click first point: close · {key} finish	Клацання: плавна точка · Подвійне клацання: кут · Перетягування точки: перемістити · Клацання першої точки: замкнути · {key}: завершити
  	Search settings…	Пошук налаштувань…
  	No matching settings	Немає відповідних налаштувань
@@ -52412,7 +52976,7 @@ index 1d067c9a3b25afc94c63666804f5ced0ebe7bbca..e8326822cd847a0367390677505158f7
  	Loading fonts…	Завантаження шрифтів…
  	Simulate Pressure	Імітувати натиск
  	Stroke Path…	Обвести контур…
-@@ -3818,7 +3818,7 @@ curves	Smooth	Згладити
+@@ -3818,7 +3812,7 @@ curves	Smooth	Згладити
  	{name} (Photoshop)	{name} (Photoshop)
  	{message} ({note})	{message} ({note})
  @plural	Loaded {n} action from {file}|Loaded {n} actions from {file}	Завантажено {n} операцію з {file}|Завантажено {n} операції з {file}|Завантажено {n} операцій з {file}
@@ -52422,28 +52986,37 @@ index 1d067c9a3b25afc94c63666804f5ced0ebe7bbca..e8326822cd847a0367390677505158f7
  @plural	{n} step with no Photoshop equivalent left out|{n} steps with no Photoshop equivalent left out	Пропущено {n} крок без відповідника в Photoshop|Пропущено {n} кроки без відповідника в Photoshop|Пропущено {n} кроків без відповідника в Photoshop
  
 diff --git a/crates/ui-egui/src/i18n/vi.tsv b/crates/ui-egui/src/i18n/vi.tsv
-index da058b253928a582043241a658574c176a970d7c..3a40dd15b636c0bf01db1e1902d716272f180c19 100644
+index da058b253928a582043241a658574c176a970d7c..d73e867b625c8d4d0b8eb7d35f85074678503538 100644
 --- a/crates/ui-egui/src/i18n/vi.tsv
 +++ b/crates/ui-egui/src/i18n/vi.tsv
-@@ -15,7 +15,7 @@
+@@ -15,7 +15,6 @@
  # Clean-room: every entry was written from the plain meaning of the English label using ordinary
  # Vietnamese computing and image-editing vocabulary. No proprietary localisation resource, string
  # table or product UI was consulted or copied; add entries the same way. Product and technology
 -# names (KIO Photo, ArtCraft, OpenType, RGB, CMYK, Lab, PSD, PNG, JPEG, WebP, OpenEXR, AVIF …)
-+# names (Bogo Photo, ArtCraft, OpenType, RGB, CMYK, Lab, PSD, PNG, JPEG, WebP, OpenEXR, AVIF …)
  # stay as they are; the trailing "…" of dialog commands is kept. Plural rule: one form
  # (`plural_none` in i18n/mod.rs).
  
-@@ -652,7 +652,7 @@
+@@ -652,9 +651,8 @@
  	3-up Vertical	3 cửa sổ dọc
  	4-up	4 cửa sổ
  	6-up	6 cửa sổ
 -	About KIO Photo	Giới thiệu KIO Photo
 +	About Bogo Photo	Giới thiệu Bogo Photo
  	Actions	Thao tác
- 	ArtCraft Website	Trang web ArtCraft
+-	ArtCraft Website	Trang web ArtCraft
  	Brush Settings	Thiết lập cọ
-@@ -694,8 +694,8 @@
+ 	Brushes	Cọ
+ 	Cascade	Xếp tầng
+@@ -674,7 +672,6 @@
+ 	Histogram	Histogram
+ 	History	Lịch sử
+ 	Info	Thông tin
+-	Join the ArtCraft Discord…	Tham gia Discord ArtCraft…
+ 	Layer Comps	Tổ hợp lớp
+ 	Lock Workspace	Khóa không gian làm việc
+ 	Match All	Đồng bộ tất cả
+@@ -694,8 +691,8 @@
  	Paragraph Styles	Kiểu đoạn văn
  	Paths	Đường dẫn
  	Patterns	Họa tiết
@@ -52454,7 +53027,7 @@ index da058b253928a582043241a658574c176a970d7c..3a40dd15b636c0bf01db1e1902d71627
  	Photography	Nhiếp ảnh
  	Pixel Art	Pixel Art
  	Pro Medium Gray Theme	Chủ đề Pro xám vừa
-@@ -1519,7 +1519,7 @@ cameraRaw	Shadows	Vùng tối
+@@ -1519,7 +1516,7 @@ cameraRaw	Shadows	Vùng tối
  	Subdivisions	Phân chia
  	System title bar	Thanh tiêu đề hệ thống
  	Text file	Tệp văn bản
@@ -52463,7 +53036,7 @@ index da058b253928a582043241a658574c176a970d7c..3a40dd15b636c0bf01db1e1902d71627
  	Tiny	Rất nhỏ
  	Traditional (72.27 points/inch)	Truyền thống (72,27 point/inch)
  	Transparency & Gamut	Độ trong suốt & gam màu
-@@ -1548,7 +1548,7 @@ cameraRaw	Shadows	Vùng tối
+@@ -1548,7 +1545,7 @@ cameraRaw	Shadows	Vùng tối
  	About	Giới thiệu
  	Contributors	Người đóng góp
  	Models	Mô hình
@@ -52472,7 +53045,7 @@ index da058b253928a582043241a658574c176a970d7c..3a40dd15b636c0bf01db1e1902d71627
  	Version {version}	Phiên bản {version}
  	Unsaved changes	Thay đổi chưa lưu
  	Answer the unsaved-changes prompt first	Hãy trả lời hộp thoại thay đổi chưa lưu trước
-@@ -1584,10 +1584,10 @@ cameraRaw	Shadows	Vùng tối
+@@ -1584,10 +1581,10 @@ cameraRaw	Shadows	Vùng tối
  	Convert document's colors to the working space	Chuyển màu tài liệu sang không gian làm việc
  	Discard the embedded profile (don't color manage)	Bỏ hồ sơ nhúng (không quản lý màu)
  	Native file drag-and-drop is unavailable	Kéo thả tệp gốc không khả dụng
@@ -52485,16 +53058,17 @@ index da058b253928a582043241a658574c176a970d7c..3a40dd15b636c0bf01db1e1902d71627
  	Retry GPU	Thử lại GPU
  	Retry GPU requires a restart. Save your work first.	Thử lại GPU cần khởi động lại. Hãy lưu công việc trước.
  	Keep Using CPU	Tiếp tục dùng CPU
-@@ -1963,7 +1963,7 @@ colorRange	Invert	Đảo ngược
+@@ -1962,8 +1959,7 @@ colorRange	Invert	Đảo ngược
+ 
  # Visual QA finalization
  	New document…	Tài liệu mới…
- 	Join us on Discord	Tham gia Discord
+-	Join us on Discord	Tham gia Discord
 -	KIO Photo website	Trang web KIO Photo
 +	Bogo Photo website	Trang web Bogo Photo
  	Anchor:	Neo:
  	Canvas extension color:	Màu mở rộng canvas:
  layers	Fill	Độ tô
-@@ -2122,7 +2122,7 @@ layers	Fill:	Độ tô:
+@@ -2122,7 +2118,7 @@ layers	Fill:	Độ tô:
  	A save to {name} is still running; try again when it finishes	Đang lưu {name}; thử lại khi hoàn tất
  	Adwaita Dark Theme	Chủ đề Adwaita tối
  	Adwaita Light Theme	Chủ đề Adwaita sáng
@@ -52503,7 +53077,7 @@ index da058b253928a582043241a658574c176a970d7c..3a40dd15b636c0bf01db1e1902d71627
  	Appearance Mode	Chế độ giao diện
  	Auto Hide	Tự động ẩn
  	Click to add a point, right-click to remove	Nhấp để thêm điểm, nhấp chuột phải để xóa
-@@ -2205,7 +2205,7 @@ layers	Fill:	Độ tô:
+@@ -2205,7 +2201,7 @@ layers	Fill:	Độ tô:
  	Vector Mask from Current Path	Mặt nạ vector từ đường dẫn hiện tại
  	{label} is writing the file and can no longer be cancelled	{label} đang ghi tệp và không thể hủy nữa
  	{name} options	Tùy chọn {name}
@@ -52512,7 +53086,7 @@ index da058b253928a582043241a658574c176a970d7c..3a40dd15b636c0bf01db1e1902d71627
  	{size} (was {old})	{size} (trước là {old})
  	{w} px x {h} px ({ppi} ppi)	{w} px x {h} px ({ppi} ppi)
  	…and {n} more	…và {n} nữa
-@@ -2220,7 +2220,7 @@ layers	Fill:	Độ tô:
+@@ -2220,7 +2216,7 @@ layers	Fill:	Độ tô:
  	Corner Crop Marks	Dấu cắt góc
  	Default printer	Máy in mặc định
  	No Color Management	Không quản lý màu
@@ -52521,7 +53095,23 @@ index da058b253928a582043241a658574c176a970d7c..3a40dd15b636c0bf01db1e1902d71627
  	Printer	Máy in
  	Printer Manages Colors	Máy in quản lý màu
  	Printer Setup	Thiết lập máy in
-@@ -2342,7 +2342,7 @@ shape	Appearance	Diện mạo
+@@ -2325,7 +2321,6 @@ layers	Fill:	Độ tô:
+ 	Add	Thêm
+ 	Appearance	Giao diện
+ shape	Appearance	Diện mạo
+-	ArtCraft	ArtCraft
+ 	Bottom	Dưới
+ 	Capture	Ghi lại
+ 	Change	Thay
+@@ -2334,7 +2329,6 @@ shape	Appearance	Diện mạo
+ 	current	hiện tại
+ 	Cycle Orientation	Đổi hướng khung
+ 	Difference	Hiệu
+-	Discord	Discord
+ 	Display P3	Display P3
+ 	GitHub	GitHub
+ 	Gray Gamma 2.2	Gray Gamma 2.2
+@@ -2342,7 +2336,7 @@ shape	Appearance	Diện mạo
  	Inverse	Đảo vùng chọn
  	Lighten	Làm sáng
  	Missing delete command	Thiếu lệnh xóa
@@ -52530,7 +53120,7 @@ index da058b253928a582043241a658574c176a970d7c..3a40dd15b636c0bf01db1e1902d71627
  	Reset	Đặt lại
  	Tetrahedral	Tetrahedral
  	Top	Trên
-@@ -2351,7 +2351,7 @@ shape	Appearance	Diện mạo
+@@ -2351,7 +2345,7 @@ shape	Appearance	Diện mạo
  # Phase 5.6 — upstream kys first-launch import prompt
  	Show channels in color	Hiện kênh bằng màu
  	Import keyboard shortcuts?	Nhập phím tắt?
@@ -52539,7 +53129,7 @@ index da058b253928a582043241a658574c176a970d7c..3a40dd15b636c0bf01db1e1902d71627
  	Edit › Keyboard Shortcuts › Reset All to Defaults undoes an import.	Chỉnh sửa › Phím tắt › Đặt lại tất cả về mặc định sẽ hoàn tác lần nhập.
  	Don't Import	Không nhập
  	The keyboard shortcut set was not imported: {error}	Không nhập được bộ phím tắt: {error}
-@@ -2364,7 +2364,7 @@ shape	Appearance	Diện mạo
+@@ -2364,7 +2358,7 @@ shape	Appearance	Diện mạo
  	Next Document	Tài liệu tiếp theo
  	Open EXR Parts…	Mở các phần EXR…
  	Pencil	Bút chì
@@ -52548,7 +53138,7 @@ index da058b253928a582043241a658574c176a970d7c..3a40dd15b636c0bf01db1e1902d71627
  	Previous Document	Tài liệu trước
  	Refine	Tinh chỉnh
  	Remove from Recent	Xóa khỏi Gần đây
-@@ -2552,8 +2552,8 @@ shape	Appearance	Diện mạo
+@@ -2552,8 +2546,8 @@ shape	Appearance	Diện mạo
  	Basic	Cơ bản
  	Brush Preset picker	Bộ chọn cài đặt cọ
  	Native file drag-and-drop is not supported on Wayland yet. Use File › Open, or copy the image in your file manager and paste it with {paste}.	Chưa hỗ trợ kéo-thả tệp gốc trên Wayland. Hãy dùng Tệp › Mở, hoặc sao chép ảnh trong trình quản lý tệp và dán bằng {paste}.
@@ -52559,7 +53149,7 @@ index da058b253928a582043241a658574c176a970d7c..3a40dd15b636c0bf01db1e1902d71627
  	Kerning	Điều chỉnh khoảng cách chữ
  	Layout	Bố cục
  	Metrics	Số đo
-@@ -2582,7 +2582,7 @@ shape	Appearance	Diện mạo
+@@ -2582,7 +2576,7 @@ shape	Appearance	Diện mạo
  	Could not use Puppet Warp: the layer is empty	Không thể dùng Uốn búp bê: lớp rỗng
  	Crosswise	Ngang
  	Current Tool	Công cụ hiện tại
@@ -52568,7 +53158,7 @@ index da058b253928a582043241a658574c176a970d7c..3a40dd15b636c0bf01db1e1902d71627
  	Delete Workspace	Xoá không gian làm việc
  	Document Dimensions	Kích thước tài liệu
  	Document Profile	Hồ sơ tài liệu
-@@ -3602,7 +3602,7 @@ curves	Smooth	Làm mượt
+@@ -3602,7 +3596,7 @@ curves	Smooth	Làm mượt
  	{name} (Photoshop)	{name} (Photoshop)
  	{message} ({note})	{message} ({note})
  @plural	Loaded {n} action from {file}|Loaded {n} actions from {file}	Đã nạp {n} hành động từ {file}
@@ -52578,7 +53168,7 @@ index da058b253928a582043241a658574c176a970d7c..3a40dd15b636c0bf01db1e1902d71627
  @plural	{n} step with no Photoshop equivalent left out|{n} steps with no Photoshop equivalent left out	Đã bỏ qua {n} bước không có chức năng tương ứng trong Photoshop
  
 diff --git a/crates/ui-egui/src/i18n/zh-hans.tsv b/crates/ui-egui/src/i18n/zh-hans.tsv
-index c1fdf833651546c67d02fc15ef624b37857a4c5b..75bcf05d05c7416051445dab64c1d224de80e249 100644
+index c1fdf833651546c67d02fc15ef624b37857a4c5b..c4e68bb2e0af364eae12c8796e745183f2c2037d 100644
 --- a/crates/ui-egui/src/i18n/zh-hans.tsv
 +++ b/crates/ui-egui/src/i18n/zh-hans.tsv
 @@ -5,7 +5,7 @@
@@ -52590,20 +53180,22 @@ index c1fdf833651546c67d02fc15ef624b37857a4c5b..75bcf05d05c7416051445dab64c1d224
  # including the current menus, panels and platform-specific shortcut templates.
  # No proprietary translation resources were consulted or extracted.
  # Licensed MIT OR Apache-2.0, as the code.
-@@ -792,9 +792,9 @@
+@@ -792,11 +792,9 @@
  	Timeline	时间轴
  	Tool Presets	工具预设
  	Tools	工具
 -	About KIO Photo	关于 KIO Photo
 -	KIO Photo Website	KIO Photo 网站
 -	KIO Photo on GitHub	KIO Photo 的 GitHub 页面
+-	ArtCraft Website	ArtCraft 网站
+-	Join the ArtCraft Discord…	加入 ArtCraft 的 Discord 社区…
 +	About Bogo Photo	关于 Bogo Photo
 +	Bogo Photo Website	Bogo Photo 网站
 +	Bogo Photo on GitHub	Bogo Photo 的 GitHub 页面
- 	ArtCraft Website	ArtCraft 网站
- 	Join the ArtCraft Discord…	加入 ArtCraft 的 Discord 社区…
  	Report an Issue…	报告问题…
-@@ -848,7 +848,7 @@
+ 	WIA Support…	WIA 支持…
+ 	Apply	应用
+@@ -848,7 +846,7 @@
  	All Caps	全部大写
  	All Slices	所有切片
  	All User Slices	所有用户切片
@@ -52612,7 +53204,15 @@ index c1fdf833651546c67d02fc15ef624b37857a4c5b..75bcf05d05c7416051445dab64c1d224
  	Alt	Alt
  	Alt-click to define a source point to clone from	按 Alt 单击以定义仿制源点
  	Always use pressure for opacity	始终用压感控制不透明度
-@@ -1100,8 +1100,8 @@
+@@ -1080,7 +1078,6 @@
+ 	Diffusion	扩散
+ 	Discard the embedded profile (don't color manage)	丢弃嵌入的配置文件（不进行色彩管理）
+ 	Discontiguous	不连续
+-	Discord	Discord
+ 	Dismiss	关闭
+ 	Display P3	Display P3
+ 	Display Text	显示文字
+@@ -1100,8 +1097,8 @@
  	Drop an image or PSD anywhere to open it.	将图像或 PSD 拖放到任意位置即可打开。
  	Native file drag-and-drop is unavailable	Wayland 上不支持原生文件拖放
  	Native file drag-and-drop is not supported on Wayland yet. Use File › Open, or copy the image in your file manager and paste it with {paste}.	Wayland 尚不支持原生文件拖放。请使用“文件 › 打开”，或在文件管理器中复制图像后使用 {paste} 粘贴。
@@ -52623,7 +53223,15 @@ index c1fdf833651546c67d02fc15ef624b37857a4c5b..75bcf05d05c7416051445dab64c1d224
  	Edit › Paste	“编辑 › 粘贴”
  	Duplicate Layers…	复制图层…
  	Duplicate style	复制样式
-@@ -1355,9 +1355,9 @@
+@@ -1217,7 +1214,6 @@
+ 	Invert All	全部反相
+ 	Invert has no settings.	反相没有可调整的设置。
+ 	Italic	斜体
+-	Join us on Discord	加入我们的 Discord 社区
+ 	Justify all	全部两端对齐
+ 	Justify last centered	两端对齐，末行居中
+ 	Justify last left	两端对齐，末行左对齐
+@@ -1355,9 +1351,9 @@
  	Perspective Warp is not active	透视变形尚未启用
  	Perspective Warp: draw planes along the image's perspective, then switch to Warp	透视变形：沿图像透视绘制平面，然后切换到变形
  	Photo Filter	照片滤镜
@@ -52636,7 +53244,7 @@ index c1fdf833651546c67d02fc15ef624b37857a4c5b..75bcf05d05c7416051445dab64c1d224
  	Pin Depth:	控制点深度：
  	Pixel Length:	像素长度：
  	Pixels/Centimeter	像素/厘米
-@@ -1433,11 +1433,11 @@
+@@ -1433,11 +1429,11 @@
  	Import Shortcuts…	导入快捷键…
  	Load a keyboard shortcut set saved as .kys	载入保存为 .kys 的键盘快捷键集
  	Imported {n} shortcuts from {file}. Click OK to keep them.	已从 {file} 导入 {n} 个快捷键。点击“确定”保留。
@@ -52650,7 +53258,15 @@ index c1fdf833651546c67d02fc15ef624b37857a4c5b..75bcf05d05c7416051445dab64c1d224
  	Edit › Keyboard Shortcuts › Reset All to Defaults undoes an import.	“编辑 › 键盘快捷键 › 全部重置为默认值”可撤销导入。
  	Don't Import	不导入
  	The keyboard shortcut set was not imported: {error}	未导入键盘快捷键集：{error}
-@@ -1669,7 +1669,7 @@
+@@ -1631,7 +1627,6 @@
+ 	Apple Watch 45mm	Apple Watch 45mm
+ 	Aqua	水绿色
+ 	Art & Illustration	艺术与插画
+-	ArtCraft	ArtCraft
+ 	Background Eraser Tool	背景橡皮擦工具
+ 	Bevel & Emboss	斜面和浮雕
+ 	Blend Mode	混合模式
+@@ -1669,7 +1664,7 @@
  	Current Tool	当前工具
  	Custom Shape Tool	自定形状工具
  	Cyans	青色
@@ -52659,7 +53275,7 @@ index c1fdf833651546c67d02fc15ef624b37857a4c5b..75bcf05d05c7416051445dab64c1d224
  	Delete Workspace	删除工作区
  	Diamond	菱形
  	Dimensions:	尺寸：
-@@ -1781,7 +1781,7 @@
+@@ -1781,7 +1776,7 @@
  	Pen Tool	钢笔工具
  	Convert Point Tool	转换点工具
  	Photo	照片
@@ -52668,7 +53284,7 @@ index c1fdf833651546c67d02fc15ef624b37857a4c5b..75bcf05d05c7416051445dab64c1d224
  	Picas	派卡
  	Pillow Emboss	枕状浮雕
  	Pixel Replacement	像素替换
-@@ -2166,7 +2166,7 @@ cameraRaw	Blending	混合
+@@ -2166,7 +2161,7 @@ cameraRaw	Blending	混合
  	System Info	系统信息
  	More panels	更多面板
  	More documents	更多文档
@@ -52677,7 +53293,7 @@ index c1fdf833651546c67d02fc15ef624b37857a4c5b..75bcf05d05c7416051445dab64c1d224
  	Graphics	图形
  	Reset GPU Backend	重置 GPU 后端
  	Applies at next launch.	下次启动时生效。
-@@ -2284,7 +2284,7 @@ cameraRaw	Blending	混合
+@@ -2284,7 +2279,7 @@ cameraRaw	Blending	混合
  	Automatic uses GPU acceleration when available and falls back to CPU rendering on errors.	自动模式会在可用时使用 GPU 加速，出错时改用 CPU 渲染。
  	Switched to CPU rendering	已切换到 CPU 渲染
  	GPU acceleration could not continue. Your documents are unchanged.	GPU 加速无法继续。您的文档未更改。
@@ -52686,7 +53302,7 @@ index c1fdf833651546c67d02fc15ef624b37857a4c5b..75bcf05d05c7416051445dab64c1d224
  	Retry GPU requires a restart. Save your work first.	重试 GPU 需要重新启动。请先保存您的工作。
  	Keep Using CPU	继续使用 CPU
  	Retry GPU	重试 GPU
-@@ -2495,7 +2495,7 @@ fontWeight	Italic	斜体
+@@ -2495,7 +2490,7 @@ fontWeight	Italic	斜体
  	Color to Alpha…	颜色转为 Alpha…
  	Transparency Threshold	透明度阈值
  	Opacity Threshold	不透明度阈值
@@ -52695,7 +53311,7 @@ index c1fdf833651546c67d02fc15ef624b37857a4c5b..75bcf05d05c7416051445dab64c1d224
  
  	Rasterize svg groups deeper than	栅格化超过此深度的 SVG 组
  	0 turns this threshold off; SVG groups nested deeper than 100 levels are always rasterized.	设为 0 可关闭此阈值；嵌套超过 100 层的 SVG 组始终会被栅格化。
-@@ -2729,7 +2729,7 @@ curves	Smooth	平滑
+@@ -2729,7 +2724,7 @@ curves	Smooth	平滑
  	{name} (Photoshop)	{name}（Photoshop）
  	{message} ({note})	{message}（{note}）
  @plural	Loaded {n} action from {file}|Loaded {n} actions from {file}	已从 {file} 载入 {n} 个动作
@@ -52705,32 +53321,33 @@ index c1fdf833651546c67d02fc15ef624b37857a4c5b..75bcf05d05c7416051445dab64c1d224
  @plural	{n} step with no Photoshop equivalent left out|{n} steps with no Photoshop equivalent left out	已省略 {n} 个没有 Photoshop 对应功能的步骤
  
 diff --git a/crates/ui-egui/src/i18n/zh-hant.tsv b/crates/ui-egui/src/i18n/zh-hant.tsv
-index df677462c26f8321309eb50d736c753d7fce5e51..dc8eea0a827609e35e299ace959090788f192c48 100644
+index df677462c26f8321309eb50d736c753d7fce5e51..b73f90c2ab91da30fdc877948fb7bce5f736c24d 100644
 --- a/crates/ui-egui/src/i18n/zh-hant.tsv
 +++ b/crates/ui-egui/src/i18n/zh-hant.tsv
-@@ -14,7 +14,7 @@
+@@ -14,7 +14,6 @@
  # Clean-room: every entry was written from the plain meaning of the English label using the
  # image-editing vocabulary in everyday use in Taiwan (圖層, 遮色片, 選取範圍, 濾鏡, 色階 ...). No
  # proprietary localisation resource, string table or product UI was consulted or copied; add
 -# entries the same way. Product and technology names (KIO Photo, ArtCraft, OpenType, CMYK, Lab ...)
-+# entries the same way. Product and technology names (Bogo Photo, ArtCraft, OpenType, CMYK, Lab ...)
  # and paper sizes (Legal, Tabloid) stay in Latin letters; the trailing "…" of dialog commands is
  # kept. Full-width punctuation (，。：) inside sentences; half-width parentheses and the " · "
  # separators as in the English.
-@@ -797,9 +797,9 @@
+@@ -797,11 +796,9 @@
  	Timeline	時間軸
  	Tool Presets	工具預設集
  	Tools	工具
 -	About KIO Photo	關於 KIO Photo
 -	KIO Photo Website	KIO Photo 網站
 -	KIO Photo on GitHub	GitHub 上的 KIO Photo
+-	ArtCraft Website	ArtCraft 網站
+-	Join the ArtCraft Discord…	加入 ArtCraft Discord…
 +	About Bogo Photo	關於 Bogo Photo
 +	Bogo Photo Website	Bogo Photo 網站
 +	Bogo Photo on GitHub	GitHub 上的 Bogo Photo
- 	ArtCraft Website	ArtCraft 網站
- 	Join the ArtCraft Discord…	加入 ArtCraft Discord…
  	Report an Issue…	回報問題…
-@@ -852,7 +852,7 @@
+ 	WIA Support…	WIA 支援…
+ 	Apply	套用
+@@ -852,7 +849,7 @@
  	All Caps	全部大寫
  	All Slices	所有切片
  	All User Slices	所有使用者切片
@@ -52739,7 +53356,15 @@ index df677462c26f8321309eb50d736c753d7fce5e51..dc8eea0a827609e35e299ace95909078
  	Alt	Alt
  	Always use pressure for opacity	一律以壓力控制不透明度
  	Always use pressure for size	一律以壓力控制大小
-@@ -1103,8 +1103,8 @@
+@@ -1083,7 +1080,6 @@
+ 	Diffusion	擴散
+ 	Discard the embedded profile (don't color manage)	捨棄嵌入的描述檔 (不進行色彩管理)
+ 	Discontiguous	不連續
+-	Discord	Discord
+ 	Dismiss	關閉
+ 	Display P3	Display P3
+ 	Display Text	顯示文字
+@@ -1103,8 +1099,8 @@
  	Drop an image or PSD anywhere to open it.	將影像或 PSD 拖放到任何位置即可開啟。
  	Native file drag-and-drop is unavailable	Wayland 不支援原生檔案拖放
  	Native file drag-and-drop is not supported on Wayland yet. Use File › Open, or copy the image in your file manager and paste it with {paste}.	Wayland 尚未支援原生檔案拖放。請使用「檔案 › 開啟」，或在檔案管理員中複製影像後使用 {paste} 貼上。
@@ -52750,7 +53375,15 @@ index df677462c26f8321309eb50d736c753d7fce5e51..dc8eea0a827609e35e299ace95909078
  	Edit › Paste	「編輯 › 貼上」
  	Duplicate Layers…	複製圖層…
  	Duplicate style	複製樣式
-@@ -1352,9 +1352,9 @@
+@@ -1218,7 +1214,6 @@
+ 	Invert All	全部反轉
+ 	Invert has no settings.	負片效果沒有設定。
+ 	Italic	斜體
+-	Join us on Discord	加入我們的 Discord
+ 	Justify all	全部齊行
+ 	Justify last centered	最後一行置中齊行
+ 	Justify last left	最後一行靠左齊行
+@@ -1352,9 +1347,9 @@
  	Perspective Warp is not active	透視彎曲未啟用
  	Perspective Warp: draw planes along the image's perspective, then switch to Warp	透視彎曲：沿影像透視繪製平面，然後切換到彎曲
  	Photo Filter	相片濾鏡
@@ -52763,7 +53396,7 @@ index df677462c26f8321309eb50d736c753d7fce5e51..dc8eea0a827609e35e299ace95909078
  	Pin Depth:	圖釘深度：
  	Pixel Length:	像素長度：
  	Pixels/Centimeter	像素/公分
-@@ -1430,11 +1430,11 @@
+@@ -1430,11 +1425,11 @@
  	Import Shortcuts…	匯入快速鍵…
  	Load a keyboard shortcut set saved as .kys	載入儲存為 .kys 的鍵盤快速鍵集
  	Imported {n} shortcuts from {file}. Click OK to keep them.	已從 {file} 匯入 {n} 個快速鍵。按一下「確定」即可保留。
@@ -52777,7 +53410,15 @@ index df677462c26f8321309eb50d736c753d7fce5e51..dc8eea0a827609e35e299ace95909078
  	Edit › Keyboard Shortcuts › Reset All to Defaults undoes an import.	「編輯 › 鍵盤快速鍵 › 全部重設為預設值」可復原匯入。
  	Don't Import	不匯入
  	The keyboard shortcut set was not imported: {error}	未匯入鍵盤快速鍵集：{error}
-@@ -1663,7 +1663,7 @@
+@@ -1625,7 +1620,6 @@
+ 	Apple Watch 45mm	Apple Watch 45mm
+ 	Aqua	水藍色
+ 	Art & Illustration	藝術與插畫
+-	ArtCraft	ArtCraft
+ 	Background Eraser Tool	背景橡皮擦工具
+ 	Bevel & Emboss	斜角和浮雕
+ 	Blend Mode	混合模式
+@@ -1663,7 +1657,7 @@
  	Current Tool	目前工具
  	Custom Shape Tool	自訂形狀工具
  	Cyans	青色系
@@ -52786,7 +53427,7 @@ index df677462c26f8321309eb50d736c753d7fce5e51..dc8eea0a827609e35e299ace95909078
  	Delete Workspace	刪除工作區
  	Diamond	菱形
  	Dimensions:	尺寸：
-@@ -1774,7 +1774,7 @@
+@@ -1774,7 +1768,7 @@
  	Pen Tool	筆型工具
  	Convert Point Tool	轉換錨點工具
  	Photo	相片
@@ -52795,7 +53436,7 @@ index df677462c26f8321309eb50d736c753d7fce5e51..dc8eea0a827609e35e299ace95909078
  	Picas	派卡
  	Pillow Emboss	枕狀浮雕
  	Pixel Replacement	像素取代
-@@ -2102,7 +2102,7 @@
+@@ -2102,7 +2096,7 @@
  	System Info	系統資訊
  	More panels	更多面板
  	More documents	更多文件
@@ -52804,7 +53445,7 @@ index df677462c26f8321309eb50d736c753d7fce5e51..dc8eea0a827609e35e299ace95909078
  	Graphics	圖形
  	Reset GPU Backend	重設 GPU 後端
  	Applies at next launch.	下次啟動時套用。
-@@ -2227,7 +2227,7 @@
+@@ -2227,7 +2221,7 @@
  	Automatic uses GPU acceleration when available and falls back to CPU rendering on errors.	自動模式會在可用時使用 GPU 加速，發生錯誤時改用 CPU 渲染。
  	Switched to CPU rendering	已改用 CPU 渲染
  	GPU acceleration could not continue. Your documents are unchanged.	GPU 加速無法繼續。您的文件未變更。
@@ -52813,7 +53454,7 @@ index df677462c26f8321309eb50d736c753d7fce5e51..dc8eea0a827609e35e299ace95909078
  	Retry GPU requires a restart. Save your work first.	重試 GPU 需要重新啟動。請先儲存您的工作。
  	Keep Using CPU	繼續使用 CPU
  	Retry GPU	重試 GPU
-@@ -2465,7 +2465,7 @@ fontWeight	Italic	斜體
+@@ -2465,7 +2459,7 @@ fontWeight	Italic	斜體
  	Color to Alpha…	顏色轉為 Alpha…
  	Transparency Threshold	透明度臨界值
  	Opacity Threshold	不透明度臨界值
@@ -52822,7 +53463,7 @@ index df677462c26f8321309eb50d736c753d7fce5e51..dc8eea0a827609e35e299ace95909078
  
  	Rasterize svg groups deeper than	點陣化超過此深度的 SVG 群組
  	0 turns this threshold off; SVG groups nested deeper than 100 levels are always rasterized.	設為 0 可關閉此臨界值；巢狀超過 100 層的 SVG 群組一律會點陣化。
-@@ -2714,7 +2714,7 @@ curves	Smooth	平滑
+@@ -2714,7 +2708,7 @@ curves	Smooth	平滑
  	{name} (Photoshop)	{name}（Photoshop）
  	{message} ({note})	{message}（{note}）
  @plural	Loaded {n} action from {file}|Loaded {n} actions from {file}	已從 {file} 載入 {n} 個動作
@@ -52889,53 +53530,184 @@ index 60ae208808dc2297eb2f2d4706cc90d19dde6f14..2a96cc5d3fc35ff266b6dac21478180c
      assert_eq!(field(&h, "messageWarning"), json!(false), "an import clears the earlier shortcut conflict warning");
      // Nothing is applied until OK.
 diff --git a/crates/ui-egui/src/links.rs b/crates/ui-egui/src/links.rs
-index a318e1a29cd65e3c9c2d49e3606df7241ca35b7b..763029c1b7bd228889d3eb95762fa8e6afc9d7d8 100644
+index a318e1a29cd65e3c9c2d49e3606df7241ca35b7b..06e48d1d59c1d6632c906611e81470e601274999 100644
 --- a/crates/ui-egui/src/links.rs
 +++ b/crates/ui-egui/src/links.rs
-@@ -41,11 +41,11 @@ pub fn discord_button(app: &mut PhotocraftApp, ui: &mut egui::Ui, min_width: f32
-     r
+@@ -1,27 +1,14 @@
+-//! Community and project links: the Help menu, the About dialog, the start screen and the title
+-//! bar all open these. URLs follow the crafting-app pattern (`getartcraft.com/apps/<app>`,
+-//! `github.com/storytold/<app>`).
+-
+-use serde_json::{Value, json};
++//! General document-link browser service. Product promotions are not registered.
+ 
+ use crate::PhotocraftApp;
++use serde_json::{Value, json};
+ 
+-pub const DISCORD: &str = "https://discord.gg/artcraft";
+-pub const ARTCRAFT_WEBSITE: &str = "https://getartcraft.com";
+-pub const APP_PAGE: &str = "https://getartcraft.com/apps/photocraft";
+-pub const GITHUB: &str = "https://github.com/storytold/photocraft";
+-pub const ISSUES: &str = "https://github.com/storytold/photocraft/issues";
+-
+-/// Help-menu link commands: (id, url). Labels live in `menus::UI_COMMANDS`.
+-pub const COMMANDS: &[(&str, &str)] =
+-    &[("help.discord", DISCORD), ("help.website", APP_PAGE), ("help.artcraftWebsite", ARTCRAFT_WEBSITE), ("help.github", GITHUB), ("help.reportIssue", ISSUES)];
++pub const COMMANDS: &[(&str, &str)] = &[];
+ 
+-pub fn url_for(id: &str) -> Option<&'static str> {
+-    COMMANDS.iter().find(|c| c.0 == id).map(|c| c.1)
++pub fn url_for(_id: &str) -> Option<&'static str> {
++    None
  }
  
+-/// Open `url` in the system browser (a new tab on the web) and note it in the status bar. Prefers
+-/// the platform `open_url` service (reliable on Windows/macOS/Linux); falls back to `ctx.open_url`.
+ pub fn open(app: &mut PhotocraftApp, ctx: &egui::Context, url: &str) -> Value {
+     let opened = app.services.open_url.as_ref().map(|f| f(url).is_ok()).unwrap_or(false);
+     if !opened {
+@@ -32,94 +19,41 @@ pub fn open(app: &mut PhotocraftApp, ctx: &egui::Context, url: &str) -> Value {
+     json!({"url": url})
+ }
+ 
+-/// The prominent "Join us on Discord" button.
+-pub fn discord_button(app: &mut PhotocraftApp, ui: &mut egui::Ui, min_width: f32) -> egui::Response {
+-    let r = crate::widgets::primary_button(ui, tl!("Join us on Discord"), min_width).on_hover_text(DISCORD);
+-    if r.clicked() {
+-        open(app, ui.ctx(), DISCORD);
+-    }
+-    r
+-}
+-
 -/// "KIO Photo website · GitHub · ArtCraft" as links, centred. Clicks route through [`open`] (the
-+/// "Bogo Photo website · GitHub · ArtCraft" as links, centred. Clicks route through [`open`] (the
- /// platform browser service) rather than `ui.hyperlink_to`, which uses the unreliable `ctx.open_url`.
- pub fn link_row(app: &mut PhotocraftApp, ui: &mut egui::Ui) {
-     let t = crate::theme::Tokens::get(ui.ctx());
+-/// platform browser service) rather than `ui.hyperlink_to`, which uses the unreliable `ctx.open_url`.
+-pub fn link_row(app: &mut PhotocraftApp, ui: &mut egui::Ui) {
+-    let t = crate::theme::Tokens::get(ui.ctx());
 -    let links = [(tl!("KIO Photo website"), APP_PAGE), (tl!("GitHub"), GITHUB), (tl!("ArtCraft"), ARTCRAFT_WEBSITE)];
-+    let links = [(tl!("Bogo Photo website"), APP_PAGE), (tl!("GitHub"), GITHUB), (tl!("ArtCraft"), ARTCRAFT_WEBSITE)];
-     let font = egui::FontId::proportional(12.5);
-     let sep = "  ·  ";
-     let width: f32 = links.iter().map(|(l, _)| ui.painter().layout_no_wrap((*l).into(), font.clone(), t.text).size().x).sum::<f32>()
-@@ -58,7 +58,7 @@ pub fn link_row(app: &mut PhotocraftApp, ui: &mut egui::Ui) {
-             if i > 0 {
-                 ui.label(egui::RichText::new(sep).font(font.clone()).color(t.text_faint));
-             }
+-    let font = egui::FontId::proportional(12.5);
+-    let sep = "  ·  ";
+-    let width: f32 = links.iter().map(|(l, _)| ui.painter().layout_no_wrap((*l).into(), font.clone(), t.text).size().x).sum::<f32>()
+-        + 2.0 * ui.painter().layout_no_wrap(sep.into(), font.clone(), t.text).size().x;
+-    let mut clicked: Option<&str> = None;
+-    ui.horizontal(|ui| {
+-        ui.spacing_mut().item_spacing.x = 0.0;
+-        ui.add_space(((ui.available_width() - width) / 2.0).max(0.0));
+-        for (i, (label, url)) in links.iter().enumerate() {
+-            if i > 0 {
+-                ui.label(egui::RichText::new(sep).font(font.clone()).color(t.text_faint));
+-            }
 -            if ui.link(egui::RichText::new(*label).font(font.clone()).color(t.accent)).on_hover_text(*url).clicked() {
-+            if ui.link(egui::RichText::new(*label).font(font.clone()).color(t.text)).on_hover_text(*url).clicked() {
-                 clicked = Some(url);
-             }
+-                clicked = Some(url);
+-            }
+-        }
+-    });
+-    if let Some(url) = clicked {
+-        open(app, ui.ctx(), url);
+-    }
+-}
+-
+ #[cfg(test)]
+ mod tests {
+     use super::*;
+ 
+     #[test]
+-    fn links_open_through_the_platform_service() {
+-        // Issue #14: links (Help menu, Discord button, start-page links) must open in the browser.
+-        // They route through the `open_url` service rather than the unreliable `ctx.open_url`.
++    fn ordinary_document_links_keep_the_platform_browser_service() {
+         use std::sync::{Arc, Mutex};
+-        let opened: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(Vec::new()));
+-        let rec = opened.clone();
++        let opened = Arc::new(Mutex::new(Vec::<String>::new()));
++        let record = opened.clone();
+         let services = crate::Services {
+-            open_url: Some(Box::new(move |u: &str| {
+-                rec.lock().unwrap().push(u.to_string());
++            open_url: Some(Box::new(move |url: &str| {
++                record.lock().unwrap().push(url.to_string());
+                 Ok(())
+             })),
+             ..Default::default()
+         };
+         let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), services);
+         let ctx = egui::Context::default();
+-        // Every Help-menu link id reaches the service with its URL.
+-        for (id, url) in COMMANDS {
+-            crate::menus::invoke(&mut app, &ctx, id, json!({})).unwrap();
+-            assert_eq!(opened.lock().unwrap().last().map(String::as_str), Some(*url), "{id}");
+-        }
+-        // The direct open() helper (Discord button / start-page links) also uses it.
+-        open(&mut app, &ctx, DISCORD);
+-        assert_eq!(opened.lock().unwrap().last().map(String::as_str), Some(DISCORD));
+-    }
+-
+-    #[test]
+-    fn help_menu_lists_links_then_separator_then_system_info_and_about() {
+-        let app = PhotocraftApp::new(photocraft_engine::Session::new(), Default::default());
+-        let help: Vec<String> = crate::menus::menu_items(&app).into_iter().filter(|i| i.path == ["Help"]).map(|i| i.id).collect();
+-        assert_eq!(help, ["help.discord", "help.website", "help.artcraftWebsite", "help.github", "help.reportIssue", "---", "help.systemInfo", "help.about"]);
+-        for (id, _) in COMMANDS {
+-            assert!(crate::menus::is_live(id) && crate::menus::is_enabled(&app, id), "{id}");
+-        }
++        let target = "https://example.invalid/qa-document-link";
++        assert_eq!(open(&mut app, &ctx, target)["url"], target);
++        assert_eq!(*opened.lock().unwrap(), [target]);
+     }
+ 
+     #[test]
+-    fn link_commands_open_their_urls() {
++    fn only_functional_help_items_remain_and_retired_actions_are_absent() {
+         let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), Default::default());
+         let ctx = egui::Context::default();
+-        for (id, url) in [
+-            ("help.discord", "https://discord.gg/artcraft"),
+-            ("help.website", "https://getartcraft.com/apps/photocraft"),
+-            ("help.github", "https://github.com/storytold/photocraft"),
+-        ] {
+-            let r = crate::menus::invoke(&mut app, &ctx, id, serde_json::json!({})).unwrap();
+-            assert_eq!(r["url"], url);
+-            assert_eq!(app.ui.status, format!("Opened {url}"));
++        let help: Vec<String> =
++            crate::menus::menu_items(&app).into_iter().filter(|item| item.path == ["Help"] && item.id != "---").map(|item| item.id).collect();
++        assert_eq!(help, ["help.systemInfo", "help.about"]);
++        assert!(COMMANDS.is_empty());
++        for id in ["help.discord", "help.website", "help.artcraftWebsite", "help.github", "help.reportIssue"] {
++            assert_eq!(url_for(id), None);
++            assert!(!crate::menus::is_live(id), "{id}");
++            assert!(crate::menus::invoke(&mut app, &ctx, id, json!({})).is_err(), "{id}");
          }
+     }
+ }
 diff --git a/crates/ui-egui/src/menus.rs b/crates/ui-egui/src/menus.rs
-index b80bdd495381bbb9a755a85e42ac49c60be203b5..bd0c20af888816444c9fea2181dabfce67ccf1c3 100644
+index b80bdd495381bbb9a755a85e42ac49c60be203b5..8441c07b3db42f38c3e93d3fb3bb1e1f02c5addf 100644
 --- a/crates/ui-egui/src/menus.rs
 +++ b/crates/ui-egui/src/menus.rs
-@@ -94,12 +94,12 @@ pub const UI_COMMANDS: &[(&str, &str, &[&str], Option<&str>)] = &[
+@@ -93,13 +93,8 @@ pub const UI_COMMANDS: &[(&str, &str, &[&str], Option<&str>)] = &[
+     ("window.theme.softDark", "Soft Dark Theme", &["Window", "Theme"], None),
      ("window.theme.system", "Sync with system", &["Window", "Theme"], None),
      ("edit.search", "Search…", &["Edit"], Some("Cmd+F")),
-     ("help.discord", "Join the ArtCraft Discord…", &["Help"], None),
+-    ("help.discord", "Join the ArtCraft Discord…", &["Help"], None),
 -    ("help.website", "KIO Photo Website", &["Help"], None),
-+    ("help.website", "Bogo Photo Website", &["Help"], None),
-     ("help.artcraftWebsite", "ArtCraft Website", &["Help"], None),
+-    ("help.artcraftWebsite", "ArtCraft Website", &["Help"], None),
 -    ("help.github", "KIO Photo on GitHub", &["Help"], None),
-+    ("help.github", "Bogo Photo on GitHub", &["Help"], None),
-     ("help.reportIssue", "Report an Issue…", &["Help"], None),
+-    ("help.reportIssue", "Report an Issue…", &["Help"], None),
      ("help.systemInfo", "System Info…", &["Help"], None),
 -    ("help.about", "About KIO Photo", &["Help"], None),
 +    ("help.about", "About Bogo Photo", &["Help"], None),
  ];
  
  /// Window › <document>: the open documents, listed at the end of the Window menu as in Photoshop.
-@@ -1852,7 +1852,7 @@ mod tests {
+@@ -190,9 +185,6 @@ pub(crate) fn invoke_unguarded(app: &mut PhotocraftApp, ctx: &egui::Context, id:
+         return result;
+     }
+     // Help › Discord, website, GitHub, Report an Issue.
+-    if let Some(url) = crate::links::url_for(id) {
+-        return Ok(crate::links::open(app, ctx, url));
+-    }
+     if id == "view.proofSetup.custom" {
+         return Ok(json!({"dialog": crate::filter_dialog::open(app, "view.proofSetup")}));
+     }
+@@ -1852,7 +1844,7 @@ mod tests {
                  }
                  h.run_steps(3);
              };
@@ -53043,7 +53815,7 @@ index 121c367a72b2b210892e0b52b84ef309e7bcbeb6..242ba8c415dc582c89c3b5ec8f9aa020
      let id = post(app, "Native file drag-and-drop is unavailable", lines, false, Some(WAYLAND_FILE_DROP_DISMISSED));
      if let Some(notice) = app.ui.notices.iter_mut().find(|notice| notice.id == id) {
 diff --git a/crates/ui-egui/src/panels.rs b/crates/ui-egui/src/panels.rs
-index 51cc8f109135a920b10b42aa78d8d0743b0195a1..e687272787273a3cb47cee27dc3e9b86839c28c8 100644
+index 51cc8f109135a920b10b42aa78d8d0743b0195a1..eda81f88a60b39c98090dc530d540898cb90b46f 100644
 --- a/crates/ui-egui/src/panels.rs
 +++ b/crates/ui-egui/src/panels.rs
 @@ -596,7 +596,7 @@ pub fn title_bar(app: &mut PhotocraftApp, ui: &mut egui::Ui) {
@@ -53055,7 +53827,31 @@ index 51cc8f109135a920b10b42aa78d8d0743b0195a1..e687272787273a3cb47cee27dc3e9b86
              // The menus and the far-end controls are laid out first; the title is centred in
              // whatever room is left between them (`free`, left to right: menus then controls, or
              // controls then menus in a right-to-left UI), shortened or dropped rather than drawn
-@@ -740,7 +740,7 @@ pub fn system_title_bar(app: &PhotocraftApp) -> bool {
+@@ -682,23 +682,6 @@ pub fn title_bar(app: &mut PhotocraftApp, ui: &mut egui::Ui) {
+                     }
+                     // The community Discord, one click away while the bar has room for it
+                     // (narrow windows drop it first; it is also Help › Discord).
+-                    if ui.available_width() >= DISCORD_ROOM {
+-                        let discord = egui::Button::image_and_text(
+-                            icons::image("message-square", 14.0, t.text_dim),
+-                            egui::RichText::new(tl!("Discord")).color(t.text_dim).size(12.0),
+-                        )
+-                        .frame(false);
+-                        if ui
+-                            .add(discord)
+-                            .on_hover_text({
+-                                let template = "Join the ArtCraft Discord ({url})";
+-                                crate::i18n::fmt(tl!(template), &[("url", crate::links::DISCORD)])
+-                            })
+-                            .clicked()
+-                        {
+-                            crate::links::open(app, ui.ctx(), crate::links::DISCORD);
+-                        }
+-                    }
+                     if rtl { ui.min_rect().right() } else { ui.min_rect().left() }
+                 };
+                 free = if rtl { (controls_end, menus_end) } else { (menus_end, controls_end) };
+@@ -740,7 +723,7 @@ pub fn system_title_bar(app: &PhotocraftApp) -> bool {
  /// marks unsaved changes, like the `•` in the app-drawn title), or just the app name with no
  /// document open.
  pub fn window_title(app: &PhotocraftApp) -> String {
@@ -53064,7 +53860,15 @@ index 51cc8f109135a920b10b42aa78d8d0743b0195a1..e687272787273a3cb47cee27dc3e9b86
  }
  
  /// Keep the OS window title (and the taskbar / Alt-Tab entry) on the active file. Sends
-@@ -817,19 +817,19 @@ mod title_tests {
+@@ -756,7 +739,6 @@ pub fn sync_window_title(app: &mut PhotocraftApp, ctx: &egui::Context) {
+ /// Minimum space kept between the window title and the menus or controls beside it.
+ const TITLE_GAP: f32 = 16.0;
+ /// Free room the title bar needs after its other controls to show the Discord button.
+-const DISCORD_ROOM: f32 = 120.0;
+ /// The workspace switcher's narrowest width, and one 28 pt title-bar icon with its spacing.
+ const WORKSPACE_MIN: f32 = 90.0;
+ const ICON_SLOT: f32 = 34.0;
+@@ -817,19 +799,19 @@ mod title_tests {
  
      #[test]
      fn window_title_with_no_document_is_the_app_name() {
@@ -53087,7 +53891,7 @@ index 51cc8f109135a920b10b42aa78d8d0743b0195a1..e687272787273a3cb47cee27dc3e9b86
      }
  
      #[test]
-@@ -867,11 +867,11 @@ mod title_tests {
+@@ -867,11 +849,11 @@ mod title_tests {
          let ctx = egui::Context::default();
          crate::PhotocraftApp::setup_context(&ctx, crate::theme::ThemeKind::ALL[0]);
          super::sync_window_title(&mut app, &ctx);
@@ -53101,7 +53905,7 @@ index 51cc8f109135a920b10b42aa78d8d0743b0195a1..e687272787273a3cb47cee27dc3e9b86
          // Same document state again: the cached title stops a repeat command.
          super::sync_window_title(&mut app, &ctx);
          let mut out = ctx.run_ui(egui::RawInput::default(), |_| {});
-@@ -880,7 +880,7 @@ mod title_tests {
+@@ -880,7 +862,7 @@ mod title_tests {
          assert!(!cmds.iter().any(|c| matches!(c, egui::ViewportCommand::Title(_))), "repeat Title: {cmds:?}");
          open_named(&mut app, "foo.psd");
          super::sync_window_title(&mut app, &ctx);
@@ -54000,6 +54804,19 @@ index 97d5a6f0b8160907a4462fb3a1aaabd3abcedbc6..fc8ebdb6a4f69de6b7d31e6f2560f80c
                  assert!((w - scaled).abs() < 1.0, "{w} vs {scaled}");
              })
              .textures_delta
+diff --git a/crates/ui-egui/src/titlebar.rs b/crates/ui-egui/src/titlebar.rs
+index c45baa2f0d226756a00f100977308c3970455ba1..b614a30c53f3f7aa8d165073f54f4e95c03d3dd2 100644
+--- a/crates/ui-egui/src/titlebar.rs
++++ b/crates/ui-egui/src/titlebar.rs
+@@ -659,7 +659,7 @@ mod tests {
+             }
+             // Wide windows show the whole group; the narrowest drops Discord (also Help › Discord).
+             let has_discord = texts(&out).iter().any(|(t, _)| t == "Discord");
+-            assert_eq!(has_discord, width > 1000.0, "Discord at {width}");
++            assert!(!has_discord, "retired promotion at {width}");
+         }
+     }
+ 
 diff --git a/crates/ui-egui/src/tool_cursor.rs b/crates/ui-egui/src/tool_cursor.rs
 index 3d9f4473b13f92b1d3f2161dd5b1e39908b28201..133e25d5726cd0bdd592ffe91823e045ce2f56ec 100644
 --- a/crates/ui-egui/src/tool_cursor.rs

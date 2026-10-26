@@ -1,3 +1,21 @@
+diff --git a/apps/designcraft-cli/src/main.rs b/apps/designcraft-cli/src/main.rs
+index dd62cd91de3bd71d15c34c5955c9e0d65de84c34..b7a4b49361cf2f967f554cb047f2052eeb02f83e 100644
+--- a/apps/designcraft-cli/src/main.rs
++++ b/apps/designcraft-cli/src/main.rs
+@@ -71,12 +71,7 @@ non-zero exit when a step fails."#;
+ 
+ /// The links line under the usage block.
+ fn usage_footer() -> String {
+-    format!(
+-        "\nCommunity: {}  ·  {}  ·  {}",
+-        designcraft_engine::links::DISCORD,
+-        designcraft_engine::links::APP_PAGE,
+-        designcraft_engine::links::GITHUB
+-    )
++    String::new()
+ }
+ 
+ /// stdout went away. A reader that stopped early (a closed pipe) ends the program quietly, as
 diff --git a/apps/designcraft-web/index.html b/apps/designcraft-web/index.html
 index 9fa4d1a47bbca8dcd66855a69d63dfc3679ca9a2..927dd15a4bbdb3d02d65b3f61883bc0af3cc36b8 100644
 --- a/apps/designcraft-web/index.html
@@ -78,10 +96,10 @@ index 5b3981a9e64a063e35bdabe6320be9c75bbdbf6a..28e7ae6aa82afebbe03182e0988298ba
          Box::new(move |cc| {
              let mut gpu = gpu;
 diff --git a/apps/designcraft/src/native_menu.rs b/apps/designcraft/src/native_menu.rs
-index 37c1ecbd5762b28d9349b2c1059f18981864a5f0..d0a0d2be8849edbff2e0d7c4633dd59460341dd4 100644
+index 37c1ecbd5762b28d9349b2c1059f18981864a5f0..2c065a09b4ea70d8bfa2ec94ffdadcebcf849a7e 100644
 --- a/apps/designcraft/src/native_menu.rs
 +++ b/apps/designcraft/src/native_menu.rs
-@@ -36,12 +36,12 @@ impl NativeMenu {
+@@ -36,15 +36,13 @@ impl NativeMenu {
          let mut items = HashMap::new();
          let mut counter = 0usize;
          // Application menu.
@@ -89,14 +107,25 @@ index 37c1ecbd5762b28d9349b2c1059f18981864a5f0..d0a0d2be8849edbff2e0d7c4633dd594
 +        let app_menu = Submenu::new("Bogo Design", true);
          // Our own About splash (with the community links) instead of the stock panel.
 -        let about = MenuItem::with_id("dc-about", "About KIO Design", true, None);
+-        let discord = MenuItem::with_id("dc-discord", "Join the ArtCraft Discord…", true, None);
 +        let about = MenuItem::with_id("dc-about", "About Bogo Design", true, None);
-         let discord = MenuItem::with_id("dc-discord", "Join the ArtCraft Discord…", true, None);
          // Not the predefined Quit: it terminates the app at once, past the unsaved-changes prompt.
 -        let quit = MenuItem::with_id("dc-quit", designcraft_ui_egui::i18n::tr(&app.ui.language, "Quit KIO Design"), true, accel("Cmd+Q"));
 +        let quit = MenuItem::with_id("dc-quit", designcraft_ui_egui::i18n::tr(&app.ui.language, "Quit Bogo Design"), true, accel("Cmd+Q"));
          let _ = app_menu.append_items(&[
              &about,
-             &discord,
+-            &discord,
+             &PredefinedMenuItem::separator(),
+             &PredefinedMenuItem::services(None),
+             &PredefinedMenuItem::separator(),
+@@ -55,7 +53,6 @@ impl NativeMenu {
+             &quit,
+         ]);
+         items.insert("dc-about".into(), ("help.about".into(), serde_json::Value::Null, Handle::Plain(about)));
+-        items.insert("dc-discord".into(), ("help.discord".into(), serde_json::Value::Null, Handle::Plain(discord)));
+         items.insert("dc-quit".into(), ("app.quit".into(), serde_json::Value::Null, Handle::Plain(quit)));
+         let _ = menu.append(&app_menu);
+         for (title, entries) in menus::menu_tree() {
 diff --git a/assets/app-icon/BOGO-ICON-SOURCE.txt b/assets/app-icon/BOGO-ICON-SOURCE.txt
 new file mode 100644
 index 0000000000000000000000000000000000000000..ba528c1dce9d7858c84e02495921b6c1f26871c1
@@ -52375,19 +52404,151 @@ zapeVIL@AYVPe*o}iqK_$A0Rjbdw7$oFN+Mrk#2Q}p;txy<Uh8&fI7lN7@*drP|@S{
 z-Spfe)7DC~buIK(=-W9P#z=bVGs6*!X5fI0bv!o_8~7J>#EYNB7UB1WhWBZ#Z~lM!
 j`hWBP3Iuu^LLZpP0n;xX=2j8_k3(HWN4Zkb`s@DyonCZ|
 
+diff --git a/crates/engine/src/cmd/inspect.rs b/crates/engine/src/cmd/inspect.rs
+index f3c2733684cf2439547cc8de1864b4064514e5af..f075e4d3535d233999b546213bb4b5391379fbb1 100644
+--- a/crates/engine/src/cmd/inspect.rs
++++ b/crates/engine/src/cmd/inspect.rs
+@@ -9,8 +9,6 @@ use crate::{Result, Session};
+ pub fn specs() -> Vec<CommandSpec> {
+     vec![
+         cmd!(query "document.inspect", "Inspect Document", [], None, "{} → pages, spreads, items, stories (with overset), styles, swatches, selection", has_doc, inspect),
+-        cmd!(query "app.links", "Community & Project Links", [], None,
+-            "{} → {discord, website, appPage, github, issues} (ArtCraft Discord, website, DesignCraft page and repository)", always, |_, _| Ok(crate::links::all())),
+         cmd!(query "document.list", "List Documents", [], None, "{}", always, |s, _| {
+             Ok(json!(s.documents().iter().enumerate().map(|(i, d)| json!({"index": i, "title": d.title(), "dirty": d.is_dirty(), "active": Some(i) == s.active_index()})).collect::<Vec<_>>()))
+         }),
+diff --git a/crates/engine/src/links.rs b/crates/engine/src/links.rs
+index ead5bd6a4c953b4cf1d9ae2a04af660bb606897b..fc347ba894c03afa92a0c46f8c7dacb9427bc7de 100644
+--- a/crates/engine/src/links.rs
++++ b/crates/engine/src/links.rs
+@@ -1,41 +1,13 @@
+-//! ArtCraft community and project links (Help menu, About, start screen, CLI, MCP).
++//! Retired promotional registry. General document links are handled elsewhere.
+ 
+ use serde_json::{Value, json};
+ 
+-/// The app's slug on getartcraft.com and GitHub.
+-pub const APP: &str = "designcraft";
+-/// The ArtCraft community Discord.
+-pub const DISCORD: &str = "https://discord.gg/artcraft";
+-/// The ArtCraft website.
+-pub const WEBSITE: &str = "https://getartcraft.com";
+-/// DesignCraft's page on the ArtCraft website.
+-pub const APP_PAGE: &str = "https://getartcraft.com/apps/designcraft";
+-/// DesignCraft's source repository.
+-pub const GITHUB: &str = "https://github.com/storytold/designcraft";
+-/// Where to report bugs and request features.
+-pub const ISSUES: &str = "https://github.com/storytold/designcraft/issues";
+-
+-/// All links as JSON (the `app.links` command).
+ pub fn all() -> Value {
+-    json!({
+-        "discord": DISCORD,
+-        "website": WEBSITE,
+-        "appPage": APP_PAGE,
+-        "github": GITHUB,
+-        "issues": ISSUES,
+-    })
++    json!({})
+ }
+ 
+-/// A link by key (`discord`, `website`, `appPage`, `github`, `issues`).
+-pub fn get(key: &str) -> Option<&'static str> {
+-    Some(match key {
+-        "discord" => DISCORD,
+-        "website" => WEBSITE,
+-        "appPage" => APP_PAGE,
+-        "github" => GITHUB,
+-        "issues" => ISSUES,
+-        _ => return None,
+-    })
++pub fn get(_key: &str) -> Option<&'static str> {
++    None
+ }
+ 
+ #[cfg(test)]
+@@ -43,13 +15,10 @@ mod tests {
+     use super::*;
+ 
+     #[test]
+-    fn links_follow_the_app_slug() {
+-        assert!(APP_PAGE.ends_with(&format!("/apps/{APP}")));
+-        assert!(GITHUB.ends_with(&format!("/storytold/{APP}")));
+-        assert!(ISSUES.starts_with(GITHUB));
+-        for k in ["discord", "website", "appPage", "github", "issues"] {
+-            assert!(get(k).is_some_and(|u| u.starts_with("https://")), "{k}");
+-            assert_eq!(all()[k], get(k).unwrap());
++    fn retired_promotions_have_no_registered_urls() {
++        assert!(all().as_object().unwrap().is_empty());
++        for key in ["discord", "website", "appPage", "github", "issues"] {
++            assert_eq!(get(key), None);
+         }
+     }
+ }
+diff --git a/crates/mcp/src/server.rs b/crates/mcp/src/server.rs
+index cd7bffda4d069fb614c571fe68f88dde4eeddbbd..6e6647dde9680dcbdd2ef8cb09bfd62d01616bcb 100644
+--- a/crates/mcp/src/server.rs
++++ b/crates/mcp/src/server.rs
+@@ -18,7 +18,7 @@ const INVALID_PARAMS: i64 = -32602;
+ const INTERNAL_ERROR: i64 = -32603;
+ const RESOURCE_NOT_FOUND: i64 = -32002;
+ 
+-const INSTRUCTIONS: &str = "DesignCraft is a page-layout app (an InDesign clone). Coordinates are points in spread \
++const INSTRUCTIONS: &str = "Bogo Design is a page-layout app (an InDesign clone). Coordinates are points in spread \
+ space (y down; on a single-page spread the page's top-left is (0,0); a default Letter page is 612×792). Every action \
+ is a command: find ids and parameters with list_commands and run them with execute (or several with batch). Typical \
+ flow: new_document → execute frame.create {rect:[x0,y0,x1,y1], content:\"text\", text:\"…\"} → set_story_text / \
+@@ -134,13 +134,10 @@ impl Server {
+                 Ok(json!({
+                     "protocolVersion": version,
+                     "capabilities": {"tools": {}, "resources": {}},
+-                    "serverInfo": {"name": "designcraft", "title": "DesignCraft", "version": env!("CARGO_PKG_VERSION"), "websiteUrl": designcraft_engine::links::APP_PAGE},
++                    "serverInfo": {"name": "designcraft", "title": "Bogo Design", "version": env!("CARGO_PKG_VERSION")},
+                     "instructions": format!(
+-                        "{INSTRUCTIONS} Backend: {}. Community: {} (Discord), {} (app page), {} (source). The `app.links` command returns these links.",
+-                        self.backend.describe(),
+-                        designcraft_engine::links::DISCORD,
+-                        designcraft_engine::links::APP_PAGE,
+-                        designcraft_engine::links::GITHUB
++                        "{INSTRUCTIONS} Backend: {}.",
++                        self.backend.describe()
+                     ),
+                 }))
+             }
 diff --git a/crates/ui-egui/src/about.rs b/crates/ui-egui/src/about.rs
-index f6692c773c516d65fcac876134d6440c6832daf6..3e7a686de67eae0ebd5824595d266df63598aede 100644
+index f6692c773c516d65fcac876134d6440c6832daf6..270210d40ede47ca5aa37e63596425e4ba558866 100644
 --- a/crates/ui-egui/src/about.rs
 +++ b/crates/ui-egui/src/about.rs
-@@ -14,7 +14,6 @@ pub const BRAND: Color32 = Color32::from_rgb(0x4e, 0x7b, 0xfb);
- /// Discord's brand colour, used for the "Join our Discord" buttons (colour only; no Discord artwork).
- pub const DISCORD: Color32 = Color32::from_rgb(0x58, 0x65, 0xf2);
+@@ -2,9 +2,7 @@
+ //! ArtCraft mark, version, and community links (Discord first and largest), plus the other ArtCraft
+ //! apps; Contributors and Models are the compiled-in credits (`crate::credits`).
  
+-use designcraft_engine::links;
+ use egui::{Color32, Rect, Sense, Stroke, pos2, vec2};
+-use serde_json::json;
+ 
+ use crate::DesignApp;
+ use crate::theme::{Tokens, semibold};
+@@ -12,18 +10,6 @@ use crate::theme::{Tokens, semibold};
+ /// Existing UI accent color; the product mark uses the supplied KIO icon.
+ pub const BRAND: Color32 = Color32::from_rgb(0x4e, 0x7b, 0xfb);
+ /// Discord's brand colour, used for the "Join our Discord" buttons (colour only; no Discord artwork).
+-pub const DISCORD: Color32 = Color32::from_rgb(0x58, 0x65, 0xf2);
 -
- /// The other ArtCraft apps (app-page slug, name, what it is) — same list as the README.
- pub const SIBLINGS: &[(&str, &str, &str)] = &[
-     ("photocraft", "PhotoCraft", "image editing"),
-@@ -40,7 +39,12 @@ pub fn paint_mark(ui: &egui::Ui, rect: Rect, _color: Color32) {
+-
+-/// The other ArtCraft apps (app-page slug, name, what it is) — same list as the README.
+-pub const SIBLINGS: &[(&str, &str, &str)] = &[
+-    ("photocraft", "PhotoCraft", "image editing"),
+-    ("vectorcraft", "VectorCraft", "vector illustration"),
+-    ("filmcraft", "FilmCraft", "video editing, color and sound"),
+-    ("lightcraft", "LightCraft", "photo library and raw development"),
+-    ("pdfcraft", "PdfCraft", "reading, organizing and protecting PDFs"),
+-    ("effectcraft", "EffectCraft", "motion graphics and visual effects"),
+-];
+ 
+ /// The About window's tabs, in `UiState::about_tab` order (`help.about {tab}` names them in lowercase).
+ pub const ABOUT_TABS: [&str; 3] = ["About", "Contributors", "Models"];
+@@ -40,55 +26,26 @@ pub fn paint_mark(ui: &egui::Ui, rect: Rect, _color: Color32) {
      });
      if let Some(texture) = texture {
          let side = rect.width().min(rect.height());
@@ -52401,7 +52562,55 @@ index f6692c773c516d65fcac876134d6440c6832daf6..3e7a686de67eae0ebd5824595d266df6
      }
  }
  
-@@ -125,7 +129,7 @@ pub fn show(app: &mut DesignApp, ctx: &egui::Context) {
+ /// A speech-bubble glyph (drawn in code) for Discord buttons.
+-pub fn paint_chat_icon(p: &egui::Painter, c: egui::Pos2, s: f32, color: Color32) {
+-    let body = Rect::from_center_size(c - vec2(0.0, s * 0.06), vec2(s, s * 0.72));
+-    p.rect_filled(body, s * 0.24, color);
+-    let tail = vec![
+-        pos2(body.left() + s * 0.22, body.bottom() - 1.0),
+-        pos2(body.left() + s * 0.12, body.bottom() + s * 0.24),
+-        pos2(body.left() + s * 0.44, body.bottom() - 1.0),
+-    ];
+-    p.add(egui::Shape::convex_polygon(tail, color, Stroke::NONE));
+-    let eye = s * 0.09;
+-    let bg = if color.r() as u32 + color.g() as u32 + color.b() as u32 > 380 { DISCORD } else { Color32::WHITE };
+-    p.circle_filled(body.center() - vec2(s * 0.18, 0.0), eye, bg);
+-    p.circle_filled(body.center() + vec2(s * 0.18, 0.0), eye, bg);
+-}
+ 
+ /// The big "Join our Discord" button. Returns true when clicked.
+-pub fn discord_button(ui: &mut egui::Ui, label: &str, size: egui::Vec2) -> bool {
+-    let (r, resp) = ui.allocate_exact_size(size, Sense::click());
+-    let resp = resp.on_hover_text(links::DISCORD).on_hover_cursor(egui::CursorIcon::PointingHand);
+-    let fill = if resp.hovered() { Color32::from_rgb(0x47, 0x52, 0xc4) } else { DISCORD };
+-    ui.painter().rect_filled(r, size.y / 2.0, fill);
+-    let icon = size.y * 0.5;
+-    let font = semibold((size.y * 0.42).max(11.0));
+-    let galley = crate::rtl::plain(ui.ctx(), label, font, Color32::WHITE);
+-    let total = icon + 8.0 + galley.size().x;
+-    let x0 = r.center().x - total / 2.0;
+-    paint_chat_icon(ui.painter(), pos2(x0 + icon / 2.0, r.center().y), icon, Color32::WHITE);
+-    ui.painter().galley(pos2(x0 + icon + 8.0, r.center().y - galley.size().y / 2.0), galley, Color32::WHITE);
+-    resp.clicked()
+-}
+ 
+ /// A text link that opens `url`. Returns true when clicked.
+-fn link(ui: &mut egui::Ui, text: &str, url: &str, color: Color32) -> bool {
+-    let resp = ui.add(egui::Label::new(egui::RichText::new(text).size(13.0).color(color).underline()).sense(Sense::click()));
+-    let resp = resp.on_hover_text(url).on_hover_cursor(egui::CursorIcon::PointingHand);
+-    resp.clicked()
+-}
+ 
+ pub fn show(app: &mut DesignApp, ctx: &egui::Context) {
+     if !app.ui.about {
+         return;
+     }
+     let t = Tokens::get(ctx);
+-    let mut open: Option<&'static str> = None;
+     let resp = egui::Modal::new(egui::Id::new("about")).show(ctx, |ui| {
+         ui.set_width(if app.ui.about_tab == 0 { 460.0 } else { 640.0 });
+         ui.horizontal(|ui| {
+@@ -125,7 +82,7 @@ pub fn show(app: &mut DesignApp, ctx: &egui::Context) {
              ui.add_space(6.0);
              ui.label(crate::rtl::widget(
                  ui,
@@ -52410,36 +52619,93 @@ index f6692c773c516d65fcac876134d6440c6832daf6..3e7a686de67eae0ebd5824595d266df6
              ));
              crate::rtl::label(
                  ui,
-@@ -142,9 +146,12 @@ pub fn show(app: &mut DesignApp, ctx: &egui::Context) {
+@@ -140,62 +97,6 @@ pub fn show(app: &mut DesignApp, ctx: &egui::Context) {
+                     .size(13.0)
+                     .color(t.text),
              ));
-             ui.label(crate::rtl::widget(
-                 ui,
+-            ui.label(crate::rtl::widget(
+-                ui,
 -                egui::RichText::new(crate::i18n::tr(&app.ui.language, "Independent KIO fork of DesignCraft v0.8.0 by the ArtCraft team. No upstream endorsement."))
 -                    .size(12.0)
 -                    .color(t.text_dim),
-+                egui::RichText::new(crate::i18n::tr(
-+                    &app.ui.language,
-+                    "Independent Bogo fork of DesignCraft v0.8.0 by the ArtCraft team. No upstream endorsement.",
-+                ))
-+                .size(12.0)
-+                .color(t.text_dim),
-             ));
-             ui.add_space(16.0);
-             if discord_button(ui, "Upstream DesignCraft community", vec2(300.0, 40.0)) {
-@@ -163,7 +170,7 @@ pub fn show(app: &mut DesignApp, ctx: &egui::Context) {
-                 let w = 330.0;
-                 ui.add_space(((ui.available_width() - w) / 2.0).max(0.0));
-                 for (text, key) in
+-            ));
+-            ui.add_space(16.0);
+-            if discord_button(ui, "Upstream DesignCraft community", vec2(300.0, 40.0)) {
+-                open = Some("discord");
+-            }
+-            ui.add_space(4.0);
+-            ui.label(crate::rtl::widget(
+-                ui,
+-                egui::RichText::new(crate::i18n::tr(&app.ui.language, "discord.gg/artcraft — help, feedback and show-and-tell"))
+-                    .size(11.0)
+-                    .color(t.text_dim),
+-            ));
+-            ui.add_space(14.0);
+-            ui.horizontal(|ui| {
+-                // Centre the row of links.
+-                let w = 330.0;
+-                ui.add_space(((ui.available_width() - w) / 2.0).max(0.0));
+-                for (text, key) in
 -                    [("KIO Design page", "appPage"), ("GitHub", "github"), ("getartcraft.com", "website"), ("Report an issue", "issues")]
-+                    [("Bogo Design page", "appPage"), ("GitHub", "github"), ("getartcraft.com", "website"), ("Report an issue", "issues")]
-                 {
-                     if link(ui, text, links::get(key).unwrap_or_default(), t.accent) {
-                         open = Some(key);
+-                {
+-                    if link(ui, text, links::get(key).unwrap_or_default(), t.accent) {
+-                        open = Some(key);
+-                    }
+-                    ui.add_space(6.0);
+-                }
+-            });
+-            ui.add_space(16.0);
+-            ui.separator();
+-            ui.add_space(6.0);
+-            ui.label(crate::rtl::widget(
+-                ui,
+-                egui::RichText::new(crate::i18n::tr(&app.ui.language, "Other upstream ArtCraft apps")).font(semibold(12.0)).color(t.text_strong),
+-            ));
+-            ui.add_space(4.0);
+-            ui.horizontal(|ui| {
+-                let pad = ui.spacing().button_padding.x * 2.0 + ui.spacing().item_spacing.x;
+-                let w: f32 = SIBLINGS
+-                    .iter()
+-                    .map(|(_, n, _)| ui.painter().layout_no_wrap(n.to_string(), egui::FontId::proportional(12.0), Color32::WHITE).size().x + pad)
+-                    .sum::<f32>()
+-                    - ui.spacing().item_spacing.x;
+-                ui.add_space(((ui.available_width() - w) / 2.0).max(0.0));
+-                for (slug, name, what) in SIBLINGS {
+-                    let url = format!("{}/apps/{slug}", links::WEBSITE);
+-                    let b =
+-                        ui.add(egui::Button::new(egui::RichText::new(*name).size(12.0)).corner_radius(10.0)).on_hover_text(format!("{what} — {url}"));
+-                    if b.clicked() {
+-                        app.ui.pending_urls.push(url);
+-                    }
+-                }
+-            });
+             ui.add_space(12.0);
+             ui.label(crate::rtl::widget(
+                 ui,
+@@ -210,7 +111,4 @@ pub fn show(app: &mut DesignApp, ctx: &egui::Context) {
+     if resp.should_close() {
+         app.ui.about = false;
+     }
+-    if let Some(k) = open {
+-        let _ = app.run(&format!("help.{k}"), json!({}));
+-    }
+ }
 diff --git a/crates/ui-egui/src/chrome.rs b/crates/ui-egui/src/chrome.rs
-index 967730af5e309819caf55cef3df4a6c8e33a7261..d0598f6881c4dabbe68ac92d5a26f297e2114d10 100644
+index 967730af5e309819caf55cef3df4a6c8e33a7261..e93803fce0b9b2584e76c7506e7f4e434d285779 100644
 --- a/crates/ui-egui/src/chrome.rs
 +++ b/crates/ui-egui/src/chrome.rs
-@@ -139,8 +139,8 @@ pub fn app_bar(app: &mut DesignApp, ui: &mut egui::Ui) {
+@@ -124,10 +124,6 @@ pub fn app_bar(app: &mut DesignApp, ui: &mut egui::Ui) {
+                             app.status("Export a PDF, IDML or package to share — no cloud account needed.");
+                         }
+                         ui.add_space(8.0);
+-                        // Always one click away: the ArtCraft community Discord.
+-                        if crate::about::discord_button(ui, "Discord", vec2(78.0, 22.0)) {
+-                            let _ = app.run("help.discord", json!({}));
+-                        }
+                         tools_start = ui.min_rect().min.x;
+                         ui.min_rect().width()
+                     });
+@@ -139,8 +135,8 @@ pub fn app_bar(app: &mut DesignApp, ui: &mut egui::Ui) {
              });
              // Centred title.
              let title = match app.session.active() {
@@ -52450,7 +52716,7 @@ index 967730af5e309819caf55cef3df4a6c8e33a7261..d0598f6881c4dabbe68ac92d5a26f297
              };
              // Centred between the menus and the right-hand controls; left out when it won't fit.
              let galley = crate::rtl::plain(ui.ctx(), &title, egui::FontId::proportional(11.5), t.text);
-@@ -662,7 +662,7 @@ pub fn start_screen(app: &mut DesignApp, ui: &mut egui::Ui) {
+@@ -662,7 +658,7 @@ pub fn start_screen(app: &mut DesignApp, ui: &mut egui::Ui) {
          |ui| {
              ui.label(crate::rtl::widget(
                  ui,
@@ -52459,21 +52725,67 @@ index 967730af5e309819caf55cef3df4a6c8e33a7261..d0598f6881c4dabbe68ac92d5a26f297
              ));
              ui.label(crate::rtl::widget(
                  ui,
-@@ -766,10 +766,10 @@ fn community_card(app: &mut DesignApp, ui: &mut egui::Ui) {
-                 ));
-                 ui.add_space(4.0);
-                 ui.horizontal(|ui| {
+@@ -711,7 +707,6 @@ pub fn start_screen(app: &mut DesignApp, ui: &mut egui::Ui) {
+                 }
+             });
+             ui.add_space(20.0);
+-            community_card(app, ui);
+             ui.add_space(24.0);
+             ui.label(crate::rtl::widget(
+                 ui,
+@@ -744,50 +739,6 @@ pub fn start_screen(app: &mut DesignApp, ui: &mut egui::Ui) {
+     let _ = Content::Unassigned;
+ }
+ 
+-/// Start screen: the ArtCraft community (Discord first) and project links.
+-fn community_card(app: &mut DesignApp, ui: &mut egui::Ui) {
+-    let t = Tokens::get(ui.ctx());
+-    egui::Frame::NONE.fill(t.panel).corner_radius(10.0).inner_margin(egui::Margin::same(14)).show(ui, |ui| {
+-        ui.set_max_width(640.0);
+-        ui.horizontal(|ui| {
+-            let (r, _) = ui.allocate_exact_size(vec2(44.0, 44.0), Sense::hover());
+-            crate::about::paint_mark(ui, r, crate::about::BRAND);
+-            ui.add_space(8.0);
+-            ui.vertical(|ui| {
+-                ui.label(crate::rtl::widget(
+-                    ui,
+-                    egui::RichText::new(crate::i18n::tr(&app.ui.language, "Join the ArtCraft community")).font(semibold(14.0)).color(t.text_strong),
+-                ));
+-                ui.label(crate::rtl::widget(
+-                    ui,
+-                    egui::RichText::new(crate::i18n::tr(&app.ui.language, "Get help, share your layouts and shape what we build next."))
+-                        .size(12.0)
+-                        .color(t.text_dim),
+-                ));
+-                ui.add_space(4.0);
+-                ui.horizontal(|ui| {
 -                    for (text, id) in [("KIO Design page", "help.appPage"), ("GitHub", "help.github"), ("getartcraft.com", "help.website")] {
-+                    for (text, id) in [("Bogo Design page", "help.appPage"), ("GitHub", "help.github"), ("getartcraft.com", "help.website")] {
-                         let url = designcraft_engine::links::get(&id[5..]).unwrap_or_default();
-                         let l = ui
+-                        let url = designcraft_engine::links::get(&id[5..]).unwrap_or_default();
+-                        let l = ui
 -                            .add(egui::Label::new(egui::RichText::new(text).size(12.0).color(t.accent).underline()).sense(Sense::click()))
-+                            .add(egui::Label::new(egui::RichText::new(text).size(12.0).color(t.text).underline()).sense(Sense::click()))
-                             .on_hover_text(url)
-                             .on_hover_cursor(egui::CursorIcon::PointingHand);
-                         if l.clicked() {
+-                            .on_hover_text(url)
+-                            .on_hover_cursor(egui::CursorIcon::PointingHand);
+-                        if l.clicked() {
+-                            let _ = app.run(id, json!({}));
+-                        }
+-                        ui.add_space(8.0);
+-                    }
+-                });
+-            });
+-            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+-                if crate::about::discord_button(ui, crate::i18n::tr(&app.ui.language, "Join our Discord"), vec2(190.0, 38.0)) {
+-                    let _ = app.run("help.discord", json!({}));
+-                }
+-            });
+-        });
+-    });
+-}
+-
+ #[cfg(test)]
+ mod tests {
+     use egui::{pos2, vec2};
 diff --git a/crates/ui-egui/src/i18n.rs b/crates/ui-egui/src/i18n.rs
-index d010e7dc8f47f2d8b4f64a3735b8b22a1a62e6b9..cde75ca613acc525e2f62f1b0a4bd596154e2d08 100644
+index d010e7dc8f47f2d8b4f64a3735b8b22a1a62e6b9..35aef184d54b9f6146e687773435230e211d4f20 100644
 --- a/crates/ui-egui/src/i18n.rs
 +++ b/crates/ui-egui/src/i18n.rs
 @@ -709,8 +709,8 @@ const TABLE: &[(&str, [&str; 5])] = &[
@@ -52487,7 +52799,16 @@ index d010e7dc8f47f2d8b4f64a3735b8b22a1a62e6b9..cde75ca613acc525e2f62f1b0a4bd596
      ("Accept All Changes", ["Accept All Changes", "Accept All Changes", "Accept All Changes", "Accept All Changes", "接受所有更改"]),
      ("Activate Document", ["Activate Document", "Activate Document", "Activate Document", "Activate Document", "激活文档"]),
      ("Add Anchor Point", ["Add Anchor Point", "Add Anchor Point", "Add Anchor Point", "Add Anchor Point", "添加锚点"]),
-@@ -907,10 +907,10 @@ const TABLE: &[(&str, [&str; 5])] = &[
+@@ -771,8 +771,6 @@ const TABLE: &[(&str, [&str; 5])] = &[
+         "Apply Parent to Pages…",
+         ["Apply Parent to Pages…", "Apply Parent to Pages…", "Apply Parent to Pages…", "Apply Parent to Pages…", "将主页应用于页面…"],
+     ),
+-    ("ArtCraft App Page…", ["ArtCraft App Page…", "ArtCraft App Page…", "ArtCraft App Page…", "ArtCraft App Page…", "ArtCraft 应用页面…"]),
+-    ("ArtCraft Website…", ["ArtCraft Website…", "ArtCraft Website…", "ArtCraft Website…", "ArtCraft Website…", "ArtCraft 网站…"]),
+     ("Attributes", ["Attributes", "Attributes", "Attributes", "Attributes", "属性"]),
+     ("Bevel and Emboss", ["Bevel and Emboss", "Bevel and Emboss", "Bevel and Emboss", "Bevel and Emboss", "斜面和浮雕"]),
+     ("Buttons", ["Buttons", "Buttons", "Buttons", "Buttons", "按钮"]),
+@@ -907,10 +905,10 @@ const TABLE: &[(&str, [&str; 5])] = &[
      ("Delete Item", ["Delete Item", "Delete Item", "Delete Item", "Delete Item", "删除项目"]),
      ("Delete Text Variable", ["Delete Text Variable", "Delete Text Variable", "Delete Text Variable", "Delete Text Variable", "删除文本变量"]),
      ("Delete Workspace…", ["Delete Workspace…", "Delete Workspace…", "Delete Workspace…", "Delete Workspace…", "删除工作区…"]),
@@ -52501,7 +52822,24 @@ index d010e7dc8f47f2d8b4f64a3735b8b22a1a62e6b9..cde75ca613acc525e2f62f1b0a4bd596
      ),
      (
          "Detach All Objects from Parent",
-@@ -1541,7 +1541,7 @@ const TABLE: &[(&str, [&str; 5])] = &[
+@@ -1048,16 +1046,6 @@ const TABLE: &[(&str, [&str; 5])] = &[
+     ("Insert Variable", ["Insert Variable", "Insert Variable", "Insert Variable", "Insert Variable", "插入变量"]),
+     ("Inspect Document", ["Inspect Document", "Inspect Document", "Inspect Document", "Inspect Document", "检查文档"]),
+     ("Interface Color Theme", ["Interface Color Theme", "Interface Color Theme", "Interface Color Theme", "Interface Color Theme", "界面颜色主题"]),
+-    (
+-        "Join the ArtCraft Discord…",
+-        [
+-            "Join the ArtCraft Discord…",
+-            "Join the ArtCraft Discord…",
+-            "Join the ArtCraft Discord…",
+-            "Join the ArtCraft Discord…",
+-            "加入 ArtCraft Discord…",
+-        ],
+-    ),
+     ("Last Object Below", ["Last Object Below", "Last Object Below", "Last Object Below", "Last Object Below", "下方最后一个对象"]),
+     ("Library Contents", ["Library Contents", "Library Contents", "Library Contents", "Library Contents", "库内容"]),
+     ("Library Items", ["Library Items", "Library Items", "Library Items", "Library Items", "库项目"]),
+@@ -1541,7 +1529,7 @@ const TABLE: &[(&str, [&str; 5])] = &[
          ["Cross-Reference Format", "Cross-Reference Format", "Cross-Reference Format", "Cross-Reference Format", "交叉引用格式"],
      ),
      ("Delete Workspace", ["Delete Workspace", "Delete Workspace", "Delete Workspace", "Delete Workspace", "删除工作区"]),
@@ -52510,7 +52848,28 @@ index d010e7dc8f47f2d8b4f64a3735b8b22a1a62e6b9..cde75ca613acc525e2f62f1b0a4bd596
      ("Display Performance", ["Display Performance", "Display Performance", "Display Performance", "Display Performance", "显示性能"]),
      ("Document Grid", ["Document Grid", "Document Grid", "Document Grid", "Document Grid", "文档网格"]),
      (
-@@ -1882,8 +1882,8 @@ const TABLE: &[(&str, [&str; 5])] = &[
+@@ -1584,20 +1572,9 @@ const TABLE: &[(&str, [&str; 5])] = &[
+     ("Hyphens and Dashes", ["Hyphens and Dashes", "Hyphens and Dashes", "Hyphens and Dashes", "Hyphens and Dashes", "连字符和破折号"]),
+     ("Interactive", ["Interactive", "Interactive", "Interactive", "Interactive", "交互式"]),
+     ("Invert", ["Invert", "Invert", "Invert", "Invert", "反相"]),
+-    (
+-        "Join the ArtCraft community",
+-        [
+-            "Join the ArtCraft community",
+-            "Join the ArtCraft community",
+-            "Join the ArtCraft community",
+-            "Join the ArtCraft community",
+-            "加入 ArtCraft 社区",
+-        ],
+-    ),
+     ("Keyboard Increments", ["Keyboard Increments", "Keyboard Increments", "Keyboard Increments", "Keyboard Increments", "键盘增量"]),
+     ("Liquid guides", ["Liquid guides", "Liquid guides", "Liquid guides", "Liquid guides", "自适应参考线"]),
+     ("Markers", ["Markers", "Markers", "Markers", "Markers", "标记"]),
+-    ("More ArtCraft apps", ["More ArtCraft apps", "More ArtCraft apps", "More ArtCraft apps", "More ArtCraft apps", "更多 ArtCraft 应用"]),
+     ("Nested Line Styles", ["Nested Line Styles", "Nested Line Styles", "Nested Line Styles", "Nested Line Styles", "嵌套行样式"]),
+     ("Nested Styles", ["Nested Styles", "Nested Styles", "Nested Styles", "Nested Styles", "嵌套样式"]),
+     (
+@@ -1882,8 +1859,8 @@ const TABLE: &[(&str, [&str; 5])] = &[
      ("Utilities", ["Utilities", "Utilities", "Utilities", "Utilities", "实用程序"]),
      ("Variable Font", ["Variable Font", "Variable Font", "Variable Font", "Variable Font", "可变字体"]),
      (
@@ -52521,11 +52880,36 @@ index d010e7dc8f47f2d8b4f64a3735b8b22a1a62e6b9..cde75ca613acc525e2f62f1b0a4bd596
      ),
      ("When Scaling", ["When Scaling", "When Scaling", "When Scaling", "When Scaling", "缩放时"]),
      ("[Basic] (working) ▾", ["[Basic] (working) ▾", "[Basic] (working) ▾", "[Basic] (working) ▾", "[Basic] (working) ▾", "[基本] (工作区) ▾"]),
+@@ -1900,16 +1877,6 @@ const TABLE: &[(&str, [&str; 5])] = &[
+             "[无] — 在色带上选择一种颜色。",
+         ],
+     ),
+-    (
+-        "discord.gg/artcraft — help, feedback and show-and-tell",
+-        [
+-            "discord.gg/artcraft — help, feedback and show-and-tell",
+-            "discord.gg/artcraft — help, feedback and show-and-tell",
+-            "discord.gg/artcraft — help, feedback and show-and-tell",
+-            "discord.gg/artcraft — help, feedback and show-and-tell",
+-            "discord.gg/artcraft — 帮助、反馈和展示",
+-        ],
+-    ),
+     (
+         "⌥-click clears overrides",
+         ["⌥-click clears overrides", "⌥-click clears overrides", "⌥-click clears overrides", "⌥-click clears overrides", "⌥-单击清除覆盖"],
+@@ -2653,7 +2620,6 @@ const TABLE: &[(&str, [&str; 5])] = &[
+     ("H&J Violations", ["H&J Violations", "H&J Violations", "H&J Violations", "H&J Violations", "断字与对齐违规"]),
+     ("Include Bleed", ["Include Bleed", "Include Bleed", "Include Bleed", "Include Bleed", "包含出血"]),
+     ("Include Stroke Weight", ["Include Stroke Weight", "Include Stroke Weight", "Include Stroke Weight", "Include Stroke Weight", "包含描边粗细"]),
+-    ("Join our Discord", ["Join our Discord", "Join our Discord", "Join our Discord", "Join our Discord", "加入我们的 Discord 社区"]),
+     ("Keep Violations", ["Keep Violations", "Keep Violations", "Keep Violations", "Keep Violations", "保持选项违规"]),
+     (
+         "Overprint [Black] Swatch at 100%",
 diff --git a/crates/ui-egui/src/i18n/ar.rs b/crates/ui-egui/src/i18n/ar.rs
-index d50ef93677dcc6dfad1a23771a06a3476a0dcb09..2b3faa1f17ffce1bdf07d3e8f6836693350ec9b1 100644
+index d50ef93677dcc6dfad1a23771a06a3476a0dcb09..a0bf94b05a453163915a8a60cafcea0ee18513a5 100644
 --- a/crates/ui-egui/src/i18n/ar.rs
 +++ b/crates/ui-egui/src/i18n/ar.rs
-@@ -150,9 +150,9 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+@@ -150,21 +150,18 @@ pub(super) const TABLE: &[(&str, &str)] = &[
      ("Hyperlinks", "ارتباطات تشعبية"),
      ("Bookmarks", "إشارات مرجعية"),
      ("Show All Menu Items", "إظهار كل عناصر القائمة"),
@@ -52538,7 +52922,44 @@ index d50ef93677dcc6dfad1a23771a06a3476a0dcb09..2b3faa1f17ffce1bdf07d3e8f6836693
      ("Page layout for print and screen — fast, open and scriptable.", "تخطيط الصفحات للطباعة والشاشة — سريع ومفتوح وقابل للبرمجة."),
      ("  New file  ", "  ملف جديد  "),
      ("  Open  ", "  فتح  "),
-@@ -1185,8 +1185,8 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+     ("  Open sample magazine  ", "  فتح نموذج المجلة  "),
+     ("Start a new document", "بدء مستند جديد"),
+     ("No document open", "لا يوجد مستند مفتوح"),
+-    ("Join the ArtCraft community", "انضم إلى مجتمع ArtCraft"),
+     ("Get help, share your layouts and shape what we build next.", "احصل على المساعدة وشارك تصميماتك وساهم في تطوير التطبيق."),
+-    ("Join our Discord", "انضم إلى Discord"),
+     ("Community", "المجتمع"),
+     ("Join the community", "انضم إلى المجتمع"),
+-    ("discord.gg/artcraft — help, feedback and show-and-tell", "discord.gg/artcraft — مساعدة وآراء وعرض الأعمال"),
+     ("  OK  ", "  موافق  "),
+     ("Float panel", "تعويم اللوحة"),
+     ("Dock panel", "إرساء اللوحة"),
+@@ -909,7 +906,6 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+     ("Merge into Active Layer", "دمج في الطبقة النشطة"),
+     ("Misspelled word → Correction (one per line):", "كلمة خاطئة ← تصحيح (واحد في كل سطر):"),
+     ("Mobile", "جوال"),
+-    ("More ArtCraft apps", "المزيد من تطبيقات ArtCraft"),
+     ("Move Selection Here", "نقل التحديد إلى هنا"),
+     ("Move to Color Group", "نقل إلى مجموعة ألوان"),
+     ("Move to Group", "نقل إلى مجموعة"),
+@@ -948,7 +944,6 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+     ("Page Numbering", "ترقيم الصفحات"),
+     ("Page · PPI", "صفحة · PPI"),
+     ("Pages:", "الصفحات:"),
+-    ("Part of the ArtCraft suite of open creative tools.", "جزء من مجموعة ArtCraft للأدوات الإبداعية المفتوحة."),
+     ("Pasteboard Options", "خيارات مساحة اللصق"),
+     ("Path", "مسار"),
+     ("Place the insertion point in a table, or create one.", "ضع نقطة الإدراج داخل جدول أو أنشئ جدولًا."),
+@@ -1138,8 +1133,6 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+     ("Apply Cell Style", "تطبيق نمط الخلية"),
+     ("Apply Condition", "تطبيق شرط"),
+     ("Apply Parent to Pages…", "تطبيق الصفحة الأصلية على الصفحات…"),
+-    ("ArtCraft App Page…", "صفحة تطبيق ArtCraft…"),
+-    ("ArtCraft Website…", "موقع ArtCraft…"),
+     ("Attributes", "السمات"),
+     ("Bevel and Emboss", "القطع المشطوف والنقش البارز"),
+     ("Buttons", "أزرار"),
+@@ -1185,8 +1178,8 @@ pub(super) const TABLE: &[(&str, &str)] = &[
      ("Delete Item", "حذف عنصر"),
      ("Delete Text Variable", "حذف متغير نصي"),
      ("Delete Workspace…", "حذف مساحة العمل…"),
@@ -52549,7 +52970,15 @@ index d50ef93677dcc6dfad1a23771a06a3476a0dcb09..2b3faa1f17ffce1bdf07d3e8f6836693
      ("Detach All Objects from Parent", "فصل جميع الكائنات عن الصفحة الأصلية"),
      ("Directional Feather", "الحواف المنعمة الاتجاهية"),
      ("Distribute", "توزيع"),
-@@ -1478,7 +1478,7 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+@@ -1241,7 +1234,6 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+     ("Insert Variable", "إدراج متغير"),
+     ("Inspect Document", "فحص المستند"),
+     ("Interface Color Theme", "نسق ألوان الواجهة"),
+-    ("Join the ArtCraft Discord…", "الانضمام إلى Discord الخاص بـ ArtCraft…"),
+     ("Last Object Below", "آخر كائن أسفل"),
+     ("Library Contents", "محتويات المكتبة"),
+     ("Library Items", "عناصر المكتبة"),
+@@ -1478,7 +1470,7 @@ pub(super) const TABLE: &[(&str, &str)] = &[
      ),
      ("Convert Cell Type", "تحويل نوع الخلية"),
      ("Copy Link(s", "نسخ الروابط"),
@@ -52559,7 +52988,7 @@ index d50ef93677dcc6dfad1a23771a06a3476a0dcb09..2b3faa1f17ffce1bdf07d3e8f6836693
      ("Export EPUB (Reflowable", "تصدير EPUB (قابل لإعادة التدفق"),
      ("Hyperlinks & Cross-References", "الارتباطات التشعبية والمراجع المتقاطعة"),
 diff --git a/crates/ui-egui/src/i18n/it.rs b/crates/ui-egui/src/i18n/it.rs
-index c71881cef1fc4ac95bc72cda0f22c963137203db..79296bdf6221e62f7f9debe289d929b9aa2c68b5 100644
+index c71881cef1fc4ac95bc72cda0f22c963137203db..0147176d6cb14ec71b6cedc368959a320a18a61c 100644
 --- a/crates/ui-egui/src/i18n/it.rs
 +++ b/crates/ui-egui/src/i18n/it.rs
 @@ -400,8 +400,8 @@ pub(super) const TABLE: &[(&str, &str)] = &[
@@ -52573,7 +53002,16 @@ index c71881cef1fc4ac95bc72cda0f22c963137203db..79296bdf6221e62f7f9debe289d929b9
      ("Accept All Changes", "Accetta tutte le modifiche"),
      ("Activate Document", "Attiva documento"),
      ("Add Anchor Point", "Aggiungi punto di ancoraggio"),
-@@ -485,8 +485,8 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+@@ -432,8 +432,6 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+     ("Sample Color (Eyedropper)", "Campiona colore (Contagocce)"),
+     ("Apply Condition", "Applica condizione"),
+     ("Apply Parent to Pages…", "Applica pagina mastro alle pagine…"),
+-    ("ArtCraft App Page…", "Pagina dell'app ArtCraft…"),
+-    ("ArtCraft Website…", "Sito web di ArtCraft…"),
+     ("Attributes", "Attributi"),
+     ("Bevel and Emboss", "Smusso e rilievo"),
+     ("Buttons", "Pulsanti"),
+@@ -485,8 +483,8 @@ pub(super) const TABLE: &[(&str, &str)] = &[
      ("Delete Item", "Elimina elemento"),
      ("Delete Text Variable", "Elimina variabile di testo"),
      ("Delete Workspace…", "Elimina area di lavoro…"),
@@ -52584,7 +53022,15 @@ index c71881cef1fc4ac95bc72cda0f22c963137203db..79296bdf6221e62f7f9debe289d929b9
      ("Detach All Objects from Parent", "Scollega tutti gli oggetti dalla pagina mastro"),
      ("Directional Feather", "Bordi sfocati direzionali"),
      ("Distribute", "Distribuisci"),
-@@ -846,7 +846,7 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+@@ -560,7 +558,6 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+     ("Insert Variable", "Inserisci variabile"),
+     ("Inspect Document", "Ispeziona documento"),
+     ("Interface Color Theme", "Tema colore dell'interfaccia"),
+-    ("Join the ArtCraft Discord…", "Unisciti al Discord di ArtCraft…"),
+     ("Last Object Below", "Ultimo oggetto sotto"),
+     ("Library Contents", "Contenuto libreria"),
+     ("Library Items", "Elementi libreria"),
+@@ -846,7 +843,7 @@ pub(super) const TABLE: &[(&str, &str)] = &[
      ("Crop Amount", "Valore di ritaglio"),
      ("Cross-Reference Format", "Formato riferimento incrociato"),
      ("Delete Workspace", "Elimina area di lavoro"),
@@ -52593,7 +53039,27 @@ index c71881cef1fc4ac95bc72cda0f22c963137203db..79296bdf6221e62f7f9debe289d929b9
      ("Display Performance", "Prestazioni di visualizzazione"),
      ("Document Grid", "Griglia documento"),
      ("Document Recovery Data", "Dati di recupero documento"),
-@@ -949,7 +949,7 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+@@ -865,11 +862,9 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+     ("Hyphens and Dashes", "Trattini e lineette"),
+     ("Interactive", "Interattivo"),
+     ("Invert", "Inverti"),
+-    ("Join the ArtCraft community", "Unisciti alla community ArtCraft"),
+     ("Keyboard Increments", "Incrementi da tastiera"),
+     ("Liquid guides", "Guide liquide"),
+     ("Markers", "Indicatori"),
+-    ("More ArtCraft apps", "Altre app ArtCraft"),
+     ("Nested Line Styles", "Stili di riga nidificati"),
+     ("Nested Styles", "Stili nidificati"),
+     ("No articles: exports follow page order.", "Nessun articolo: le esportazioni seguono l'ordine delle pagine."),
+@@ -904,7 +899,6 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+         "Impaginazione per la stampa e lo schermo — veloce, aperta e automatizzabile con script.",
+     ),
+     ("Page · PPI", "Pagina · PPI"),
+-    ("Part of the ArtCraft suite of open creative tools.", "Parte della suite ArtCraft di strumenti creativi aperti."),
+     ("Pasteboard Options", "Opzioni tavolo di montaggio"),
+     ("Paths", "Tracciati"),
+     ("Place the insertion point in a table, or create one.", "Posiziona il punto di inserimento in una tabella o creane una."),
+@@ -949,14 +943,13 @@ pub(super) const TABLE: &[(&str, &str)] = &[
      ("User Dictionary (this document)", "Dizionario utente (questo documento)"),
      ("Utilities", "Utilità"),
      ("Variable Font", "Font variabile"),
@@ -52602,8 +53068,23 @@ index c71881cef1fc4ac95bc72cda0f22c963137203db..79296bdf6221e62f7f9debe289d929b9
      ("When Scaling", "Durante il ridimensionamento"),
      ("[Basic] (working) ▾", "[Base] (in uso) ▾"),
      ("[Black] Overprint", "Sovrastampa [Nero]"),
+     ("[No Group]", "[Nessun gruppo]"),
+     ("[None]", "[Nessuno]"),
+     ("[None] — choose a colour on the ramp.", "[Nessuno] — scegli un colore sulla barra dei colori."),
+-    ("discord.gg/artcraft — help, feedback and show-and-tell", "discord.gg/artcraft — aiuto, feedback e condivisione dei lavori"),
+     ("⌥-click clears overrides", "⌥-clic cancella le modifiche locali"),
+     ("⚠ out of date", "⚠ non aggiornato"),
+     ("General", "Generale"),
+@@ -1358,7 +1351,6 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+     ("H&J Violations", "Violazioni di sillabazione e giustificazione"),
+     ("Include Bleed", "Includi pagina al vivo"),
+     ("Include Stroke Weight", "Includi spessore traccia"),
+-    ("Join our Discord", "Unisciti al nostro Discord"),
+     ("Keep Violations", "Violazioni opzioni di mantenimento"),
+     ("Overprint [Black] Swatch at 100%", "Sovrastampa campione [Nero] al 100%"),
+     ("Printer's Marks", "Segni di stampa"),
 diff --git a/crates/ui-egui/src/i18n/ja.rs b/crates/ui-egui/src/i18n/ja.rs
-index ca53c82592ee77bd14f029f2b09b36dbb607b0a0..84d26a819f0ab96001c8a02418d854dbd25af6fe 100644
+index ca53c82592ee77bd14f029f2b09b36dbb607b0a0..a2523190481f5827d7c8e762b997945ce9c3efd9 100644
 --- a/crates/ui-egui/src/i18n/ja.rs
 +++ b/crates/ui-egui/src/i18n/ja.rs
 @@ -402,8 +402,8 @@ pub(super) const TABLE: &[(&str, &str)] = &[
@@ -52617,7 +53098,16 @@ index ca53c82592ee77bd14f029f2b09b36dbb607b0a0..84d26a819f0ab96001c8a02418d854db
      ("Accept All Changes", "すべての変更を採用"),
      ("Activate Document", "ドキュメントをアクティブ化"),
      ("Add Anchor Point", "アンカーポイントを追加"),
-@@ -484,8 +484,8 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+@@ -431,8 +431,6 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+     ("Sample Color (Eyedropper)", "カラーを抽出 (スポイト)"),
+     ("Apply Condition", "条件を適用"),
+     ("Apply Parent to Pages…", "ページに親ページを適用…"),
+-    ("ArtCraft App Page…", "ArtCraft アプリページ…"),
+-    ("ArtCraft Website…", "ArtCraft ウェブサイト…"),
+     ("Attributes", "属性"),
+     ("Bevel and Emboss", "ベベルとエンボス"),
+     ("Buttons", "ボタン"),
+@@ -484,8 +482,8 @@ pub(super) const TABLE: &[(&str, &str)] = &[
      ("Delete Item", "項目を削除"),
      ("Delete Text Variable", "テキスト変数を削除"),
      ("Delete Workspace…", "ワークスペースを削除…"),
@@ -52628,7 +53118,15 @@ index ca53c82592ee77bd14f029f2b09b36dbb607b0a0..84d26a819f0ab96001c8a02418d854db
      ("Detach All Objects from Parent", "すべてのオブジェクトを親ページから分離"),
      ("Directional Feather", "方向別ぼかし"),
      ("Distribute", "均等に配置"),
-@@ -845,7 +845,7 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+@@ -559,7 +557,6 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+     ("Insert Variable", "変数を挿入"),
+     ("Inspect Document", "ドキュメントを調査"),
+     ("Interface Color Theme", "インターフェイスのカラーテーマ"),
+-    ("Join the ArtCraft Discord…", "ArtCraft の Discord に参加…"),
+     ("Last Object Below", "最背面のオブジェクト"),
+     ("Library Contents", "ライブラリの内容"),
+     ("Library Items", "ライブラリの項目"),
+@@ -845,7 +842,7 @@ pub(super) const TABLE: &[(&str, &str)] = &[
      ("Crop Amount", "トリミング量"),
      ("Cross-Reference Format", "相互参照の書式"),
      ("Delete Workspace", "ワークスペースを削除"),
@@ -52637,7 +53135,27 @@ index ca53c82592ee77bd14f029f2b09b36dbb607b0a0..84d26a819f0ab96001c8a02418d854db
      ("Display Performance", "表示品質"),
      ("Document Grid", "ドキュメントグリッド"),
      ("Document Recovery Data", "ドキュメント復旧データ"),
-@@ -945,7 +945,7 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+@@ -861,11 +858,9 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+     ("Hyphens and Dashes", "ハイフンとダッシュ"),
+     ("Interactive", "インタラクティブ"),
+     ("Invert", "反転"),
+-    ("Join the ArtCraft community", "ArtCraft コミュニティに参加"),
+     ("Keyboard Increments", "キーボードの移動量"),
+     ("Liquid guides", "リキッドガイド"),
+     ("Markers", "マーカー"),
+-    ("More ArtCraft apps", "他の ArtCraft アプリ"),
+     ("Nested Line Styles", "入れ子行スタイル"),
+     ("Nested Styles", "入れ子スタイル"),
+     ("No articles: exports follow page order.", "アーティクルがありません。ページ順に書き出します。"),
+@@ -900,7 +895,6 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+         "印刷・画面向けの高速なページレイアウトツールです。オープンで、スクリプトにも対応します。",
+     ),
+     ("Page · PPI", "ページ・PPI"),
+-    ("Part of the ArtCraft suite of open creative tools.", "オープンな制作ツール群 ArtCraft の一部です。"),
+     ("Pasteboard Options", "ペーストボードのオプション"),
+     ("Paths", "パス"),
+     ("Place the insertion point in a table, or create one.", "表内に挿入位置を置くか、表を作成してください。"),
+@@ -945,14 +939,13 @@ pub(super) const TABLE: &[(&str, &str)] = &[
      ("User Dictionary (this document)", "ユーザー辞書 (このドキュメント)"),
      ("Utilities", "ユーティリティ"),
      ("Variable Font", "バリアブルフォント"),
@@ -52646,7 +53164,30 @@ index ca53c82592ee77bd14f029f2b09b36dbb607b0a0..84d26a819f0ab96001c8a02418d854db
      ("When Scaling", "拡大・縮小時"),
      ("[Basic] (working) ▾", "[基本] (作業中) ▾"),
      ("[Black] Overprint", "「黒」のオーバープリント"),
-@@ -1484,8 +1484,8 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+     ("[No Group]", "[グループなし]"),
+     ("[None]", "[なし]"),
+     ("[None] — choose a colour on the ramp.", "[なし] — カラーバーでカラーを選択してください。"),
+-    ("discord.gg/artcraft — help, feedback and show-and-tell", "discord.gg/artcraft — サポート・ご意見・作品紹介"),
+     ("⌥-click clears overrides", "⌥ を押しながらクリックするとオーバーライドを消去します"),
+     ("⚠ out of date", "⚠ 要更新"),
+     ("General", "一般"),
+@@ -1351,7 +1344,6 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+     ("H&J Violations", "H&J の制約違反"),
+     ("Include Bleed", "裁ち落としを含める"),
+     ("Include Stroke Weight", "線の太さを含める"),
+-    ("Join our Discord", "Discord に参加"),
+     ("Keep Violations", "段落保持の制約違反"),
+     ("Overprint [Black] Swatch at 100%", "100% の「黒」スウォッチをオーバープリント"),
+     ("Printer's Marks", "プリント用マーク"),
+@@ -1476,16 +1468,14 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+     // few field labels.
+     ("Anchored Object Options", "アンカー付きオブジェクトのオプション"),
+     ("Apply Parent to Pages", "ページに親ページを適用"),
+-    ("ArtCraft App Page", "ArtCraft アプリページ"),
+-    ("ArtCraft Website", "ArtCraft ウェブサイト"),
+     ("Check Spelling", "スペルチェック"),
+     ("Corner Options", "角のオプション"),
+     ("Create Guides", "ガイドを作成"),
      ("Define Cross-Reference Format", "相互参照の書式を定義"),
      ("Define Lists", "リストを定義"),
      ("Define Text Variable", "テキスト変数を定義"),
@@ -52657,11 +53198,19 @@ index ca53c82592ee77bd14f029f2b09b36dbb607b0a0..84d26a819f0ab96001c8a02418d854db
      ("Document Endnote Options", "ドキュメントの文末脚注オプション"),
      ("Document Footnote Options", "ドキュメントの脚注オプション"),
      ("Export EPUB", "EPUB を書き出し"),
+@@ -1506,7 +1496,6 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+     ("Insert Cross-Reference", "相互参照を挿入"),
+     ("Insert Math Expression", "数式を挿入"),
+     ("Insert Pages", "ページを挿入"),
+-    ("Join the ArtCraft Discord", "ArtCraft の Discord に参加"),
+     ("Load DTD", "DTD を読み込み"),
+     ("Load Swatches", "スウォッチを読み込み"),
+     ("Margins and Columns", "マージン・段組"),
 diff --git a/crates/ui-egui/src/i18n/pt_br.rs b/crates/ui-egui/src/i18n/pt_br.rs
-index b6d923b4a88287992a17bcac4f0d5881b7ee07d7..ea5858648239279c11b0706ad9467e1eb0e3ed04 100644
+index b6d923b4a88287992a17bcac4f0d5881b7ee07d7..f5773fa3b897d18832fdff1b5eb763e0fc3a0088 100644
 --- a/crates/ui-egui/src/i18n/pt_br.rs
 +++ b/crates/ui-egui/src/i18n/pt_br.rs
-@@ -150,9 +150,9 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+@@ -150,24 +150,21 @@ pub(super) const TABLE: &[(&str, &str)] = &[
      ("Hyperlinks", "Hiperlinks"),
      ("Bookmarks", "Indicadores"),
      ("Show All Menu Items", "Mostrar todos os itens de menu"),
@@ -52674,8 +53223,39 @@ index b6d923b4a88287992a17bcac4f0d5881b7ee07d7..ea5858648239279c11b0706ad9467e1e
      ("Page layout for print and screen — fast, open and scriptable.", "Layout de página para impressão e tela — rápido, aberto e scriptável."),
      ("  New file  ", "  Novo arquivo  "),
      ("  Open  ", "  Abrir  "),
+     ("  Open sample magazine  ", "  Abrir revista de exemplo  "),
+     ("Start a new document", "Iniciar um novo documento"),
+     ("No document open", "Nenhum documento aberto"),
+-    ("Join the ArtCraft community", "Junte-se à comunidade ArtCraft"),
+     (
+         "Get help, share your layouts and shape what we build next.",
+         "Obtenha ajuda, compartilhe seus layouts e ajude a moldar o que construímos em seguida.",
+     ),
+-    ("Join our Discord", "Junte-se ao nosso Discord"),
+     ("Community", "Comunidade"),
+     ("Join the community", "Junte-se à comunidade"),
+-    ("discord.gg/artcraft — help, feedback and show-and-tell", "discord.gg/artcraft — ajuda, feedback e demonstrações"),
+     ("  OK  ", "  OK  "),
+     ("Float panel", "Painel flutuante"),
+     ("Dock panel", "Painel encaixado"),
+@@ -903,7 +900,6 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+     ("Merge into Active Layer", "Mesclar na camada ativa"),
+     ("Misspelled word → Correction (one per line):", "Palavra incorreta → Correção (uma por linha):"),
+     ("Mobile", "Dispositivo móvel"),
+-    ("More ArtCraft apps", "Mais aplicativos ArtCraft"),
+     ("Move Selection Here", "Mover a seleção para cá"),
+     ("Move to Color Group", "Mover para grupo de cores"),
+     ("Move to Group", "Mover para grupo"),
+@@ -948,7 +944,6 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+     ("Page Numbering", "Numeração de página"),
+     ("Page · PPI", "Página · PPI"),
+     ("Pages:", "Páginas:"),
+-    ("Part of the ArtCraft suite of open creative tools.", "Parte do conjunto ArtCraft de ferramentas criativas abertas."),
+     ("Pasteboard Options", "Opções da área de transferência"),
+     ("Path", "Caminho"),
+     ("Place the insertion point in a table, or create one.", "Coloque o ponto de inserção em uma tabela ou crie uma."),
 diff --git a/crates/ui-egui/src/i18n/uk.rs b/crates/ui-egui/src/i18n/uk.rs
-index 76f7a38b1636a8b903352aa13621699ff6b025a3..ebaf0791e9f689d40d6c4c064ec92bdd476eb015 100644
+index 76f7a38b1636a8b903352aa13621699ff6b025a3..41fba9fa5ec95a4904ba6058adb917d6745480f0 100644
 --- a/crates/ui-egui/src/i18n/uk.rs
 +++ b/crates/ui-egui/src/i18n/uk.rs
 @@ -403,8 +403,8 @@ pub(super) const TABLE: &[(&str, &str)] = &[
@@ -52689,7 +53269,16 @@ index 76f7a38b1636a8b903352aa13621699ff6b025a3..ebaf0791e9f689d40d6c4c064ec92bdd
      ("Accept All Changes", "Прийняти всі зміни"),
      ("Activate Document", "Активувати документ"),
      ("Add Anchor Point", "Додати опорну точку"),
-@@ -488,8 +488,8 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+@@ -435,8 +435,6 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+     ("Sample Color (Eyedropper)", "Узяти колір (піпетка)"),
+     ("Apply Condition", "Застосувати умову"),
+     ("Apply Parent to Pages…", "Застосувати шаблон до сторінок…"),
+-    ("ArtCraft App Page…", "Сторінка програми ArtCraft…"),
+-    ("ArtCraft Website…", "Вебсайт ArtCraft…"),
+     ("Attributes", "Атрибути"),
+     ("Bevel and Emboss", "Скіс і рельєф"),
+     ("Buttons", "Кнопки"),
+@@ -488,8 +486,8 @@ pub(super) const TABLE: &[(&str, &str)] = &[
      ("Delete Item", "Видалити елемент"),
      ("Delete Text Variable", "Видалити текстову змінну"),
      ("Delete Workspace…", "Видалити робоче середовище…"),
@@ -52700,7 +53289,15 @@ index 76f7a38b1636a8b903352aa13621699ff6b025a3..ebaf0791e9f689d40d6c4c064ec92bdd
      ("Detach All Objects from Parent", "Від’єднати всі об’єкти від шаблону"),
      ("Directional Feather", "Спрямоване розтушовування"),
      ("Distribute", "Розподілити"),
-@@ -849,7 +849,7 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+@@ -563,7 +561,6 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+     ("Insert Variable", "Вставити змінну"),
+     ("Inspect Document", "Перевірити документ"),
+     ("Interface Color Theme", "Колірна тема інтерфейсу"),
+-    ("Join the ArtCraft Discord…", "Приєднатися до Discord ArtCraft…"),
+     ("Last Object Below", "Останній об’єкт нижче"),
+     ("Library Contents", "Вміст бібліотеки"),
+     ("Library Items", "Елементи бібліотеки"),
+@@ -849,7 +846,7 @@ pub(super) const TABLE: &[(&str, &str)] = &[
      ("Crop Amount", "Величина обрізання"),
      ("Cross-Reference Format", "Формат перехресного посилання"),
      ("Delete Workspace", "Видалити робоче середовище"),
@@ -52709,7 +53306,27 @@ index 76f7a38b1636a8b903352aa13621699ff6b025a3..ebaf0791e9f689d40d6c4c064ec92bdd
      ("Display Performance", "Якість відображення"),
      ("Document Grid", "Сітка документа"),
      ("Document Recovery Data", "Дані відновлення документа"),
-@@ -946,7 +946,7 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+@@ -865,11 +862,9 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+     ("Hyphens and Dashes", "Дефіси та тире"),
+     ("Interactive", "Інтерактивність"),
+     ("Invert", "Інвертувати"),
+-    ("Join the ArtCraft community", "Приєднатися до спільноти ArtCraft"),
+     ("Keyboard Increments", "Кроки переміщення клавішами"),
+     ("Liquid guides", "Напрямні гнучкого макета"),
+     ("Markers", "Маркери"),
+-    ("More ArtCraft apps", "Інші програми ArtCraft"),
+     ("Nested Line Styles", "Вкладені стилі рядків"),
+     ("Nested Styles", "Вкладені стилі"),
+     ("No articles: exports follow page order.", "Немає статей: експорт дотримується порядку сторінок."),
+@@ -901,7 +896,6 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+     ("Page Numbering", "Нумерація сторінок"),
+     ("Page layout for print and screen — fast, open and scriptable.", "Верстка для друку й екрана — швидка, відкрита, зі сценаріями."),
+     ("Page · PPI", "Сторінка · PPI"),
+-    ("Part of the ArtCraft suite of open creative tools.", "Частина набору відкритих творчих інструментів ArtCraft."),
+     ("Pasteboard Options", "Параметри монтажного столу"),
+     ("Paths", "Контури"),
+     ("Place the insertion point in a table, or create one.", "Установіть курсор у таблиці або створіть її."),
+@@ -946,14 +940,13 @@ pub(super) const TABLE: &[(&str, &str)] = &[
      ("User Dictionary (this document)", "Словник користувача (цей документ)"),
      ("Utilities", "Допоміжні інструменти"),
      ("Variable Font", "Варіативний шрифт"),
@@ -52718,6 +53335,21 @@ index 76f7a38b1636a8b903352aa13621699ff6b025a3..ebaf0791e9f689d40d6c4c064ec92bdd
      ("When Scaling", "Під час масштабування"),
      ("[Basic] (working) ▾", "[Основний] (робочий) ▾"),
      ("[Black] Overprint", "Накладання [Чорного]"),
+     ("[No Group]", "[Без групи]"),
+     ("[None]", "[Немає]"),
+     ("[None] — choose a colour on the ramp.", "[Немає] — виберіть колір на шкалі."),
+-    ("discord.gg/artcraft — help, feedback and show-and-tell", "discord.gg/artcraft — допомога, відгуки та обмін роботами"),
+     ("⌥-click clears overrides", "⌥-клацання скидає перевизначення"),
+     ("⚠ out of date", "⚠ застаріле"),
+     ("General", "Загальні"),
+@@ -1355,7 +1348,6 @@ pub(super) const TABLE: &[(&str, &str)] = &[
+     ("H&J Violations", "Порушення переносів і вирівнювання"),
+     ("Include Bleed", "Включати виліт"),
+     ("Include Stroke Weight", "Враховувати товщину обведення"),
+-    ("Join our Discord", "Приєднуйтесь до нашого Discord"),
+     ("Keep Violations", "Порушення правил утримання рядків"),
+     ("Overprint [Black] Swatch at 100%", "Накладання зразка [Чорний] на 100%"),
+     ("Printer's Marks", "Друкарські позначки"),
 diff --git a/crates/ui-egui/src/lib.rs b/crates/ui-egui/src/lib.rs
 index 1db2f591d6c444f8a80f2c519e5c0019acaf1f0c..9cc5e319cc926f84b5ee466e714acdbc6c9b6fc2 100644
 --- a/crates/ui-egui/src/lib.rs
@@ -52732,7 +53364,7 @@ index 1db2f591d6c444f8a80f2c519e5c0019acaf1f0c..9cc5e319cc926f84b5ee466e714acdbc
              let fill = t.pasteboard;
              let ctx = ui.ctx().clone();
 diff --git a/crates/ui-egui/src/menus.rs b/crates/ui-egui/src/menus.rs
-index 82a659a53b2754e392e6ecc36b22ffb41216f9d7..d1e071fe239ebcfd08fed3a42f57b733f4c42559 100644
+index 82a659a53b2754e392e6ecc36b22ffb41216f9d7..4f50cdad8cc63dff070728686e42cb27dd2ef720 100644
 --- a/crates/ui-egui/src/menus.rs
 +++ b/crates/ui-egui/src/menus.rs
 @@ -11,7 +11,7 @@ pub const UI_COMMANDS: &[(&str, &str, Option<&str>, &str)] = &[
@@ -52744,17 +53376,16 @@ index 82a659a53b2754e392e6ecc36b22ffb41216f9d7..d1e071fe239ebcfd08fed3a42f57b733
      ("app.saveCopyDialog", "Save a Copy…", Some("Cmd+Alt+S"), "{} — choose where to write a copy (the document stays as it is)"),
      ("app.loadSwatches", "Load Swatches…", None, "{} — pick a swatch exchange (.ase) file"),
      ("app.packageDialog", "Package…", Some("Cmd+Alt+Shift+P"), "{} — choose the package folder to create (file.package)"),
-@@ -180,14 +180,14 @@ pub const UI_COMMANDS: &[(&str, &str, Option<&str>, &str)] = &[
+@@ -179,15 +179,9 @@ pub const UI_COMMANDS: &[(&str, &str, Option<&str>, &str)] = &[
+         "{on?: bool, at?: [x, y] (points from the canvas's top-left)} — the Contextual Task Bar stays where it is (or at `at`) instead of following the selection; with neither, toggles",
      ),
      ("window.taskBarReset", "Reset Bar Position", None, "{} — the Contextual Task Bar follows the selection again, under it"),
-     ("help.discord", "Join the ArtCraft Discord…", None, "{} — opens https://discord.gg/artcraft in the browser"),
+-    ("help.discord", "Join the ArtCraft Discord…", None, "{} — opens https://discord.gg/artcraft in the browser"),
 -    ("help.appPage", "KIO Design Website…", None, "{} — opens https://getartcraft.com/apps/designcraft"),
 -    ("help.github", "KIO Design on GitHub…", None, "{} — opens https://github.com/storytold/designcraft"),
-+    ("help.appPage", "Bogo Design Website…", None, "{} — opens https://getartcraft.com/apps/designcraft"),
-+    ("help.github", "Bogo Design on GitHub…", None, "{} — opens https://github.com/storytold/designcraft"),
-     ("help.issues", "Report an Issue…", None, "{} — opens the GitHub issue tracker"),
-     ("help.website", "ArtCraft Website…", None, "{} — opens https://getartcraft.com"),
-     ("help.app", "ArtCraft App Page…", None, "{app} — opens https://getartcraft.com/apps/{app} (e.g. photocraft)"),
+-    ("help.issues", "Report an Issue…", None, "{} — opens the GitHub issue tracker"),
+-    ("help.website", "ArtCraft Website…", None, "{} — opens https://getartcraft.com"),
+-    ("help.app", "ArtCraft App Page…", None, "{app} — opens https://getartcraft.com/apps/{app} (e.g. photocraft)"),
      (
          "help.about",
 -        "About KIO Design",
@@ -52762,6 +53393,49 @@ index 82a659a53b2754e392e6ecc36b22ffb41216f9d7..d1e071fe239ebcfd08fed3a42f57b733
          None,
          "{open?: true, tab?: \"about\"|\"contributors\"|\"models\"} — the About window: splash with community links, contributor and model credits (open: false closes it)",
      ),
+@@ -735,21 +729,7 @@ pub const MENUS: &[(&str, &[&str])] = &[
+             "ui:window.brightness",
+         ],
+     ),
+-    (
+-        "Help",
+-        &[
+-            "ui:help.discord",
+-            "-",
+-            "ui:help.appPage",
+-            "ui:help.github",
+-            "ui:help.issues",
+-            "ui:help.website",
+-            "-",
+-            "cmd:file.newSample",
+-            "-",
+-            "ui:help.about",
+-        ],
+-    ),
++    ("Help", &["-", "-", "cmd:file.newSample", "-", "ui:help.about"]),
+ ];
+ 
+ pub fn ui_label(id: &str) -> Option<(&'static str, Option<&'static str>)> {
+@@ -1415,19 +1395,6 @@ pub fn run_ui(app: &mut DesignApp, id: &str, p: &Value) -> Option<Result<Value,
+             app.ui.about = p.get("open").and_then(Value::as_bool).unwrap_or(true);
+             Ok(json!(app.ui.about))
+         }
+-        "help.app" => match p.get("app").and_then(Value::as_str) {
+-            Some(slug) if !slug.is_empty() && slug.chars().all(|c| c.is_ascii_alphanumeric() || c == '-') => {
+-                let url = format!("{}/apps/{slug}", designcraft_engine::links::WEBSITE);
+-                app.ui.pending_urls.push(url.clone());
+-                Ok(json!({"url": url}))
+-            }
+-            _ => Err("help.app: give `app` (e.g. \"photocraft\")".into()),
+-        },
+-        h if h.starts_with("help.") && designcraft_engine::links::get(&h[5..]).is_some() => {
+-            let url = designcraft_engine::links::get(&h[5..]).unwrap_or_default().to_string();
+-            app.ui.pending_urls.push(url.clone());
+-            Ok(json!({"url": url}))
+-        }
+         "window.toolsDoubleColumn" => flag(&mut app.ui.tools_double_column),
+         "window.newWorkspace" => {
+             let Some(name) = p.get("name").and_then(Value::as_str).map(str::trim).filter(|n| !n.is_empty()) else {
 diff --git a/crates/ui-egui/src/rtl.rs b/crates/ui-egui/src/rtl.rs
 index 5a97821632544ee51c4dcbb95ed3c984b4ccd188..36faea2a84c65c109bec4132857107df1defa63c 100644
 --- a/crates/ui-egui/src/rtl.rs

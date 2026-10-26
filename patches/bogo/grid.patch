@@ -65,10 +65,27 @@ index e159881f9b8cb465362669156f25f92349f07751..8f07031b07c6fc8440b90fbc6e4b42c8
      }
  }
 diff --git a/apps/gridcraft/src/native_menu.rs b/apps/gridcraft/src/native_menu.rs
-index 34600e7a2160eae04e809c931f1ec5f7eda6a6ce..29b5b5b2125a0c344e523c075789ec3c5a32a16e 100644
+index 34600e7a2160eae04e809c931f1ec5f7eda6a6ce..c67a938394ab8963e8f7146fd04ce2f940cc3a1c 100644
 --- a/apps/gridcraft/src/native_menu.rs
 +++ b/apps/gridcraft/src/native_menu.rs
-@@ -201,8 +201,8 @@ fn select_theme(app: &mut SheetApp, id: &str) -> bool {
+@@ -169,15 +169,7 @@ fn tree() -> Vec<(&'static str, Vec<Entry>)> {
+             ],
+         ),
+         ("Window", vec![("New Window", "view.newWindow", None), ("Next Sheet", "sheet.next", None), ("Previous Sheet", "sheet.previous", None)]),
+-        (
+-            "Help",
+-            vec![
+-                ("Agent Control (MCP)…", "dialog:agents", None),
+-                ("Contributors…", "dialog:about:Contributors", None),
+-                ("Upstream GridCraft project", "url:https://getartcraft.com/apps/gridcraft", None),
+-                ("Upstream GridCraft community…", "url:https://discord.gg/artcraft", None),
+-            ],
+-        ),
++        ("Help", vec![("Agent Control (MCP)…", "dialog:agents", None), ("Contributors…", "dialog:about:Contributors", None)]),
+     ]
+ }
+ 
+@@ -201,8 +193,8 @@ fn select_theme(app: &mut SheetApp, id: &str) -> bool {
  impl NativeMenu {
      pub fn install(ctx: &egui::Context) -> NativeMenu {
          let menu = Menu::new();
@@ -50921,7 +50938,7 @@ index 646a79db2025265d0db0abefdd46ce3832752523..487609249eb046257b4e68b9d0aea4f9
          }
      }
 diff --git a/crates/ui-egui/src/dialogs.rs b/crates/ui-egui/src/dialogs.rs
-index 41b8ffe774ed224919f433c473674d8a4d113b93..503f4e658ee04eb72d07c68e0ebe53bd72d41055 100644
+index 41b8ffe774ed224919f433c473674d8a4d113b93..f0d1d89bcbed9dbfbdc57cd3c190bcfa82bf25c2 100644
 --- a/crates/ui-egui/src/dialogs.rs
 +++ b/crates/ui-egui/src/dialogs.rs
 @@ -674,7 +674,7 @@ impl Dialog {
@@ -50951,7 +50968,7 @@ index 41b8ffe774ed224919f433c473674d8a4d113b93..503f4e658ee04eb72d07c68e0ebe53bd
                      ui.add_space(4.0);
                      ui.monospace("gridcraft --control 7979        # JSON-lines control channel\ngridcraft-cli mcp --connect 7979   # MCP bridged to this window\ngridcraft-cli mcp                   # headless MCP server");
                      ui.add_space(4.0);
-@@ -1483,10 +1483,10 @@ fn about(ui: &mut egui::Ui, d: &mut Dialog) {
+@@ -1483,13 +1483,10 @@ fn about(ui: &mut egui::Ui, d: &mut Dialog) {
          "Contributors" => crate::credits::contributors_ui(ui),
          "Models" => crate::credits::models_ui(ui),
          _ => {
@@ -50960,11 +50977,13 @@ index 41b8ffe774ed224919f433c473674d8a4d113b93..503f4e658ee04eb72d07c68e0ebe53bd
              ui.label(format!("Version {}", env!("CARGO_PKG_VERSION")));
              ui.add_space(4.0);
 -            ui.label("Independent KIO fork. Original GridCraft v0.7.0 by the ArtCraft team.");
-+            ui.label("Independent Bogo fork. Original GridCraft v0.7.0 by the ArtCraft team.");
-             ui.hyperlink_to("Upstream source: GridCraft", "https://github.com/storytold/gridcraft/tree/d9d09f0baa912e88c5111107903fc8c640214b57");
+-            ui.hyperlink_to("Upstream source: GridCraft", "https://github.com/storytold/gridcraft/tree/d9d09f0baa912e88c5111107903fc8c640214b57");
              ui.small("MIT OR Apache-2.0. Copyright (c) 2026 ArtCraft Team and the GridCraft contributors.");
-             ui.hyperlink_to("Upstream GridCraft community", "https://discord.gg/artcraft");
-@@ -1498,7 +1498,7 @@ fn about(ui: &mut egui::Ui, d: &mut Dialog) {
+-            ui.hyperlink_to("Upstream GridCraft community", "https://discord.gg/artcraft");
+         }
+     }
+ }
+@@ -1498,7 +1495,7 @@ fn about(ui: &mut egui::Ui, d: &mut Dialog) {
  /// preserved VBA project. Mirrors Excel's Developer ▸ Macros list, but is honest that VBA is
  /// preserved and not executed.
  fn macros(ui: &mut egui::Ui, d: &mut Dialog) {

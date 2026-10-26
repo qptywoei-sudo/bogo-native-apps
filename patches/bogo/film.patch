@@ -256,7 +256,7 @@ index 1b2d01d0047971c47ca0ed5764b964bbfe5c8d67..1eb442aa4da45ba7b9e7355e390e05ed
      let dialog = prepare_dialog(dialog);
      let (tx, rx) = std::sync::mpsc::channel();
 diff --git a/apps/filmcraft/src/native_menu.rs b/apps/filmcraft/src/native_menu.rs
-index 9f11f458846926680dd153ad5bfe72764bd75666..3cf8cb83e71c9e86f4ff164f5cb222fd4e52b65e 100644
+index 9f11f458846926680dd153ad5bfe72764bd75666..2cdc4b2441b9dd03c693c48311d77fc675c8b39c 100644
 --- a/apps/filmcraft/src/native_menu.rs
 +++ b/apps/filmcraft/src/native_menu.rs
 @@ -28,7 +28,7 @@ pub fn install(app: &FilmcraftApp, ctx: egui::Context) -> (Receiver<String>, Men
@@ -268,15 +268,26 @@ index 9f11f458846926680dd153ad5bfe72764bd75666..3cf8cb83e71c9e86f4ff164f5cb222fd
      let [settings_label, hide_label, hide_others_label, quit_label] = NATIVE_APP_MENU;
      // FilmCraft ▸ Settings ▸ <category> (Premiere's app-menu layout; General is Cmd+,)
      let settings = Submenu::new(app.ui.language.tr(settings_label), true);
-@@ -41,7 +41,7 @@ pub fn install(app: &FilmcraftApp, ctx: egui::Context) -> (Receiver<String>, Men
+@@ -41,9 +41,8 @@ pub fn install(app: &FilmcraftApp, ctx: egui::Context) -> (Receiver<String>, Men
      }
      // About and Discord repeat Help menu commands: same translated labels, updated with them
      let label = |id: &str, english: &str| items.iter().find(|i| i.id == id).map_or_else(|| english.to_string(), |i| i.label.clone());
 -    let about = MenuItem::with_id("app.about", label("app.about", "About KIO Film"), true, None);
+-    let discord = MenuItem::with_id("help.discord", label("help.discord", "Join the ArtCraft Discord…"), true, None);
+-    for (id, mi) in [("app.about", &about), ("help.discord", &discord)] {
 +    let about = MenuItem::with_id("app.about", label("app.about", "About Bogo Film"), true, None);
-     let discord = MenuItem::with_id("help.discord", label("help.discord", "Join the ArtCraft Discord…"), true, None);
-     for (id, mi) in [("app.about", &about), ("help.discord", &discord)] {
++    for (id, mi) in [("app.about", &about)] {
          if let Some(it) = items.iter().find(|i| i.id == id) {
+             // recorded as built (enabled, no shortcut), so the first update applies the real state
+             native.push((Item { enabled: true, shortcut: None, ..it.clone() }, mi.clone()));
+@@ -58,7 +57,6 @@ pub fn install(app: &FilmcraftApp, ctx: egui::Context) -> (Receiver<String>, Men
+     let [(_, hide), (_, hide_others), (_, quit)] = &predefined;
+     let _ = app_menu.append_items(&[
+         &about,
+-        &discord,
+         &PredefinedMenuItem::separator(),
+         &settings,
+         &PredefinedMenuItem::separator(),
 diff --git a/assets/app-icon/BOGO-ICON-SOURCE.txt b/assets/app-icon/BOGO-ICON-SOURCE.txt
 new file mode 100644
 index 0000000000000000000000000000000000000000..4e274e83efd7200c1248b111ad09f8bb14efc16f
@@ -48965,20 +48976,56 @@ index 8803bf264501d49111d501dca477842b7a35ed96..14e111d85e292c43b0c2579867420b26
          Node::Split { axis, size, first, second } => DockNode::Split {
              vertical: axis == SplitAxis::Vertical,
              size: match size {
+diff --git a/crates/ui-egui/src/header.rs b/crates/ui-egui/src/header.rs
+index 5b8f23c8586bb2f578344ea939a1ca8b87a7eaf5..8a086ea10921f0e56ccd8934ea01b48484adada3 100644
+--- a/crates/ui-egui/src/header.rs
++++ b/crates/ui-egui/src/header.rs
+@@ -120,20 +120,10 @@ pub fn show(app: &mut FilmcraftApp, ui: &mut egui::Ui, rect: Rect) {
+     let wresp = ui.interact(wr, egui::Id::new("hdr-ws-name"), Sense::click());
+     app.auto.add("header.workspaceName", wr, &ws);
+     p.galley_with_override_text_color(pos2(wr.min.x + 4.0, rect.center().y - wg.size().y / 2.0), wg, if wresp.hovered() { t.text } else { t.text_dim });
+-    // Community: a labelled Discord button, always one click away.
+     {
+-        let label = "Discord";
+-        let g = p.layout_no_wrap(label.to_string(), Tokens::ui(12.0), Color32::WHITE);
+-        let w = g.size().x + 34.0;
+-        let r = Rect::from_min_size(pos2(wr.min.x - w - 14.0, rect.center().y - 12.0), vec2(w, 24.0));
+-        let resp = ui.interact(r, egui::Id::new("hdr-discord"), Sense::click()).on_hover_text(tl!("Join the ArtCraft Discord (discord.gg/artcraft)"));
+-        app.auto.add("header.discord", r, "Join the ArtCraft Discord");
+-        ui.painter().rect_filled(r, 12.0, if resp.hovered() { t.accent_hover } else { t.accent });
+-        icons::paint(ui.painter(), Rect::from_center_size(pos2(r.min.x + 14.0, r.center().y), vec2(14.0, 14.0)), Icon::Chat, Color32::WHITE);
+-        ui.painter().galley(pos2(r.min.x + 25.0, r.center().y - g.size().y / 2.0), g, Color32::WHITE);
+         // Localized menus and user titles can be wider than English. Use the actual gap.
+         let left = left_end + 12.0;
+-        let right = r.min.x - 12.0;
++        let right = wr.min.x - 12.0;
+         if right > left + 40.0 {
+             let mut job = egui::text::LayoutJob::simple_singleline(title, Tokens::ui(14.0), t.tab_text_active);
+             job.wrap.max_width = right - left;
+@@ -147,10 +137,6 @@ pub fn show(app: &mut FilmcraftApp, ui: &mut egui::Ui, rect: Rect) {
+                 t.tab_text_active,
+             );
+         }
+-
+-        if resp.clicked() {
+-            crate::links::open(app, ui.ctx(), crate::links::DISCORD);
+-        }
+     }
+     let popup_id = egui::Id::new("workspaces-popup");
+     if ws_resp.clicked() || wresp.clicked() {
 diff --git a/crates/ui-egui/src/i18n/de.tsv b/crates/ui-egui/src/i18n/de.tsv
-index 216c673457b0ce971b79fc44960df2286ad92e89..bc14fef54f1b5edcf61a18365a66e999b1a5c203 100644
+index 216c673457b0ce971b79fc44960df2286ad92e89..294c6141609dcdede17da43166279e37167e59df 100644
 --- a/crates/ui-egui/src/i18n/de.tsv
 +++ b/crates/ui-egui/src/i18n/de.tsv
-@@ -4,7 +4,7 @@
+@@ -4,7 +4,6 @@
  # German video-editing vocabulary. No proprietary localisation resource, string table or product UI
  # was consulted or copied; add entries the same way. Like the German catalogs of the other Craft
  # apps, text addresses the user informally ("du") and commands use the infinitive ("Projekt
 -# öffnen…"). Product, format and feature names (KIO Film, ArtCraft, Lumetri, Essential Graphics,
-+# öffnen…"). Product, format and feature names (Bogo Film, ArtCraft, Lumetri, Essential Graphics,
  # EDL, AAF…) keep their spelling. This catalog covers every menu, including the native macOS
  # app menu; anything else is shown in English.
  #
-@@ -14,7 +14,7 @@
+@@ -14,7 +13,7 @@
  # menu) = Voreinstellungen. "Timeline" is not translated.
  
  	AAF…	AAF…
@@ -48987,7 +49034,15 @@ index 216c673457b0ce971b79fc44960df2286ad92e89..bc14fef54f1b5edcf61a18365a66e999
  	Add Audio Submix Track	Audio-Submix-Spur hinzufügen
  	Add Caption at Playhead	Untertitel an Abspielposition hinzufügen
  	Add Chapter Marker…	Kapitelmarker hinzufügen…
-@@ -144,9 +144,9 @@
+@@ -40,7 +39,6 @@
+ 	Apply Default Transitions to Selection	Standardübergänge auf Auswahl anwenden
+ 	Apply Video Transition	Videoübergang anwenden
+ 	Arrange	Anordnen
+-	ArtCraft Website	ArtCraft-Website
+ 	Assembly	Montage
+ 	Attach Proxies…	Proxys anhängen…
+ 	Audio	Audio
+@@ -144,9 +142,8 @@
  	File	Datei
  	File…	Datei…
  	Fill frame	Bild füllen
@@ -48996,11 +49051,10 @@ index 216c673457b0ce971b79fc44960df2286ad92e89..bc14fef54f1b5edcf61a18365a66e999
 -	KIO Film on getartcraft.com	KIO Film auf getartcraft.com
 +	Bogo Film Help…	Bogo Film-Hilfe…
 +	Bogo Film on GitHub	Bogo Film auf GitHub
-+	Bogo Film on getartcraft.com	Bogo Film auf getartcraft.com
  	Final Cut Pro XML…	Final Cut Pro XML…
  	Find Next	Weitersuchen
  	Find…	Suchen…
-@@ -180,7 +180,7 @@
+@@ -180,7 +177,7 @@
  	Guide Templates	Hilfslinienvorlagen
  	Help	Hilfe
  	Hide All Caption Tracks	Alle Untertitelspuren ausblenden
@@ -49009,7 +49063,15 @@ index 216c673457b0ce971b79fc44960df2286ad92e89..bc14fef54f1b5edcf61a18365a66e999
  	Hide Others	Andere ausblenden
  	High Quality Playback	Wiedergabe in hoher Qualität
  	History	Verlauf
-@@ -273,7 +273,7 @@
+@@ -195,7 +192,6 @@
+ 	Install Motion Graphics Template…	Motion-Graphics-Vorlage installieren…
+ 	Interpret Footage…	Material interpretieren…
+ 	Iris	Iris
+-	Join the ArtCraft Discord…	Dem ArtCraft-Discord beitreten…
+ 	Keyboard Shortcuts…	Tastenkürzel…
+ 	Label	Farbmarkierung
+ 	Labels…	Farbmarkierungen…
+@@ -273,7 +269,7 @@
  	Properties	Eigenschaften
  	Proxy	Proxy
  	Purple	Lila
@@ -49018,7 +49080,7 @@ index 216c673457b0ce971b79fc44960df2286ad92e89..bc14fef54f1b5edcf61a18365a66e999
  	Reconnect Full Resolution Media…	Medien in voller Auflösung neu verknüpfen…
  	Recover Unsaved Changes…	Nicht gespeicherte Änderungen wiederherstellen…
  	Rectangle	Rechteck
-@@ -330,7 +330,7 @@
+@@ -330,7 +326,7 @@
  	Select Previous Graphic	Vorherige Grafik auswählen
  	Select Previous Layer	Vorherige Ebene auswählen
  	Selection Follows Playhead	Auswahl folgt Abspielposition
@@ -49028,15 +49090,14 @@ index 216c673457b0ce971b79fc44960df2286ad92e89..bc14fef54f1b5edcf61a18365a66e999
  	Send Backward	Schrittweise nach hinten
  	Send to Back	In den Hintergrund
 diff --git a/crates/ui-egui/src/i18n/es.tsv b/crates/ui-egui/src/i18n/es.tsv
-index 252322bd0e48e796f19146eb2219a89c4d3ea5b9..660f2197dff0625b7308776756db6f19d537b6f0 100644
+index 252322bd0e48e796f19146eb2219a89c4d3ea5b9..c6f4df4bd7ef83e1a072e731d0b33b2e3a76ffdb 100644
 --- a/crates/ui-egui/src/i18n/es.tsv
 +++ b/crates/ui-egui/src/i18n/es.tsv
-@@ -11,10 +11,10 @@
+@@ -11,10 +11,9 @@
  # Clean-room: every entry was written from the plain meaning of the English text using ordinary
  # Spanish video-editing vocabulary (pista, cabezal, secuencia, bandeja, procesar…). No proprietary
  # localisation resource, string table or product UI was consulted or copied; add entries the same
 -# way. Product and technology names (KIO Film, ArtCraft, Lumetri, ProRes, LUFS…) keep their
-+# way. Product and technology names (Bogo Film, ArtCraft, Lumetri, ProRes, LUFS…) keep their
  # spelling. "video" is written without an accent, as in the rest of this catalog.
  
 -	About KIO Film	Acerca de KIO Film
@@ -49044,7 +49105,15 @@ index 252322bd0e48e796f19146eb2219a89c4d3ea5b9..660f2197dff0625b7308776756db6f19
  	Add Audio Submix Track	Añadir pista de submezcla de audio
  	Add Caption at Playhead	Añadir subtítulo en el cabezal
  	Add Chapter Marker…	Añadir marcador de capítulo…
-@@ -133,9 +133,9 @@
+@@ -40,7 +39,6 @@
+ 	Apply Default Transitions to Selection	Aplicar transiciones predeterminadas a la selección
+ 	Apply Video Transition	Aplicar transición de video
+ 	Arrange	Organizar
+-	ArtCraft Website	Sitio web de ArtCraft
+ 	Assembly	Ensamblaje
+ 	Attach Proxies…	Adjuntar proxies…
+ 	Audio Channels…	Canales de audio…
+@@ -133,9 +131,8 @@
  	File	Archivo
  	File…	Archivo…
  	Fill frame	Rellenar fotograma
@@ -49053,11 +49122,18 @@ index 252322bd0e48e796f19146eb2219a89c4d3ea5b9..660f2197dff0625b7308776756db6f19
 -	KIO Film on getartcraft.com	KIO Film en getartcraft.com
 +	Bogo Film Help…	Ayuda de Bogo Film…
 +	Bogo Film on GitHub	Bogo Film en GitHub
-+	Bogo Film on getartcraft.com	Bogo Film en getartcraft.com
  	Find Next	Buscar siguiente
  	Find…	Buscar…
  	Fit	Ajustar
-@@ -308,7 +308,7 @@
+@@ -179,7 +176,6 @@
+ 	Insert Frame Hold Segment	Insertar segmento de fotograma congelado
+ 	Install Motion Graphics Template…	Instalar plantilla de animación…
+ 	Interpret Footage…	Interpretar material…
+-	Join the ArtCraft Discord…	Únete al Discord de ArtCraft…
+ 	Keyboard Shortcuts…	Atajos de teclado…
+ 	Label	Etiqueta
+ 	Labels…	Etiquetas…
+@@ -308,7 +304,7 @@
  	Select Previous Graphic	Seleccionar gráfico anterior
  	Select Previous Layer	Seleccionar capa anterior
  	Selection Follows Playhead	La selección sigue al cabezal
@@ -49066,7 +49142,24 @@ index 252322bd0e48e796f19146eb2219a89c4d3ea5b9..660f2197dff0625b7308776756db6f19
  	Selection…	Selección…
  	Send Backward	Enviar atrás
  	Send to Back	Enviar al fondo
-@@ -438,8 +438,8 @@
+@@ -374,7 +370,6 @@
+ 	Master volume: use the Audio Track Mixer	Volumen maestro: usa el mezclador de pistas de audio
+ 	Search	Buscar
+ 	Quick Export	Exportación rápida
+-	Join the ArtCraft Discord (discord.gg/artcraft)	Únete al Discord de ArtCraft (discord.gg/artcraft)
+ 	Cancel	Cancelar
+ 	OK	Aceptar
+ 	Interpret Footage	Interpretar material
+@@ -417,8 +412,6 @@
+ 	Delete Caption Track	Eliminar pista de subtítulos
+ 	Delete Empty Caption Tracks	Eliminar pistas de subtítulos vacías
+ 	Version {version}	Versión {version}
+-	A clean-room, pure-Rust non-linear video editor. Part of the ArtCraft family.	Un editor de video no lineal en Rust puro, desarrollado en sala limpia. Parte de la familia ArtCraft.
+-	Join the ArtCraft Discord	Únete al Discord de ArtCraft
+ 	Source code on GitHub	Código fuente en GitHub
+ 	Report an issue	Informar de un problema
+ 	MIT OR Apache-2.0. Fonts: Inter, Noto Serif and JetBrains Mono (SIL OFL 1.1).	MIT OR Apache-2.0. Fuentes: Inter, Noto Serif y JetBrains Mono (SIL OFL 1.1).
+@@ -438,8 +431,8 @@
  	No background jobs.	No hay tareas en segundo plano.
  	Recover Unsaved Changes	Recuperar cambios no guardados
  	Untitled	Sin título
@@ -49077,7 +49170,15 @@ index 252322bd0e48e796f19146eb2219a89c4d3ea5b9..660f2197dff0625b7308776756db6f19
  	Recover unsaved changes from {when}?	¿Recuperar los cambios no guardados de {when}?
  	The project had not been saved yet.	El proyecto aún no se había guardado.
  	{n} sessions have unsaved changes:	{n} sesiones tienen cambios sin guardar:
-@@ -966,7 +966,7 @@
+@@ -459,7 +452,6 @@
+ 	Bars and Tone	Barras y tono
+ 	SMPTE HD bars with 1 kHz reference tone	Barras SMPTE HD con tono de referencia de 1 kHz
+ 	Community	Comunidad
+-	Join us on Discord	Únete a nosotros en Discord
+ 	OMF Export Settings	Ajustes de exportación OMF
+ 	AAF Export Settings	Ajustes de exportación AAF
+ 	OMF Title:	Título OMF:
+@@ -966,7 +958,7 @@
  	Font family	Familia de fuentes
  	Label Colors	Colores de etiqueta
  	Decoded frames held for the monitors and thumbnails: {used} of {budget}.	Fotogramas descodificados en memoria para los monitores y miniaturas: {used} de {budget}.
@@ -49086,7 +49187,7 @@ index 252322bd0e48e796f19146eb2219a89c4d3ea5b9..660f2197dff0625b7308776756db6f19
  	not available in this session	no disponible en esta sesión
  	Currently: {loc} — {files} file(s), {size}	Actualmente: {loc} — {files} archivo(s), {size}
  	 ({ch} output channels)	 ({ch} canales de salida)
-@@ -1077,7 +1077,7 @@
+@@ -1077,7 +1069,7 @@
  	Video Frame	Fotograma de video
  	Pin To	Fijar a
  	Pinned Edges	Bordes fijados
@@ -49095,7 +49196,7 @@ index 252322bd0e48e796f19146eb2219a89c4d3ea5b9..660f2197dff0625b7308776756db6f19
  	{n} Font	{n} Fuente
  	{n} Size	{n} Tamaño
  	{n} Color	{n} Color
-@@ -1087,7 +1087,7 @@
+@@ -1087,7 +1079,7 @@
  	Export As Motion Graphics Template	Exportar como plantilla de animación
  	Category:	Categoría:
  	Editable properties:	Propiedades editables:
@@ -49104,7 +49205,7 @@ index 252322bd0e48e796f19146eb2219a89c4d3ea5b9..660f2197dff0625b7308776756db6f19
  	Exported graphics template to {path}	Plantilla de gráficos exportada a {path}
  	Replace Fonts in Projects	Reemplazar fuentes en proyectos
  	Fonts used in the project:	Fuentes usadas en el proyecto:
-@@ -1457,7 +1457,7 @@
+@@ -1457,7 +1449,7 @@
  	Center of Sphere	Centro de la esfera
  	Cents	Centésimas
  	Change to Color	Cambiar a color
@@ -49113,7 +49214,7 @@ index 252322bd0e48e796f19146eb2219a89c4d3ea5b9..660f2197dff0625b7308776756db6f19
  	Channel	Canal
  	Channel Blur	Desenfoque de canal
  	Channel Mix	Mezcla de canales
-@@ -1830,13 +1830,13 @@
+@@ -1830,13 +1822,13 @@
  	Hard Limiter	Limitador duro
  	Hard Mix	Mezcla definida
  	Hardware decoding	Descodificación por hardware
@@ -49129,7 +49230,7 @@ index 252322bd0e48e796f19146eb2219a89c4d3ea5b9..660f2197dff0625b7308776756db6f19
  	Hide Others	Ocultar otras
  	High	Alta
  	High Cutoff	Corte de agudos
-@@ -2107,7 +2107,7 @@
+@@ -2107,7 +2099,7 @@
  	Night	Noche
  	No Motion	Sin movimiento
  	No Scroll	Sin desplazamiento
@@ -49138,7 +49239,7 @@ index 252322bd0e48e796f19146eb2219a89c4d3ea5b9..660f2197dff0625b7308776756db6f19
  	Noise	Ruido
  	Noise & Grain	Ruido y grano
  	Noise (Legacy)	Ruido (heredado)
-@@ -2539,7 +2539,7 @@
+@@ -2539,7 +2531,7 @@
  	Template Properties	Propiedades de la plantilla
  	Text Animator	Animador de texto
  	Text Color	Color del texto
@@ -49147,7 +49248,7 @@ index 252322bd0e48e796f19146eb2219a89c4d3ea5b9..660f2197dff0625b7308776756db6f19
  	Thickness	Grosor
  	Tile Gradient	Degradado en mosaico
  	Tilt	Inclinación
-@@ -2749,7 +2749,7 @@
+@@ -2749,7 +2741,7 @@
  	System Compatibility Report	Informe de compatibilidad del sistema
  	no GPU adapter: the CPU compositor is used	no hay adaptador de GPU: se usa el compositor de CPU
  	Avid Log Exchange	Avid Log Exchange
@@ -49156,7 +49257,7 @@ index 252322bd0e48e796f19146eb2219a89c4d3ea5b9..660f2197dff0625b7308776756db6f19
  	{name} Selection.fcproj	{name} Selección.fcproj
  	{name} (Simplified)	{name} (simplificada)
  	Find in:	Buscar en:
-@@ -2889,7 +2889,7 @@
+@@ -2889,7 +2881,7 @@
  	Start Queue	Iniciar cola
  	Stop	Detener
  	Clear Finished	Borrar terminadas
@@ -49165,7 +49266,7 @@ index 252322bd0e48e796f19146eb2219a89c4d3ea5b9..660f2197dff0625b7308776756db6f19
  	Sequence name	Nombre de la secuencia
  	Folder	Carpeta
  	Preset	Ajuste preestablecido
-@@ -2979,7 +2979,7 @@
+@@ -2979,7 +2971,7 @@
  	Drag a clip to slide it between its neighbours.	Arrastra un clip para deslizarlo entre sus vecinos.
  	Drag to scroll the timeline.	Arrastra para desplazar la línea de tiempo.
  	Click to zoom in; Opt-click to zoom out.	Haz clic para acercar; Opción+clic para alejar.
@@ -49174,7 +49275,7 @@ index 252322bd0e48e796f19146eb2219a89c4d3ea5b9..660f2197dff0625b7308776756db6f19
  	Details: {path}	Detalles: {path}
  	Opened {url}	Abierto {url}
  	(empty)	(vacío)
-@@ -3239,7 +3239,7 @@
+@@ -3239,7 +3231,7 @@
  	QuickTime, ProRes 4444 (4:4:4) with alpha channel, 24-bit 48 kHz PCM	QuickTime, ProRes 4444 (4:4:4) con canal alfa, PCM de 24 bits y 48 kHz
  	QuickTime, ProRes 4444 XQ (4:4:4), 24-bit 48 kHz PCM	QuickTime, ProRes 4444 XQ (4:4:4), PCM de 24 bits y 48 kHz
  	QuickTime, ProRes 422, 24-bit 48 kHz PCM	QuickTime, ProRes 422, PCM de 24 bits y 48 kHz
@@ -49183,7 +49284,7 @@ index 252322bd0e48e796f19146eb2219a89c4d3ea5b9..660f2197dff0625b7308776756db6f19
  	Rate Stretch Tool	Herramienta Ajuste de velocidad
  	Razor Tool	Herramienta Cuchilla
  	Rectangle Tool	Herramienta Rectángulo
-@@ -3540,8 +3540,8 @@
+@@ -3540,8 +3532,8 @@
  	Composite in Linear Color	Componer en color lineal
  	Auto Tone Map Media (HDR and log into SDR)	Mapeo de tonos automático de medios (HDR y log a SDR)
  	Configure…	Configurar…
@@ -49194,7 +49295,7 @@ index 252322bd0e48e796f19146eb2219a89c4d3ea5b9..660f2197dff0625b7308776756db6f19
  	Loop marked range	Bucle del intervalo marcado
  	Play Source	Reproducir origen
  	Source Play/Stop	Reproducir/Detener origen
-@@ -3607,6 +3607,6 @@
+@@ -3607,6 +3599,6 @@
  	Opens in your web browser: {url}	Se abre en el navegador web: {url}
  	Saves this session's log and shows it in your file manager.	Guarda el registro de esta sesión y lo muestra en el explorador de archivos.
  	Shows a report on this computer.	Muestra un informe sobre este equipo.
@@ -49203,19 +49304,18 @@ index 252322bd0e48e796f19146eb2219a89c4d3ea5b9..660f2197dff0625b7308776756db6f19
  	Couldn't open your web browser	No se pudo abrir el navegador web
  	Open this address in your browser yourself:	Abre esta dirección tú mismo en el navegador:
 diff --git a/crates/ui-egui/src/i18n/fr.tsv b/crates/ui-egui/src/i18n/fr.tsv
-index afa0472309497d2987f5ea5cb2481dbcb88891da..940c849beb855b06344170286368e2ace76e700a 100644
+index afa0472309497d2987f5ea5cb2481dbcb88891da..03c13c6e5f01107b59bca814599c78a9d2732960 100644
 --- a/crates/ui-egui/src/i18n/fr.tsv
 +++ b/crates/ui-egui/src/i18n/fr.tsv
-@@ -4,7 +4,7 @@
+@@ -4,7 +4,6 @@
  # French video-editing vocabulary. No proprietary localisation resource, string table or product UI
  # was consulted or copied; add entries the same way. Commands use the infinitive ("Enregistrer
  # sous…"), messages address the user as "vous", and labels use French sentence case. Product,
 -# format and technology names (KIO Film, ArtCraft, Lumetri, ProRes, LUFS, EDL, AAF…) keep their
-+# format and technology names (Bogo Film, ArtCraft, Lumetri, ProRes, LUFS, EDL, AAF…) keep their
  # spelling. French spacing: a space before ":", ";", "?" and "!". This catalog has the same entries
  # as `es.tsv` plus the native macOS Settings menu; strings added later show in English until they
  # are translated. A native-speaker review is welcome.
-@@ -16,7 +16,7 @@
+@@ -16,7 +15,7 @@
  # décalage, overwrite = écraser, scopes = oscilloscopes, preferences (also the native macOS
  # Settings menu) = Préférences, settings = paramètres.
  
@@ -49224,7 +49324,15 @@ index afa0472309497d2987f5ea5cb2481dbcb88891da..940c849beb855b06344170286368e2ac
  	Add Audio Submix Track	Ajouter une piste de sous-mixage audio
  	Add Caption at Playhead	Ajouter un sous-titre à la tête de lecture
  	Add Chapter Marker…	Ajouter un marqueur de chapitre…
-@@ -135,9 +135,9 @@
+@@ -42,7 +41,6 @@
+ 	Apply Default Transitions to Selection	Appliquer les transitions par défaut à la sélection
+ 	Apply Video Transition	Appliquer une transition vidéo
+ 	Arrange	Disposition
+-	ArtCraft Website	Site web d'ArtCraft
+ 	Assembly	Assemblage
+ 	Attach Proxies…	Associer des proxys…
+ 	Audio Channels…	Canaux audio…
+@@ -135,9 +133,8 @@
  	File	Fichier
  	File…	Fichier…
  	Fill frame	Remplir l'image
@@ -49233,11 +49341,18 @@ index afa0472309497d2987f5ea5cb2481dbcb88891da..940c849beb855b06344170286368e2ac
 -	KIO Film on getartcraft.com	KIO Film sur getartcraft.com
 +	Bogo Film Help…	Aide de Bogo Film…
 +	Bogo Film on GitHub	Bogo Film sur GitHub
-+	Bogo Film on getartcraft.com	Bogo Film sur getartcraft.com
  	Find Next	Rechercher le suivant
  	Find…	Rechercher…
  	Fit	Adapter
-@@ -310,7 +310,7 @@
+@@ -181,7 +178,6 @@
+ 	Insert Frame Hold Segment	Insérer un segment d'image figée
+ 	Install Motion Graphics Template…	Installer un modèle d'animation graphique…
+ 	Interpret Footage…	Interpréter le métrage…
+-	Join the ArtCraft Discord…	Rejoindre le Discord d'ArtCraft…
+ 	Keyboard Shortcuts…	Raccourcis clavier…
+ 	Label	Étiquette
+ 	Labels…	Étiquettes…
+@@ -310,7 +306,7 @@
  	Select Previous Graphic	Sélectionner le graphique précédent
  	Select Previous Layer	Sélectionner le calque précédent
  	Selection Follows Playhead	La sélection suit la tête de lecture
@@ -49246,7 +49361,24 @@ index afa0472309497d2987f5ea5cb2481dbcb88891da..940c849beb855b06344170286368e2ac
  	Selection…	Sélection…
  	Send Backward	Reculer
  	Send to Back	Mettre à l'arrière-plan
-@@ -440,8 +440,8 @@
+@@ -376,7 +372,6 @@
+ 	Master volume: use the Audio Track Mixer	Volume principal : utilisez le Mixeur de pistes audio
+ 	Search	Rechercher
+ 	Quick Export	Exportation rapide
+-	Join the ArtCraft Discord (discord.gg/artcraft)	Rejoindre le Discord d'ArtCraft (discord.gg/artcraft)
+ 	Cancel	Annuler
+ 	OK	OK
+ 	Interpret Footage	Interpréter le métrage
+@@ -419,8 +414,6 @@
+ 	Delete Caption Track	Supprimer la piste de sous-titres
+ 	Delete Empty Caption Tracks	Supprimer les pistes de sous-titres vides
+ 	Version {version}	Version {version}
+-	A clean-room, pure-Rust non-linear video editor. Part of the ArtCraft family.	Un éditeur vidéo non linéaire en pur Rust, conçu en salle blanche. Membre de la famille ArtCraft.
+-	Join the ArtCraft Discord	Rejoindre le Discord d'ArtCraft
+ 	Source code on GitHub	Code source sur GitHub
+ 	Report an issue	Signaler un problème
+ 	MIT OR Apache-2.0. Fonts: Inter, Noto Serif and JetBrains Mono (SIL OFL 1.1).	MIT OR Apache-2.0. Polices : Inter, Noto Serif et JetBrains Mono (SIL OFL 1.1).
+@@ -440,8 +433,8 @@
  	No background jobs.	Aucune tâche en arrière-plan.
  	Recover Unsaved Changes	Récupérer les modifications non enregistrées
  	Untitled	Sans titre
@@ -49257,7 +49389,15 @@ index afa0472309497d2987f5ea5cb2481dbcb88891da..940c849beb855b06344170286368e2ac
  	Recover unsaved changes from {when}?	Récupérer les modifications non enregistrées de {when} ?
  	The project had not been saved yet.	Le projet n'avait pas encore été enregistré.
  	{n} sessions have unsaved changes:	{n} sessions contiennent des modifications non enregistrées :
-@@ -966,7 +966,7 @@
+@@ -461,7 +454,6 @@
+ 	Bars and Tone	Barres et tonalité
+ 	SMPTE HD bars with 1 kHz reference tone	Barres SMPTE HD avec tonalité de référence à 1 kHz
+ 	Community	Communauté
+-	Join us on Discord	Rejoignez-nous sur Discord
+ 	OMF Export Settings	Paramètres d'exportation OMF
+ 	AAF Export Settings	Paramètres d'exportation AAF
+ 	OMF Title:	Titre OMF :
+@@ -966,7 +958,7 @@
  	Font family	Famille de polices
  	Label Colors	Couleurs d'étiquette
  	Decoded frames held for the monitors and thumbnails: {used} of {budget}.	Images décodées conservées pour les moniteurs et les vignettes : {used} sur {budget}.
@@ -49266,7 +49406,7 @@ index afa0472309497d2987f5ea5cb2481dbcb88891da..940c849beb855b06344170286368e2ac
  	not available in this session	non disponible dans cette session
  	Currently: {loc} — {files} file(s), {size}	Actuellement : {loc} — {files} fichier(s), {size}
  	 ({ch} output channels)	 ({ch} canaux de sortie)
-@@ -1077,7 +1077,7 @@
+@@ -1077,7 +1069,7 @@
  	Video Frame	Cadre vidéo
  	Pin To	Épingler à
  	Pinned Edges	Bords épinglés
@@ -49275,7 +49415,7 @@ index afa0472309497d2987f5ea5cb2481dbcb88891da..940c849beb855b06344170286368e2ac
  	{n} Font	Police de {n}
  	{n} Size	Taille de {n}
  	{n} Color	Couleur de {n}
-@@ -1087,7 +1087,7 @@
+@@ -1087,7 +1079,7 @@
  	Export As Motion Graphics Template	Exporter en tant que modèle d'animation graphique
  	Category:	Catégorie :
  	Editable properties:	Propriétés modifiables :
@@ -49284,7 +49424,7 @@ index afa0472309497d2987f5ea5cb2481dbcb88891da..940c849beb855b06344170286368e2ac
  	Exported graphics template to {path}	Modèle de graphiques exporté vers {path}
  	Replace Fonts in Projects	Remplacer les polices dans les projets
  	Fonts used in the project:	Polices utilisées dans le projet :
-@@ -1457,7 +1457,7 @@
+@@ -1457,7 +1449,7 @@
  	Center of Sphere	Centre de la sphère
  	Cents	Cents
  	Change to Color	Changer en couleur
@@ -49293,7 +49433,7 @@ index afa0472309497d2987f5ea5cb2481dbcb88891da..940c849beb855b06344170286368e2ac
  	Channel	Canal
  	Channel Blur	Flou de canal
  	Channel Mix	Mixage des canaux
-@@ -1830,7 +1830,7 @@
+@@ -1830,7 +1822,7 @@
  	Hard Limiter	Limiteur dur
  	Hard Mix	Mélange dur
  	Hardware decoding	Décodage matériel
@@ -49302,7 +49442,7 @@ index afa0472309497d2987f5ea5cb2481dbcb88891da..940c849beb855b06344170286368e2ac
  	Head Size	Taille de la tête
  	Heart	Cœur
  	Height	Hauteur
-@@ -2105,7 +2105,7 @@
+@@ -2105,7 +2097,7 @@
  	Night	Nuit
  	No Motion	Aucun mouvement
  	No Scroll	Aucun défilement
@@ -49311,7 +49451,7 @@ index afa0472309497d2987f5ea5cb2481dbcb88891da..940c849beb855b06344170286368e2ac
  	Noise	Bruit
  	Noise & Grain	Bruit et grain
  	Noise (Legacy)	Bruit (ancien)
-@@ -2536,7 +2536,7 @@
+@@ -2536,7 +2528,7 @@
  	Template Properties	Propriétés du modèle
  	Text Animator	Animateur de texte
  	Text Color	Couleur du texte
@@ -49320,7 +49460,7 @@ index afa0472309497d2987f5ea5cb2481dbcb88891da..940c849beb855b06344170286368e2ac
  	Thickness	Épaisseur
  	Tile Gradient	Dégradé en mosaïque
  	Tilt	Inclinaison
-@@ -2746,7 +2746,7 @@
+@@ -2746,7 +2738,7 @@
  	System Compatibility Report	Rapport de compatibilité système
  	no GPU adapter: the CPU compositor is used	aucun adaptateur GPU : le compositeur CPU est utilisé
  	Avid Log Exchange	Avid Log Exchange
@@ -49329,7 +49469,7 @@ index afa0472309497d2987f5ea5cb2481dbcb88891da..940c849beb855b06344170286368e2ac
  	{name} Selection.fcproj	{name} Sélection.fcproj
  	{name} (Simplified)	{name} (simplifiée)
  	Find in:	Rechercher dans :
-@@ -2886,7 +2886,7 @@
+@@ -2886,7 +2878,7 @@
  	Start Queue	Lancer la file d'attente
  	Stop	Arrêter
  	Clear Finished	Effacer les éléments terminés
@@ -49338,7 +49478,7 @@ index afa0472309497d2987f5ea5cb2481dbcb88891da..940c849beb855b06344170286368e2ac
  	Sequence name	Nom de la séquence
  	Folder	Dossier
  	Preset	Préréglage
-@@ -2976,7 +2976,7 @@
+@@ -2976,7 +2968,7 @@
  	Drag a clip to slide it between its neighbours.	Faites glisser un clip pour le faire coulisser entre ses voisins.
  	Drag to scroll the timeline.	Faites glisser pour faire défiler la timeline.
  	Click to zoom in; Opt-click to zoom out.	Cliquez pour un zoom avant ; Option+clic pour un zoom arrière.
@@ -49347,7 +49487,7 @@ index afa0472309497d2987f5ea5cb2481dbcb88891da..940c849beb855b06344170286368e2ac
  	Details: {path}	Détails : {path}
  	Opened {url}	{url} ouvert
  	(empty)	(vide)
-@@ -3218,7 +3218,7 @@
+@@ -3218,7 +3210,7 @@
  	QuickTime, ProRes 4444 (4:4:4) with alpha channel, 24-bit 48 kHz PCM	QuickTime, ProRes 4444 (4:4:4) avec couche alpha, PCM 24 bits 48 kHz
  	QuickTime, ProRes 4444 XQ (4:4:4), 24-bit 48 kHz PCM	QuickTime, ProRes 4444 XQ (4:4:4), PCM 24 bits 48 kHz
  	QuickTime, ProRes 422, 24-bit 48 kHz PCM	QuickTime, ProRes 422, PCM 24 bits 48 kHz
@@ -49356,7 +49496,7 @@ index afa0472309497d2987f5ea5cb2481dbcb88891da..940c849beb855b06344170286368e2ac
  	Rate Stretch Tool	Outil Étirement de la vitesse
  	Razor Tool	Outil Cutter
  	Rectangle Tool	Outil Rectangle
-@@ -3519,8 +3519,8 @@
+@@ -3519,8 +3511,8 @@
  	Composite in Linear Color	Composer en couleur linéaire
  	Auto Tone Map Media (HDR and log into SDR)	Mappage automatique des tons des médias (HDR et log vers SDR)
  	Configure…	Configurer…
@@ -49368,19 +49508,18 @@ index afa0472309497d2987f5ea5cb2481dbcb88891da..940c849beb855b06344170286368e2ac
  	Play Source	Lire la source
  	Source Play/Stop	Lire/arrêter la source
 diff --git a/crates/ui-egui/src/i18n/id.tsv b/crates/ui-egui/src/i18n/id.tsv
-index fa210edc225158e8c4f9042505247aa5726c8a0c..84ad9f983d1fea6236ad694d4d6ab9b94905cd6f 100644
+index fa210edc225158e8c4f9042505247aa5726c8a0c..3bc20ef886b29c38a12329325bf4f5d175c6ca41 100644
 --- a/crates/ui-egui/src/i18n/id.tsv
 +++ b/crates/ui-egui/src/i18n/id.tsv
-@@ -5,7 +5,7 @@
+@@ -5,7 +5,6 @@
  # string table or product UI was consulted or copied; add entries the same way. Commands use the
  # base verb ("Simpan Sebagai…", "Tambah Penanda"), messages address the user as "Anda", and menu
  # labels keep the title case of the English source. Product, format and technology names
 -# (KIO Film, ArtCraft, Lumetri, ProRes, LUFS, EDL, AAF…) keep their spelling, and common loanwords
-+# (Bogo Film, ArtCraft, Lumetri, ProRes, LUFS, EDL, AAF…) keep their spelling, and common loanwords
  # of the trade (render, preset, mixer, gain, ripple, roll, slip, slide, snap, scrub, offline) stay
  # as they are. Decimal fractions in descriptions use a comma (29,97 fps). This catalog has the same
  # entries as `es.tsv` plus the native macOS Settings menu; strings added later show in English until
-@@ -21,7 +21,7 @@
+@@ -21,7 +20,7 @@
  # thumbnail = gambar mini, voice-over = sulih suara, default = bawaan, preferences (also the native
  # macOS Settings menu) = Preferensi, settings = pengaturan.
  
@@ -49389,7 +49528,15 @@ index fa210edc225158e8c4f9042505247aa5726c8a0c..84ad9f983d1fea6236ad694d4d6ab9b9
  	Add Audio Submix Track	Tambah Trek Submix Audio
  	Add Caption at Playhead	Tambah Takarir di Kepala Putar
  	Add Chapter Marker…	Tambah Penanda Bab…
-@@ -140,9 +140,9 @@
+@@ -47,7 +46,6 @@
+ 	Apply Default Transitions to Selection	Terapkan Transisi Bawaan ke Pilihan
+ 	Apply Video Transition	Terapkan Transisi Video
+ 	Arrange	Susun
+-	ArtCraft Website	Situs Web ArtCraft
+ 	Assembly	Perakitan
+ 	Attach Proxies…	Lampirkan Proksi…
+ 	Audio Channels…	Kanal Audio…
+@@ -140,9 +138,8 @@
  	File	Berkas
  	File…	Berkas…
  	Fill frame	Isi bingkai
@@ -49398,11 +49545,18 @@ index fa210edc225158e8c4f9042505247aa5726c8a0c..84ad9f983d1fea6236ad694d4d6ab9b9
 -	KIO Film on getartcraft.com	KIO Film di getartcraft.com
 +	Bogo Film Help…	Bantuan Bogo Film…
 +	Bogo Film on GitHub	Bogo Film di GitHub
-+	Bogo Film on getartcraft.com	Bogo Film di getartcraft.com
  	Find Next	Cari Berikutnya
  	Find…	Cari…
  	Fit	Pas
-@@ -315,7 +315,7 @@
+@@ -186,7 +183,6 @@
+ 	Insert Frame Hold Segment	Sisipkan Segmen Tahan Bingkai
+ 	Install Motion Graphics Template…	Pasang Templat Grafis Gerak…
+ 	Interpret Footage…	Interpretasikan Rekaman…
+-	Join the ArtCraft Discord…	Gabung ke Discord ArtCraft…
+ 	Keyboard Shortcuts…	Pintasan Keyboard…
+ 	Label	Label
+ 	Labels…	Label…
+@@ -315,7 +311,7 @@
  	Select Previous Graphic	Pilih Grafis Sebelumnya
  	Select Previous Layer	Pilih Lapisan Sebelumnya
  	Selection Follows Playhead	Pilihan Mengikuti Kepala Putar
@@ -49411,7 +49565,24 @@ index fa210edc225158e8c4f9042505247aa5726c8a0c..84ad9f983d1fea6236ad694d4d6ab9b9
  	Selection…	Pilihan…
  	Send Backward	Kirim Mundur
  	Send to Back	Kirim ke Belakang
-@@ -445,8 +445,8 @@
+@@ -381,7 +377,6 @@
+ 	Master volume: use the Audio Track Mixer	Volume master: gunakan Mixer Trek Audio
+ 	Search	Cari
+ 	Quick Export	Ekspor Cepat
+-	Join the ArtCraft Discord (discord.gg/artcraft)	Gabung ke Discord ArtCraft (discord.gg/artcraft)
+ 	Cancel	Batal
+ 	OK	OK
+ 	Interpret Footage	Interpretasikan Rekaman
+@@ -424,8 +419,6 @@
+ 	Delete Caption Track	Hapus Trek Takarir
+ 	Delete Empty Caption Tracks	Hapus Trek Takarir Kosong
+ 	Version {version}	Versi {version}
+-	A clean-room, pure-Rust non-linear video editor. Part of the ArtCraft family.	Editor video non-linear clean-room berbahasa Rust murni. Bagian dari keluarga ArtCraft.
+-	Join the ArtCraft Discord	Gabung ke Discord ArtCraft
+ 	Source code on GitHub	Kode sumber di GitHub
+ 	Report an issue	Laporkan masalah
+ 	MIT OR Apache-2.0. Fonts: Inter, Noto Serif and JetBrains Mono (SIL OFL 1.1).	MIT OR Apache-2.0. Font: Inter, Noto Serif dan JetBrains Mono (SIL OFL 1.1).
+@@ -445,8 +438,8 @@
  	No background jobs.	Tidak ada tugas latar belakang.
  	Recover Unsaved Changes	Pulihkan Perubahan yang Belum Disimpan
  	Untitled	Tanpa Judul
@@ -49422,7 +49593,15 @@ index fa210edc225158e8c4f9042505247aa5726c8a0c..84ad9f983d1fea6236ad694d4d6ab9b9
  	Recover unsaved changes from {when}?	Pulihkan perubahan yang belum disimpan dari {when}?
  	The project had not been saved yet.	Proyek ini belum pernah disimpan.
  	{n} sessions have unsaved changes:	{n} sesi memiliki perubahan yang belum disimpan:
-@@ -971,7 +971,7 @@
+@@ -466,7 +459,6 @@
+ 	Bars and Tone	Bar dan Nada
+ 	SMPTE HD bars with 1 kHz reference tone	Bar SMPTE HD dengan nada referensi 1 kHz
+ 	Community	Komunitas
+-	Join us on Discord	Bergabunglah dengan kami di Discord
+ 	OMF Export Settings	Pengaturan Ekspor OMF
+ 	AAF Export Settings	Pengaturan Ekspor AAF
+ 	OMF Title:	Judul OMF:
+@@ -971,7 +963,7 @@
  	Font family	Keluarga font
  	Label Colors	Warna Label
  	Decoded frames held for the monitors and thumbnails: {used} of {budget}.	Bingkai terdekode yang disimpan untuk monitor dan gambar mini: {used} dari {budget}.
@@ -49431,7 +49610,7 @@ index fa210edc225158e8c4f9042505247aa5726c8a0c..84ad9f983d1fea6236ad694d4d6ab9b9
  	not available in this session	tidak tersedia di sesi ini
  	Currently: {loc} — {files} file(s), {size}	Saat ini: {loc} — {files} berkas, {size}
  	 ({ch} output channels)	 ({ch} kanal output)
-@@ -1082,7 +1082,7 @@
+@@ -1082,7 +1074,7 @@
  	Video Frame	Bingkai Video
  	Pin To	Sematkan ke
  	Pinned Edges	Tepi Tersemat
@@ -49440,7 +49619,7 @@ index fa210edc225158e8c4f9042505247aa5726c8a0c..84ad9f983d1fea6236ad694d4d6ab9b9
  	{n} Font	Font {n}
  	{n} Size	Ukuran {n}
  	{n} Color	Warna {n}
-@@ -1092,7 +1092,7 @@
+@@ -1092,7 +1084,7 @@
  	Export As Motion Graphics Template	Ekspor sebagai Templat Grafis Gerak
  	Category:	Kategori:
  	Editable properties:	Properti yang dapat diedit:
@@ -49449,7 +49628,7 @@ index fa210edc225158e8c4f9042505247aa5726c8a0c..84ad9f983d1fea6236ad694d4d6ab9b9
  	Exported graphics template to {path}	Templat grafis diekspor ke {path}
  	Replace Fonts in Projects	Ganti Font di Proyek
  	Fonts used in the project:	Font yang dipakai di proyek:
-@@ -1462,7 +1462,7 @@
+@@ -1462,7 +1454,7 @@
  	Center of Sphere	Pusat Bola
  	Cents	Sen
  	Change to Color	Ubah ke Warna
@@ -49458,7 +49637,7 @@ index fa210edc225158e8c4f9042505247aa5726c8a0c..84ad9f983d1fea6236ad694d4d6ab9b9
  	Channel	Kanal
  	Channel Blur	Buram Kanal
  	Channel Mix	Campuran Kanal
-@@ -1835,7 +1835,7 @@
+@@ -1835,7 +1827,7 @@
  	Hard Limiter	Limiter Keras
  	Hard Mix	Campuran Keras
  	Hardware decoding	Dekode perangkat keras
@@ -49467,7 +49646,7 @@ index fa210edc225158e8c4f9042505247aa5726c8a0c..84ad9f983d1fea6236ad694d4d6ab9b9
  	Head Size	Ukuran Kepala
  	Heart	Hati
  	Height	Tinggi
-@@ -2110,7 +2110,7 @@
+@@ -2110,7 +2102,7 @@
  	Night	Malam
  	No Motion	Tanpa Gerak
  	No Scroll	Tanpa Gulir
@@ -49476,7 +49655,7 @@ index fa210edc225158e8c4f9042505247aa5726c8a0c..84ad9f983d1fea6236ad694d4d6ab9b9
  	Noise	Derau
  	Noise & Grain	Derau & Butiran
  	Noise (Legacy)	Derau (Lama)
-@@ -2541,7 +2541,7 @@
+@@ -2541,7 +2533,7 @@
  	Template Properties	Properti Templat
  	Text Animator	Animator Teks
  	Text Color	Warna Teks
@@ -49485,7 +49664,7 @@ index fa210edc225158e8c4f9042505247aa5726c8a0c..84ad9f983d1fea6236ad694d4d6ab9b9
  	Thickness	Ketebalan
  	Tile Gradient	Gradien Ubin
  	Tilt	Miringkan
-@@ -2751,7 +2751,7 @@
+@@ -2751,7 +2743,7 @@
  	System Compatibility Report	Laporan Kompatibilitas Sistem
  	no GPU adapter: the CPU compositor is used	tidak ada adaptor GPU: kompositor CPU digunakan
  	Avid Log Exchange	Avid Log Exchange
@@ -49494,7 +49673,7 @@ index fa210edc225158e8c4f9042505247aa5726c8a0c..84ad9f983d1fea6236ad694d4d6ab9b9
  	{name} Selection.fcproj	{name} Pilihan.fcproj
  	{name} (Simplified)	{name} (Disederhanakan)
  	Find in:	Cari di:
-@@ -2891,7 +2891,7 @@
+@@ -2891,7 +2883,7 @@
  	Start Queue	Mulai Antrean
  	Stop	Berhenti
  	Clear Finished	Hapus yang Selesai
@@ -49503,7 +49682,7 @@ index fa210edc225158e8c4f9042505247aa5726c8a0c..84ad9f983d1fea6236ad694d4d6ab9b9
  	Sequence name	Nama sekuens
  	Folder	Folder
  	Preset	Preset
-@@ -2981,7 +2981,7 @@
+@@ -2981,7 +2973,7 @@
  	Drag a clip to slide it between its neighbours.	Seret klip untuk menggesernya di antara klip tetangganya.
  	Drag to scroll the timeline.	Seret untuk menggulir linimasa.
  	Click to zoom in; Opt-click to zoom out.	Klik untuk memperbesar; Opt-klik untuk memperkecil.
@@ -49512,7 +49691,7 @@ index fa210edc225158e8c4f9042505247aa5726c8a0c..84ad9f983d1fea6236ad694d4d6ab9b9
  	Details: {path}	Detail: {path}
  	Opened {url}	Membuka {url}
  	(empty)	(kosong)
-@@ -3235,7 +3235,7 @@
+@@ -3235,7 +3227,7 @@
  	QuickTime, ProRes 4444 (4:4:4) with alpha channel, 24-bit 48 kHz PCM	QuickTime, ProRes 4444 (4:4:4) dengan kanal alfa, PCM 24-bit 48 kHz
  	QuickTime, ProRes 4444 XQ (4:4:4), 24-bit 48 kHz PCM	QuickTime, ProRes 4444 XQ (4:4:4), PCM 24-bit 48 kHz
  	QuickTime, ProRes 422, 24-bit 48 kHz PCM	QuickTime, ProRes 422, PCM 24-bit 48 kHz
@@ -49521,7 +49700,7 @@ index fa210edc225158e8c4f9042505247aa5726c8a0c..84ad9f983d1fea6236ad694d4d6ab9b9
  	Rate Stretch Tool	Alat Regang Laju
  	Razor Tool	Alat Silet
  	Rectangle Tool	Alat Persegi Panjang
-@@ -3535,8 +3535,8 @@
+@@ -3535,8 +3527,8 @@
  	Composite in Linear Color	Komposit dalam Warna Linier
  	Auto Tone Map Media (HDR and log into SDR)	Pemetaan Nada Otomatis Media (HDR dan log ke SDR)
  	Configure…	Konfigurasi…
@@ -49533,17 +49712,16 @@ index fa210edc225158e8c4f9042505247aa5726c8a0c..84ad9f983d1fea6236ad694d4d6ab9b9
  	Play Source	Putar Sumber
  	Source Play/Stop	Putar/Berhenti Sumber
 diff --git a/crates/ui-egui/src/i18n/it.tsv b/crates/ui-egui/src/i18n/it.tsv
-index 59d9ac25d1c486fa01dc0cfa753d39c4720499b0..32b719963e9f295c00feb9bcec2acbd210409a97 100644
+index 59d9ac25d1c486fa01dc0cfa753d39c4720499b0..06ceee038fff75519152bd2b5a41d54cd13be65d 100644
 --- a/crates/ui-egui/src/i18n/it.tsv
 +++ b/crates/ui-egui/src/i18n/it.tsv
-@@ -9,12 +9,12 @@
+@@ -9,12 +9,11 @@
  # Clean-room: every entry was written from the plain meaning of the English text using ordinary
  # Italian video-editing vocabulary (traccia, indicatore di riproduzione, sequenza, raccoglitore,
  # attacco/stacco, fotogramma chiave, rendering…). No proprietary localisation resource, string
 -# table or product UI was consulted or copied, and no other KIO Film catalog was translated from;
 -# add entries the same way. Product, technology and format names (KIO Film, ArtCraft, Lumetri,
 +# table or product UI was consulted or copied, and no other Bogo Film catalog was translated from;
-+# add entries the same way. Product, technology and format names (Bogo Film, ArtCraft, Lumetri,
  # ProRes, LUFS, H.264…) keep their spelling, as do key-cap names (Shift, Alt, Ctrl, Cmd, Opt, Esc).
  # Commands are imperatives addressed with "tu"; decimals use a comma (29,97 fps).
  
@@ -49552,7 +49730,15 @@ index 59d9ac25d1c486fa01dc0cfa753d39c4720499b0..32b719963e9f295c00feb9bcec2acbd2
  	Add Audio Submix Track	Aggiungi traccia submix audio
  	Add Caption at Playhead	Aggiungi sottotitolo all'indicatore di riproduzione
  	Add Chapter Marker…	Aggiungi marcatore di capitolo…
-@@ -133,9 +133,9 @@
+@@ -40,7 +39,6 @@
+ 	Apply Default Transitions to Selection	Applica transizioni predefinite alla selezione
+ 	Apply Video Transition	Applica transizione video
+ 	Arrange	Disponi
+-	ArtCraft Website	Sito web di ArtCraft
+ 	Assembly	Assemblaggio
+ 	Attach Proxies…	Associa proxy…
+ 	Audio Channels…	Canali audio…
+@@ -133,9 +131,8 @@
  	File	File
  	File…	File…
  	Fill frame	Riempi il fotogramma
@@ -49561,11 +49747,18 @@ index 59d9ac25d1c486fa01dc0cfa753d39c4720499b0..32b719963e9f295c00feb9bcec2acbd2
 -	KIO Film on getartcraft.com	KIO Film su getartcraft.com
 +	Bogo Film Help…	Guida di Bogo Film…
 +	Bogo Film on GitHub	Bogo Film su GitHub
-+	Bogo Film on getartcraft.com	Bogo Film su getartcraft.com
  	Find Next	Trova successivo
  	Find…	Trova…
  	Fit	Adatta
-@@ -305,7 +305,7 @@
+@@ -179,7 +176,6 @@
+ 	Insert Frame Hold Segment	Inserisci segmento di fermo immagine
+ 	Install Motion Graphics Template…	Installa modello di grafica animata…
+ 	Interpret Footage…	Interpreta metraggio…
+-	Join the ArtCraft Discord…	Unisciti al Discord di ArtCraft…
+ 	Keyboard Shortcuts…	Scorciatoie da tastiera…
+ 	Label	Etichetta
+ 	Labels…	Etichette…
+@@ -305,7 +301,7 @@
  	Select Previous Graphic	Seleziona grafica precedente
  	Select Previous Layer	Seleziona livello precedente
  	Selection Follows Playhead	La selezione segue l'indicatore di riproduzione
@@ -49574,7 +49767,24 @@ index 59d9ac25d1c486fa01dc0cfa753d39c4720499b0..32b719963e9f295c00feb9bcec2acbd2
  	Selection…	Selezione…
  	Send Backward	Porta indietro
  	Send to Back	Porta in fondo
-@@ -435,8 +435,8 @@
+@@ -371,7 +367,6 @@
+ 	Master volume: use the Audio Track Mixer	Volume master: usa il Mixer tracce audio
+ 	Search	Cerca
+ 	Quick Export	Esportazione rapida
+-	Join the ArtCraft Discord (discord.gg/artcraft)	Unisciti al Discord di ArtCraft (discord.gg/artcraft)
+ 	Cancel	Annulla
+ 	OK	OK
+ 	Interpret Footage	Interpreta metraggio
+@@ -414,8 +409,6 @@
+ 	Delete Caption Track	Elimina traccia sottotitoli
+ 	Delete Empty Caption Tracks	Elimina tracce sottotitoli vuote
+ 	Version {version}	Versione {version}
+-	A clean-room, pure-Rust non-linear video editor. Part of the ArtCraft family.	Un editor video non lineare clean-room, interamente in Rust. Parte della famiglia ArtCraft.
+-	Join the ArtCraft Discord	Unisciti al Discord di ArtCraft
+ 	Source code on GitHub	Codice sorgente su GitHub
+ 	Report an issue	Segnala un problema
+ 	MIT OR Apache-2.0. Fonts: Inter, Noto Serif and JetBrains Mono (SIL OFL 1.1).	MIT OR Apache-2.0. Font: Inter, Noto Serif e JetBrains Mono (SIL OFL 1.1).
+@@ -435,8 +428,8 @@
  	No background jobs.	Nessun processo in background.
  	Recover Unsaved Changes	Recupera modifiche non salvate
  	Untitled	Senza titolo
@@ -49585,7 +49795,15 @@ index 59d9ac25d1c486fa01dc0cfa753d39c4720499b0..32b719963e9f295c00feb9bcec2acbd2
  	Recover unsaved changes from {when}?	Recuperare le modifiche non salvate del {when}?
  	The project had not been saved yet.	Il progetto non era ancora stato salvato.
  	{n} sessions have unsaved changes:	{n} sessioni hanno modifiche non salvate:
-@@ -963,7 +963,7 @@
+@@ -456,7 +449,6 @@
+ 	Bars and Tone	Barre e tono
+ 	SMPTE HD bars with 1 kHz reference tone	Barre SMPTE HD con tono di riferimento a 1 kHz
+ 	Community	Community
+-	Join us on Discord	Unisciti a noi su Discord
+ 	OMF Export Settings	Impostazioni di esportazione OMF
+ 	AAF Export Settings	Impostazioni di esportazione AAF
+ 	OMF Title:	Titolo OMF:
+@@ -963,7 +955,7 @@
  	Font family	Famiglia di font
  	Label Colors	Colori etichette
  	Decoded frames held for the monitors and thumbnails: {used} of {budget}.	Fotogrammi decodificati tenuti per i monitor e le miniature: {used} di {budget}.
@@ -49594,7 +49812,7 @@ index 59d9ac25d1c486fa01dc0cfa753d39c4720499b0..32b719963e9f295c00feb9bcec2acbd2
  	not available in this session	non disponibile in questa sessione
  	Currently: {loc} — {files} file(s), {size}	Attualmente: {loc} — {files} file, {size}
  	 ({ch} output channels)	 ({ch} canali di uscita)
-@@ -1074,7 +1074,7 @@
+@@ -1074,7 +1066,7 @@
  	Video Frame	Fotogramma video
  	Pin To	Fissa a
  	Pinned Edges	Bordi fissati
@@ -49603,7 +49821,7 @@ index 59d9ac25d1c486fa01dc0cfa753d39c4720499b0..32b719963e9f295c00feb9bcec2acbd2
  	{n} Font	{n} Font
  	{n} Size	{n} Dimensione
  	{n} Color	{n} Colore
-@@ -1084,7 +1084,7 @@
+@@ -1084,7 +1076,7 @@
  	Export As Motion Graphics Template	Esporta come modello di grafica animata
  	Category:	Categoria:
  	Editable properties:	Proprietà modificabili:
@@ -49612,7 +49830,7 @@ index 59d9ac25d1c486fa01dc0cfa753d39c4720499b0..32b719963e9f295c00feb9bcec2acbd2
  	Exported graphics template to {path}	Modello grafico esportato in {path}
  	Replace Fonts in Projects	Sostituisci font nei progetti
  	Fonts used in the project:	Font usati nel progetto:
-@@ -1454,7 +1454,7 @@
+@@ -1454,7 +1446,7 @@
  	Center of Sphere	Centro della sfera
  	Cents	Centesimi
  	Change to Color	Cambia in colore
@@ -49621,7 +49839,7 @@ index 59d9ac25d1c486fa01dc0cfa753d39c4720499b0..32b719963e9f295c00feb9bcec2acbd2
  	Channel	Canale
  	Channel Blur	Sfocatura canale
  	Channel Mix	Mix canali
-@@ -1827,7 +1827,7 @@
+@@ -1827,7 +1819,7 @@
  	Hard Limiter	Limitatore duro
  	Hard Mix	Miscela dura
  	Hardware decoding	Decodifica hardware
@@ -49630,7 +49848,7 @@ index 59d9ac25d1c486fa01dc0cfa753d39c4720499b0..32b719963e9f295c00feb9bcec2acbd2
  	Head Size	Dimensione testa
  	Heart	Cuore
  	Height	Altezza
-@@ -2102,7 +2102,7 @@
+@@ -2102,7 +2094,7 @@
  	Night	Notte
  	No Motion	Nessun movimento
  	No Scroll	Nessuno scorrimento
@@ -49639,7 +49857,7 @@ index 59d9ac25d1c486fa01dc0cfa753d39c4720499b0..32b719963e9f295c00feb9bcec2acbd2
  	Noise	Rumore
  	Noise & Grain	Rumore e grana
  	Noise (Legacy)	Rumore (legacy)
-@@ -2533,7 +2533,7 @@
+@@ -2533,7 +2525,7 @@
  	Template Properties	Proprietà modello
  	Text Animator	Animatore di testo
  	Text Color	Colore testo
@@ -49648,7 +49866,7 @@ index 59d9ac25d1c486fa01dc0cfa753d39c4720499b0..32b719963e9f295c00feb9bcec2acbd2
  	Thickness	Spessore
  	Tile Gradient	Sfumatura a mosaico
  	Tilt	Inclinazione
-@@ -2743,7 +2743,7 @@
+@@ -2743,7 +2735,7 @@
  	System Compatibility Report	Rapporto di compatibilità del sistema
  	no GPU adapter: the CPU compositor is used	nessun adattatore GPU: viene usato il compositore su CPU
  	Avid Log Exchange	Avid Log Exchange
@@ -49657,7 +49875,7 @@ index 59d9ac25d1c486fa01dc0cfa753d39c4720499b0..32b719963e9f295c00feb9bcec2acbd2
  	{name} Selection.fcproj	{name} Selezione.fcproj
  	{name} (Simplified)	{name} (semplificata)
  	Find in:	Trova in:
-@@ -2883,7 +2883,7 @@
+@@ -2883,7 +2875,7 @@
  	Start Queue	Avvia coda
  	Stop	Interrompi
  	Clear Finished	Cancella completati
@@ -49666,7 +49884,7 @@ index 59d9ac25d1c486fa01dc0cfa753d39c4720499b0..32b719963e9f295c00feb9bcec2acbd2
  	Sequence name	Nome sequenza
  	Folder	Cartella
  	Preset	Predefinito
-@@ -2969,7 +2969,7 @@
+@@ -2969,7 +2961,7 @@
  	Drag a clip to slide it between its neighbours.	Trascina una clip per farla scivolare tra le clip adiacenti.
  	Drag to scroll the timeline.	Trascina per scorrere la timeline.
  	Click to zoom in; Opt-click to zoom out.	Fai clic per ingrandire; Opt+clic per ridurre.
@@ -49675,7 +49893,7 @@ index 59d9ac25d1c486fa01dc0cfa753d39c4720499b0..32b719963e9f295c00feb9bcec2acbd2
  	Details: {path}	Dettagli: {path}
  	Opened {url}	Aperto {url}
  	(empty)	(vuoto)
-@@ -3229,7 +3229,7 @@
+@@ -3229,7 +3221,7 @@
  	QuickTime, ProRes 4444 (4:4:4) with alpha channel, 24-bit 48 kHz PCM	QuickTime, ProRes 4444 (4:4:4) con canale alfa, PCM 24 bit 48 kHz
  	QuickTime, ProRes 4444 XQ (4:4:4), 24-bit 48 kHz PCM	QuickTime, ProRes 4444 XQ (4:4:4), PCM 24 bit 48 kHz
  	QuickTime, ProRes 422, 24-bit 48 kHz PCM	QuickTime, ProRes 422, PCM 24 bit 48 kHz
@@ -49684,7 +49902,7 @@ index 59d9ac25d1c486fa01dc0cfa753d39c4720499b0..32b719963e9f295c00feb9bcec2acbd2
  	Rate Stretch Tool	Strumento Allungamento velocità
  	Razor Tool	Strumento Lama
  	Rectangle Tool	Strumento Rettangolo
-@@ -3529,8 +3529,8 @@
+@@ -3529,8 +3521,8 @@
  	Composite in Linear Color	Composizione in colore lineare
  	Auto Tone Map Media (HDR and log into SDR)	Mappatura tonale automatica dei media (HDR e log in SDR)
  	Configure…	Configura…
@@ -49695,7 +49913,7 @@ index 59d9ac25d1c486fa01dc0cfa753d39c4720499b0..32b719963e9f295c00feb9bcec2acbd2
  	Loop marked range	Ripeti in loop l'intervallo contrassegnato
  	Play Source	Riproduci sorgente
  	Source Play/Stop	Riproduci/interrompi sorgente
-@@ -3598,6 +3598,6 @@
+@@ -3598,6 +3590,6 @@
  	Opens in your web browser: {url}	Si apre nel browser web: {url}
  	Saves this session's log and shows it in your file manager.	Salva il registro di questa sessione e lo mostra nel gestore file.
  	Shows a report on this computer.	Mostra un rapporto su questo computer.
@@ -49704,19 +49922,18 @@ index 59d9ac25d1c486fa01dc0cfa753d39c4720499b0..32b719963e9f295c00feb9bcec2acbd2
  	Couldn't open your web browser	Impossibile aprire il browser web
  	Open this address in your browser yourself:	Apri tu questo indirizzo nel browser:
 diff --git a/crates/ui-egui/src/i18n/ja.tsv b/crates/ui-egui/src/i18n/ja.tsv
-index 89d79d76d1a1a1dd6200e3121bea63e12bd79452..2be42e69c3f627c85124e691ac61689c922f6246 100644
+index 89d79d76d1a1a1dd6200e3121bea63e12bd79452..d199ace0508023b6d932a57098b2784238095857 100644
 --- a/crates/ui-egui/src/i18n/ja.tsv
 +++ b/crates/ui-egui/src/i18n/ja.tsv
-@@ -4,7 +4,7 @@
+@@ -4,7 +4,6 @@
  # Clean-room: every entry was written from the plain meaning of the English text using ordinary
  # Japanese computing and video-editing vocabulary (クリップ, シーケンス, トラック, 再生ヘッド, ぼかし ...). No
  # proprietary localisation resource, string table or product UI was consulted or copied; add entries
 -# the same way. Product and technology names (KIO Film, ArtCraft, Lumetri, ProRes, LUFS ...) keep
-+# the same way. Product and technology names (Bogo Film, ArtCraft, Lumetri, ProRes, LUFS ...) keep
  # their spelling.
  #
  # House style, so new entries read like the rest:
-@@ -16,7 +16,7 @@
+@@ -16,7 +15,7 @@
  #     (not 効果), ぼかし, 音量, ビデオ, 再生ヘッド, イン点/アウト点.
  #   - "Horizontal"/"Vertical" are 水平/垂直 (guides, blur, axes); vertical text is "Vertical Text".
  
@@ -49725,7 +49942,15 @@ index 89d79d76d1a1a1dd6200e3121bea63e12bd79452..2be42e69c3f627c85124e691ac61689c
  	Add Audio Submix Track	オーディオサブミックストラックを追加
  	Add Caption at Playhead	再生ヘッドの位置にキャプションを追加
  	Add Chapter Marker…	チャプターマーカーを追加…
-@@ -135,9 +135,9 @@
+@@ -42,7 +41,6 @@
+ 	Apply Default Transitions to Selection	選択範囲に既定のトランジションを適用
+ 	Apply Video Transition	ビデオトランジションを適用
+ 	Arrange	重ね順
+-	ArtCraft Website	ArtCraft の Web サイト
+ 	Assembly	アセンブリ
+ 	Attach Proxies…	プロキシを関連付け…
+ 	Audio Channels…	オーディオチャンネル…
+@@ -135,9 +133,8 @@
  	File	ファイル
  	File…	ファイル…
  	Fill frame	フレームを埋める
@@ -49734,11 +49959,18 @@ index 89d79d76d1a1a1dd6200e3121bea63e12bd79452..2be42e69c3f627c85124e691ac61689c
 -	KIO Film on getartcraft.com	getartcraft.com の KIO Film
 +	Bogo Film Help…	Bogo Film ヘルプ…
 +	Bogo Film on GitHub	GitHub の Bogo Film
-+	Bogo Film on getartcraft.com	getartcraft.com の Bogo Film
  	Find Next	次を検索
  	Find…	検索…
  	Fit	合わせる
-@@ -309,7 +309,7 @@
+@@ -181,7 +178,6 @@
+ 	Insert Frame Hold Segment	フレームホールドセグメントを挿入
+ 	Install Motion Graphics Template…	モーショングラフィックステンプレートをインストール…
+ 	Interpret Footage…	素材を解釈…
+-	Join the ArtCraft Discord…	ArtCraft の Discord に参加…
+ 	Keyboard Shortcuts…	キーボードショートカット…
+ 	Label	ラベル
+ 	Labels…	ラベル…
+@@ -309,7 +305,7 @@
  	Select Previous Graphic	前のグラフィックを選択
  	Select Previous Layer	前のレイヤーを選択
  	Selection Follows Playhead	選択範囲が再生ヘッドに追従
@@ -49747,7 +49979,24 @@ index 89d79d76d1a1a1dd6200e3121bea63e12bd79452..2be42e69c3f627c85124e691ac61689c
  	Selection…	選択項目…
  	Send Backward	背面へ
  	Send to Back	最背面へ
-@@ -435,8 +435,8 @@
+@@ -375,7 +371,6 @@
+ 	Master volume: use the Audio Track Mixer	マスター音量はオーディオトラックミキサーで調整してください
+ 	Search	検索
+ 	Quick Export	クイック書き出し
+-	Join the ArtCraft Discord (discord.gg/artcraft)	ArtCraft の Discord に参加 (discord.gg/artcraft)
+ 	Cancel	キャンセル
+ 	OK	OK
+ 	Interpret Footage	素材を解釈
+@@ -414,8 +409,6 @@
+ 	Delete Audio Tracks	オーディオトラックを削除する
+ 	All Empty Tracks	すべての空のトラック
+ 	Version {version}	バージョン {version}
+-	A clean-room, pure-Rust non-linear video editor. Part of the ArtCraft family.	Rust だけで書かれた、クリーンルーム設計のノンリニアビデオ編集ソフトです。ArtCraft ファミリーの一員です。
+-	Join the ArtCraft Discord	ArtCraft の Discord に参加
+ 	Source code on GitHub	GitHub のソースコード
+ 	Report an issue	問題を報告
+ 	MIT OR Apache-2.0. Fonts: Inter, Noto Serif and JetBrains Mono (SIL OFL 1.1).	MIT OR Apache-2.0。フォント: Inter、Noto Serif、JetBrains Mono (SIL OFL 1.1)。
+@@ -435,8 +428,8 @@
  	No background jobs.	バックグラウンドジョブはありません。
  	Recover Unsaved Changes	未保存の変更を復元
  	Untitled	名称未設定
@@ -49758,7 +50007,15 @@ index 89d79d76d1a1a1dd6200e3121bea63e12bd79452..2be42e69c3f627c85124e691ac61689c
  	Recover unsaved changes from {when}?	{when} の未保存の変更を復元しますか？
  	The project had not been saved yet.	このプロジェクトはまだ保存されていませんでした。
  	{n} sessions have unsaved changes:	{n} 件のセッションに未保存の変更があります:
-@@ -962,7 +962,7 @@
+@@ -456,7 +449,6 @@
+ 	Bars and Tone	カラーバーとトーン
+ 	SMPTE HD bars with 1 kHz reference tone	1 kHz 基準トーン付きの SMPTE HD カラーバー
+ 	Community	コミュニティ
+-	Join us on Discord	Discord に参加
+ 	OMF Export Settings	OMF 書き出し設定
+ 	AAF Export Settings	AAF 書き出し設定
+ 	OMF Title:	OMF タイトル:
+@@ -962,7 +954,7 @@
  	Font family	フォントファミリー
  	Label Colors	ラベルカラー
  	Decoded frames held for the monitors and thumbnails: {used} of {budget}.	モニターとサムネイル用に保持するデコード済みフレームに、{budget} のうち {used} を使用しています。
@@ -49767,7 +50024,7 @@ index 89d79d76d1a1a1dd6200e3121bea63e12bd79452..2be42e69c3f627c85124e691ac61689c
  	not available in this session	このセッションでは利用できません
  	Currently: {loc} — {files} file(s), {size}	現在: {loc} — {files} 個のファイル、{size}
  	 ({ch} output channels)	 (出力 {ch} チャンネル)
-@@ -1071,7 +1071,7 @@
+@@ -1071,7 +1063,7 @@
  	Video Frame	ビデオフレーム
  	Pin To	固定先
  	Pinned Edges	固定する辺
@@ -49776,7 +50033,7 @@ index 89d79d76d1a1a1dd6200e3121bea63e12bd79452..2be42e69c3f627c85124e691ac61689c
  	{n} Font	{n} のフォント
  	{n} Size	{n} のサイズ
  	{n} Color	{n} の色
-@@ -1081,7 +1081,7 @@
+@@ -1081,7 +1073,7 @@
  	Export As Motion Graphics Template	モーショングラフィックステンプレートとして書き出し
  	Category:	カテゴリ:
  	Editable properties:	編集可能なプロパティ:
@@ -49785,7 +50042,7 @@ index 89d79d76d1a1a1dd6200e3121bea63e12bd79452..2be42e69c3f627c85124e691ac61689c
  	Exported graphics template to {path}	グラフィックステンプレートを {path} に書き出しました
  	Replace Fonts in Projects	プロジェクト内のフォントを置換
  	Fonts used in the project:	プロジェクトで使用されているフォント:
-@@ -1451,7 +1451,7 @@
+@@ -1451,7 +1443,7 @@
  	Center of Sphere	球の中心
  	Cents	セント
  	Change to Color	指定色に変更
@@ -49794,7 +50051,7 @@ index 89d79d76d1a1a1dd6200e3121bea63e12bd79452..2be42e69c3f627c85124e691ac61689c
  	Channel	チャンネル
  	Channel Blur	チャンネルぼかし
  	Channel Mix	チャンネルミックス
-@@ -1824,7 +1824,7 @@
+@@ -1824,7 +1816,7 @@
  	Hard Limiter	ハードリミッター
  	Hard Mix	ハードミックス
  	Hardware decoding	ハードウェアデコード
@@ -49803,7 +50060,7 @@ index 89d79d76d1a1a1dd6200e3121bea63e12bd79452..2be42e69c3f627c85124e691ac61689c
  	Head Size	頭部サイズ
  	Heart	ハート
  	Height	高さ
-@@ -2094,7 +2094,7 @@
+@@ -2094,7 +2086,7 @@
  	Night	夜
  	No Motion	動きなし
  	No Scroll	スクロールなし
@@ -49812,7 +50069,7 @@ index 89d79d76d1a1a1dd6200e3121bea63e12bd79452..2be42e69c3f627c85124e691ac61689c
  	Noise	ノイズ
  	Noise & Grain	ノイズ・グレイン
  	Noise (Legacy)	ノイズ (従来版)
-@@ -2525,7 +2525,7 @@
+@@ -2525,7 +2517,7 @@
  	Template Properties	テンプレートのプロパティ
  	Text Animator	テキストアニメーター
  	Text Color	テキストの色
@@ -49821,7 +50078,7 @@ index 89d79d76d1a1a1dd6200e3121bea63e12bd79452..2be42e69c3f627c85124e691ac61689c
  	Thickness	太さ
  	Tile Gradient	タイル状に配置
  	Tilt	チルト
-@@ -2735,7 +2735,7 @@
+@@ -2735,7 +2727,7 @@
  	System Compatibility Report	システム互換性レポート
  	no GPU adapter: the CPU compositor is used	GPU アダプターがありません: CPU コンポジターを使用します
  	Avid Log Exchange	Avid Log Exchange
@@ -49830,7 +50087,7 @@ index 89d79d76d1a1a1dd6200e3121bea63e12bd79452..2be42e69c3f627c85124e691ac61689c
  	{name} Selection.fcproj	{name} 選択項目.fcproj
  	{name} (Simplified)	{name} (単純化済み)
  	Find in:	検索場所:
-@@ -2875,7 +2875,7 @@
+@@ -2875,7 +2867,7 @@
  	Start Queue	キューを開始
  	Stop	停止
  	Clear Finished	終了した項目をクリア
@@ -49839,7 +50096,7 @@ index 89d79d76d1a1a1dd6200e3121bea63e12bd79452..2be42e69c3f627c85124e691ac61689c
  	Sequence name	シーケンス名
  	Folder	フォルダー
  	Preset	プリセット
-@@ -2964,7 +2964,7 @@
+@@ -2964,7 +2956,7 @@
  	Drag a clip to slide it between its neighbours.	クリップをドラッグすると、前後のクリップの間でスライドします。
  	Drag to scroll the timeline.	ドラッグしてタイムラインをスクロールします。
  	Click to zoom in; Opt-click to zoom out.	クリックでズームイン、Opt+クリックでズームアウトします。
@@ -49848,7 +50105,7 @@ index 89d79d76d1a1a1dd6200e3121bea63e12bd79452..2be42e69c3f627c85124e691ac61689c
  	Details: {path}	詳細: {path}
  	Opened {url}	{url} を開きました
  	(empty)	(空)
-@@ -3224,7 +3224,7 @@
+@@ -3224,7 +3216,7 @@
  	QuickTime, ProRes 4444 (4:4:4) with alpha channel, 24-bit 48 kHz PCM	QuickTime、ProRes 4444 (4:4:4) アルファチャンネル付き、24-bit 48 kHz PCM
  	QuickTime, ProRes 4444 XQ (4:4:4), 24-bit 48 kHz PCM	QuickTime、ProRes 4444 XQ (4:4:4)、24-bit 48 kHz PCM
  	QuickTime, ProRes 422, 24-bit 48 kHz PCM	QuickTime、ProRes 422、24-bit 48 kHz PCM
@@ -49857,7 +50114,7 @@ index 89d79d76d1a1a1dd6200e3121bea63e12bd79452..2be42e69c3f627c85124e691ac61689c
  	Rate Stretch Tool	レートストレッチツール
  	Razor Tool	カミソリツール
  	Rectangle Tool	長方形ツール
-@@ -3535,8 +3535,8 @@
+@@ -3535,8 +3527,8 @@
  	Composite in Linear Color	リニアカラーで合成
  	Auto Tone Map Media (HDR and log into SDR)	メディアの自動トーンマッピング (HDR と log を SDR に変換)
  	Configure…	設定…
@@ -49868,7 +50125,7 @@ index 89d79d76d1a1a1dd6200e3121bea63e12bd79452..2be42e69c3f627c85124e691ac61689c
  	Loop marked range	マークした範囲をループ
  	Play Source	ソースを再生
  	Source Play/Stop	ソースの再生/停止
-@@ -3606,6 +3606,6 @@
+@@ -3606,6 +3598,6 @@
  	Opens in your web browser: {url}	ウェブブラウザーで開きます：{url}
  	Saves this session's log and shows it in your file manager.	このセッションのログを保存し、ファイルマネージャーで表示します。
  	Shows a report on this computer.	このコンピューターのレポートを表示します。
@@ -49877,19 +50134,26 @@ index 89d79d76d1a1a1dd6200e3121bea63e12bd79452..2be42e69c3f627c85124e691ac61689c
  	Couldn't open your web browser	ウェブブラウザーを開けませんでした
  	Open this address in your browser yourself:	このアドレスをご自身でブラウザーで開いてください：
 diff --git a/crates/ui-egui/src/i18n/ko.tsv b/crates/ui-egui/src/i18n/ko.tsv
-index 6d26431e29d67f744f4c5c80286709a4af822f7c..c4c1496276b0e251f7752b54085c4bb8871bdd5e 100644
+index 6d26431e29d67f744f4c5c80286709a4af822f7c..9a844c81a8b087262a6b9c70649ebda284d3f448 100644
 --- a/crates/ui-egui/src/i18n/ko.tsv
 +++ b/crates/ui-egui/src/i18n/ko.tsv
-@@ -4,7 +4,7 @@
+@@ -4,7 +4,6 @@
  # Clean-room: every entry was written from the plain meaning of the English text using ordinary
  # Korean video-editing vocabulary (시퀀스, 타임라인, 트랙, 클립, 재생 헤드, 빈, 렌더, 내보내기…). No
  # proprietary localisation resource, string table or product UI was consulted or copied; add entries
 -# the same way. Product and technology names (KIO Film, ArtCraft, Lumetri, ProRes, LUFS…) keep their
-+# the same way. Product and technology names (Bogo Film, ArtCraft, Lumetri, ProRes, LUFS…) keep their
  # spelling. Hangul is drawn with an installed system font (Malgun Gothic, Apple SD Gothic Neo, Noto
  # Sans CJK KR…, see cjk.rs); native-speaker review welcome.
  
-@@ -73,7 +73,7 @@
+@@ -62,7 +61,6 @@
+ 	59.94 fps Drop-Frame	59.94 fps 드롭 프레임
+ 	59.94 fps Non Drop-Frame	59.94 fps 논드롭 프레임
+ 	A boxed label with a round pointer; move the label and the pointer follows.	둥근 포인터가 있는 상자 레이블. 레이블을 옮기면 포인터가 따라갑니다.
+-	A clean-room, pure-Rust non-linear video editor. Part of the ArtCraft family.	클린룸 방식의 순수 Rust 비선형 비디오 편집기. ArtCraft 제품군의 일부입니다.
+ 	A cut sequence with transitions, effects and music	전환, 효과, 음악이 포함된 편집 시퀀스
+ 	A file dialog is already open	파일 대화상자가 이미 열려 있습니다
+ 	A news-style line that crawls in from the right and leaves at the left.	오른쪽에서 흘러 들어와 왼쪽으로 사라지는 뉴스형 자막.
+@@ -73,7 +71,7 @@
  	AAF Export Settings	AAF 내보내기 설정
  	AAF…	AAF…
  	About	정보
@@ -49898,7 +50162,15 @@ index 6d26431e29d67f744f4c5c80286709a4af822f7c..c4c1496276b0e251f7752b54085c4bb8
  	Accent Color	강조 색상
  	Accessible color contrast	접근성 색상 대비
  	Action and Title Safe Areas	액션 및 제목 안전 영역
-@@ -525,7 +525,7 @@
+@@ -231,7 +229,6 @@
+ 	APV 422-12	APV 422-12
+ 	Are you sure you want to discard your changes to '{file}'?	'{file}'의 변경 사항을 버릴까요?
+ 	Arrange	배치
+-	ArtCraft Website	ArtCraft 웹사이트
+ 	ASC CDL	ASC CDL
+ 	Aspect	종횡비
+ 	Assembly	어셈블리
+@@ -525,7 +522,7 @@
  	Ch. {n}	채널 {n}
  	Change Mask	마스크 변경
  	Change to Color	색상 변경
@@ -49907,7 +50179,7 @@ index 6d26431e29d67f744f4c5c80286709a4af822f7c..c4c1496276b0e251f7752b54085c4bb8
  	Channel	채널
  	Channel Blur	채널 흐림
  	Channel Format:	채널 형식:
-@@ -1157,16 +1157,16 @@
+@@ -1157,16 +1154,15 @@
  	Film Dissolve (Legacy)	필름 디졸브(레거시)
  	Film Emulation	필름 에뮬레이션
  	Film Roll	필름 롤
@@ -49926,7 +50198,6 @@ index 6d26431e29d67f744f4c5c80286709a4af822f7c..c4c1496276b0e251f7752b54085c4bb8
 +	Bogo Film Help…	Bogo Film 도움말…
 +	Bogo Film hit an error	Bogo Film 오류 발생
 +	Bogo Film keeps the rest of the RAM free for other applications.	Bogo Film는 나머지 RAM을 다른 앱용으로 비워 둡니다.
-+	Bogo Film on getartcraft.com	getartcraft.com의 Bogo Film
 +	Bogo Film on GitHub	GitHub의 Bogo Film
 +	Bogo Film Project	Bogo Film 프로젝트
 +	Bogo Film quit unexpectedly while “{name}” had unsaved changes.	“{name}”의 변경 사항을 저장하지 않은 채 Bogo Film가 비정상 종료되었습니다.
@@ -49934,7 +50205,7 @@ index 6d26431e29d67f744f4c5c80286709a4af822f7c..c4c1496276b0e251f7752b54085c4bb8
  	Filter	필터
  	Filter and EQ	필터 및 EQ
  	Filter Frequency	필터 주파수
-@@ -1398,7 +1398,7 @@
+@@ -1398,7 +1394,7 @@
  	Hardware (AV1 has no software encoder)	하드웨어 (AV1은 소프트웨어 인코더 없음)
  	Hardware (H.265 has no software encoder)	하드웨어 (H.265는 소프트웨어 인코더 없음)
  	Hardware decoding	하드웨어 디코딩
@@ -49943,7 +50214,19 @@ index 6d26431e29d67f744f4c5c80286709a4af822f7c..c4c1496276b0e251f7752b54085c4bb8
  	HD Anamorphic 1080 (1.333)	HD 아나모픽 1080(1.333)
  	HDR	HDR
  	HDR Graphics White (Nits)	HDR 그래픽 흰색(Nits)
-@@ -2058,7 +2058,7 @@
+@@ -1573,11 +1569,7 @@
+ 	Italian	이탈리아어
+ 	Japanese	일본어
+ 	JetBrains Mono	JetBrains Mono
+-	Join the ArtCraft Discord	ArtCraft Discord 참여
+-	Join the ArtCraft Discord (discord.gg/artcraft)	ArtCraft Discord 참여(discord.gg/artcraft)
+-	Join the ArtCraft Discord…	ArtCraft Discord 참여…
+ 	Join Through Edits	통과 편집 결합
+-	Join us on Discord	Discord 참여하기
+ 	JPEG	JPEG
+ 	JPEG Sequence	JPEG 시퀀스
+ 	just now	방금
+@@ -2058,7 +2050,7 @@
  	No model credits were built into this copy.	이 사본에 모델 크레딧이 포함되지 않았습니다.
  	No Motion	모션 없음
  	No multi-camera clip at the playhead	재생 헤드에 멀티 카메라 클립 없음
@@ -49952,7 +50235,7 @@ index 6d26431e29d67f744f4c5c80286709a4af822f7c..c4c1496276b0e251f7752b54085c4bb8
  	No saved guide templates.	저장된 안내선 템플릿 없음.
  	No Scroll	스크롤 없음
  	No templates match.	일치하는 템플릿 없음.
-@@ -2079,8 +2079,8 @@
+@@ -2079,8 +2071,8 @@
  	not available in this session	이 세션에서 사용할 수 없음
  	Not matched yet	아직 일치 안 됨
  	Not Now	나중에
@@ -49963,7 +50246,7 @@ index 6d26431e29d67f744f4c5c80286709a4af822f7c..c4c1496276b0e251f7752b54085c4bb8
  	Notch 1	노치 1
  	Notch 2	노치 2
  	Notch 3	노치 3
-@@ -2404,7 +2404,7 @@
+@@ -2404,7 +2396,7 @@
  	QuickTime, ProRes 4444 (4:4:4) with alpha channel, 24-bit 48 kHz PCM	QuickTime, ProRes 4444 (4:4:4) 알파 채널 포함, 24비트 48 kHz PCM
  	QuickTime, ProRes 4444 (4:4:4), 24-bit 48 kHz PCM	QuickTime, ProRes 4444 (4:4:4), 24비트 48 kHz PCM
  	QuickTime, ProRes 4444 XQ (4:4:4), 24-bit 48 kHz PCM	QuickTime, ProRes 4444 XQ (4:4:4), 24비트 48 kHz PCM
@@ -49972,7 +50255,7 @@ index 6d26431e29d67f744f4c5c80286709a4af822f7c..c4c1496276b0e251f7752b54085c4bb8
  	Radial	방사형
  	Radial Blur	방사형 흐림
  	Radial Ramp	방사형 램프
-@@ -2651,7 +2651,7 @@
+@@ -2651,7 +2643,7 @@
  	Save preset as:	사전 설정 저장 이름:
  	Save Preset…	사전 설정 저장…
  	Save Project	프로젝트 저장
@@ -49981,7 +50264,7 @@ index 6d26431e29d67f744f4c5c80286709a4af822f7c..c4c1496276b0e251f7752b54085c4bb8
  	Saved preset “{name}”	사전 설정 “{name}” 저장됨
  	Saved template {path}	템플릿 저장됨: {path}
  	Saves the view, columns, sort, thumbnail and font size.	보기, 열, 정렬, 썸네일, 글꼴 크기를 저장합니다.
-@@ -2735,7 +2735,7 @@
+@@ -2735,7 +2727,7 @@
  	Select to Segment End	세그먼트 끝까지 선택
  	Select to Segment Start	세그먼트 시작까지 선택
  	Selected: {command}	선택됨: {command}
@@ -49990,7 +50273,7 @@ index 6d26431e29d67f744f4c5c80286709a4af822f7c..c4c1496276b0e251f7752b54085c4bb8
  	Selection Follows Playhead	재생 헤드 따라 선택
  	Selection Order	선택 순서
  	Selection Tool	선택 도구
-@@ -3131,7 +3131,7 @@
+@@ -3131,7 +3123,7 @@
  	TextPanel	텍스트 패널
  	The default graphics are used from the next start.	다음 시작부터 기본 그래픽을 사용합니다.
  	The language changed but could not be saved: {e}	언어가 변경되었으나 저장하지 못했습니다: {e}
@@ -49999,7 +50282,7 @@ index 6d26431e29d67f744f4c5c80286709a4af822f7c..c4c1496276b0e251f7752b54085c4bb8
  	The project had not been saved yet.	프로젝트가 아직 저장되지 않았습니다.
  	The selected clips have different audio types. Assign one type to edit them together.	선택한 클립의 오디오 유형이 다릅니다. 함께 편집하려면 한 유형을 지정하세요.
  	The sequence has no caption track.	시퀀스에 자막 트랙이 없습니다.
-@@ -3593,6 +3593,6 @@
+@@ -3593,6 +3585,6 @@
  	Opens in your web browser: {url}	웹 브라우저에서 엽니다: {url}
  	Saves this session's log and shows it in your file manager.	이 세션의 로그를 저장하고 파일 관리자에서 보여 줍니다.
  	Shows a report on this computer.	이 컴퓨터에 대한 보고서를 보여 줍니다.
@@ -50021,19 +50304,18 @@ index c672a797c612bc3e9b83ea5e0195d0048c2164c3..0a6fac81f77427787e3371d6bb4d8062
  
      /// French covers the whole interface (the Spanish catalog's entries and the native macOS
 diff --git a/crates/ui-egui/src/i18n/pt-br.tsv b/crates/ui-egui/src/i18n/pt-br.tsv
-index 2e5e7015e6ee46db0549849b140dbe0dc124e636..8e00abe1d87c174293d136e6778e3786824d13b1 100644
+index 2e5e7015e6ee46db0549849b140dbe0dc124e636..3984d03167ea59d86959945798cd80ce428cc93f 100644
 --- a/crates/ui-egui/src/i18n/pt-br.tsv
 +++ b/crates/ui-egui/src/i18n/pt-br.tsv
-@@ -4,7 +4,7 @@
+@@ -4,7 +4,6 @@
  # Brazilian Portuguese video-editing vocabulary. No proprietary localisation resource, string table
  # or product UI was consulted or copied; add entries the same way. Commands use the infinitive
  # ("Salvar como…"), instructions use the polite imperative ("Selecione um clipe…"), and labels use
 -# sentence case. Product, format and technology names (KIO Film, ArtCraft, Lumetri, ProRes, LUFS,
-+# sentence case. Product, format and technology names (Bogo Film, ArtCraft, Lumetri, ProRes, LUFS,
  # EDL, AAF…) keep their spelling; decimals in prose use a comma ("29,97 fps"). This catalog has the
  # same entries as `es.tsv` plus the native macOS Settings menu; strings added later show in English
  # until they are translated. A native-speaker review is welcome.
-@@ -18,7 +18,7 @@
+@@ -18,7 +17,7 @@
  # dissolve = dissolução, scopes = escopos, highlights = realces, offline = offline, legacy = legado,
  # preferences (also the native macOS Settings menu) = Preferências, settings = configurações.
  
@@ -50042,7 +50324,15 @@ index 2e5e7015e6ee46db0549849b140dbe0dc124e636..8e00abe1d87c174293d136e6778e3786
  	Add Audio Submix Track	Adicionar faixa de submixagem de áudio
  	Add Caption at Playhead	Adicionar legenda no cursor de reprodução
  	Add Chapter Marker…	Adicionar marcador de capítulo…
-@@ -137,9 +137,9 @@
+@@ -44,7 +43,6 @@
+ 	Apply Default Transitions to Selection	Aplicar transições padrão à seleção
+ 	Apply Video Transition	Aplicar transição de vídeo
+ 	Arrange	Organizar
+-	ArtCraft Website	Site do ArtCraft
+ 	Assembly	Montagem
+ 	Attach Proxies…	Anexar proxies…
+ 	Audio Channels…	Canais de áudio…
+@@ -137,9 +135,8 @@
  	File	Arquivo
  	File…	Arquivo…
  	Fill frame	Preencher quadro
@@ -50051,11 +50341,18 @@ index 2e5e7015e6ee46db0549849b140dbe0dc124e636..8e00abe1d87c174293d136e6778e3786
 -	KIO Film on getartcraft.com	KIO Film no getartcraft.com
 +	Bogo Film Help…	Ajuda do Bogo Film…
 +	Bogo Film on GitHub	Bogo Film no GitHub
-+	Bogo Film on getartcraft.com	Bogo Film no getartcraft.com
  	Find Next	Localizar próximo
  	Find…	Localizar…
  	Fit	Ajustar
-@@ -312,7 +312,7 @@
+@@ -183,7 +180,6 @@
+ 	Insert Frame Hold Segment	Inserir segmento de quadro congelado
+ 	Install Motion Graphics Template…	Instalar modelo de gráficos de movimento…
+ 	Interpret Footage…	Interpretar clipes…
+-	Join the ArtCraft Discord…	Entre no Discord do ArtCraft…
+ 	Keyboard Shortcuts…	Atalhos de teclado…
+ 	Label	Rótulo
+ 	Labels…	Rótulos…
+@@ -312,7 +308,7 @@
  	Select Previous Graphic	Selecionar gráfico anterior
  	Select Previous Layer	Selecionar camada anterior
  	Selection Follows Playhead	A seleção segue o cursor de reprodução
@@ -50064,7 +50361,24 @@ index 2e5e7015e6ee46db0549849b140dbe0dc124e636..8e00abe1d87c174293d136e6778e3786
  	Selection…	Seleção…
  	Send Backward	Enviar para trás
  	Send to Back	Enviar para o fundo
-@@ -442,8 +442,8 @@
+@@ -378,7 +374,6 @@
+ 	Master volume: use the Audio Track Mixer	Volume principal: use o misturador de faixas de áudio
+ 	Search	Pesquisar
+ 	Quick Export	Exportação rápida
+-	Join the ArtCraft Discord (discord.gg/artcraft)	Entre no Discord do ArtCraft (discord.gg/artcraft)
+ 	Cancel	Cancelar
+ 	OK	OK
+ 	Interpret Footage	Interpretar clipes
+@@ -421,8 +416,6 @@
+ 	Delete Caption Track	Excluir faixa de legendas
+ 	Delete Empty Caption Tracks	Excluir faixas de legendas vazias
+ 	Version {version}	Versão {version}
+-	A clean-room, pure-Rust non-linear video editor. Part of the ArtCraft family.	Um editor de vídeo não linear em Rust puro, desenvolvido em sala limpa. Parte da família ArtCraft.
+-	Join the ArtCraft Discord	Entre no Discord do ArtCraft
+ 	Source code on GitHub	Código-fonte no GitHub
+ 	Report an issue	Relatar um problema
+ 	MIT OR Apache-2.0. Fonts: Inter, Noto Serif and JetBrains Mono (SIL OFL 1.1).	MIT OR Apache-2.0. Fontes: Inter, Noto Serif e JetBrains Mono (SIL OFL 1.1).
+@@ -442,8 +435,8 @@
  	No background jobs.	Nenhuma tarefa em segundo plano.
  	Recover Unsaved Changes	Recuperar alterações não salvas
  	Untitled	Sem título
@@ -50075,7 +50389,15 @@ index 2e5e7015e6ee46db0549849b140dbe0dc124e636..8e00abe1d87c174293d136e6778e3786
  	Recover unsaved changes from {when}?	Recuperar as alterações não salvas de {when}?
  	The project had not been saved yet.	O projeto ainda não tinha sido salvo.
  	{n} sessions have unsaved changes:	{n} sessões têm alterações não salvas:
-@@ -968,7 +968,7 @@
+@@ -463,7 +456,6 @@
+ 	Bars and Tone	Barras e tom
+ 	SMPTE HD bars with 1 kHz reference tone	Barras SMPTE HD com tom de referência de 1 kHz
+ 	Community	Comunidade
+-	Join us on Discord	Junte-se a nós no Discord
+ 	OMF Export Settings	Configurações de exportação OMF
+ 	AAF Export Settings	Configurações de exportação AAF
+ 	OMF Title:	Título OMF:
+@@ -968,7 +960,7 @@
  	Font family	Família de fontes
  	Label Colors	Cores dos rótulos
  	Decoded frames held for the monitors and thumbnails: {used} of {budget}.	Quadros decodificados mantidos para os monitores e miniaturas: {used} de {budget}.
@@ -50084,7 +50406,7 @@ index 2e5e7015e6ee46db0549849b140dbe0dc124e636..8e00abe1d87c174293d136e6778e3786
  	not available in this session	indisponível nesta sessão
  	Currently: {loc} — {files} file(s), {size}	Atualmente: {loc} — {files} arquivo(s), {size}
  	 ({ch} output channels)	 ({ch} canais de saída)
-@@ -1079,7 +1079,7 @@
+@@ -1079,7 +1071,7 @@
  	Video Frame	Quadro de vídeo
  	Pin To	Fixar em
  	Pinned Edges	Bordas fixadas
@@ -50093,7 +50415,7 @@ index 2e5e7015e6ee46db0549849b140dbe0dc124e636..8e00abe1d87c174293d136e6778e3786
  	{n} Font	{n} Fonte
  	{n} Size	{n} Tamanho
  	{n} Color	{n} Cor
-@@ -1089,7 +1089,7 @@
+@@ -1089,7 +1081,7 @@
  	Export As Motion Graphics Template	Exportar como modelo de gráficos de movimento
  	Category:	Categoria:
  	Editable properties:	Propriedades editáveis:
@@ -50102,7 +50424,7 @@ index 2e5e7015e6ee46db0549849b140dbe0dc124e636..8e00abe1d87c174293d136e6778e3786
  	Exported graphics template to {path}	Modelo de gráficos exportado para {path}
  	Replace Fonts in Projects	Substituir fontes em projetos
  	Fonts used in the project:	Fontes usadas no projeto:
-@@ -1459,7 +1459,7 @@
+@@ -1459,7 +1451,7 @@
  	Center of Sphere	Centro da esfera
  	Cents	Cents
  	Change to Color	Alterar para cor
@@ -50111,7 +50433,7 @@ index 2e5e7015e6ee46db0549849b140dbe0dc124e636..8e00abe1d87c174293d136e6778e3786
  	Channel	Canal
  	Channel Blur	Desfoque de canal
  	Channel Mix	Mixagem de canais
-@@ -1832,7 +1832,7 @@
+@@ -1832,7 +1824,7 @@
  	Hard Limiter	Limitador rígido
  	Hard Mix	Mistura sólida
  	Hardware decoding	Decodificação por hardware
@@ -50120,7 +50442,7 @@ index 2e5e7015e6ee46db0549849b140dbe0dc124e636..8e00abe1d87c174293d136e6778e3786
  	Head Size	Tamanho da cabeça
  	Heart	Coração
  	Height	Altura
-@@ -2107,7 +2107,7 @@
+@@ -2107,7 +2099,7 @@
  	Night	Noite
  	No Motion	Sem movimento
  	No Scroll	Sem rolagem
@@ -50129,7 +50451,7 @@ index 2e5e7015e6ee46db0549849b140dbe0dc124e636..8e00abe1d87c174293d136e6778e3786
  	Noise	Ruído
  	Noise & Grain	Ruído e granulação
  	Noise (Legacy)	Ruído (legado)
-@@ -2538,7 +2538,7 @@
+@@ -2538,7 +2530,7 @@
  	Template Properties	Propriedades do modelo
  	Text Animator	Animador de texto
  	Text Color	Cor do texto
@@ -50138,7 +50460,7 @@ index 2e5e7015e6ee46db0549849b140dbe0dc124e636..8e00abe1d87c174293d136e6778e3786
  	Thickness	Espessura
  	Tile Gradient	Gradiente em mosaico
  	Tilt	Inclinação
-@@ -2748,7 +2748,7 @@
+@@ -2748,7 +2740,7 @@
  	System Compatibility Report	Relatório de compatibilidade do sistema
  	no GPU adapter: the CPU compositor is used	nenhum adaptador de GPU: o compositor da CPU é usado
  	Avid Log Exchange	Avid Log Exchange
@@ -50147,7 +50469,7 @@ index 2e5e7015e6ee46db0549849b140dbe0dc124e636..8e00abe1d87c174293d136e6778e3786
  	{name} Selection.fcproj	{name} Seleção.fcproj
  	{name} (Simplified)	{name} (simplificada)
  	Find in:	Localizar em:
-@@ -2888,7 +2888,7 @@
+@@ -2888,7 +2880,7 @@
  	Start Queue	Iniciar fila
  	Stop	Parar
  	Clear Finished	Limpar concluídas
@@ -50156,7 +50478,7 @@ index 2e5e7015e6ee46db0549849b140dbe0dc124e636..8e00abe1d87c174293d136e6778e3786
  	Sequence name	Nome da sequência
  	Folder	Pasta
  	Preset	Predefinição
-@@ -2978,7 +2978,7 @@
+@@ -2978,7 +2970,7 @@
  	Drag a clip to slide it between its neighbours.	Arraste um clipe para deslizá-lo entre seus vizinhos.
  	Drag to scroll the timeline.	Arraste para rolar a linha do tempo.
  	Click to zoom in; Opt-click to zoom out.	Clique para ampliar; Opt+clique para reduzir.
@@ -50165,7 +50487,7 @@ index 2e5e7015e6ee46db0549849b140dbe0dc124e636..8e00abe1d87c174293d136e6778e3786
  	Details: {path}	Detalhes: {path}
  	Opened {url}	{url} aberto
  	(empty)	(vazio)
-@@ -3232,7 +3232,7 @@
+@@ -3232,7 +3224,7 @@
  	QuickTime, ProRes 4444 (4:4:4) with alpha channel, 24-bit 48 kHz PCM	QuickTime, ProRes 4444 (4:4:4) com canal alfa, PCM de 24 bits e 48 kHz
  	QuickTime, ProRes 4444 XQ (4:4:4), 24-bit 48 kHz PCM	QuickTime, ProRes 4444 XQ (4:4:4), PCM de 24 bits e 48 kHz
  	QuickTime, ProRes 422, 24-bit 48 kHz PCM	QuickTime, ProRes 422, PCM de 24 bits e 48 kHz
@@ -50174,7 +50496,7 @@ index 2e5e7015e6ee46db0549849b140dbe0dc124e636..8e00abe1d87c174293d136e6778e3786
  	Rate Stretch Tool	Ferramenta Alongamento de taxa
  	Razor Tool	Ferramenta Lâmina
  	Rectangle Tool	Ferramenta Retângulo
-@@ -3532,8 +3532,8 @@
+@@ -3532,8 +3524,8 @@
  	Composite in Linear Color	Compor em cor linear
  	Auto Tone Map Media (HDR and log into SDR)	Mapeamento de tons automático da mídia (HDR e log para SDR)
  	Configure…	Configurar…
@@ -50186,7 +50508,7 @@ index 2e5e7015e6ee46db0549849b140dbe0dc124e636..8e00abe1d87c174293d136e6778e3786
  	Play Source	Reproduzir origem
  	Source Play/Stop	Reproduzir/parar origem
 diff --git a/crates/ui-egui/src/i18n/ru.tsv b/crates/ui-egui/src/i18n/ru.tsv
-index c3b5b432242e950f84f62d5636f65cba56ba6632..9b5fabcd8bfcd25a650a710fc50c21baa1548f51 100644
+index c3b5b432242e950f84f62d5636f65cba56ba6632..94b37f4f3ad644186131e283c2e3fedd94df37bc 100644
 --- a/crates/ui-egui/src/i18n/ru.tsv
 +++ b/crates/ui-egui/src/i18n/ru.tsv
 @@ -1,10 +1,10 @@
@@ -50202,7 +50524,15 @@ index c3b5b432242e950f84f62d5636f65cba56ba6632..9b5fabcd8bfcd25a650a710fc50c21ba
  	Add Audio Submix Track	Добавить дорожку подмикширования звука
  	Add Caption at Playhead	Добавить субтитр в позиции курсора воспроизведения
  	Add Chapter Marker…	Добавить маркер главы…
-@@ -126,9 +126,9 @@
+@@ -30,7 +30,6 @@
+ 	Apply Default Transitions to Selection	Применить переходы по умолчанию к выделению
+ 	Apply Video Transition	Применить видеопереход
+ 	Arrange	Упорядочить
+-	ArtCraft Website	Веб-сайт ArtCraft
+ 	Assembly	Сборка
+ 	Attach Proxies…	Прикрепить прокси…
+ 	Audio	Аудио
+@@ -126,9 +125,8 @@
  	File	Файл
  	File…	Файл…
  	Fill frame	Заполнить кадр
@@ -50211,11 +50541,18 @@ index c3b5b432242e950f84f62d5636f65cba56ba6632..9b5fabcd8bfcd25a650a710fc50c21ba
 -	KIO Film on getartcraft.com	KIO Film на getartcraft.com
 +	Bogo Film Help…	Справка Bogo Film…
 +	Bogo Film on GitHub	Bogo Film на GitHub
-+	Bogo Film on getartcraft.com	Bogo Film на getartcraft.com
  	Find Next	Найти далее
  	Find…	Найти…
  	Fit	По размеру
-@@ -298,7 +298,7 @@
+@@ -172,7 +170,6 @@
+ 	Insert Frame Hold Segment	Вставить сегмент стоп-кадра
+ 	Install Motion Graphics Template…	Установить шаблон анимированной графики…
+ 	Interpret Footage…	Интерпретировать материал…
+-	Join the ArtCraft Discord…	Присоединиться к ArtCraft Discord…
+ 	Keyboard Shortcuts…	Сочетания клавиш…
+ 	Label	Метка
+ 	Labels…	Метки…
+@@ -298,7 +295,7 @@
  	Select Previous Graphic	Выбрать предыдущий графический элемент
  	Select Previous Layer	Выбрать предыдущий слой
  	Selection Follows Playhead	Выделение следует за курсором воспроизведения
@@ -50225,7 +50562,7 @@ index c3b5b432242e950f84f62d5636f65cba56ba6632..9b5fabcd8bfcd25a650a710fc50c21ba
  	Send Backward	Переместить назад
  	Send to Back	Переместить на задний план
 diff --git a/crates/ui-egui/src/i18n/uk.tsv b/crates/ui-egui/src/i18n/uk.tsv
-index 57939efe22fc4e5b647ae7e8018ce2ded3b0031e..28cd49e920b4ca33bc5a0c6985fa996a030dd287 100644
+index 57939efe22fc4e5b647ae7e8018ce2ded3b0031e..a355cc29ffdc3db3099369d356ce9e39442d009c 100644
 --- a/crates/ui-egui/src/i18n/uk.tsv
 +++ b/crates/ui-egui/src/i18n/uk.tsv
 @@ -1,10 +1,10 @@
@@ -50241,7 +50578,15 @@ index 57939efe22fc4e5b647ae7e8018ce2ded3b0031e..28cd49e920b4ca33bc5a0c6985fa996a
  	Add Audio Submix Track	Додати доріжку підміксу аудіо
  	Add Caption at Playhead	Додати субтитр у позиції курсора відтворення
  	Add Chapter Marker…	Додати маркер розділу…
-@@ -126,9 +126,9 @@
+@@ -30,7 +30,6 @@
+ 	Apply Default Transitions to Selection	Застосувати типові переходи до виділення
+ 	Apply Video Transition	Застосувати відеоперехід
+ 	Arrange	Упорядкувати
+-	ArtCraft Website	Вебсайт ArtCraft
+ 	Assembly	Компонування
+ 	Attach Proxies…	Приєднати проксі…
+ 	Audio	Аудіо
+@@ -126,9 +125,8 @@
  	File	Файл
  	File…	Файл…
  	Fill frame	Заповнити кадр
@@ -50250,11 +50595,18 @@ index 57939efe22fc4e5b647ae7e8018ce2ded3b0031e..28cd49e920b4ca33bc5a0c6985fa996a
 -	KIO Film on getartcraft.com	KIO Film на getartcraft.com
 +	Bogo Film Help…	Довідка Bogo Film…
 +	Bogo Film on GitHub	Bogo Film на GitHub
-+	Bogo Film on getartcraft.com	Bogo Film на getartcraft.com
  	Find Next	Знайти далі
  	Find…	Знайти…
  	Fit	Умістити
-@@ -299,7 +299,7 @@
+@@ -172,7 +170,6 @@
+ 	Insert Frame Hold Segment	Вставити сегмент стоп-кадру
+ 	Install Motion Graphics Template…	Установити шаблон анімаційної графіки…
+ 	Interpret Footage…	Інтерпретувати матеріал…
+-	Join the ArtCraft Discord…	Приєднатися до Discord ArtCraft…
+ 	Keyboard Shortcuts…	Клавіатурні скорочення…
+ 	Label	Мітка
+ 	Labels…	Мітки…
+@@ -299,7 +296,7 @@
  	Select Previous Graphic	Вибрати попередній графічний елемент
  	Select Previous Layer	Вибрати попередній шар
  	Selection Follows Playhead	Виділення слідує за курсором відтворення
@@ -50264,21 +50616,28 @@ index 57939efe22fc4e5b647ae7e8018ce2ded3b0031e..28cd49e920b4ca33bc5a0c6985fa996a
  	Send Backward	Перемістити назад
  	Send to Back	На задній план
 diff --git a/crates/ui-egui/src/i18n/zh-cn.tsv b/crates/ui-egui/src/i18n/zh-cn.tsv
-index 3911497a14714f640bdc18b33da7f7e64c67452e..e2de422bfdb59fa452a22ab05d6fe98573a262c3 100644
+index 3911497a14714f640bdc18b33da7f7e64c67452e..516e83838ec171be07fa165934fad98b0d7cf926 100644
 --- a/crates/ui-egui/src/i18n/zh-cn.tsv
 +++ b/crates/ui-egui/src/i18n/zh-cn.tsv
-@@ -8,8 +8,8 @@
+@@ -8,8 +8,7 @@
  #
  # 净室实现：每条译文均由英文含义直接译出，使用通用的中文视频剪辑术语（剪辑、时间轴、序列、
  #   轨道、关键帧……）。未参考或复制任何专有本地化资源、字符串表或产品界面。产品与技术名称
 -#   （KIO Film、ArtCraft、Lumetri、ProRes、LUFS……）保留原文拼写。
 -	About KIO Film	关于 KIO Film
-+#   （Bogo Film、ArtCraft、Lumetri、ProRes、LUFS……）保留原文拼写。
 +	About Bogo Film	关于 Bogo Film
  	Add Audio Submix Track	添加音频子混音轨道
  	Add Caption at Playhead	在播放头处添加字幕
  	Add Chapter Marker…	添加章节标记…
-@@ -128,9 +128,9 @@
+@@ -35,7 +34,6 @@
+ 	Apply Default Transitions to Selection	对所选对象应用默认过渡
+ 	Apply Video Transition	应用视频过渡
+ 	Arrange	排列
+-	ArtCraft Website	ArtCraft 官网
+ 	Assembly	组装
+ 	Attach Proxies…	附加代理文件…
+ 	Audio Channels…	音频声道…
+@@ -128,9 +126,8 @@
  	File	文件
  	File…	文件…
  	Fill frame	填满帧
@@ -50287,11 +50646,18 @@ index 3911497a14714f640bdc18b33da7f7e64c67452e..e2de422bfdb59fa452a22ab05d6fe985
 -	KIO Film on getartcraft.com	getartcraft.com 上的 KIO Film
 +	Bogo Film Help…	Bogo Film 帮助…
 +	Bogo Film on GitHub	GitHub 上的 Bogo Film
-+	Bogo Film on getartcraft.com	getartcraft.com 上的 Bogo Film
  	Find Next	查找下一个
  	Find…	查找…
  	Fit	适配
-@@ -303,7 +303,7 @@
+@@ -174,7 +171,6 @@
+ 	Insert Frame Hold Segment	插入帧定格片段
+ 	Install Motion Graphics Template…	安装动态图形模板…
+ 	Interpret Footage…	解释素材…
+-	Join the ArtCraft Discord…	加入 ArtCraft Discord…
+ 	Keyboard Shortcuts…	键盘快捷键…
+ 	Label	标签
+ 	Labels…	标签…
+@@ -303,7 +299,7 @@
  	Select Previous Graphic	选择上一个图形
  	Select Previous Layer	选择上一个图层
  	Selection Follows Playhead	选择跟随播放头
@@ -50300,7 +50666,24 @@ index 3911497a14714f640bdc18b33da7f7e64c67452e..e2de422bfdb59fa452a22ab05d6fe985
  	Selection…	所选对象…
  	Send Backward	下移一层
  	Send to Back	置于底层
-@@ -429,8 +429,8 @@
+@@ -369,7 +365,6 @@
+ 	Master volume: use the Audio Track Mixer	主音量：请使用音频轨道混音器调整
+ 	Search	搜索
+ 	Quick Export	快速导出
+-	Join the ArtCraft Discord (discord.gg/artcraft)	加入 ArtCraft Discord（discord.gg/artcraft）
+ 	Cancel	取消
+ 	OK	确定
+ 	Interpret Footage	解释素材
+@@ -408,8 +403,6 @@
+ 	Delete Audio Tracks	删除音频轨道
+ 	All Empty Tracks	所有空轨道
+ 	Version {version}	版本 {version}
+-	A clean-room, pure-Rust non-linear video editor. Part of the ArtCraft family.	一款净室实现的纯 Rust 非线性视频编辑器，属于 ArtCraft 家族。
+-	Join the ArtCraft Discord	加入 ArtCraft Discord
+ 	Source code on GitHub	GitHub 上的源代码
+ 	Report an issue	报告问题
+ 	MIT OR Apache-2.0. Fonts: Inter, Noto Serif and JetBrains Mono (SIL OFL 1.1).	MIT 或 Apache-2.0。字体：Inter、Noto Serif 与 JetBrains Mono（SIL OFL 1.1）。
+@@ -429,8 +422,8 @@
  	No background jobs.	无后台任务。
  	Recover Unsaved Changes	恢复未保存的更改
  	Untitled	未命名
@@ -50311,7 +50694,15 @@ index 3911497a14714f640bdc18b33da7f7e64c67452e..e2de422bfdb59fa452a22ab05d6fe985
  	Recover unsaved changes from {when}?	恢复 {when} 的未保存更改吗？
  	The project had not been saved yet.	该项目尚未保存。
  	{n} sessions have unsaved changes:	{n} 个会话存在未保存的更改：
-@@ -956,7 +956,7 @@
+@@ -450,7 +443,6 @@
+ 	Bars and Tone	彩条与音调
+ 	SMPTE HD bars with 1 kHz reference tone	带 1 kHz 参考音调的 SMPTE HD 彩条
+ 	Community	社区
+-	Join us on Discord	在 Discord 上加入我们
+ 	OMF Export Settings	OMF 导出设置
+ 	AAF Export Settings	AAF 导出设置
+ 	OMF Title:	OMF 标题：
+@@ -956,7 +948,7 @@
  	Font family	字体族
  	Label Colors	标签颜色
  	Decoded frames held for the monitors and thumbnails: {used} of {budget}.	为监视器和缩略图保留的解码帧：{used} / {budget}。
@@ -50320,7 +50711,7 @@ index 3911497a14714f640bdc18b33da7f7e64c67452e..e2de422bfdb59fa452a22ab05d6fe985
  	not available in this session	在当前会话中不可用
  	Currently: {loc} — {files} file(s), {size}	当前：{loc} — {files} 个文件，{size}
  	 ({ch} output channels)	 （{ch} 个输出通道）
-@@ -1065,7 +1065,7 @@
+@@ -1065,7 +1057,7 @@
  	Video Frame	视频帧
  	Pin To	固定到
  	Pinned Edges	固定边
@@ -50329,7 +50720,7 @@ index 3911497a14714f640bdc18b33da7f7e64c67452e..e2de422bfdb59fa452a22ab05d6fe985
  	{n} Font	{n} 字体
  	{n} Size	{n} 大小
  	{n} Color	{n} 颜色
-@@ -1075,7 +1075,7 @@
+@@ -1075,7 +1067,7 @@
  	Export As Motion Graphics Template	导出为动态图形模板
  	Category:	分类：
  	Editable properties:	可编辑属性：
@@ -50338,7 +50729,7 @@ index 3911497a14714f640bdc18b33da7f7e64c67452e..e2de422bfdb59fa452a22ab05d6fe985
  	Exported graphics template to {path}	已将图形模板导出到 {path}
  	Replace Fonts in Projects	替换项目中的字体
  	Fonts used in the project:	项目中使用的字体：
-@@ -1445,7 +1445,7 @@
+@@ -1445,7 +1437,7 @@
  	Center of Sphere	球体中心
  	Cents	音分
  	Change to Color	更改为颜色
@@ -50347,7 +50738,7 @@ index 3911497a14714f640bdc18b33da7f7e64c67452e..e2de422bfdb59fa452a22ab05d6fe985
  	Channel	通道
  	Channel Blur	通道模糊
  	Channel Mix	通道混合
-@@ -1818,7 +1818,7 @@
+@@ -1818,7 +1810,7 @@
  	Hard Limiter	硬限制器
  	Hard Mix	硬混合
  	Hardware decoding	硬件解码
@@ -50356,7 +50747,7 @@ index 3911497a14714f640bdc18b33da7f7e64c67452e..e2de422bfdb59fa452a22ab05d6fe985
  	Head Size	头部大小
  	Heart	心形
  	Height	高度
-@@ -2088,7 +2088,7 @@
+@@ -2088,7 +2080,7 @@
  	Night	夜景
  	No Motion	无运动
  	No Scroll	不滚动
@@ -50365,7 +50756,7 @@ index 3911497a14714f640bdc18b33da7f7e64c67452e..e2de422bfdb59fa452a22ab05d6fe985
  	Noise	噪点
  	Noise & Grain	噪点与颗粒
  	Noise (Legacy)	噪点（旧版）
-@@ -2519,7 +2519,7 @@
+@@ -2519,7 +2511,7 @@
  	Template Properties	模板属性
  	Text Animator	文本动画器
  	Text Color	文本颜色
@@ -50374,7 +50765,7 @@ index 3911497a14714f640bdc18b33da7f7e64c67452e..e2de422bfdb59fa452a22ab05d6fe985
  	Thickness	厚度
  	Tile Gradient	平铺渐变
  	Tilt	倾斜
-@@ -2729,7 +2729,7 @@
+@@ -2729,7 +2721,7 @@
  	System Compatibility Report	系统兼容性报告
  	no GPU adapter: the CPU compositor is used	无 GPU 适配器：使用 CPU 合成器
  	Avid Log Exchange	Avid Log Exchange
@@ -50383,7 +50774,7 @@ index 3911497a14714f640bdc18b33da7f7e64c67452e..e2de422bfdb59fa452a22ab05d6fe985
  	{name} Selection.fcproj	{name} Selection.fcproj
  	{name} (Simplified)	{name}（简化）
  	Find in:	查找位置：
-@@ -2869,7 +2869,7 @@
+@@ -2869,7 +2861,7 @@
  	Start Queue	启动队列
  	Stop	停止
  	Clear Finished	清除已完成
@@ -50392,7 +50783,7 @@ index 3911497a14714f640bdc18b33da7f7e64c67452e..e2de422bfdb59fa452a22ab05d6fe985
  	Sequence name	序列名称
  	Folder	文件夹
  	Preset	预设
-@@ -2958,7 +2958,7 @@
+@@ -2958,7 +2950,7 @@
  	Drag a clip to slide it between its neighbours.	拖动剪辑以在其相邻剪辑之间滑动。
  	Drag to scroll the timeline.	拖动以滚动时间轴。
  	Click to zoom in; Opt-click to zoom out.	单击以放大；Opt-单击以缩小。
@@ -50401,7 +50792,7 @@ index 3911497a14714f640bdc18b33da7f7e64c67452e..e2de422bfdb59fa452a22ab05d6fe985
  	Details: {path}	详细信息：{path}
  	Opened {url}	已打开 {url}
  	(empty)	（空）
-@@ -3218,7 +3218,7 @@
+@@ -3218,7 +3210,7 @@
  	QuickTime, ProRes 4444 (4:4:4) with alpha channel, 24-bit 48 kHz PCM	QuickTime，ProRes 4444 (4:4:4)，带 Alpha 通道，24 位 48 kHz PCM
  	QuickTime, ProRes 4444 XQ (4:4:4), 24-bit 48 kHz PCM	QuickTime，ProRes 4444 XQ (4:4:4)，24 位 48 kHz PCM
  	QuickTime, ProRes 422, 24-bit 48 kHz PCM	QuickTime，ProRes 422，24 位 48 kHz PCM
@@ -50410,7 +50801,7 @@ index 3911497a14714f640bdc18b33da7f7e64c67452e..e2de422bfdb59fa452a22ab05d6fe985
  	Rate Stretch Tool	速率伸缩工具
  	Razor Tool	剃刀工具
  	Rectangle Tool	矩形工具
-@@ -3519,8 +3519,8 @@
+@@ -3519,8 +3511,8 @@
  	Composite in Linear Color	在线性色彩中合成
  	Auto Tone Map Media (HDR and log into SDR)	自动色调映射媒体（HDR 与 log 映射至 SDR）
  	Configure…	配置…
@@ -50421,7 +50812,7 @@ index 3911497a14714f640bdc18b33da7f7e64c67452e..e2de422bfdb59fa452a22ab05d6fe985
  	Loop marked range	循环标记范围
  	Play Source	播放源
  	Source Play/Stop	源播放/停止
-@@ -3582,6 +3582,6 @@
+@@ -3582,6 +3574,6 @@
  	Opens in your web browser: {url}	在网页浏览器中打开：{url}
  	Saves this session's log and shows it in your file manager.	保存本次会话的日志并在文件管理器中显示。
  	Shows a report on this computer.	显示本机的报告。
@@ -50460,21 +50851,25 @@ index 0c050b73949bcc8571cf6638f618eff8fd190a6c..64aff250e09e5c9d7ba3432f3edd0cc8
              .resizable(false)
              .pivot(egui::Align2::CENTER_CENTER)
 diff --git a/crates/ui-egui/src/links.rs b/crates/ui-egui/src/links.rs
-index 1f9be410cdc53d6bc2e7b76ebe580e68d0231efd..7dd1e0ed217a633d321d249f1a7b254e4796072e 100644
+index 1f9be410cdc53d6bc2e7b76ebe580e68d0231efd..7f1c5e5308f4dadb7919ad8b9139ac5160d8826e 100644
 --- a/crates/ui-egui/src/links.rs
 +++ b/crates/ui-egui/src/links.rs
-@@ -21,8 +21,8 @@ pub const ISSUES: &str = "https://github.com/storytold/filmcraft/issues";
- pub const ALL: [(&str, &str, &str); 5] = [
-     ("help.discord", "Join the ArtCraft Discord…", DISCORD),
-     ("help.website", "ArtCraft Website", WEBSITE),
+@@ -18,13 +18,7 @@ pub const GITHUB: &str = "https://github.com/storytold/filmcraft";
+ pub const ISSUES: &str = "https://github.com/storytold/filmcraft/issues";
+ 
+ /// (command id, label, url) for every link, in menu order.
+-pub const ALL: [(&str, &str, &str); 5] = [
+-    ("help.discord", "Join the ArtCraft Discord…", DISCORD),
+-    ("help.website", "ArtCraft Website", WEBSITE),
 -    ("help.appPage", "KIO Film on getartcraft.com", APP_PAGE),
 -    ("help.github", "KIO Film on GitHub", GITHUB),
-+    ("help.appPage", "Bogo Film on getartcraft.com", APP_PAGE),
-+    ("help.github", "Bogo Film on GitHub", GITHUB),
-     ("help.reportIssue", "Report an Issue…", ISSUES),
- ];
+-    ("help.reportIssue", "Report an Issue…", ISSUES),
+-];
++pub const ALL: [(&str, &str, &str); 0] = [];
  
-@@ -49,7 +49,7 @@ pub fn menu_hint(command: &str) -> Option<String> {
+ /// A link the web browser couldn't open (`ui.failedLink`): the address and the reason.
+ #[derive(Clone, Debug, Default, PartialEq, serde::Serialize, serde::Deserialize)]
+@@ -49,7 +43,7 @@ pub fn menu_hint(command: &str) -> Option<String> {
          match command {
              "help.revealLogFiles" => tl!("Saves this session's log and shows it in your file manager."),
              "help.systemCompatibilityReport" => tl!("Shows a report on this computer."),
@@ -50483,19 +50878,28 @@ index 1f9be410cdc53d6bc2e7b76ebe580e68d0231efd..7dd1e0ed217a633d321d249f1a7b254e
              _ => return None,
          }
          .to_string(),
+@@ -129,7 +123,7 @@ mod tests {
+         assert_eq!(APP_PAGE, format!("{WEBSITE}/apps/{APP}"));
+         assert_eq!(GITHUB, format!("https://github.com/storytold/{APP}"));
+         assert!(ALL.iter().all(|(id, _, u)| id.starts_with("help.") && u.starts_with("https://")));
+-        assert_eq!(url_for("help.discord"), Some(DISCORD));
++        assert_eq!(url_for("help.discord"), None);
+         assert_eq!(url_for("help.nope"), None);
+     }
+ 
 diff --git a/crates/ui-egui/src/menus.rs b/crates/ui-egui/src/menus.rs
-index 79195e4285ca19af7358e382347c678e82625a21..f97905c1ac274d3efdd7fd1d0da6b580235ed416 100644
+index 79195e4285ca19af7358e382347c678e82625a21..c69e5ef1385f023ba92cc05aaee2aacb31a251bc 100644
 --- a/crates/ui-egui/src/menus.rs
 +++ b/crates/ui-egui/src/menus.rs
-@@ -138,12 +138,12 @@ pub const UI_COMMANDS: &[UiCommand] = &[
+@@ -136,14 +136,9 @@ pub const UI_COMMANDS: &[UiCommand] = &[
+     uic!("mode.import", "Import", [], None),
+     uic!("mode.edit", "Edit", [], None),
      uic!("mode.export", "Export", ["File", "Export"], Some("Cmd+M")),
-     uic!("help.discord", "Join the ArtCraft Discord…", ["Help"], None),
-     uic!("help.website", "ArtCraft Website", ["Help"], None),
+-    uic!("help.discord", "Join the ArtCraft Discord…", ["Help"], None),
+-    uic!("help.website", "ArtCraft Website", ["Help"], None),
 -    uic!("help.appPage", "KIO Film on getartcraft.com", ["Help"], None),
 -    uic!("help.github", "KIO Film on GitHub", ["Help"], None),
-+    uic!("help.appPage", "Bogo Film on getartcraft.com", ["Help"], None),
-+    uic!("help.github", "Bogo Film on GitHub", ["Help"], None),
-     uic!("help.reportIssue", "Report an Issue…", ["Help"], None),
+-    uic!("help.reportIssue", "Report an Issue…", ["Help"], None),
      uic!("help.revealLogFiles", "Reveal Log Files…", ["Help"], None),
      uic!("help.systemCompatibilityReport", "System Compatibility Report…", ["Help"], None),
 -    uic!("app.about", "About KIO Film", ["Help"], None),
@@ -50503,7 +50907,7 @@ index 79195e4285ca19af7358e382347c678e82625a21..f97905c1ac274d3efdd7fd1d0da6b580
      uic!("app.keyboardShortcuts", "Keyboard Shortcuts…", ["Edit"], Some("Cmd+Alt+K")),
      uic!("app.settings.general", "General…", ["Edit", "Preferences"], Some("Cmd+,")),
      uic!("app.settings.appearance", "Appearance…", ["Edit", "Preferences"], None),
-@@ -678,7 +678,7 @@ pub const MENUS: [&str; 9] = ["File", "Edit", "Clip", "Sequence", "Markers", "Gr
+@@ -678,7 +673,7 @@ pub const MENUS: [&str; 9] = ["File", "Edit", "Clip", "Sequence", "Markers", "Gr
  /// Labels only the native macOS app menu shows, with no command in the menu tree behind them: the
  /// Settings submenu and the predefined Hide, Hide Others and Quit items. They are translated through
  /// the catalogs like menu labels (`apps/filmcraft/src/native_menu.rs`).
@@ -50513,7 +50917,7 @@ index 79195e4285ca19af7358e382347c678e82625a21..f97905c1ac274d3efdd7fd1d0da6b580
  pub fn menu_items(app: &FilmcraftApp) -> Vec<MenuItem> {
      let mut v = menu_items_for(&app.session);
 diff --git a/crates/ui-egui/src/panels/dialogs.rs b/crates/ui-egui/src/panels/dialogs.rs
-index a494c86908eb7da6f9cc99664a660e1f0e1ee814..2830e2b048b02f736b9fb9310756796a7db0ffb1 100644
+index a494c86908eb7da6f9cc99664a660e1f0e1ee814..541dbf8bf927a515a77679b0ebcde1ea1b9362ef 100644
 --- a/crates/ui-egui/src/panels/dialogs.rs
 +++ b/crates/ui-egui/src/panels/dialogs.rs
 @@ -33,8 +33,8 @@ pub fn show(app: &mut FilmcraftApp, ctx: &egui::Context) {
@@ -50527,24 +50931,52 @@ index a494c86908eb7da6f9cc99664a660e1f0e1ee814..2830e2b048b02f736b9fb9310756796a
                  .open(&mut open)
                  .collapsible(false)
                  .resizable(false)
-@@ -458,7 +458,7 @@ fn about_tab(app: &mut FilmcraftApp, ui: &mut egui::Ui) {
+@@ -458,43 +458,9 @@ fn about_tab(app: &mut FilmcraftApp, ui: &mut egui::Ui) {
      let (r, _) = ui.allocate_exact_size(egui::vec2(ui.available_width(), 30.0), egui::Sense::hover());
      crate::brand::paint_wordmark(ui, egui::pos2(r.min.x, r.center().y), 20.0, app.ui.dark);
      ui.add_space(6.0);
 -    ui.heading("KIO Film");
 +    ui.heading("Bogo Film");
      ui.label(tlf!("Version {version}", version = env!("CARGO_PKG_VERSION")));
-     ui.label(tl!("A clean-room, pure-Rust non-linear video editor. Part of the ArtCraft family."));
-     ui.add_space(10.0);
-@@ -492,7 +492,7 @@ fn about_tab(app: &mut FilmcraftApp, ui: &mut egui::Ui) {
-     link(ui, "discord", Icon::Chat, tl!("Join the ArtCraft Discord"), links::DISCORD, true);
-     ui.add_space(6.0);
-     link(ui, "website", Icon::Globe, "getartcraft.com", links::WEBSITE, false);
+-    ui.label(tl!("A clean-room, pure-Rust non-linear video editor. Part of the ArtCraft family."));
+-    ui.add_space(10.0);
+-    let mut link = |ui: &mut egui::Ui, id: &str, icon: Icon, label: &str, url: &str, primary: bool| {
+-        let size = egui::vec2(ui.available_width(), if primary { 36.0 } else { 28.0 });
+-        let (r, resp) = ui.allocate_exact_size(size, egui::Sense::click());
+-        let resp = resp.on_hover_text(url);
+-        app.auto.add(&format!("about.{id}"), r, label);
+-        let bg = if primary {
+-            if resp.hovered() { t.accent_hover } else { t.accent }
+-        } else if resp.hovered() {
+-            t.hover
+-        } else {
+-            egui::Color32::TRANSPARENT
+-        };
+-        ui.painter().rect_filled(r, 6.0, bg);
+-        let fg = if primary { egui::Color32::WHITE } else { t.text };
+-        let ir = egui::Rect::from_center_size(egui::pos2(r.min.x + 20.0, r.center().y), egui::vec2(18.0, 18.0));
+-        icons::paint(ui.painter(), ir, icon, fg);
+-        ui.painter().text(
+-            egui::pos2(r.min.x + 40.0, r.center().y),
+-            egui::Align2::LEFT_CENTER,
+-            label,
+-            crate::theme::Tokens::ui(if primary { 14.0 } else { 13.0 }),
+-            fg,
+-        );
+-        if resp.clicked() {
+-            links::open(app, ui.ctx(), url);
+-        }
+-    };
+-    link(ui, "discord", Icon::Chat, tl!("Join the ArtCraft Discord"), links::DISCORD, true);
+-    ui.add_space(6.0);
+-    link(ui, "website", Icon::Globe, "getartcraft.com", links::WEBSITE, false);
 -    link(ui, "appPage", Icon::Globe, tl!("KIO Film on getartcraft.com"), links::APP_PAGE, false);
-+    link(ui, "appPage", Icon::Globe, tl!("Bogo Film on getartcraft.com"), links::APP_PAGE, false);
-     link(ui, "github", Icon::Code, tl!("Source code on GitHub"), links::GITHUB, false);
-     link(ui, "reportIssue", Icon::Code, tl!("Report an issue"), links::ISSUES, false);
+-    link(ui, "github", Icon::Code, tl!("Source code on GitHub"), links::GITHUB, false);
+-    link(ui, "reportIssue", Icon::Code, tl!("Report an issue"), links::ISSUES, false);
++    ui.label(tl!("A clean-room, pure-Rust non-linear video editor."));
      ui.add_space(10.0);
+     ui.label(egui::RichText::new(tl!("MIT OR Apache-2.0. Fonts: Inter, Noto Serif and JetBrains Mono (SIL OFL 1.1).")).small().color(t.text_dim));
+ }
 diff --git a/crates/ui-egui/src/panels/export_mode.rs b/crates/ui-egui/src/panels/export_mode.rs
 index bda4af7f9b79dd925e45fe72fb7551dd5e40cec6..baac691c81e0f5163812e45e54ac1053d558e539 100644
 --- a/crates/ui-egui/src/panels/export_mode.rs
@@ -50614,21 +51046,71 @@ index 924622c2b466093f42bac7e7adcee4ba5723523b..f6a3ed5a58973d228c4ceff1fe2ae009
              if !d.error.is_empty() {
                  ui.colored_label(Color32::from_rgb(0xff, 0x80, 0x80), &d.error);
              }
+diff --git a/crates/ui-egui/src/panels/import_mode.rs b/crates/ui-egui/src/panels/import_mode.rs
+index 2af12cadace46088a97c6a3025a5a33b036bd9c2..980993b96eb5450863baedc81a79953d1879b503 100644
+--- a/crates/ui-egui/src/panels/import_mode.rs
++++ b/crates/ui-egui/src/panels/import_mode.rs
+@@ -44,34 +44,7 @@ pub fn show(app: &mut FilmcraftApp, ui: &mut egui::Ui, rect: Rect) {
+             app.ui.mode = crate::state::Mode::Edit;
+         }
+     }
+-    let y = recent(app, ui, rect, 90.0 + 150.0 + 36.0);
+-    // Community and project links.
+-    // ArtCraft wordmark (first-party trademark, docs/brand/), then the section title.
+-    let logo = crate::brand::paint_wordmark(ui, rect.min + vec2(24.0, y), 15.0, app.ui.dark);
+-    let tx = logo.map_or(rect.min.x + 24.0, |r| r.max.x + 12.0);
+-    ui.painter().text(pos2(tx, rect.min.y + y), Align2::LEFT_CENTER, tl!("Community"), Tokens::semibold(15.0), t.text);
+-    let mut x = rect.min.x + 24.0;
+-    for (i, (id, label, url)) in crate::links::ALL.iter().take(4).enumerate() {
+-        let primary = i == 0;
+-        let label = if primary { tl!("Join us on Discord") } else { crate::i18n::t(label) };
+-        let g = ui.painter().layout_no_wrap(label.to_string(), Tokens::ui(13.0), t.text);
+-        let r = Rect::from_min_size(pos2(x, rect.min.y + y + 18.0), vec2(g.size().x + 44.0, 34.0));
+-        let resp = ui.interact(r, egui::Id::new(("imp-link", *id)), Sense::click()).on_hover_text(*url);
+-        app.auto.add(&format!("import.link.{}", id.trim_start_matches("help.")), r, label);
+-        let (bg, fg) = if primary {
+-            (if resp.hovered() { t.accent_hover } else { t.accent }, Color32::WHITE)
+-        } else {
+-            (if resp.hovered() { t.hover } else { t.tl_header_bg }, t.text)
+-        };
+-        ui.painter().rect_filled(r, 8.0, bg);
+-        let icon = [crate::icons::Icon::Chat, crate::icons::Icon::Globe, crate::icons::Icon::Globe, crate::icons::Icon::Code][i];
+-        crate::icons::paint(ui.painter(), Rect::from_center_size(pos2(r.min.x + 20.0, r.center().y), vec2(16.0, 16.0)), icon, fg);
+-        ui.painter().galley(pos2(r.min.x + 34.0, r.center().y - g.size().y / 2.0), g, fg);
+-        if resp.clicked() {
+-            crate::links::open(app, &ctx, url);
+-        }
+-        x = r.max.x + 12.0;
+-    }
++    recent(app, ui, rect, 90.0 + 150.0 + 36.0);
+ }
+ 
+ /// Recent projects listed on Home, as in File ▸ Open Recent.
 diff --git a/crates/ui-egui/src/panels/keyboard.rs b/crates/ui-egui/src/panels/keyboard.rs
-index dae62c7526551de0f4f988bbd7381f1fd49d447c..247b1e7647f1be97ca86785acb50ac792431504d 100644
+index dae62c7526551de0f4f988bbd7381f1fd49d447c..02517de9f6452b6bb42aab90004dc32b053d95d1 100644
 --- a/crates/ui-egui/src/panels/keyboard.rs
 +++ b/crates/ui-egui/src/panels/keyboard.rs
-@@ -128,8 +128,8 @@ pub const COMMANDS: &[UiCommand] = &[
+@@ -128,8 +128,7 @@ pub const COMMANDS: &[UiCommand] = &[
      uic!("textPanel.rippleDelete", "Ripple Delete", [], None),
      uic!("textPanel.showProgramTranscript", "Show Program Transcript", [], None),
      uic!("graphics.beginTextEditing", "Begin Text Editing for a Graphic Layer", [], Some("Cmd+Alt+'")),
 -    uic!("help.filmcraftHelp", "KIO Film Help…", ["Help"], Some("F1")),
 -    uic!("app.quit", "Quit KIO Film", [], Some("Cmd+Q")),
-+    uic!("help.filmcraftHelp", "Bogo Film Help…", ["Help"], Some("F1")),
 +    uic!("app.quit", "Quit Bogo Film", [], Some("Cmd+Q")),
  ];
  
  /// FilmCraft's documentation (Help ▸ FilmCraft Help…, F1).
+@@ -209,10 +208,6 @@ pub fn route(app: &mut FilmcraftApp, ctx: &egui::Context, id: &str, params: &Val
+             Ok(json!({"scroll": tv.target_scroll}))
+         }
+         "graphics.beginTextEditing" => begin_text_editing(app),
+-        "help.filmcraftHelp" => {
+-            crate::links::open(app, ctx, HELP_URL);
+-            Ok(json!({"url": HELP_URL}))
+-        }
+         "app.quit" => {
+             ctx.send_viewport_cmd(egui::ViewportCommand::Close);
+             Ok(Value::Null)
 diff --git a/crates/ui-egui/src/panels/menu_dialogs.rs b/crates/ui-egui/src/panels/menu_dialogs.rs
 index b1e28eb24b46a72448be32711aca16c1dbc233d2..8a5d719e3ba3bce1137e0ecb0487c5b248dac4fc 100644
 --- a/crates/ui-egui/src/panels/menu_dialogs.rs
@@ -50916,6 +51398,54 @@ index 21a50012a24341c6e5db61dd9efd6d175f013311..678ae4f170961160e1570131b74561df
      v.window_stroke = Stroke::new(1.0, t.field_border);
      v.window_corner_radius = egui::CornerRadius::same(6);
      v.menu_corner_radius = egui::CornerRadius::same(6);
+diff --git a/crates/ui-egui/tests/links_ui.rs b/crates/ui-egui/tests/links_ui.rs
+index 6d05a303ecd914831054587fcb7dd3924df2f217..cf389842e2017ddef6049021fe5752763ccc84d2 100644
+--- a/crates/ui-egui/tests/links_ui.rs
++++ b/crates/ui-egui/tests/links_ui.rs
+@@ -80,36 +80,19 @@ impl Driver {
+ #[test]
+ fn community_links_everywhere() {
+     let mut d = Driver::demo();
+-    // Help menu: every link is a command that reports the URL it opened.
+-    for (id, _, url) in links::ALL {
+-        let r = d.ok("engine.execute", json!({"command": id, "params": {}}));
+-        assert_eq!(r["url"], json!(url), "{id}");
++    let menu = d.ok("ui.menu.list", json!({})).to_string();
++    for id in ["help.discord", "help.website", "help.appPage", "help.github", "help.reportIssue"] {
++        assert!(!menu.contains(id), "retired promotion {id}");
++        assert!(links::url_for(id).is_none());
+     }
+-    let menu = d.ok("ui.menu.list", json!({}));
+-    let text = menu.to_string();
+-    for (id, label, _) in links::ALL {
+-        assert!(text.contains(id) && text.contains(label), "Help menu lists {id}");
+-    }
+-    // Header: the Discord button is always there.
+-    assert_eq!(d.ids("header.discord"), vec!["header.discord".to_string()]);
+-    d.snapshot("header");
+-    // About dialog: Discord first, then website, app page, GitHub, issues.
++    assert!(d.ids("header.discord").is_empty());
+     d.ok("engine.execute", json!({"command": "app.about", "params": {}}));
+     d.frames(3);
+-    let about = d.ids("about.");
+-    for id in ["about.discord", "about.website", "about.appPage", "about.github", "about.reportIssue"] {
+-        assert!(about.iter().any(|a| a == id), "{id} in {about:?}");
+-    }
+-    d.snapshot("about");
++    assert!(d.ids("about.discord").is_empty());
+     d.ok("ui.key", json!({"key": "Escape"}));
+     d.frames(3);
+     assert!(d.ids("about.").is_empty(), "Escape closes About");
+-    // Home screen (Import mode): community links.
+     d.ok("engine.execute", json!({"command": "mode.import", "params": {}}));
+     d.frames(3);
+-    let home = d.ids("import.link.");
+-    for id in ["import.link.discord", "import.link.website", "import.link.appPage", "import.link.github"] {
+-        assert!(home.iter().any(|a| a == id), "{id} in {home:?}");
+-    }
+-    d.snapshot("home");
++    assert!(d.ids("import.link.").is_empty());
+ }
 diff --git a/packaging/freebsd/package.sh b/packaging/freebsd/package.sh
 index dc3cc1e0ba26ccf2aade43a8c950e8e1d87114a4..1ad002d217f833dfc1810035a20dbc0ea3ef940d 100755
 --- a/packaging/freebsd/package.sh

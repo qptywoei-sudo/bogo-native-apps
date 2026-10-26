@@ -9,6 +9,7 @@ from pathlib import Path
 
 from bogo_assets import ASSETS, originals
 from bogo_chrome_contrast import transform as chrome_contrast
+from bogo_promotion_removal import apply as remove_promotions
 
 NAMES = {'cad': 'CAD', 'design': 'Design', 'vector': 'Vector', 'film': 'Film', 'light': 'Light', 'pdf': 'PDF', 'effect': 'Effect', 'ui': 'UI', 'word': 'Word', 'sound': 'Sound', 'deck': 'Deck', 'grid': 'Grid', 'launcher': 'Launcher', 'photo': 'Photo'}
 PALETTE = {'brand': 'FC7501', 'header': 'FFF3E8', 'background': 'FFFAF6', 'hover': 'FFE7D4', 'border': 'F1D3BD', 'text': '342B26'}
@@ -217,3 +218,4 @@ def transform_source(source, app):
         if new != old:
             path.write_text(new, encoding='utf-8')
     icon_assets(source, app)
+    remove_promotions(source, app)

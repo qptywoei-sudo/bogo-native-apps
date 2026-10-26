@@ -63,7 +63,7 @@ index fc951b4a9faa485d4dd7cfd1537303314b06b149..4ab64e59b886d587e4392313e6460899
          .set("OriginalFilename", "artcraft-launcher.exe")
          .set("InternalName", "artcraft-launcher");
 diff --git a/apps/artcraft-launcher/src/main.rs b/apps/artcraft-launcher/src/main.rs
-index 2fd6a901353d2f9ab28aae235a3e9a463e3b426f..382c59964ea6ec23dfed27765d251eb4110e3811 100644
+index 2fd6a901353d2f9ab28aae235a3e9a463e3b426f..fb2c59349a38d1ff10c86cbe286a31286baab0db 100644
 --- a/apps/artcraft-launcher/src/main.rs
 +++ b/apps/artcraft-launcher/src/main.rs
 @@ -1,4 +1,4 @@
@@ -80,6 +80,15 @@ index 2fd6a901353d2f9ab28aae235a3e9a463e3b426f..382c59964ea6ec23dfed27765d251eb4
      // First, so the panic report and every start-up warning are recorded (`logging`).
      let logs = logging::install();
      logging::install_panic_hook();
+@@ -41,7 +42,7 @@ fn main() -> ExitCode {
+     artcraft_launcher_ui_egui::i18n::detect_system_lang_in_background();
+     let args: Vec<String> = std::env::args().skip(1).collect();
+     if args.iter().any(|a| a == "--version" || a == "-V") {
+-        println!("artcraft-launcher {}", env!("CARGO_PKG_VERSION"));
++        println!("Bogo Launcher {}", env!("ARTCRAFT_LAUNCHER_VERSION"));
+         return ExitCode::SUCCESS;
+     }
+     let mut hidden = args.iter().any(|a| a == login::HIDDEN_FLAG);
 @@ -58,7 +59,7 @@ fn main() -> ExitCode {
      if let Some(logs) = logs {
          match artcraft_launcher_native::paths::Paths::new() {
@@ -146,10 +155,10 @@ index bb7dbfe3a7c1dad4dd06d463fc9aa6eba4ddcbcb..6f1f058b14a77d0fc52036a235692269
  }
  
 diff --git a/apps/artcraft-launcher/src/tray.rs b/apps/artcraft-launcher/src/tray.rs
-index 7f7b9b47829283df7eef1b95c0bdd36eb9970a6f..6ec3e220be8848cf543da724b438b9431d3c3d93 100644
+index 7f7b9b47829283df7eef1b95c0bdd36eb9970a6f..497aba2ffe63d050356406192d8db733d75086a8 100644
 --- a/apps/artcraft-launcher/src/tray.rs
 +++ b/apps/artcraft-launcher/src/tray.rs
-@@ -46,20 +46,20 @@ fn load_icon() -> Result<tray_icon::Icon, String> {
+@@ -46,30 +46,25 @@ fn load_icon() -> Result<tray_icon::Icon, String> {
  /// Windows and macOS keep tray-icon's defaults: there the title is drawn next to the icon (macOS)
  /// or unsupported (Windows), and the id never reaches the user.
  fn identity(builder: TrayIconBuilder) -> TrayIconBuilder {
@@ -164,16 +173,20 @@ index 7f7b9b47829283df7eef1b95c0bdd36eb9970a6f..6ec3e220be8848cf543da724b438b943
 -        let show = MenuItem::new(i18n::t("Show KIO Launcher"), true, None);
 +        let show = MenuItem::new(i18n::t("Show Bogo Launcher"), true, None);
          let check = MenuItem::new(i18n::t("Check for Updates"), true, None);
-         use artcraft_launcher_core::catalog::{DISCORD_URL, GITHUB_URL, WEBSITE_URL};
-         let website = MenuItem::new(i18n::t("Visit getartcraft.com"), true, None);
-         let github = MenuItem::new(i18n::t("ArtCraft on GitHub"), true, None);
-         let discord = MenuItem::new(i18n::t("Join the ArtCraft Discord"), true, None);
+-        use artcraft_launcher_core::catalog::{DISCORD_URL, GITHUB_URL, WEBSITE_URL};
+-        let website = MenuItem::new(i18n::t("Visit getartcraft.com"), true, None);
+-        let github = MenuItem::new(i18n::t("ArtCraft on GitHub"), true, None);
+-        let discord = MenuItem::new(i18n::t("Join the ArtCraft Discord"), true, None);
 -        let quit = MenuItem::new(i18n::t("Quit KIO Launcher"), true, None);
 +        let quit = MenuItem::new(i18n::t("Quit Bogo Launcher"), true, None);
          let menu = Menu::new();
-         menu.append_items(&[&show, &check, &PredefinedMenuItem::separator(), &website, &github, &discord, &PredefinedMenuItem::separator(), &quit])
-             .map_err(|e| e.to_string())?;
-@@ -69,7 +69,7 @@ impl Tray {
+-        menu.append_items(&[&show, &check, &PredefinedMenuItem::separator(), &website, &github, &discord, &PredefinedMenuItem::separator(), &quit])
+-            .map_err(|e| e.to_string())?;
+-        let links = [(website.id().clone(), WEBSITE_URL), (github.id().clone(), GITHUB_URL), (discord.id().clone(), DISCORD_URL)];
++        menu.append_items(&[&show, &check, &PredefinedMenuItem::separator(), &quit]).map_err(|e| e.to_string())?;
++        let links: [(MenuId, &'static str); 0] = [];
+         let icon = identity(TrayIconBuilder::new())
+             .with_menu(Box::new(menu))
              .with_icon(load_icon()?)
              .with_icon_as_template(cfg!(target_os = "macos"))
              .with_menu_on_left_click(cfg!(target_os = "macos"))
@@ -182,22 +195,23 @@ index 7f7b9b47829283df7eef1b95c0bdd36eb9970a6f..6ec3e220be8848cf543da724b438b943
              .build()
              .map_err(|e| e.to_string())?;
          let (tx, rx): (Sender<TrayAction>, Receiver<TrayAction>) = channel();
-@@ -104,12 +104,12 @@ impl Tray {
+@@ -103,14 +98,7 @@ impl Tray {
+                 wake();
              }
          }));
-         let labels = vec![
+-        let labels = vec![
 -            (show, "Show KIO Launcher"),
-+            (show, "Show Bogo Launcher"),
-             (check, "Check for Updates"),
-             (website, "Visit getartcraft.com"),
-             (github, "ArtCraft on GitHub"),
-             (discord, "Join the ArtCraft Discord"),
+-            (check, "Check for Updates"),
+-            (website, "Visit getartcraft.com"),
+-            (github, "ArtCraft on GitHub"),
+-            (discord, "Join the ArtCraft Discord"),
 -            (quit, "Quit KIO Launcher"),
-+            (quit, "Quit Bogo Launcher"),
-         ];
+-        ];
++        let labels = vec![(show, "Show Bogo Launcher"), (check, "Check for Updates"), (quit, "Quit Bogo Launcher")];
          Ok(Self { icon, show: show_id, check: check_id, quit: quit_id, rx, tooltip: String::new(), language: String::new(), labels })
      }
-@@ -127,9 +127,9 @@ impl Tray {
+ 
+@@ -127,9 +115,9 @@ impl Tray {
              self.language = lang.code().to_string();
          }
          let tip = if count == 0 {
@@ -149050,7 +149064,7 @@ zM<^z@I`A`7KDVDzaF)`?WjmcwpA{BF1zR0{P0**^Im96#S2z9tXV3Cax#B*|bRh{r
 Qy@0EMXc}JCne8M02i=P@9RL6T
 
 diff --git a/crates/core/src/catalog.rs b/crates/core/src/catalog.rs
-index 90ec812ac0bc456bba9e3de3bb977543f80796c6..2f21cc5a6ab1c71649fa0c354782a5081b89b324 100644
+index 90ec812ac0bc456bba9e3de3bb977543f80796c6..323e9866d291c45d3736f3c2cede5f09053dc9cc 100644
 --- a/crates/core/src/catalog.rs
 +++ b/crates/core/src/catalog.rs
 @@ -55,6 +55,27 @@ impl CraftApp {
@@ -149228,16 +149242,26 @@ index 90ec812ac0bc456bba9e3de3bb977543f80796c6..2f21cc5a6ab1c71649fa0c354782a508
      ),
  ];
  
-@@ -233,7 +254,7 @@ pub const WEBSITE_URL: &str = "https://kio-library.vercel.app";
+@@ -233,33 +254,25 @@ pub const WEBSITE_URL: &str = "https://kio-library.vercel.app";
  // Retained only for original developer-loopback feed migration parsing. Production uses kio_registry::REPOSITORY.
  pub const GITHUB_OWNER: &str = "storytold";
  /// ArtCraft on GitHub: every Craft App's source.
 -pub const GITHUB_URL: &str = "https://github.com/qptywoei777-rgb/kio-native-apps";
 +pub const GITHUB_URL: &str = "https://github.com/qptywoei-sudo/bogo-native-apps";
  /// ArtCraft's social accounts: (service, URL). Shown as small icons, less prominent than Discord.
- pub const SOCIAL: [(&str, &str); 5] = [
-     ("X", "https://x.com/get_artcraft"),
-@@ -251,15 +272,15 @@ pub const DISCORD_URL: &str = "https://discord.gg/artcraft";
+-pub const SOCIAL: [(&str, &str); 5] = [
+-    ("X", "https://x.com/get_artcraft"),
+-    ("Instagram", "https://www.instagram.com/officialartcraftstudios"),
+-    ("LinkedIn", "https://www.linkedin.com/company/artcraft-ai"),
+-    ("YouTube", "https://www.youtube.com/@OfficialArtcraftStudios"),
+-    ("TikTok", "https://www.tiktok.com/@artcraft.studios"),
+-];
+ 
+ /// The ArtCraft community on Discord.
+-pub const DISCORD_URL: &str = "https://discord.gg/artcraft";
+ 
+ /// KIO Launcher itself, described like a Craft App so it can update itself with the same
+ /// machinery (asset names `artcraft-launcher-<ver>-…`, bundle id `com.kio.launcher`,
  /// `KIO Launcher.app`). Not part of [`SUITE`].
  pub const LAUNCHER: CraftApp = app(
      "artcraft-launcher",
@@ -149257,7 +149281,7 @@ index 90ec812ac0bc456bba9e3de3bb977543f80796c6..2f21cc5a6ab1c71649fa0c354782a508
  /// The launcher's own asset stem.
  pub const LAUNCHER_ID: &str = "artcraft-launcher";
  
-@@ -276,8 +297,8 @@ mod tests {
+@@ -276,8 +289,8 @@ mod tests {
          ids.dedup();
          assert_eq!(ids.len(), SUITE.len());
          for a in &SUITE {
@@ -149268,7 +149292,7 @@ index 90ec812ac0bc456bba9e3de3bb977543f80796c6..2f21cc5a6ab1c71649fa0c354782a508
              assert_ne!(a.kio_id(), "unknown");
          }
      }
-@@ -286,8 +307,22 @@ mod tests {
+@@ -286,8 +299,22 @@ mod tests {
      fn pdfcraft_also_answers_to_printcraft() {
          let pdf = CraftApp::by_id("pdfcraft").unwrap();
          assert_eq!(pdf.stems().collect::<Vec<_>>(), ["pdfcraft", "printcraft"]);
@@ -149704,7 +149728,7 @@ index 0e996360cffe8d0cf7cfe55f007f1c306eeb6be3..12228786b2ed936027321324b6ccacac
          assert!(parse_asset_name("figcraft-0.5.1-linux-x86_64.tar.gz", &["figcraft"]).is_some());
      }
 diff --git a/crates/core/src/protocol.rs b/crates/core/src/protocol.rs
-index 7ad1503d406729bb3ac5448dd224791deada4a92..cd1a7d361585c9cc83693bd2b849535d7ea481b2 100644
+index 7ad1503d406729bb3ac5448dd224791deada4a92..e220834d9305ca6d38e356aa5d9bc84bcbb0a609 100644
 --- a/crates/core/src/protocol.rs
 +++ b/crates/core/src/protocol.rs
 @@ -41,7 +41,7 @@ pub enum Command {
@@ -149716,6 +149740,24 @@ index 7ad1503d406729bb3ac5448dd224791deada4a92..cd1a7d361585c9cc83693bd2b849535d
      UpdateLauncher,
      /// Fetch the pictures of an app's details page (`core::details`), one [`Event::Screenshot`]
      /// each, the lead picture first. Pictures already saved on this machine arrive without
+@@ -120,7 +120,7 @@ pub enum Origin {
+ impl Origin {
+     pub fn label(self) -> &'static str {
+         match self {
+-            Self::ArtCraftApi => "ArtCraft API",
++            Self::ArtCraftApi => "Bogo catalog",
+             Self::GitHub => "GitHub",
+         }
+     }
+@@ -142,7 +142,7 @@ pub enum Source {
+ impl Source {
+     pub fn label(self) -> &'static str {
+         match self {
+-            Self::Feed => "ArtCraft",
++            Self::Feed => "Bogo",
+             Self::GitHubApi => "GitHub",
+             Self::GitHubPages => "GitHub (release pages)",
+             Self::Cache => "saved results",
 @@ -159,7 +159,7 @@ pub enum Event {
          /// The service this answer came from.
          from: Origin,
@@ -150765,7 +150807,7 @@ index 6cfabd892aa5d39129daeb2dcbbd41382951555a..599a9c11919b7b89112b652a7f234ab2
          }
      }
 diff --git a/crates/ui-egui/src/app.rs b/crates/ui-egui/src/app.rs
-index 499dca6f12258b53670fc53fe06771e9a5d22eb3..f57ceda35e8bef5bd7772f03971018ecc5bf5b77 100644
+index 499dca6f12258b53670fc53fe06771e9a5d22eb3..6f36b51259d8ea35d59e19205b07fbefad25e5a2 100644
 --- a/crates/ui-egui/src/app.rs
 +++ b/crates/ui-egui/src/app.rs
 @@ -437,7 +437,7 @@ impl LauncherUi {
@@ -150777,8 +150819,17 @@ index 499dca6f12258b53670fc53fe06771e9a5d22eb3..f57ceda35e8bef5bd7772f03971018ec
                      (crate::i18n::fmt(tl!("{name} {v} is available"), &[("name", name), ("v", v)]), body)
                  }
                  many => {
+@@ -617,7 +617,7 @@ impl LauncherUi {
+         list.into_iter().map(|(_, e)| e.app.id).collect()
+     }
+ 
+-    /// "ArtCraft API", "GitHub" or "ArtCraft API and GitHub": the services behind the releases on
++    /// "Bogo catalog", "GitHub" or "ArtCraft API and GitHub": the services behind the releases on
+     /// screen right now. `None` until something has loaded.
+     pub(crate) fn sources_label(&self) -> Option<String> {
+         use artcraft_launcher_core::protocol::Origin;
 diff --git a/crates/ui-egui/src/dialogs.rs b/crates/ui-egui/src/dialogs.rs
-index b53e720c8cf64ea7b4833bdc0740e3b89cefd891..9f5a464e526bb14813b0afca4318f80e50acc630 100644
+index b53e720c8cf64ea7b4833bdc0740e3b89cefd891..a7bc496e504e5141f8fd6bef3d80fc2aa9316d38 100644
 --- a/crates/ui-egui/src/dialogs.rs
 +++ b/crates/ui-egui/src/dialogs.rs
 @@ -111,7 +111,7 @@ impl LauncherUi {
@@ -150829,8 +150880,38 @@ index b53e720c8cf64ea7b4833bdc0740e3b89cefd891..9f5a464e526bb14813b0afca4318f80e
                  && let Err(e) = host.set_login_item(on)
              {
                  let ctx = ui.ctx().clone();
+@@ -345,29 +345,6 @@ impl LauncherUi {
+             }
+         }
+ 
+-        section(ui, tl!("Community"));
+-        ui.label(RichText::new(tl!("Questions, ideas and news from the ArtCraft team")).color(t.muted));
+-        ui.add_space(6.0);
+-        ui.horizontal_wrapped(|ui| {
+-            use artcraft_launcher_core::catalog::{DISCORD_URL, GITHUB_URL, WEBSITE_URL};
+-            if widgets::button(ui, tl!("Join the Discord"), Kind::Primary, 0.0).on_hover_text(DISCORD_URL).clicked() {
+-                ui.ctx().open_url(egui::OpenUrl::new_tab(DISCORD_URL));
+-            }
+-            if widgets::button(ui, tl!("Website"), Kind::Secondary, 0.0).on_hover_text(WEBSITE_URL).clicked() {
+-                ui.ctx().open_url(egui::OpenUrl::new_tab(WEBSITE_URL));
+-            }
+-            if widgets::button(ui, tl!("GitHub"), Kind::Secondary, 0.0).on_hover_text(GITHUB_URL).clicked() {
+-                ui.ctx().open_url(egui::OpenUrl::new_tab(GITHUB_URL));
+-            }
+-            // Wrap the social links as a group so their icons stay together.
+-            let count = artcraft_launcher_core::catalog::SOCIAL.len() as f32;
+-            let width = count * (16.0 + 8.0) + (count - 1.0).max(0.0) * 4.0;
+-            ui.allocate_ui_with_layout(vec2(width, theme::CONTROL_H), egui::Layout::left_to_right(egui::Align::Center), |ui| {
+-                ui.spacing_mut().item_spacing.x = 4.0;
+-                widgets::social_icons(ui, 16.0);
+-            });
+-        });
+-
+         section(ui, tl!("Appearance"));
+         let mut theme_choice = self.settings.theme;
+         ui.horizontal(|ui| {
 diff --git a/crates/ui-egui/src/i18n/cs.tsv b/crates/ui-egui/src/i18n/cs.tsv
-index f5a53c6cb11951eb3f20489730c5b7621355c4a4..9388297b3bee482bebb329fe55aec11afa8df91a 100644
+index f5a53c6cb11951eb3f20489730c5b7621355c4a4..0bab1021c9880812db1dd82c70dcd8572e0fb74a 100644
 --- a/crates/ui-egui/src/i18n/cs.tsv
 +++ b/crates/ui-egui/src/i18n/cs.tsv
 @@ -1,4 +1,4 @@
@@ -150848,7 +150929,15 @@ index f5a53c6cb11951eb3f20489730c5b7621355c4a4..9388297b3bee482bebb329fe55aec11a
  	Open Source Tools for Creatives, Makers, and Builders	Open-source nástroje pro kreativce, tvůrce a vývojáře
  	Settings	Nastavení
  	Check for updates	Zkontrolovat aktualizace
-@@ -60,7 +60,7 @@
+@@ -26,7 +26,6 @@
+ 	Installed version	Nainstalovaná verze
+ 	Latest version	Nejnovější verze
+ 	Newest release	Nejnovější vydání
+-	Discord	Discord
+ 	GitHub	GitHub
+ 	Website	Web
+ 	Classic apps	Klasické aplikace
+@@ -60,7 +59,7 @@
  	Reinstall	Znovu nainstalovat
  	Uninstall…	Odinstalovat…
  	All releases	Všechna vydání
@@ -150857,7 +150946,7 @@ index f5a53c6cb11951eb3f20489730c5b7621355c4a4..9388297b3bee482bebb329fe55aec11a
  	Dismiss	Skrýt
  	Update and restart	Aktualizovat a restartovat
  	A new version is available. Would you like to relaunch with the updated version?	Je k dispozici nová verze. Chcete aplikaci znovu spustit s aktualizovanou verzí?
-@@ -70,7 +70,7 @@
+@@ -70,7 +69,7 @@
  	Released {date}	Vydáno {date}
  	Open on GitHub	Otevřít na GitHubu
  	Close	Zavřít
@@ -150866,21 +150955,29 @@ index f5a53c6cb11951eb3f20489730c5b7621355c4a4..9388297b3bee482bebb329fe55aec11a
  	Only when I ask	Pouze na vyžádání
  	Automatically download and install updates	Automaticky stahovat a instalovat aktualizace
  	Notify me when an installed app has an update	Upozornit, když má nainstalovaná aplikace aktualizaci
-@@ -82,11 +82,11 @@
+@@ -82,11 +81,10 @@
  	Running in the background	Běh na pozadí
  	Keep running in the tray when the window is closed	Po zavření okna ponechat spuštěné v oznamovací oblasti
  	Show the window on the current desktop	Zobrazit okno na aktuální ploše
 -	Start KIO Launcher when I log in	Spouštět KIO Launcher po přihlášení
 +	Start Bogo Launcher when I log in	Spouštět Bogo Launcher po přihlášení
  	Community	Komunita
- 	Questions, ideas and news from the ArtCraft team	Dotazy, nápady a novinky od týmu ArtCraft
+-	Questions, ideas and news from the ArtCraft team	Dotazy, nápady a novinky od týmu ArtCraft
  	Appearance	Vzhled
 -	Quit KIO Launcher	Ukončit KIO Launcher
 +	Quit Bogo Launcher	Ukončit Bogo Launcher
  	Done	Hotovo
  	Uninstall {name}?	Odinstalovat {name}?
  	The app will be moved to the Trash. Your documents and settings stay.	Aplikace bude přesunuta do Koše. Vaše dokumenty a nastavení zůstanou zachovány.
-@@ -120,7 +120,7 @@
+@@ -110,7 +108,6 @@
+ 	Apps you hid	Aplikace, které jste skryli
+ 	Checked {ago} · using {sources}	Zkontrolováno {ago} · zdroje: {sources}
+ 	{a} and {b}	{a} a {b}
+-	Join the Discord	Připojit se na Discord
+ 	Learn more	Další informace
+ 	Minimize	Minimalizovat
+ 	Maximize	Maximalizovat
+@@ -120,7 +117,7 @@
  	Open link	Otevřít odkaz
  	Update	Aktualizovat
  	{name} icon	Ikona aplikace {name}
@@ -150889,7 +150986,16 @@ index f5a53c6cb11951eb3f20489730c5b7621355c4a4..9388297b3bee482bebb329fe55aec11a
  	Cancel update	Zrušit aktualizaci
  	Stop waiting; the update can be started again later	Přestat čekat; aktualizaci lze spustit znovu později
  	Download again	Stáhnout znovu
-@@ -192,7 +192,7 @@ month	Dec	12.
+@@ -171,8 +168,6 @@ month	Dec	12.
+ 	Installing for {platform}	Instalace pro {platform}
+ 	Downloads for {platform}	Stažení pro {platform}
+ 	No downloads for this system	Pro tento systém nejsou k dispozici žádné soubory ke stažení
+-	Join the ArtCraft community on Discord	Připojit se ke komunitě ArtCraft na Discordu
+-	ArtCraft on {name}	ArtCraft na {name}
+ 	Couldn't open {name}: {e}	{name} nelze otevřít: {e}
+ 	Download cancelled	Stahování zrušeno
+ 	Available to install	K dispozici k instalaci
+@@ -192,7 +187,7 @@ month	Dec	12.
  	Version {version} installed	Nainstalována verze {version}
  	Version {latest}	Verze {latest}
  	No release published yet	Zatím nebylo zveřejněno žádné vydání
@@ -150898,7 +151004,15 @@ index f5a53c6cb11951eb3f20489730c5b7621355c4a4..9388297b3bee482bebb329fe55aec11a
  	App	Aplikace
  	Latest	Nejnovější
  	Released	Vydáno
-@@ -227,7 +227,7 @@ month	Dec	12.
+@@ -214,7 +209,6 @@ month	Dec	12.
+ 	Couldn't check for updates: {f}	Aktualizace nelze zkontrolovat: {f}
+ 	Website (coming soon)	Web (již brzy)
+ 	GitHub repository	Repozitář na GitHubu
+-	ArtCraft	ArtCraft
+ 	Update 1 app	Aktualizovat 1 aplikaci
+ 	Update all ({count})	Aktualizovat vše ({count})
+ 	⊞  Grid	⊞  Mřížka
+@@ -227,7 +221,7 @@ month	Dec	12.
  	Full changelog	Úplný přehled změn
  	link	odkaz
  	No apps match	Žádné aplikace neodpovídají hledání
@@ -150907,7 +151021,7 @@ index f5a53c6cb11951eb3f20489730c5b7621355c4a4..9388297b3bee482bebb329fe55aec11a
  	{name} {v} is available	Je k dispozici {name} {v}
  	{count} updates are available	Počet dostupných aktualizací: {count}
  	These notes weren't fetched (GitHub's request limit was reached). They're on the release page.	Tyto poznámky se nepodařilo načíst (byl dosažen limit požadavků GitHubu). Najdete je na stránce vydání.
-@@ -280,7 +280,7 @@ filter	Installed	Nainstalováno
+@@ -280,7 +274,7 @@ filter	Installed	Nainstalováno
  @id	launcher.notes	Co je nového
  @id	launcher.dismiss	Zavřít
  @id	settings.open	Nastavení
@@ -150916,7 +151030,15 @@ index f5a53c6cb11951eb3f20489730c5b7621355c4a4..9388297b3bee482bebb329fe55aec11a
  @id	view.grid	Mřížka
  @id	view.table	Tabulka
  @id	filter.all	Vše
-@@ -304,12 +304,12 @@ filter	Installed	Nainstalováno
+@@ -294,7 +288,6 @@ filter	Installed	Nainstalováno
+ @id	sort.installed	Nainstalovaná verze
+ @id	sort.latest	Nejnovější verze
+ @id	sort.released	Nejnovější vydání
+-@id	help.discord	Discord
+ @id	help.github	GitHub
+ @id	help.website	Web
+ @id	update.check	Zkontrolovat aktualizace
+@@ -304,12 +297,9 @@ filter	Installed	Nainstalováno
  @id	linux.preferred_kind	Instalovat nové aplikace jako
  @id	tray.close_to_tray	Po zavření okna ponechat spuštěné v oznamovací oblasti
  @id	tray.show_on_current_desktop	Zobrazit okno na aktuální ploše
@@ -150926,15 +151048,15 @@ index f5a53c6cb11951eb3f20489730c5b7621355c4a4..9388297b3bee482bebb329fe55aec11a
 -	Show KIO Launcher	Zobrazit KIO Launcher
 +	Show Bogo Launcher	Zobrazit Bogo Launcher
  	Check for Updates	Zkontrolovat aktualizace
- 	Visit getartcraft.com	Navštívit getartcraft.com
- 	ArtCraft on GitHub	ArtCraft na GitHubu
- 	Join the ArtCraft Discord	Připojit se na ArtCraft Discord
+-	Visit getartcraft.com	Navštívit getartcraft.com
+-	ArtCraft on GitHub	ArtCraft na GitHubu
+-	Join the ArtCraft Discord	Připojit se na ArtCraft Discord
 -@plural	KIO Launcher · {n} update available|KIO Launcher · {n} updates available	KIO Launcher · {n} dostupná aktualizace|KIO Launcher · {n} dostupné aktualizace|KIO Launcher · {n} dostupných aktualizací
 -	No font for this language was found on this system. Install a font for this language and restart KIO Launcher.	V systému nebylo nalezeno písmo pro tento jazyk. Nainstalujte vhodné písmo a restartujte KIO Launcher.
 +@plural	Bogo Launcher · {n} update available|Bogo Launcher · {n} updates available	Bogo Launcher · {n} dostupná aktualizace|Bogo Launcher · {n} dostupné aktualizace|Bogo Launcher · {n} dostupných aktualizací
 +	No font for this language was found on this system. Install a font for this language and restart Bogo Launcher.	V systému nebylo nalezeno písmo pro tento jazyk. Nainstalujte vhodné písmo a restartujte Bogo Launcher.
 diff --git a/crates/ui-egui/src/i18n/de.tsv b/crates/ui-egui/src/i18n/de.tsv
-index 1139a7abbf1be43f43a971b4c411afd1619cc93f..f04253e8379bfc99f49e36d85f7c87ad8e7344d5 100644
+index 1139a7abbf1be43f43a971b4c411afd1619cc93f..148885c982e2e7305e6793edad498bb831ca3e00 100644
 --- a/crates/ui-egui/src/i18n/de.tsv
 +++ b/crates/ui-egui/src/i18n/de.tsv
 @@ -1,4 +1,4 @@
@@ -150943,7 +151065,7 @@ index 1139a7abbf1be43f43a971b4c411afd1619cc93f..f04253e8379bfc99f49e36d85f7c87ad
  # Format: context<TAB>source<TAB>translation
  # Empty context = plain UI string (tl!, t).
  # @id = command-id keyed (tr_id).
-@@ -6,21 +6,21 @@
+@@ -6,21 +6,20 @@
  # @msg = status/error message template (message, msg).
  # Other context = disambiguation for tr_ctx.
  #
@@ -150960,7 +151082,6 @@ index 1139a7abbf1be43f43a971b4c411afd1619cc93f..f04253e8379bfc99f49e36d85f7c87ad
 +# Left in English on purpose: product name "Bogo Launcher" (and its "Launcher" tag), suite
 +# name "Bogo App Suite",
 +# app names (Bogo Photo, Bogo Light, Bogo Film, Bogo Design, Bogo Vector, Bogo PDF, Bogo Effect,
-+# Bogo Word, Bogo Deck, Bogo Grid, Bogo CAD, Bogo Sound, Bogo UI), "GitHub", "Discord".
  # Shortcut keys keep their key-cap names (Shift, Alt, Ctrl, Cmd, Esc).
  # Trailing "…" (U+2026) must be preserved. Placeholders {name}, {n}, {version}, {count}, {v},
  # {what}, {unit}, {real}, {e} must appear in translation.
@@ -150971,7 +151092,15 @@ index 1139a7abbf1be43f43a971b4c411afd1619cc93f..f04253e8379bfc99f49e36d85f7c87ad
  	Open Source Tools for Creatives, Makers, and Builders	Open-Source-Werkzeuge für Kreative, Maker und Entwickler
  	Settings	Einstellungen
  	Check for updates	Nach Updates suchen
-@@ -73,7 +73,7 @@
+@@ -40,7 +39,6 @@
+ 	Installed version	Installierte Version
+ 	Latest version	Neueste Version
+ 	Newest release	Neueste Veröffentlichung
+-	Discord	Discord
+ 	GitHub	GitHub
+ 	Website	Website
+ 	Classic apps	Klassische Apps
+@@ -73,7 +71,7 @@
  	Reinstall	Neu installieren
  	Uninstall…	Deinstallieren…
  	All releases	Alle Versionen
@@ -150980,7 +151109,7 @@ index 1139a7abbf1be43f43a971b4c411afd1619cc93f..f04253e8379bfc99f49e36d85f7c87ad
  	Dismiss	Ausblenden
  	Update and restart	Aktualisieren und neu starten
  	A new version is available. Would you like to relaunch with the updated version?	Eine neue Version ist verfügbar. Mit der neuen Version neu starten?
-@@ -83,7 +83,7 @@
+@@ -83,7 +81,7 @@
  	Released {date}	Veröffentlicht am {date}
  	Open on GitHub	Auf GitHub öffnen
  	Close	Schließen
@@ -150989,21 +151118,29 @@ index 1139a7abbf1be43f43a971b4c411afd1619cc93f..f04253e8379bfc99f49e36d85f7c87ad
  	Only when I ask	Nur manuell
  	Automatically download and install updates	Updates automatisch herunterladen und installieren
  	Notify me when an installed app has an update	Benachrichtigen, wenn es für eine installierte App ein Update gibt
-@@ -95,11 +95,11 @@
+@@ -95,11 +93,10 @@
  	Running in the background	Im Hintergrund ausführen
  	Keep running in the tray when the window is closed	Beim Schließen des Fensters im Infobereich weiterlaufen
  	Show the window on the current desktop	Fenster auf dem aktuellen Schreibtisch zeigen
 -	Start KIO Launcher when I log in	KIO Launcher bei der Anmeldung starten
 +	Start Bogo Launcher when I log in	Bogo Launcher bei der Anmeldung starten
  	Community	Community
- 	Questions, ideas and news from the ArtCraft team	Fragen, Ideen und Neuigkeiten vom ArtCraft-Team
+-	Questions, ideas and news from the ArtCraft team	Fragen, Ideen und Neuigkeiten vom ArtCraft-Team
  	Appearance	Erscheinungsbild
 -	Quit KIO Launcher	KIO Launcher beenden
 +	Quit Bogo Launcher	Bogo Launcher beenden
  	Done	Fertig
  	Uninstall {name}?	{name} deinstallieren?
  	The app will be moved to the Trash. Your documents and settings stay.	Die App wird in den Papierkorb verschoben. Deine Dokumente und Einstellungen bleiben erhalten.
-@@ -134,7 +134,7 @@
+@@ -124,7 +121,6 @@
+ 	Apps you hid	Apps, die du ausgeblendet hast
+ 	Checked {ago} · using {sources}	Zuletzt geprüft: {ago} · über {sources}
+ 	{a} and {b}	{a} und {b}
+-	Join the Discord	Dem Discord beitreten
+ 	Learn more	Mehr erfahren
+ 	Minimize	Minimieren
+ 	Maximize	Maximieren
+@@ -134,7 +130,7 @@
  	Open link	Link öffnen
  	Update	Aktualisieren
  	{name} icon	{name}-Symbol
@@ -151012,7 +151149,16 @@ index 1139a7abbf1be43f43a971b4c411afd1619cc93f..f04253e8379bfc99f49e36d85f7c87ad
  	Cancel update	Update abbrechen
  	Stop waiting; the update can be started again later	Nicht mehr warten; das Update kann später erneut gestartet werden
  	Download again	Erneut herunterladen
-@@ -212,7 +212,7 @@ month	Dec	Dez.
+@@ -191,8 +187,6 @@ month	Dec	Dez.
+ 	Installing for {platform}	Installation für {platform}
+ 	Downloads for {platform}	Downloads für {platform}
+ 	No downloads for this system	Keine Downloads für dieses System
+-	Join the ArtCraft community on Discord	Tritt der ArtCraft-Community auf Discord bei
+-	ArtCraft on {name}	ArtCraft auf {name}
+ 	Couldn't open {name}: {e}	{name} konnte nicht geöffnet werden: {e}
+ 	Download cancelled	Download abgebrochen
+ 	Available to install	Installierbar
+@@ -212,7 +206,7 @@ month	Dec	Dez.
  	Version {version} installed	Version {version} installiert
  	Version {latest}	Version {latest}
  	No release published yet	Noch keine Version veröffentlicht
@@ -151021,7 +151167,15 @@ index 1139a7abbf1be43f43a971b4c411afd1619cc93f..f04253e8379bfc99f49e36d85f7c87ad
  	App	App
  	Latest	Neueste
  	Released	Veröffentlicht
-@@ -246,7 +246,7 @@ month	Dec	Dez.
+@@ -233,7 +227,6 @@ month	Dec	Dez.
+ 	Downloads the new version, replaces this one and opens it again	Lädt die neue Version herunter, ersetzt diese und öffnet sie erneut
+ 	Couldn't check for updates: {f}	Updates konnten nicht geprüft werden: {f}
+ 	GitHub repository	GitHub-Repository
+-	ArtCraft	ArtCraft
+ 	Update 1 app	1 App aktualisieren
+ 	Update all ({count})	Alle aktualisieren ({count})
+ 	⊞  Grid	⊞  Raster
+@@ -246,7 +239,7 @@ month	Dec	Dez.
  	Full changelog	Vollständiges Änderungsprotokoll
  	link	Link
  	No apps match	Keine passenden Apps
@@ -151030,7 +151184,7 @@ index 1139a7abbf1be43f43a971b4c411afd1619cc93f..f04253e8379bfc99f49e36d85f7c87ad
  	{name} {v} is available	{name} {v} ist verfügbar
  	{count} updates are available	{count} Updates sind verfügbar
  	These notes weren't fetched (GitHub's request limit was reached). They're on the release page.	Diese Hinweise wurden nicht geladen (das Anfragelimit von GitHub ist erreicht). Sie stehen auf der Release-Seite.
-@@ -297,7 +297,7 @@ filter	Installed	Installiert
+@@ -297,7 +290,7 @@ filter	Installed	Installiert
  @id	launcher.notes	Neuigkeiten
  @id	launcher.dismiss	Ausblenden
  @id	settings.open	Einstellungen
@@ -151039,7 +151193,15 @@ index 1139a7abbf1be43f43a971b4c411afd1619cc93f..f04253e8379bfc99f49e36d85f7c87ad
  @id	view.grid	Raster
  @id	view.table	Tabelle
  @id	filter.all	Alle
-@@ -321,11 +321,11 @@ filter	Installed	Installiert
+@@ -311,7 +304,6 @@ filter	Installed	Installiert
+ @id	sort.installed	Installierte Version
+ @id	sort.latest	Neueste Version
+ @id	sort.released	Neueste Veröffentlichung
+-@id	help.discord	Discord
+ @id	help.github	GitHub
+ @id	help.website	Website
+ @id	update.check	Nach Updates suchen
+@@ -321,15 +313,12 @@ filter	Installed	Installiert
  @id	linux.preferred_kind	Neue Apps installieren als
  @id	tray.close_to_tray	Beim Schließen des Fensters im Infobereich weiterlaufen
  @id	tray.show_on_current_desktop	Fenster auf dem aktuellen Schreibtisch zeigen
@@ -151051,9 +151213,13 @@ index 1139a7abbf1be43f43a971b4c411afd1619cc93f..f04253e8379bfc99f49e36d85f7c87ad
 -	Show KIO Launcher	KIO Launcher anzeigen
 +	Show Bogo Launcher	Bogo Launcher anzeigen
  	Check for Updates	Nach Updates suchen
- 	Visit getartcraft.com	getartcraft.com besuchen
- 	ArtCraft on GitHub	ArtCraft auf GitHub
-@@ -343,5 +343,5 @@ filter	Installed	Installiert
+-	Visit getartcraft.com	getartcraft.com besuchen
+-	ArtCraft on GitHub	ArtCraft auf GitHub
+-	Join the ArtCraft Discord	Dem ArtCraft-Discord beitreten
+ 	App details	App-Details
+ 	Close (Esc)	Schließen (Esc)
+ 	Features	Funktionen
+@@ -343,5 +332,5 @@ filter	Installed	Installiert
  	Next picture (→)	Nächstes Bild (→)
  	Loading pictures…	Bilder werden geladen…
  	Pictures couldn't be loaded. Reopen this page to try again.	Die Bilder konnten nicht geladen werden. Beim erneuten Öffnen der Seite wird es noch einmal versucht.
@@ -151062,7 +151228,7 @@ index 1139a7abbf1be43f43a971b4c411afd1619cc93f..f04253e8379bfc99f49e36d85f7c87ad
 +@plural	Bogo Launcher · {n} update available|Bogo Launcher · {n} updates available	Bogo Launcher · {n} Update verfügbar|Bogo Launcher · {n} Updates verfügbar
 +	No font for this language was found on this system. Install a font for this language and restart Bogo Launcher.	Auf diesem System wurde keine Schrift für diese Sprache gefunden. Installieren Sie eine passende Schrift und starten Sie Bogo Launcher neu.
 diff --git a/crates/ui-egui/src/i18n/en.tsv b/crates/ui-egui/src/i18n/en.tsv
-index b00f8461044423ac45b28a790be7a3f9bce6171c..aefd00a556fb15655ab8b74f1208562995589e9b 100644
+index b00f8461044423ac45b28a790be7a3f9bce6171c..52278aa61c13961e8b614cc9faa9c2dab390360f 100644
 --- a/crates/ui-egui/src/i18n/en.tsv
 +++ b/crates/ui-egui/src/i18n/en.tsv
 @@ -1,6 +1,6 @@
@@ -151073,7 +151239,15 @@ index b00f8461044423ac45b28a790be7a3f9bce6171c..aefd00a556fb15655ab8b74f12085629
  	Open Source Tools for Creatives, Makers, and Builders	Open Source Tools for Creatives, Makers, and Builders
  	Settings	Settings
  	Check for updates	Check for updates
-@@ -54,7 +54,7 @@
+@@ -20,7 +20,6 @@
+ 	Installed version	Installed version
+ 	Latest version	Latest version
+ 	Newest release	Newest release
+-	Discord	Discord
+ 	GitHub	GitHub
+ 	Website	Website
+ 	Classic apps	Classic apps
+@@ -54,7 +53,7 @@
  	Reinstall	Reinstall
  	Uninstall…	Uninstall…
  	All releases	All releases
@@ -151082,7 +151256,7 @@ index b00f8461044423ac45b28a790be7a3f9bce6171c..aefd00a556fb15655ab8b74f12085629
  	Dismiss	Dismiss
  	Update and restart	Update and restart
  	A new version is available. Would you like to relaunch with the updated version?	A new version is available. Would you like to relaunch with the updated version?
-@@ -64,7 +64,7 @@
+@@ -64,7 +63,7 @@
  	Released {date}	Released {date}
  	Open on GitHub	Open on GitHub
  	Close	Close
@@ -151091,21 +151265,29 @@ index b00f8461044423ac45b28a790be7a3f9bce6171c..aefd00a556fb15655ab8b74f12085629
  	Only when I ask	Only when I ask
  	Automatically download and install updates	Automatically download and install updates
  	Notify me when an installed app has an update	Notify me when an installed app has an update
-@@ -76,11 +76,11 @@
+@@ -76,11 +75,10 @@
  	Running in the background	Running in the background
  	Keep running in the tray when the window is closed	Keep running in the tray when the window is closed
  	Show the window on the current desktop	Show the window on the current desktop
 -	Start KIO Launcher when I log in	Start KIO Launcher when I log in
 +	Start Bogo Launcher when I log in	Start Bogo Launcher when I log in
  	Community	Community
- 	Questions, ideas and news from the ArtCraft team	Questions, ideas and news from the ArtCraft team
+-	Questions, ideas and news from the ArtCraft team	Questions, ideas and news from the ArtCraft team
  	Appearance	Appearance
 -	Quit KIO Launcher	Quit KIO Launcher
 +	Quit Bogo Launcher	Quit Bogo Launcher
  	Done	Done
  	Uninstall {name}?	Uninstall {name}?
  	The app will be moved to the Trash. Your documents and settings stay.	The app will be moved to the Trash. Your documents and settings stay.
-@@ -114,7 +114,7 @@
+@@ -104,7 +102,6 @@
+ 	Apps you hid	Apps you hid
+ 	Checked {ago} · using {sources}	Checked {ago} · using {sources}
+ 	{a} and {b}	{a} and {b}
+-	Join the Discord	Join the Discord
+ 	Learn more	Learn more
+ 	Minimize	Minimize
+ 	Maximize	Maximize
+@@ -114,7 +111,7 @@
  	Open link	Open link
  	Update	Update
  	{name} icon	{name} icon
@@ -151114,7 +151296,16 @@ index b00f8461044423ac45b28a790be7a3f9bce6171c..aefd00a556fb15655ab8b74f12085629
  	Cancel update	Cancel update
  	Stop waiting; the update can be started again later	Stop waiting; the update can be started again later
  	Download again	Download again
-@@ -186,7 +186,7 @@ month	Dec	Dec
+@@ -165,8 +162,6 @@ month	Dec	Dec
+ 	Installing for {platform}	Installing for {platform}
+ 	Downloads for {platform}	Downloads for {platform}
+ 	No downloads for this system	No downloads for this system
+-	Join the ArtCraft community on Discord	Join the ArtCraft community on Discord
+-	ArtCraft on {name}	ArtCraft on {name}
+ 	Couldn't open {name}: {e}	Couldn't open {name}: {e}
+ 	Download cancelled	Download cancelled
+ 	Available to install	Available to install
+@@ -186,7 +181,7 @@ month	Dec	Dec
  	Version {version} installed	Version {version} installed
  	Version {latest}	Version {latest}
  	No release published yet	No release published yet
@@ -151123,7 +151314,15 @@ index b00f8461044423ac45b28a790be7a3f9bce6171c..aefd00a556fb15655ab8b74f12085629
  	App	App
  	Latest	Latest
  	Released	Released
-@@ -221,7 +221,7 @@ month	Dec	Dec
+@@ -208,7 +203,6 @@ month	Dec	Dec
+ 	Couldn't check for updates: {f}	Couldn't check for updates: {f}
+ 	Website (coming soon)	Website (coming soon)
+ 	GitHub repository	GitHub repository
+-	ArtCraft	ArtCraft
+ 	Update 1 app	Update 1 app
+ 	Update all ({count})	Update all ({count})
+ 	⊞  Grid	⊞  Grid
+@@ -221,7 +215,7 @@ month	Dec	Dec
  	Full changelog	Full changelog
  	link	link
  	No apps match	No apps match
@@ -151132,7 +151331,7 @@ index b00f8461044423ac45b28a790be7a3f9bce6171c..aefd00a556fb15655ab8b74f12085629
  	{name} {v} is available	{name} {v} is available
  	{count} updates are available	{count} updates are available
  	These notes weren't fetched (GitHub's request limit was reached). They're on the release page.	These notes weren't fetched (GitHub's request limit was reached). They're on the release page.
-@@ -274,7 +274,7 @@ filter	Installed	Installed
+@@ -274,7 +268,7 @@ filter	Installed	Installed
  @id	launcher.notes	What's new
  @id	launcher.dismiss	Dismiss
  @id	settings.open	Settings
@@ -151141,7 +151340,15 @@ index b00f8461044423ac45b28a790be7a3f9bce6171c..aefd00a556fb15655ab8b74f12085629
  @id	view.grid	Grid
  @id	view.table	Table
  @id	filter.all	All
-@@ -298,12 +298,12 @@ filter	Installed	Installed
+@@ -288,7 +282,6 @@ filter	Installed	Installed
+ @id	sort.installed	Installed version
+ @id	sort.latest	Latest version
+ @id	sort.released	Newest release
+-@id	help.discord	Discord
+ @id	help.github	GitHub
+ @id	help.website	Website
+ @id	update.check	Check for updates
+@@ -298,12 +291,9 @@ filter	Installed	Installed
  @id	linux.preferred_kind	Install new apps as
  @id	tray.close_to_tray	Keep running in the tray when the window is closed
  @id	tray.show_on_current_desktop	Show the window on the current desktop
@@ -151151,15 +151358,15 @@ index b00f8461044423ac45b28a790be7a3f9bce6171c..aefd00a556fb15655ab8b74f12085629
 -	Show KIO Launcher	Show KIO Launcher
 +	Show Bogo Launcher	Show Bogo Launcher
  	Check for Updates	Check for Updates
- 	Visit getartcraft.com	Visit getartcraft.com
- 	ArtCraft on GitHub	ArtCraft on GitHub
- 	Join the ArtCraft Discord	Join the ArtCraft Discord
+-	Visit getartcraft.com	Visit getartcraft.com
+-	ArtCraft on GitHub	ArtCraft on GitHub
+-	Join the ArtCraft Discord	Join the ArtCraft Discord
 -@plural	KIO Launcher · {n} update available|KIO Launcher · {n} updates available	KIO Launcher · {n} update available|KIO Launcher · {n} updates available
 -	No font for this language was found on this system. Install a font for this language and restart KIO Launcher.	No font for this language was found on this system. Install a font for this language and restart KIO Launcher.
 +@plural	Bogo Launcher · {n} update available|Bogo Launcher · {n} updates available	Bogo Launcher · {n} update available|Bogo Launcher · {n} updates available
 +	No font for this language was found on this system. Install a font for this language and restart Bogo Launcher.	No font for this language was found on this system. Install a font for this language and restart Bogo Launcher.
 diff --git a/crates/ui-egui/src/i18n/es.tsv b/crates/ui-egui/src/i18n/es.tsv
-index 641e77cc2c25e32acefe9245241fe5ea4588b5f9..632e717bef645379a67a9f3533248a18bc8c80d8 100644
+index 641e77cc2c25e32acefe9245241fe5ea4588b5f9..5302ae420b22d6bcb1067797cc622dfa73b45c8f 100644
 --- a/crates/ui-egui/src/i18n/es.tsv
 +++ b/crates/ui-egui/src/i18n/es.tsv
 @@ -1,4 +1,4 @@
@@ -151168,7 +151375,7 @@ index 641e77cc2c25e32acefe9245241fe5ea4588b5f9..632e717bef645379a67a9f3533248a18
  # Format: context<TAB>source<TAB>translation
  # Empty context = plain UI string (tl!, t).
  # @id = command-id keyed (tr_id).
-@@ -6,21 +6,21 @@
+@@ -6,21 +6,20 @@
  # @msg = status/error message template (message, msg).
  # Other context = disambiguation for tr_ctx.
  #
@@ -151185,7 +151392,6 @@ index 641e77cc2c25e32acefe9245241fe5ea4588b5f9..632e717bef645379a67a9f3533248a18
 +# Left in English on purpose: product name "Bogo Launcher" (and its "Launcher" tag), suite
 +# name "Bogo App Suite", app names (Bogo Photo, Bogo Light, Bogo Film,
 +# Bogo Design, Bogo Vector, Bogo PDF, Bogo Effect, Bogo Word, Bogo Deck, Bogo Grid, Bogo CAD,
-+# Bogo Sound, Bogo UI), "GitHub", "Discord", "Finder", "makers".
  # Trailing "…" (U+2026) must be preserved. Placeholders must appear in the translation:
  # {ago}, {a}, {b}, {count}, {date}, {day}, {done}, {e}, {f}, {installed}, {latest}, {min},
  # {month}, {name}, {n}, {os}, {platform}, {sources}, {total}, {version}, {v}, {year}.
@@ -151196,7 +151402,15 @@ index 641e77cc2c25e32acefe9245241fe5ea4588b5f9..632e717bef645379a67a9f3533248a18
  	Open Source Tools for Creatives, Makers, and Builders	Herramientas de código abierto para creativos, makers y constructores
  	Settings	Ajustes
  	Check for updates	Buscar actualizaciones
-@@ -73,7 +73,7 @@
+@@ -40,7 +39,6 @@
+ 	Installed version	Versión instalada
+ 	Latest version	Última versión
+ 	Newest release	Publicación más reciente
+-	Discord	Discord
+ 	GitHub	GitHub
+ 	Website	Sitio web
+ 	Classic apps	Aplicaciones clásicas
+@@ -73,7 +71,7 @@
  	Reinstall	Reinstalar
  	Uninstall…	Desinstalar…
  	All releases	Todas las versiones
@@ -151205,7 +151419,7 @@ index 641e77cc2c25e32acefe9245241fe5ea4588b5f9..632e717bef645379a67a9f3533248a18
  	Dismiss	Descartar
  	Update and restart	Actualizar y reiniciar
  	A new version is available. Would you like to relaunch with the updated version?	Hay una versión nueva. ¿Quieres reiniciar con la versión actualizada?
-@@ -83,7 +83,7 @@
+@@ -83,7 +81,7 @@
  	Released {date}	Publicada el {date}
  	Open on GitHub	Abrir en GitHub
  	Close	Cerrar
@@ -151214,21 +151428,29 @@ index 641e77cc2c25e32acefe9245241fe5ea4588b5f9..632e717bef645379a67a9f3533248a18
  	Only when I ask	Solo cuando lo pida
  	Automatically download and install updates	Descargar e instalar actualizaciones automáticamente
  	Notify me when an installed app has an update	Avisarme cuando una aplicación instalada tenga una actualización
-@@ -95,11 +95,11 @@
+@@ -95,11 +93,10 @@
  	Running in the background	En segundo plano
  	Keep running in the tray when the window is closed	Seguir abierto en la bandeja del sistema al cerrar la ventana
  	Show the window on the current desktop	Mostrar la ventana en el escritorio actual
 -	Start KIO Launcher when I log in	Abrir KIO Launcher al iniciar sesión
 +	Start Bogo Launcher when I log in	Abrir Bogo Launcher al iniciar sesión
  	Community	Comunidad
- 	Questions, ideas and news from the ArtCraft team	Preguntas, ideas y noticias del equipo de ArtCraft
+-	Questions, ideas and news from the ArtCraft team	Preguntas, ideas y noticias del equipo de ArtCraft
  	Appearance	Apariencia
 -	Quit KIO Launcher	Salir de KIO Launcher
 +	Quit Bogo Launcher	Salir de Bogo Launcher
  	Done	Listo
  	Uninstall {name}?	¿Desinstalar {name}?
  	The app will be moved to the Trash. Your documents and settings stay.	La aplicación se moverá a la Papelera. Tus documentos y ajustes se conservan.
-@@ -133,7 +133,7 @@
+@@ -123,7 +120,6 @@
+ 	Apps you hid	Aplicaciones que ocultaste
+ 	Checked {ago} · using {sources}	Comprobado {ago} · con {sources}
+ 	{a} and {b}	{a} y {b}
+-	Join the Discord	Únete al Discord
+ 	Learn more	Más información
+ 	Minimize	Minimizar
+ 	Maximize	Maximizar
+@@ -133,7 +129,7 @@
  	Open link	Abrir enlace
  	Update	Actualizar
  	{name} icon	Icono de {name}
@@ -151237,7 +151459,16 @@ index 641e77cc2c25e32acefe9245241fe5ea4588b5f9..632e717bef645379a67a9f3533248a18
  	Cancel update	Cancelar la actualización
  	Stop waiting; the update can be started again later	Dejar de esperar; la actualización se puede volver a iniciar más tarde
  	Download again	Volver a descargar
-@@ -205,7 +205,7 @@ month	Dec	dic.
+@@ -184,8 +180,6 @@ month	Dec	dic.
+ 	Installing for {platform}	Instalación para {platform}
+ 	Downloads for {platform}	Descargas para {platform}
+ 	No downloads for this system	No hay descargas para este sistema
+-	Join the ArtCraft community on Discord	Únete a la comunidad de ArtCraft en Discord
+-	ArtCraft on {name}	ArtCraft en {name}
+ 	Couldn't open {name}: {e}	No se pudo abrir {name}: {e}
+ 	Download cancelled	Descarga cancelada
+ 	Available to install	Disponible para instalar
+@@ -205,7 +199,7 @@ month	Dec	dic.
  	Version {version} installed	Versión {version} instalada
  	Version {latest}	Versión {latest}
  	No release published yet	Aún no hay ninguna versión publicada
@@ -151246,7 +151477,15 @@ index 641e77cc2c25e32acefe9245241fe5ea4588b5f9..632e717bef645379a67a9f3533248a18
  	App	Aplicación
  	Latest	Última
  	Released	Publicada
-@@ -240,11 +240,11 @@ month	Dec	dic.
+@@ -227,7 +221,6 @@ month	Dec	dic.
+ 	Couldn't check for updates: {f}	No se pudieron buscar actualizaciones: {f}
+ 	Website (coming soon)	Sitio web (próximamente)
+ 	GitHub repository	Repositorio en GitHub
+-	ArtCraft	ArtCraft
+ 	Update 1 app	Actualizar 1 aplicación
+ 	Update all ({count})	Actualizar todas ({count})
+ 	⊞  Grid	⊞  Cuadrícula
+@@ -240,11 +233,11 @@ month	Dec	dic.
  	Full changelog	Registro de cambios completo
  	link	enlace
  	No apps match	Ninguna aplicación coincide
@@ -151260,7 +151499,7 @@ index 641e77cc2c25e32acefe9245241fe5ea4588b5f9..632e717bef645379a67a9f3533248a18
  	Couldn't change the login item: {e}	No se pudo cambiar el elemento de inicio de sesión: {e}
  column	App	Aplicación
  column	Installed	Instalada
-@@ -293,7 +293,7 @@ filter	Installed	Instaladas
+@@ -293,7 +286,7 @@ filter	Installed	Instaladas
  @id	launcher.notes	Novedades
  @id	launcher.dismiss	Descartar
  @id	settings.open	Ajustes
@@ -151269,7 +151508,15 @@ index 641e77cc2c25e32acefe9245241fe5ea4588b5f9..632e717bef645379a67a9f3533248a18
  @id	view.grid	Cuadrícula
  @id	view.table	Tabla
  @id	filter.all	Todas
-@@ -317,12 +317,12 @@ filter	Installed	Instaladas
+@@ -307,7 +300,6 @@ filter	Installed	Instaladas
+ @id	sort.installed	Versión instalada
+ @id	sort.latest	Última versión
+ @id	sort.released	Publicación más reciente
+-@id	help.discord	Discord
+ @id	help.github	GitHub
+ @id	help.website	Sitio web
+ @id	update.check	Buscar actualizaciones
+@@ -317,12 +309,9 @@ filter	Installed	Instaladas
  @id	linux.preferred_kind	Instalar las aplicaciones nuevas como
  @id	tray.close_to_tray	Seguir abierto en la bandeja del sistema al cerrar la ventana
  @id	tray.show_on_current_desktop	Mostrar la ventana en el escritorio actual
@@ -151279,15 +151526,15 @@ index 641e77cc2c25e32acefe9245241fe5ea4588b5f9..632e717bef645379a67a9f3533248a18
 -	Show KIO Launcher	Mostrar KIO Launcher
 +	Show Bogo Launcher	Mostrar Bogo Launcher
  	Check for Updates	Buscar actualizaciones
- 	Visit getartcraft.com	Visitar getartcraft.com
- 	ArtCraft on GitHub	ArtCraft en GitHub
- 	Join the ArtCraft Discord	Únete al Discord de ArtCraft
+-	Visit getartcraft.com	Visitar getartcraft.com
+-	ArtCraft on GitHub	ArtCraft en GitHub
+-	Join the ArtCraft Discord	Únete al Discord de ArtCraft
 -@plural	KIO Launcher · {n} update available|KIO Launcher · {n} updates available	KIO Launcher · {n} actualización disponible|KIO Launcher · {n} actualizaciones disponibles
 -	No font for this language was found on this system. Install a font for this language and restart KIO Launcher.	No se encontró ninguna fuente para este idioma en el sistema. Instale una fuente adecuada y reinicie KIO Launcher.
 +@plural	Bogo Launcher · {n} update available|Bogo Launcher · {n} updates available	Bogo Launcher · {n} actualización disponible|Bogo Launcher · {n} actualizaciones disponibles
 +	No font for this language was found on this system. Install a font for this language and restart Bogo Launcher.	No se encontró ninguna fuente para este idioma en el sistema. Instale una fuente adecuada y reinicie Bogo Launcher.
 diff --git a/crates/ui-egui/src/i18n/fr.tsv b/crates/ui-egui/src/i18n/fr.tsv
-index 090fee2f0dcddd80eec3ba2e177a56edfda70c91..333be6670791400cb9ed2613bc145dac3a1ad7b1 100644
+index 090fee2f0dcddd80eec3ba2e177a56edfda70c91..ff54c070a1416ee6e66f39aea67d577b455aa5c8 100644
 --- a/crates/ui-egui/src/i18n/fr.tsv
 +++ b/crates/ui-egui/src/i18n/fr.tsv
 @@ -1,4 +1,4 @@
@@ -151296,7 +151543,7 @@ index 090fee2f0dcddd80eec3ba2e177a56edfda70c91..333be6670791400cb9ed2613bc145dac
  # Format: context<TAB>source<TAB>translation
  # Empty context = plain UI string (tl!, t).
  # @id = command-id keyed (tr_id).
-@@ -6,19 +6,19 @@
+@@ -6,19 +6,18 @@
  # @msg = status/error message template (message, msg).
  # Other context = disambiguation for tr_ctx.
  #
@@ -151308,10 +151555,10 @@ index 090fee2f0dcddd80eec3ba2e177a56edfda70c91..333be6670791400cb9ed2613bc145dac
 -# Left in English on purpose: product name "KIO Launcher" (and its "Launcher" tag), suite
 -# name "KIO App Suite", app names (KIO Photo, KIO Light, KIO Film, KIO Design, KIO Vector,
 -# KIO PDF, KIO Effect, KIO Word, KIO Deck, KIO Grid, KIO Cad, KIO Sound, KIO UI), "GitHub",
+-# "Discord".
 +# Left in English on purpose: product name "Bogo Launcher" (and its "Launcher" tag), suite
 +# name "Bogo App Suite", app names (Bogo Photo, Bogo Light, Bogo Film, Bogo Design, Bogo Vector,
 +# Bogo PDF, Bogo Effect, Bogo Word, Bogo Deck, Bogo Grid, Bogo CAD, Bogo Sound, Bogo UI), "GitHub",
- # "Discord".
  # Trailing "…" (U+2026) must be preserved. Placeholders {name}, {n}, {version}, {count}, {v},
  # {what}, {unit}, {real}, {e} must appear in translation.
  
@@ -151321,7 +151568,15 @@ index 090fee2f0dcddd80eec3ba2e177a56edfda70c91..333be6670791400cb9ed2613bc145dac
  	Open Source Tools for Creatives, Makers, and Builders	Des outils open source pour les créatifs, les makers et les bâtisseurs
  	Settings	Réglages
  	Check for updates	Rechercher des mises à jour
-@@ -71,7 +71,7 @@
+@@ -38,7 +37,6 @@
+ 	Installed version	Version installée
+ 	Latest version	Dernière version
+ 	Newest release	Version la plus récente
+-	Discord	Discord
+ 	GitHub	GitHub
+ 	Website	Site web
+ 	Classic apps	Applications classiques
+@@ -71,7 +69,7 @@
  	Reinstall	Réinstaller
  	Uninstall…	Désinstaller…
  	All releases	Toutes les versions
@@ -151330,7 +151585,7 @@ index 090fee2f0dcddd80eec3ba2e177a56edfda70c91..333be6670791400cb9ed2613bc145dac
  	Dismiss	Ignorer
  	Update and restart	Mettre à jour et redémarrer
  	A new version is available. Would you like to relaunch with the updated version?	Une nouvelle version est disponible. Redémarrer avec la nouvelle version ?
-@@ -81,7 +81,7 @@
+@@ -81,7 +79,7 @@
  	Released {date}	Publiée le {date}
  	Open on GitHub	Ouvrir sur GitHub
  	Close	Fermer
@@ -151339,21 +151594,29 @@ index 090fee2f0dcddd80eec3ba2e177a56edfda70c91..333be6670791400cb9ed2613bc145dac
  	Only when I ask	Seulement à ma demande
  	Automatically download and install updates	Télécharger et installer les mises à jour automatiquement
  	Notify me when an installed app has an update	Me prévenir quand une application installée a une mise à jour
-@@ -93,11 +93,11 @@
+@@ -93,11 +91,10 @@
  	Running in the background	Exécution en arrière-plan
  	Keep running in the tray when the window is closed	Rester actif dans la zone de notification à la fermeture de la fenêtre
  	Show the window on the current desktop	Afficher la fenêtre sur le bureau actuel
 -	Start KIO Launcher when I log in	Lancer KIO Launcher à l'ouverture de session
 +	Start Bogo Launcher when I log in	Lancer Bogo Launcher à l'ouverture de session
  	Community	Communauté
- 	Questions, ideas and news from the ArtCraft team	Questions, idées et actualités de l'équipe ArtCraft
+-	Questions, ideas and news from the ArtCraft team	Questions, idées et actualités de l'équipe ArtCraft
  	Appearance	Apparence
 -	Quit KIO Launcher	Quitter KIO Launcher
 +	Quit Bogo Launcher	Quitter Bogo Launcher
  	Done	Terminé
  	Uninstall {name}?	Désinstaller {name} ?
  	The app will be moved to the Trash. Your documents and settings stay.	L'application sera placée dans la Corbeille. Vos documents et réglages sont conservés.
-@@ -132,7 +132,7 @@
+@@ -122,7 +119,6 @@
+ 	Apps you hid	Applications que vous avez masquées
+ 	Checked {ago} · using {sources}	Vérifié {ago} · via {sources}
+ 	{a} and {b}	{a} et {b}
+-	Join the Discord	Rejoindre le Discord
+ 	Learn more	En savoir plus
+ 	Minimize	Réduire
+ 	Maximize	Agrandir
+@@ -132,7 +128,7 @@
  	Open link	Ouvrir le lien
  	Update	Mettre à jour
  	{name} icon	Icône de {name}
@@ -151362,7 +151625,16 @@ index 090fee2f0dcddd80eec3ba2e177a56edfda70c91..333be6670791400cb9ed2613bc145dac
  	Cancel update	Annuler la mise à jour
  	Stop waiting; the update can be started again later	Ne plus attendre ; la mise à jour pourra être relancée plus tard
  	Download again	Télécharger à nouveau
-@@ -210,7 +210,7 @@ month	Dec	déc.
+@@ -189,8 +185,6 @@ month	Dec	déc.
+ 	Installing for {platform}	Installation pour {platform}
+ 	Downloads for {platform}	Téléchargements pour {platform}
+ 	No downloads for this system	Aucun téléchargement pour ce système
+-	Join the ArtCraft community on Discord	Rejoindre la communauté ArtCraft sur Discord
+-	ArtCraft on {name}	ArtCraft sur {name}
+ 	Couldn't open {name}: {e}	Impossible d'ouvrir {name} : {e}
+ 	Download cancelled	Téléchargement annulé
+ 	Available to install	Disponible à l'installation
+@@ -210,7 +204,7 @@ month	Dec	déc.
  	Version {version} installed	Version {version} installée
  	Version {latest}	Version {latest}
  	No release published yet	Aucune version publiée pour l'instant
@@ -151371,7 +151643,15 @@ index 090fee2f0dcddd80eec3ba2e177a56edfda70c91..333be6670791400cb9ed2613bc145dac
  	App	Application
  	Latest	Dernière
  	Released	Publiée
-@@ -244,7 +244,7 @@ month	Dec	déc.
+@@ -231,7 +225,6 @@ month	Dec	déc.
+ 	Downloads the new version, replaces this one and opens it again	Télécharge la nouvelle version, remplace celle-ci et la rouvre
+ 	Couldn't check for updates: {f}	Impossible de rechercher les mises à jour : {f}
+ 	GitHub repository	Dépôt GitHub
+-	ArtCraft	ArtCraft
+ 	Update 1 app	Mettre à jour 1 application
+ 	Update all ({count})	Tout mettre à jour ({count})
+ 	⊞  Grid	⊞  Grille
+@@ -244,7 +237,7 @@ month	Dec	déc.
  	Full changelog	Journal des modifications complet
  	link	lien
  	No apps match	Aucune application ne correspond
@@ -151380,7 +151660,7 @@ index 090fee2f0dcddd80eec3ba2e177a56edfda70c91..333be6670791400cb9ed2613bc145dac
  	{name} {v} is available	{name} {v} est disponible
  	{count} updates are available	{count} mises à jour sont disponibles
  	These notes weren't fetched (GitHub's request limit was reached). They're on the release page.	Ces notes n'ont pas pu être récupérées (la limite de requêtes de GitHub a été atteinte). Elles sont sur la page de la version.
-@@ -295,7 +295,7 @@ filter	Installed	Installées
+@@ -295,7 +288,7 @@ filter	Installed	Installées
  @id	launcher.notes	Nouveautés
  @id	launcher.dismiss	Ignorer
  @id	settings.open	Réglages
@@ -151389,7 +151669,15 @@ index 090fee2f0dcddd80eec3ba2e177a56edfda70c91..333be6670791400cb9ed2613bc145dac
  @id	view.grid	Grille
  @id	view.table	Tableau
  @id	filter.all	Toutes
-@@ -319,11 +319,11 @@ filter	Installed	Installées
+@@ -309,7 +302,6 @@ filter	Installed	Installées
+ @id	sort.installed	Version installée
+ @id	sort.latest	Dernière version
+ @id	sort.released	Version la plus récente
+-@id	help.discord	Discord
+ @id	help.github	GitHub
+ @id	help.website	Site web
+ @id	update.check	Rechercher des mises à jour
+@@ -319,15 +311,12 @@ filter	Installed	Installées
  @id	linux.preferred_kind	Installer les nouvelles applications en tant que
  @id	tray.close_to_tray	Rester actif dans la zone de notification à la fermeture de la fenêtre
  @id	tray.show_on_current_desktop	Afficher la fenêtre sur le bureau actuel
@@ -151401,9 +151689,13 @@ index 090fee2f0dcddd80eec3ba2e177a56edfda70c91..333be6670791400cb9ed2613bc145dac
 -	Show KIO Launcher	Afficher KIO Launcher
 +	Show Bogo Launcher	Afficher Bogo Launcher
  	Check for Updates	Rechercher des mises à jour
- 	Visit getartcraft.com	Visiter getartcraft.com
- 	ArtCraft on GitHub	ArtCraft sur GitHub
-@@ -341,5 +341,5 @@ filter	Installed	Installées
+-	Visit getartcraft.com	Visiter getartcraft.com
+-	ArtCraft on GitHub	ArtCraft sur GitHub
+-	Join the ArtCraft Discord	Rejoindre le Discord d'ArtCraft
+ 	App details	Détails de l'application
+ 	Close (Esc)	Fermer (Esc)
+ 	Features	Fonctionnalités
+@@ -341,5 +330,5 @@ filter	Installed	Installées
  	Next picture (→)	Image suivante (→)
  	Loading pictures…	Chargement des images…
  	Pictures couldn't be loaded. Reopen this page to try again.	Impossible de charger les images. Rouvrir la page permet de réessayer.
@@ -151412,7 +151704,7 @@ index 090fee2f0dcddd80eec3ba2e177a56edfda70c91..333be6670791400cb9ed2613bc145dac
 +@plural	Bogo Launcher · {n} update available|Bogo Launcher · {n} updates available	Bogo Launcher · {n} mise à jour disponible|Bogo Launcher · {n} mises à jour disponibles
 +	No font for this language was found on this system. Install a font for this language and restart Bogo Launcher.	Aucune police pour cette langue n’a été trouvée sur ce système. Installez une police adaptée, puis redémarrez Bogo Launcher.
 diff --git a/crates/ui-egui/src/i18n/hu.tsv b/crates/ui-egui/src/i18n/hu.tsv
-index 2d90ca6ecfb3f24f97990af29a1da9916067fb08..9fd1b019b3d8be4061721a15b87255da51387a68 100644
+index 2d90ca6ecfb3f24f97990af29a1da9916067fb08..71114a774130689b03f23249e3949436ffd02d4e 100644
 --- a/crates/ui-egui/src/i18n/hu.tsv
 +++ b/crates/ui-egui/src/i18n/hu.tsv
 @@ -1,4 +1,4 @@
@@ -151421,7 +151713,7 @@ index 2d90ca6ecfb3f24f97990af29a1da9916067fb08..9fd1b019b3d8be4061721a15b87255da
  # Format: context<TAB>source<TAB>translation
  # Empty context = plain UI string (tl!, t).
  # @id = command-id keyed (tr_id).
-@@ -6,21 +6,21 @@
+@@ -6,21 +6,20 @@
  # @msg = status/error message template (message, msg).
  # Other context = disambiguation for tr_ctx.
  #
@@ -151438,7 +151730,6 @@ index 2d90ca6ecfb3f24f97990af29a1da9916067fb08..9fd1b019b3d8be4061721a15b87255da
 +# Left in English on purpose: product name "Bogo Launcher" (and its "Launcher" tag), suite
 +# name "Bogo App Suite",
 +# app names (Bogo Photo, Bogo Light, Bogo Film, Bogo Design, Bogo Vector, Bogo PDF, Bogo Effect,
-+# Bogo Word, Bogo Deck, Bogo Grid, Bogo CAD, Bogo Sound, Bogo UI), "GitHub", "Discord".
  # Shortcut keys keep their key-cap names (Shift, Alt, Ctrl, Cmd, Esc).
  # Trailing "…" (U+2026) must be preserved. Placeholders {name}, {n}, {version}, {count}, {v},
  # {what}, {unit}, {real}, {e} must appear in translation.
@@ -151449,7 +151740,15 @@ index 2d90ca6ecfb3f24f97990af29a1da9916067fb08..9fd1b019b3d8be4061721a15b87255da
  	Open Source Tools for Creatives, Makers, and Builders	Nyílt forráskódú eszközök alkotóknak, barkácsolóknak és fejlesztőknek
  	Settings	Beállítások
  	Check for updates	Frissítések keresése
-@@ -73,7 +73,7 @@
+@@ -40,7 +39,6 @@
+ 	Installed version	Telepített verzió
+ 	Latest version	Legújabb verzió
+ 	Newest release	Legújabb kiadás
+-	Discord	Discord
+ 	GitHub	GitHub
+ 	Website	Webhely
+ 	Classic apps	Eredeti alkalmazások
+@@ -73,7 +71,7 @@
  	Reinstall	Újratelepítés
  	Uninstall…	Eltávolítás…
  	All releases	Minden kiadás
@@ -151458,7 +151757,7 @@ index 2d90ca6ecfb3f24f97990af29a1da9916067fb08..9fd1b019b3d8be4061721a15b87255da
  	Dismiss	Elrejtés
  	Update and restart	Frissítés és újraindítás
  	A new version is available. Would you like to relaunch with the updated version?	Új verzió érhető el. Újraindítod az alkalmazást a frissítéshez?
-@@ -83,7 +83,7 @@
+@@ -83,7 +81,7 @@
  	Released {date}	Megjelent: {date}
  	Open on GitHub	Megnyitás a GitHubon
  	Close	Bezárás
@@ -151467,21 +151766,29 @@ index 2d90ca6ecfb3f24f97990af29a1da9916067fb08..9fd1b019b3d8be4061721a15b87255da
  	Only when I ask	Csak kézi kereséskor
  	Automatically download and install updates	Frissítések automatikus letöltése és telepítése
  	Notify me when an installed app has an update	Értesítés a telepített alkalmazásokhoz elérhető frissítésekről
-@@ -95,11 +95,11 @@
+@@ -95,11 +93,10 @@
  	Running in the background	Futtatás a háttérben
  	Keep running in the tray when the window is closed	Az ablak bezárásakor kerüljön a tálcára
  	Show the window on the current desktop	Ablak megjelenítése az aktuális asztalon
 -	Start KIO Launcher when I log in	KIO Launcher indítása bejelentkezéskor
 +	Start Bogo Launcher when I log in	Bogo Launcher indítása bejelentkezéskor
  	Community	Közösség
- 	Questions, ideas and news from the ArtCraft team	Kérdések, ötletek és hírek az ArtCraft csapatától
+-	Questions, ideas and news from the ArtCraft team	Kérdések, ötletek és hírek az ArtCraft csapatától
  	Appearance	Megjelenés
 -	Quit KIO Launcher	Kilépés az ArtCraft Launcherből
-+	Quit Bogo Launcher	Kilépés az ArtCraft Launcherből
++	Quit Bogo Launcher	Kilépés a Bogo Launcherből
  	Done	Kész
  	Uninstall {name}?	{name} eltávolítása?
  	The app will be moved to the Trash. Your documents and settings stay.	Az alkalmazás a Kukába kerül. A dokumentumaid és beállításaid megmaradnak.
-@@ -134,7 +134,7 @@
+@@ -124,7 +121,6 @@
+ 	Apps you hid	Az általad elrejtett alkalmazások
+ 	Checked {ago} · using {sources}	Ellenőrizve: {ago} · {sources}
+ 	{a} and {b}	{a} és {b}
+-	Join the Discord	Csatlakozás a Discordhoz
+ 	Learn more	További információ
+ 	Minimize	Kis méret
+ 	Maximize	Teljes méret
+@@ -134,7 +130,7 @@
  	Open link	Hivatkozás megnyitása
  	Update	Frissítés
  	{name} icon	{name} ikonja
@@ -151490,7 +151797,16 @@ index 2d90ca6ecfb3f24f97990af29a1da9916067fb08..9fd1b019b3d8be4061721a15b87255da
  	Cancel update	Frissítés megszakítása
  	Stop waiting; the update can be started again later	Megszakítja a várakozást. A frissítést később újra elindíthatod.
  	Download again	Újbóli letöltés
-@@ -212,7 +212,7 @@ month	Dec	dec.
+@@ -191,8 +187,6 @@ month	Dec	dec.
+ 	Installing for {platform}	Telepítés {platform} rendszerre
+ 	Downloads for {platform}	Letöltések {platform} rendszerre
+ 	No downloads for this system	Nincsenek letöltések ehhez a rendszerhez
+-	Join the ArtCraft community on Discord	Csatlakozz az ArtCraft közösségéhez a Discordon
+-	ArtCraft on {name}	ArtCraft – {name}
+ 	Couldn't open {name}: {e}	{name} nem nyitható meg: {e}
+ 	Download cancelled	Letöltés megszakítva
+ 	Available to install	Telepíthető
+@@ -212,7 +206,7 @@ month	Dec	dec.
  	Version {version} installed	Telepített verzió: {version}
  	Version {latest}	Verzió: {latest}
  	No release published yet	Még nem jelent meg kiadás
@@ -151499,12 +151815,19 @@ index 2d90ca6ecfb3f24f97990af29a1da9916067fb08..9fd1b019b3d8be4061721a15b87255da
  	App	Alkalmazás
  	Latest	Legújabb
  	Released	Megjelent
-@@ -247,11 +247,11 @@ month	Dec	dec.
+@@ -234,7 +228,6 @@ month	Dec	dec.
+ 	Couldn't check for updates: {f}	Nem sikerült frissítéseket keresni: {f}
+ 	Website (coming soon)	Webhely (hamarosan)
+ 	GitHub repository	GitHub-tároló
+-	ArtCraft	ArtCraft
+ 	Update 1 app	1 alkalmazás frissítése
+ 	Update all ({count})	Összes frissítése ({count})
+ 	⊞  Grid	⊞  Rács
+@@ -247,11 +240,10 @@ month	Dec	dec.
  	Full changelog	Teljes változásnapló
  	link	hivatkozás
  	No apps match	Nincs találat
 -	Open KIO Launcher to update.	Nyisd meg az ArtCraft Launchert a frissítéshez.
-+	Open Bogo Launcher to update.	Nyisd meg az ArtCraft Launchert a frissítéshez.
  	{name} {v} is available	Elérhető: {name} {v}
  	{count} updates are available	{count} frissítés elérhető
  	These notes weren't fetched (GitHub's request limit was reached). They're on the release page.	A kiadási információkat nem sikerült betölteni, mert elértük a GitHub lekérdezési korlátját. A kiadás oldalán megtalálod őket.
@@ -151513,7 +151836,24 @@ index 2d90ca6ecfb3f24f97990af29a1da9916067fb08..9fd1b019b3d8be4061721a15b87255da
  	Couldn't change the login item: {e}	Az automatikus indítás beállítását nem sikerült módosítani: {e}
  
  # Contextual: table column headers
-@@ -335,14 +335,14 @@ filter	Installed	Telepítve
+@@ -311,7 +303,7 @@ filter	Installed	Telepítve
+ @id	launcher.notes	Újdonságok
+ @id	launcher.dismiss	Elrejtés
+ @id	settings.open	Beállítások
+-@id	settings.quit	Kilépés az ArtCraft Launcherből
++@id	settings.quit	Kilépés a Bogo Launcherből
+ @id	view.grid	Rács
+ @id	view.table	Táblázat
+ @id	filter.all	Összes
+@@ -325,7 +317,6 @@ filter	Installed	Telepítve
+ @id	sort.installed	Telepített verzió
+ @id	sort.latest	Legújabb verzió
+ @id	sort.released	Legújabb kiadás
+-@id	help.discord	Discord
+ @id	help.github	GitHub
+ @id	help.website	Webhely
+ @id	update.check	Frissítések keresése
+@@ -335,14 +326,11 @@ filter	Installed	Telepítve
  @id	linux.preferred_kind	Új alkalmazások csomagformátuma
  @id	tray.close_to_tray	Az ablak bezárásakor kerüljön a tálcára
  @id	tray.show_on_current_desktop	Ablak megjelenítése az aktuális asztalon
@@ -151525,15 +151865,15 @@ index 2d90ca6ecfb3f24f97990af29a1da9916067fb08..9fd1b019b3d8be4061721a15b87255da
 -	Show KIO Launcher	KIO Launcher megjelenítése
 +	Show Bogo Launcher	Bogo Launcher megjelenítése
  	Check for Updates	Frissítések keresése
- 	Visit getartcraft.com	getartcraft.com megnyitása
- 	ArtCraft on GitHub	ArtCraft a GitHubon
- 	Join the ArtCraft Discord	Csatlakozás az ArtCraft Discord-közösségéhez
+-	Visit getartcraft.com	getartcraft.com megnyitása
+-	ArtCraft on GitHub	ArtCraft a GitHubon
+-	Join the ArtCraft Discord	Csatlakozás az ArtCraft Discord-közösségéhez
 -@plural	KIO Launcher · {n} update available|KIO Launcher · {n} updates available	KIO Launcher · {n} frissítés elérhető|KIO Launcher · {n} frissítés elérhető
 -	No font for this language was found on this system. Install a font for this language and restart KIO Launcher.	A rendszer nem talált betűtípust ehhez a nyelvhez. Telepítsen megfelelő betűtípust, majd indítsa újra a KIO Launcher alkalmazást.
 +@plural	Bogo Launcher · {n} update available|Bogo Launcher · {n} updates available	Bogo Launcher · {n} frissítés elérhető|Bogo Launcher · {n} frissítés elérhető
 +	No font for this language was found on this system. Install a font for this language and restart Bogo Launcher.	A rendszer nem talált betűtípust ehhez a nyelvhez. Telepítsen megfelelő betűtípust, majd indítsa újra a Bogo Launcher alkalmazást.
 diff --git a/crates/ui-egui/src/i18n/ja.tsv b/crates/ui-egui/src/i18n/ja.tsv
-index 966b68321a6a96e7024b04e1e9940fbbc0f41784..51eaa2894c6e83024816eeb86e1d74f90fda2e93 100644
+index 966b68321a6a96e7024b04e1e9940fbbc0f41784..1256de2646cb210254213059ab6b2088d4782e4d 100644
 --- a/crates/ui-egui/src/i18n/ja.tsv
 +++ b/crates/ui-egui/src/i18n/ja.tsv
 @@ -1,4 +1,4 @@
@@ -151542,7 +151882,7 @@ index 966b68321a6a96e7024b04e1e9940fbbc0f41784..51eaa2894c6e83024816eeb86e1d74f9
  # Format: context<TAB>source<TAB>translation
  # Empty context = plain UI string (tl!, t).
  # @id = command-id keyed (tr_id).
-@@ -6,15 +6,15 @@
+@@ -6,15 +6,14 @@
  # @msg = status/error message template (message, msg).
  # Other context = disambiguation for tr_ctx.
  #
@@ -151559,11 +151899,10 @@ index 966b68321a6a96e7024b04e1e9940fbbc0f41784..51eaa2894c6e83024816eeb86e1d74f9
 +# Left in English on purpose: product name "Bogo Launcher" (and its "Launcher" tag), suite
 +# name "Bogo App Suite",
 +# app names (Bogo Photo, Bogo Light, Bogo Film, Bogo Design, Bogo Vector, Bogo PDF, Bogo Effect,
-+# Bogo Word, Bogo Deck, Bogo Grid, Bogo CAD, Bogo Sound, Bogo UI), "GitHub", "Discord".
  # Shortcut keys keep their key-cap names (Shift, Alt, Ctrl, Cmd, Esc).
  # Trailing "…" (U+2026) must be preserved. Placeholders {name}, {n}, {version}, {count}, {v},
  # {what}, {unit}, {real}, {e} must appear in translation.
-@@ -22,7 +22,7 @@
+@@ -22,7 +21,7 @@
  # system has none, the interface stays in English.
  
  	Launcher	Launcher
@@ -151572,7 +151911,15 @@ index 966b68321a6a96e7024b04e1e9940fbbc0f41784..51eaa2894c6e83024816eeb86e1d74f9
  	Open Source Tools for Creatives, Makers, and Builders	クリエイター、メイカー、ビルダーのためのオープンソースツール
  	Settings	設定
  	Check for updates	更新を確認
-@@ -75,7 +75,7 @@
+@@ -42,7 +41,6 @@
+ 	Installed version	インストール済みバージョン
+ 	Latest version	最新バージョン
+ 	Newest release	最新リリース
+-	Discord	Discord
+ 	GitHub	GitHub
+ 	Website	ウェブサイト
+ 	Classic apps	クラシックアプリ
+@@ -75,7 +73,7 @@
  	Reinstall	再インストール
  	Uninstall…	アンインストール…
  	All releases	すべてのリリース
@@ -151581,7 +151928,7 @@ index 966b68321a6a96e7024b04e1e9940fbbc0f41784..51eaa2894c6e83024816eeb86e1d74f9
  	Dismiss	閉じる
  	Update and restart	更新して再起動
  	A new version is available. Would you like to relaunch with the updated version?	新しいバージョンがあります。更新後のバージョンで再起動しますか？
-@@ -85,7 +85,7 @@
+@@ -85,7 +83,7 @@
  	Released {date}	{date} 公開
  	Open on GitHub	GitHub で開く
  	Close	閉じる
@@ -151590,21 +151937,29 @@ index 966b68321a6a96e7024b04e1e9940fbbc0f41784..51eaa2894c6e83024816eeb86e1d74f9
  	Only when I ask	手動で確認したときのみ
  	Automatically download and install updates	更新を自動でダウンロードしてインストール
  	Notify me when an installed app has an update	インストール済みアプリに更新があるときに通知する
-@@ -97,11 +97,11 @@
+@@ -97,11 +95,10 @@
  	Running in the background	バックグラウンドで実行
  	Keep running in the tray when the window is closed	ウィンドウを閉じてもトレイで実行し続ける
  	Show the window on the current desktop	現在のデスクトップにウィンドウを表示
 -	Start KIO Launcher when I log in	ログイン時に KIO Launcher を起動
 +	Start Bogo Launcher when I log in	ログイン時に Bogo Launcher を起動
  	Community	コミュニティ
- 	Questions, ideas and news from the ArtCraft team	ArtCraft チームからの質問、アイデア、ニュース
+-	Questions, ideas and news from the ArtCraft team	ArtCraft チームからの質問、アイデア、ニュース
  	Appearance	外観
 -	Quit KIO Launcher	KIO Launcher を終了
 +	Quit Bogo Launcher	Bogo Launcher を終了
  	Done	完了
  	Uninstall {name}?	{name} をアンインストールしますか？
  	The app will be moved to the Trash. Your documents and settings stay.	アプリはゴミ箱に移動されます。ドキュメントと設定はそのまま残ります。
-@@ -136,7 +136,7 @@
+@@ -126,7 +123,6 @@
+ 	Apps you hid	非表示にしたアプリ
+ 	Checked {ago} · using {sources}	最終確認: {ago} · 取得元: {sources}
+ 	{a} and {b}	{a} と {b}
+-	Join the Discord	Discord に参加
+ 	Learn more	詳細を見る
+ 	Minimize	最小化
+ 	Maximize	最大化
+@@ -136,7 +132,7 @@
  	Open link	リンクを開く
  	Update	更新
  	{name} icon	{name} のアイコン
@@ -151613,7 +151968,16 @@ index 966b68321a6a96e7024b04e1e9940fbbc0f41784..51eaa2894c6e83024816eeb86e1d74f9
  	Cancel update	更新をキャンセル
  	Stop waiting; the update can be started again later	待機を中止します。更新は後で再開できます
  	Download again	再ダウンロード
-@@ -214,7 +214,7 @@ month	Dec	12月
+@@ -193,8 +189,6 @@ month	Dec	12月
+ 	Installing for {platform}	{platform} にインストール
+ 	Downloads for {platform}	{platform} 用のダウンロード
+ 	No downloads for this system	このシステム用のダウンロードはありません
+-	Join the ArtCraft community on Discord	Discord で ArtCraft コミュニティに参加
+-	ArtCraft on {name}	{name} の ArtCraft
+ 	Couldn't open {name}: {e}	{name} を開けませんでした: {e}
+ 	Download cancelled	ダウンロードをキャンセルしました
+ 	Available to install	インストール可能
+@@ -214,7 +208,7 @@ month	Dec	12月
  	Version {version} installed	バージョン {version} インストール済み
  	Version {latest}	バージョン {latest}
  	No release published yet	まだリリースがありません
@@ -151622,7 +151986,15 @@ index 966b68321a6a96e7024b04e1e9940fbbc0f41784..51eaa2894c6e83024816eeb86e1d74f9
  	App	アプリ
  	Latest	最新
  	Released	公開日
-@@ -249,7 +249,7 @@ month	Dec	12月
+@@ -236,7 +230,6 @@ month	Dec	12月
+ 	Couldn't check for updates: {f}	更新を確認できませんでした: {f}
+ 	Website (coming soon)	ウェブサイト（近日公開）
+ 	GitHub repository	GitHub リポジトリ
+-	ArtCraft	ArtCraft
+ 	Update 1 app	1 個のアプリを更新
+ 	Update all ({count})	すべて更新（{count}）
+ 	⊞  Grid	⊞  グリッド
+@@ -249,7 +242,7 @@ month	Dec	12月
  	Full changelog	完全な変更履歴
  	link	リンク
  	No apps match	一致するアプリがありません
@@ -151631,7 +152003,7 @@ index 966b68321a6a96e7024b04e1e9940fbbc0f41784..51eaa2894c6e83024816eeb86e1d74f9
  	{name} {v} is available	{name} {v} が利用可能です
  	{count} updates are available	{count} 件の更新があります
  	These notes weren't fetched (GitHub's request limit was reached). They're on the release page.	このリリースノートは取得できませんでした（GitHub のリクエスト上限に達しました）。リリースページにあります。
-@@ -313,7 +313,7 @@ filter	Installed	インストール済み
+@@ -313,7 +306,7 @@ filter	Installed	インストール済み
  @id	launcher.notes	新着情報
  @id	launcher.dismiss	閉じる
  @id	settings.open	設定
@@ -151640,7 +152012,15 @@ index 966b68321a6a96e7024b04e1e9940fbbc0f41784..51eaa2894c6e83024816eeb86e1d74f9
  @id	view.grid	グリッド
  @id	view.table	テーブル
  @id	filter.all	すべて
-@@ -337,15 +337,15 @@ filter	Installed	インストール済み
+@@ -327,7 +320,6 @@ filter	Installed	インストール済み
+ @id	sort.installed	インストール済みバージョン
+ @id	sort.latest	最新バージョン
+ @id	sort.released	最新リリース
+-@id	help.discord	Discord
+ @id	help.github	GitHub
+ @id	help.website	ウェブサイト
+ @id	update.check	更新を確認
+@@ -337,15 +329,12 @@ filter	Installed	インストール済み
  @id	linux.preferred_kind	新しいアプリのインストール形式
  @id	tray.close_to_tray	ウィンドウを閉じてもトレイで実行し続ける
  @id	tray.show_on_current_desktop	現在のデスクトップにウィンドウを表示
@@ -151652,16 +152032,16 @@ index 966b68321a6a96e7024b04e1e9940fbbc0f41784..51eaa2894c6e83024816eeb86e1d74f9
 -	Show KIO Launcher	KIO Launcher を表示
 +	Show Bogo Launcher	Bogo Launcher を表示
  	Check for Updates	更新を確認
- 	Visit getartcraft.com	getartcraft.com を開く
- 	ArtCraft on GitHub	GitHub の ArtCraft
- 	Join the ArtCraft Discord	ArtCraft Discord に参加
+-	Visit getartcraft.com	getartcraft.com を開く
+-	ArtCraft on GitHub	GitHub の ArtCraft
+-	Join the ArtCraft Discord	ArtCraft Discord に参加
 -@plural	KIO Launcher · {n} update available|KIO Launcher · {n} updates available	KIO Launcher · {n} 件の更新があります
 +@plural	Bogo Launcher · {n} update available|Bogo Launcher · {n} updates available	Bogo Launcher · {n} 件の更新があります
  	Classic	クラシック
 -	No font for this language was found on this system. Install a font for this language and restart KIO Launcher.	この言語に対応するフォントがシステムに見つかりません。対応するフォントをインストールして、KIO Launcherを再起動してください。
 +	No font for this language was found on this system. Install a font for this language and restart Bogo Launcher.	この言語に対応するフォントがシステムに見つかりません。対応するフォントをインストールして、Bogo Launcherを再起動してください。
 diff --git a/crates/ui-egui/src/i18n/ko.tsv b/crates/ui-egui/src/i18n/ko.tsv
-index 1915fb89cb5c2519f51bd7a602dfc9aa3d247ae4..13109323935ebeac1953fe25d07f8f4863321890 100644
+index 1915fb89cb5c2519f51bd7a602dfc9aa3d247ae4..5575103d450a034f18a75ac7f2f27a981c31fd48 100644
 --- a/crates/ui-egui/src/i18n/ko.tsv
 +++ b/crates/ui-egui/src/i18n/ko.tsv
 @@ -1,7 +1,7 @@
@@ -151673,7 +152053,15 @@ index 1915fb89cb5c2519f51bd7a602dfc9aa3d247ae4..13109323935ebeac1953fe25d07f8f48
  	Open Source Tools for Creatives, Makers, and Builders	창작자와 제작자를 위한 오픈 소스 도구
  	Settings	설정
  	Check for updates	업데이트 확인
-@@ -55,7 +55,7 @@
+@@ -21,7 +21,6 @@
+ 	Installed version	설치된 버전
+ 	Latest version	최신 버전
+ 	Newest release	최신 릴리스
+-	Discord	Discord
+ 	GitHub	GitHub
+ 	Website	웹사이트
+ 	Classic apps	기존 앱
+@@ -55,7 +54,7 @@
  	Reinstall	다시 설치
  	Uninstall…	제거…
  	All releases	모든 릴리스
@@ -151682,7 +152070,7 @@ index 1915fb89cb5c2519f51bd7a602dfc9aa3d247ae4..13109323935ebeac1953fe25d07f8f48
  	Dismiss	닫기
  	Update and restart	업데이트 후 다시 시작
  	A new version is available. Would you like to relaunch with the updated version?	새 버전이 있습니다. 업데이트된 버전으로 다시 시작할까요?
-@@ -65,7 +65,7 @@
+@@ -65,7 +64,7 @@
  	Released {date}	{date} 출시
  	Open on GitHub	GitHub에서 열기
  	Close	닫기
@@ -151691,21 +152079,29 @@ index 1915fb89cb5c2519f51bd7a602dfc9aa3d247ae4..13109323935ebeac1953fe25d07f8f48
  	Only when I ask	직접 요청할 때만
  	Automatically download and install updates	업데이트 자동 다운로드 및 설치
  	Notify me when an installed app has an update	설치된 앱의 업데이트 알림
-@@ -77,11 +77,11 @@
+@@ -77,11 +76,10 @@
  	Running in the background	백그라운드 실행
  	Keep running in the tray when the window is closed	창을 닫아도 트레이에서 계속 실행
  	Show the window on the current desktop	현재 데스크톱에 창 표시
 -	Start KIO Launcher when I log in	로그인할 때 KIO Launcher 시작
 +	Start Bogo Launcher when I log in	로그인할 때 Bogo Launcher 시작
  	Community	커뮤니티
- 	Questions, ideas and news from the ArtCraft team	ArtCraft 팀의 질문, 아이디어 및 소식
+-	Questions, ideas and news from the ArtCraft team	ArtCraft 팀의 질문, 아이디어 및 소식
  	Appearance	모양
 -	Quit KIO Launcher	KIO Launcher 종료
 +	Quit Bogo Launcher	Bogo Launcher 종료
  	Done	완료
  	Uninstall {name}?	{name} 앱을 제거할까요?
  	The app will be moved to the Trash. Your documents and settings stay.	앱이 휴지통으로 이동합니다. 문서와 설정은 유지됩니다.
-@@ -115,7 +115,7 @@
+@@ -105,7 +103,6 @@
+ 	Apps you hid	숨긴 앱 목록
+ 	Checked {ago} · using {sources}	{ago} 확인 · {sources} 사용
+ 	{a} and {b}	{a} 및 {b}
+-	Join the Discord	Discord 참여
+ 	Learn more	자세히 알아보기
+ 	Minimize	최소화
+ 	Maximize	최대화
+@@ -115,7 +112,7 @@
  	Open link	링크 열기
  	Update	업데이트
  	{name} icon	{name} 아이콘
@@ -151714,7 +152110,16 @@ index 1915fb89cb5c2519f51bd7a602dfc9aa3d247ae4..13109323935ebeac1953fe25d07f8f48
  	Cancel update	업데이트 취소
  	Stop waiting; the update can be started again later	대기를 중지합니다. 나중에 업데이트를 다시 시작할 수 있습니다
  	Download again	다시 다운로드
-@@ -187,7 +187,7 @@ month	Dec	12월
+@@ -166,8 +163,6 @@ month	Dec	12월
+ 	Installing for {platform}	{platform}용 설치
+ 	Downloads for {platform}	{platform}용 다운로드
+ 	No downloads for this system	이 시스템용 다운로드 없음
+-	Join the ArtCraft community on Discord	Discord에서 ArtCraft 커뮤니티 참여
+-	ArtCraft on {name}	{name}의 ArtCraft
+ 	Couldn't open {name}: {e}	{name}을(를) 열 수 없습니다: {e}
+ 	Download cancelled	다운로드 취소됨
+ 	Available to install	설치 가능
+@@ -187,7 +182,7 @@ month	Dec	12월
  	Version {version} installed	버전 {version} 설치됨
  	Version {latest}	버전 {latest}
  	No release published yet	아직 출시된 버전 없음
@@ -151723,7 +152128,15 @@ index 1915fb89cb5c2519f51bd7a602dfc9aa3d247ae4..13109323935ebeac1953fe25d07f8f48
  	App	앱
  	Latest	최신
  	Released	출시일
-@@ -222,7 +222,7 @@ month	Dec	12월
+@@ -209,7 +204,6 @@ month	Dec	12월
+ 	Couldn't check for updates: {f}	업데이트를 확인할 수 없습니다: {f}
+ 	Website (coming soon)	웹사이트(출시 예정)
+ 	GitHub repository	GitHub 저장소
+-	ArtCraft	ArtCraft
+ 	Update 1 app	앱 1개 업데이트
+ 	Update all ({count})	모두 업데이트({count})
+ 	⊞  Grid	⊞  격자
+@@ -222,7 +216,7 @@ month	Dec	12월
  	Full changelog	전체 변경 내역
  	link	링크
  	No apps match	일치하는 앱 없음
@@ -151732,7 +152145,7 @@ index 1915fb89cb5c2519f51bd7a602dfc9aa3d247ae4..13109323935ebeac1953fe25d07f8f48
  	{name} {v} is available	{name} {v} 사용 가능
  	{count} updates are available	업데이트 {count}개 있음
  	These notes weren't fetched (GitHub's request limit was reached). They're on the release page.	GitHub 요청 한도에 도달하여 안내를 가져오지 못했습니다. 릴리스 페이지에서 확인할 수 있습니다.
-@@ -275,7 +275,7 @@ filter	Installed	설치됨
+@@ -275,7 +269,7 @@ filter	Installed	설치됨
  @id	launcher.notes	새로운 기능
  @id	launcher.dismiss	닫기
  @id	settings.open	설정
@@ -151741,7 +152154,15 @@ index 1915fb89cb5c2519f51bd7a602dfc9aa3d247ae4..13109323935ebeac1953fe25d07f8f48
  @id	view.grid	격자
  @id	view.table	표
  @id	filter.all	전체
-@@ -299,12 +299,12 @@ filter	Installed	설치됨
+@@ -289,7 +283,6 @@ filter	Installed	설치됨
+ @id	sort.installed	설치된 버전
+ @id	sort.latest	최신 버전
+ @id	sort.released	최신 릴리스
+-@id	help.discord	Discord
+ @id	help.github	GitHub
+ @id	help.website	웹사이트
+ @id	update.check	업데이트 확인
+@@ -299,12 +292,9 @@ filter	Installed	설치됨
  @id	linux.preferred_kind	새 앱 설치 형식
  @id	tray.close_to_tray	창을 닫아도 트레이에서 계속 실행
  @id	tray.show_on_current_desktop	현재 데스크톱에 창 표시
@@ -151751,9 +152172,9 @@ index 1915fb89cb5c2519f51bd7a602dfc9aa3d247ae4..13109323935ebeac1953fe25d07f8f48
 -	Show KIO Launcher	KIO Launcher 표시
 +	Show Bogo Launcher	Bogo Launcher 표시
  	Check for Updates	업데이트 확인
- 	Visit getartcraft.com	getartcraft.com 방문
- 	ArtCraft on GitHub	GitHub의 ArtCraft
- 	Join the ArtCraft Discord	ArtCraft Discord 참여
+-	Visit getartcraft.com	getartcraft.com 방문
+-	ArtCraft on GitHub	GitHub의 ArtCraft
+-	Join the ArtCraft Discord	ArtCraft Discord 참여
 -@plural	KIO Launcher · {n} update available|KIO Launcher · {n} updates available	KIO Launcher · 업데이트 {n}개 있음
 -	No font for this language was found on this system. Install a font for this language and restart KIO Launcher.	시스템에서 이 언어의 글꼴을 찾을 수 없습니다. 해당 언어의 글꼴을 설치한 후 KIO Launcher를 다시 시작하세요.
 +@plural	Bogo Launcher · {n} update available|Bogo Launcher · {n} updates available	Bogo Launcher · 업데이트 {n}개 있음
@@ -151769,7 +152190,7 @@ index c3746cff2f983acbbf6728865b6ada21fc5d6060..74ea537183d828ee1783f0e0ef1fdf6c
  //!
  //! # Adding a language
 diff --git a/crates/ui-egui/src/i18n/pl.tsv b/crates/ui-egui/src/i18n/pl.tsv
-index 58369b5f980c51a4d942041c0f2ffb2a46d1ec5d..9e009a034629ca47dbefc3c1442d9577b4234319 100644
+index 58369b5f980c51a4d942041c0f2ffb2a46d1ec5d..ebb4760fe5fe8decccecf16138610804dcc45d4d 100644
 --- a/crates/ui-egui/src/i18n/pl.tsv
 +++ b/crates/ui-egui/src/i18n/pl.tsv
 @@ -1,4 +1,4 @@
@@ -151778,7 +152199,7 @@ index 58369b5f980c51a4d942041c0f2ffb2a46d1ec5d..9e009a034629ca47dbefc3c1442d9577
  # Format: context<TAB>source<TAB>translation
  # Empty context = plain UI string (tl!, t).
  # @id = command-id keyed (tr_id).
-@@ -6,21 +6,21 @@
+@@ -6,21 +6,20 @@
  # @msg = status/error message template (message, msg).
  # Other context = disambiguation for tr_ctx.
  #
@@ -151791,10 +152212,10 @@ index 58369b5f980c51a4d942041c0f2ffb2a46d1ec5d..9e009a034629ca47dbefc3c1442d9577
 -# Left in English on purpose: product name "KIO Launcher" (and its "Launcher" tag), suite
 -# name "KIO App Suite", app names (KIO Photo, KIO Light, KIO Film, KIO Design, KIO Vector,
 -# KIO PDF, KIO Effect, KIO Word, KIO Deck, KIO Grid, KIO Cad, KIO Sound, KIO UI), "GitHub",
+-# "Discord".
 +# Left in English on purpose: product name "Bogo Launcher" (and its "Launcher" tag), suite
 +# name "Bogo App Suite", app names (Bogo Photo, Bogo Light, Bogo Film, Bogo Design, Bogo Vector,
 +# Bogo PDF, Bogo Effect, Bogo Word, Bogo Deck, Bogo Grid, Bogo CAD, Bogo Sound, Bogo UI), "GitHub",
- # "Discord".
  # Shortcut keys keep their key-cap names (Shift, Alt, Ctrl, Cmd, Esc).
  # Trailing "…" (U+2026) must be preserved. Placeholders {name}, {n}, {version}, {count}, {v},
  # {what}, {unit}, {real}, {e} must appear in translation.
@@ -151805,7 +152226,15 @@ index 58369b5f980c51a4d942041c0f2ffb2a46d1ec5d..9e009a034629ca47dbefc3c1442d9577
  	Open Source Tools for Creatives, Makers, and Builders	Narzędzia open source dla artystów, twórców i konstruktorów
  	Settings	Ustawienia
  	Check for updates	Sprawdź dostępność aktualizacji
-@@ -74,7 +74,7 @@
+@@ -40,7 +39,6 @@
+ 	Installed version	Zainstalowana wersja
+ 	Latest version	Najnowsza wersja
+ 	Newest release	Najnowsze wydanie
+-	Discord	Discord
+ 	GitHub	GitHub
+ 	Website	Strona
+ 	Classic apps	Klasyczne aplikacje
+@@ -74,7 +72,7 @@
  	Reinstall	Przeinstaluj
  	Uninstall…	Odinstaluj…
  	All releases	Wszystkie wydania
@@ -151814,7 +152243,7 @@ index 58369b5f980c51a4d942041c0f2ffb2a46d1ec5d..9e009a034629ca47dbefc3c1442d9577
  	Dismiss	Zamknij
  	Update and restart	Zaktualizuj i zrestartuj
  	A new version is available. Would you like to relaunch with the updated version?	Nowa wersja jest dostępna. Czy chcesz uruchomić ponownie ze zaktualizowaną wersją
-@@ -84,7 +84,7 @@
+@@ -84,7 +82,7 @@
  	Released {date}	Wydano {date}
  	Open on GitHub	Otwórz na GitHubie
  	Close	Zamknij
@@ -151823,21 +152252,29 @@ index 58369b5f980c51a4d942041c0f2ffb2a46d1ec5d..9e009a034629ca47dbefc3c1442d9577
  	Only when I ask	Tylko kiedy zapytam
  	Automatically download and install updates	Automatycznie pobieraj i instaluj aktualizacje
  	Notify me when an installed app has an update	Powiadom mnie o aktualizacjach dla zainstalowanych aplikacji
-@@ -96,11 +96,11 @@
+@@ -96,11 +94,10 @@
  	Running in the background	Działanie w tle
  	Keep running in the tray when the window is closed	Po zamknięciu okna działaj w zasobniku systemowym
  	Show the window on the current desktop	Pokaż okno na bieżącym pulpicie
 -	Start KIO Launcher when I log in	Uruchom KIO Launcher po zalogowaniu
 +	Start Bogo Launcher when I log in	Uruchom Bogo Launcher po zalogowaniu
  	Community	Społeczność
- 	Questions, ideas and news from the ArtCraft team	Pytania, pomysły i nowości od zespołu ArtCraft
+-	Questions, ideas and news from the ArtCraft team	Pytania, pomysły i nowości od zespołu ArtCraft
  	Appearance	Motyw
 -	Quit KIO Launcher	Wyjdź z KIO Launcher
 +	Quit Bogo Launcher	Wyjdź z Bogo Launcher
  	Done	Gotowe
  	Uninstall {name}?	Odinstalować {name}?
  	The app will be moved to the Trash. Your documents and settings stay.	Aplikacja zostanie przeniesiona do kosza. Twoje dokumenty i ustawienia pozostaną.
-@@ -135,7 +135,7 @@
+@@ -125,7 +122,6 @@
+ 	Apps you hid	Aplikacje ukryte przez ciebie
+ 	Checked {ago} · using {sources}	Ostatnio sprawdzono {ago} · przy użyciu {sources}
+ 	{a} and {b}	{a} i {b}
+-	Join the Discord	Dołącz na Discorda
+ 	Learn more	Więcej
+ 	Minimize	Minimalizuj
+ 	Maximize	Maksymalizuj
+@@ -135,7 +131,7 @@
  	Open link	Otwórz link
  	Update	Aktualizacja
  	{name} icon	Ikona {name}
@@ -151846,7 +152283,16 @@ index 58369b5f980c51a4d942041c0f2ffb2a46d1ec5d..9e009a034629ca47dbefc3c1442d9577
  	Cancel update	Anuluj aktualizację
  	Stop waiting; the update can be started again later	Przerwij oczekiwanie; aktualizację można uruchomić ponownie później
  	Download again	Pobierz ponownie
-@@ -213,7 +213,7 @@ month	Dec	gru
+@@ -192,8 +188,6 @@ month	Dec	gru
+ 	Installing for {platform}	Instalowanie dla {platform}
+ 	Downloads for {platform}	Do pobrania dla {platform}
+ 	No downloads for this system	Brak pobrań dla tego systemu
+-	Join the ArtCraft community on Discord	Dołącz do społeczności ArtCraft na Discordzie
+-	ArtCraft on {name}	ArtCraft w serwisie {name}
+ 	Couldn't open {name}: {e}	Nie udało się otworzyć {name}: {e}
+ 	Download cancelled	Anulowano pobieranie
+ 	Available to install	Dostępna do instalacji
+@@ -213,7 +207,7 @@ month	Dec	gru
  	Version {version} installed	Wersja {version} zainstalowana
  	Version {latest}	Wersja {latest}
  	No release published yet	Nie opublikowano jeszcze wydania
@@ -151855,7 +152301,15 @@ index 58369b5f980c51a4d942041c0f2ffb2a46d1ec5d..9e009a034629ca47dbefc3c1442d9577
  	App	Aplikacja
  	Latest	Najnowsza
  	Released	Wydano
-@@ -248,7 +248,7 @@ month	Dec	gru
+@@ -235,7 +229,6 @@ month	Dec	gru
+ 	Couldn't check for updates: {f}	Nie udało się sprawdzić aktualizacji: {f}
+ 	Website (coming soon)	Strona (wkrótce)
+ 	GitHub repository	Repozytorium na GitHubie
+-	ArtCraft	ArtCraft
+ 	Update 1 app	Zaktualizuj 1 aplikację
+ 	Update all ({count})	Zaktualizuj wszystkie ({count})
+ 	⊞  Grid	⊞  Siatka
+@@ -248,7 +241,7 @@ month	Dec	gru
  	Full changelog	Pełna lista zmian
  	link	link
  	No apps match	Brak pasujących aplikacji
@@ -151864,7 +152318,7 @@ index 58369b5f980c51a4d942041c0f2ffb2a46d1ec5d..9e009a034629ca47dbefc3c1442d9577
  	{name} {v} is available	Dostępna jest nowa wersja {name} {v}
  	{count} updates are available	Dostępne aktualizacje: {count}
  	These notes weren't fetched (GitHub's request limit was reached). They're on the release page.	Nie udało się pobrać tych notatek (osiągnięto limit zapytań GitHuba). Znajdziesz je na stronie wydania.
-@@ -312,7 +312,7 @@ filter	Installed	Zainstalowane
+@@ -312,7 +305,7 @@ filter	Installed	Zainstalowane
  @id	launcher.notes	Co nowego
  @id	launcher.dismiss	Zamknij
  @id	settings.open	Ustawienia
@@ -151873,7 +152327,15 @@ index 58369b5f980c51a4d942041c0f2ffb2a46d1ec5d..9e009a034629ca47dbefc3c1442d9577
  @id	view.grid	Siatka
  @id	view.table	Tabela
  @id	filter.all	Wszystkie
-@@ -336,14 +336,14 @@ filter	Installed	Zainstalowane
+@@ -326,7 +319,6 @@ filter	Installed	Zainstalowane
+ @id	sort.installed	Zainstalowana wersja
+ @id	sort.latest	Najnowsza wersja
+ @id	sort.released	Najnowsze wydanie
+-@id	help.discord	Discord
+ @id	help.github	GitHub
+ @id	help.website	Strona
+ @id	update.check	Sprawdź dostępność aktualizacji
+@@ -336,14 +328,11 @@ filter	Installed	Zainstalowane
  @id	linux.preferred_kind	Instaluj nowe aplikacje jako
  @id	tray.close_to_tray	Po zamknięciu okna działaj w zasobniku systemowym
  @id	tray.show_on_current_desktop	Pokaż okno na bieżącym pulpicie
@@ -151885,15 +152347,15 @@ index 58369b5f980c51a4d942041c0f2ffb2a46d1ec5d..9e009a034629ca47dbefc3c1442d9577
 -	Show KIO Launcher	Pokaż KIO Launcher
 +	Show Bogo Launcher	Pokaż Bogo Launcher
  	Check for Updates	Sprawdź dostępność aktualizacji
- 	Visit getartcraft.com	Odwiedź getartcraft.com
- 	ArtCraft on GitHub	ArtCraft na GitHubie
- 	Join the ArtCraft Discord	Dołącz do Discorda ArtCraft
+-	Visit getartcraft.com	Odwiedź getartcraft.com
+-	ArtCraft on GitHub	ArtCraft na GitHubie
+-	Join the ArtCraft Discord	Dołącz do Discorda ArtCraft
 -@plural	KIO Launcher · {n} update available|KIO Launcher · {n} updates available	KIO Launcher · {n} dostępna aktualizacja|KIO Launcher · {n} dostępne aktualizacje|KIO Launcher · {n} dostępnych aktualizacji
 -	No font for this language was found on this system. Install a font for this language and restart KIO Launcher.	W systemie nie znaleziono czcionki dla tego języka. Zainstaluj odpowiednią czcionkę i uruchom ponownie KIO Launcher.
 +@plural	Bogo Launcher · {n} update available|Bogo Launcher · {n} updates available	Bogo Launcher · {n} dostępna aktualizacja|Bogo Launcher · {n} dostępne aktualizacje|Bogo Launcher · {n} dostępnych aktualizacji
 +	No font for this language was found on this system. Install a font for this language and restart Bogo Launcher.	W systemie nie znaleziono czcionki dla tego języka. Zainstaluj odpowiednią czcionkę i uruchom ponownie Bogo Launcher.
 diff --git a/crates/ui-egui/src/i18n/pt-BR.tsv b/crates/ui-egui/src/i18n/pt-BR.tsv
-index b82015ed7cc9a539ddc66f9d38d49c527ea61e9d..91273101101726f52fa1096da35dd00ef31c4d0f 100644
+index b82015ed7cc9a539ddc66f9d38d49c527ea61e9d..3a822d22b59c5adca9b9c9d35dc4cbf1c843806a 100644
 --- a/crates/ui-egui/src/i18n/pt-BR.tsv
 +++ b/crates/ui-egui/src/i18n/pt-BR.tsv
 @@ -1,4 +1,4 @@
@@ -151911,7 +152373,15 @@ index b82015ed7cc9a539ddc66f9d38d49c527ea61e9d..91273101101726f52fa1096da35dd00e
  	Open Source Tools for Creatives, Makers, and Builders	Ferramentas de código aberto para criadores, artistas e desenvolvedores
  	Settings	Configurações
  	Check for updates	Verificar atualizações
-@@ -61,7 +61,7 @@
+@@ -27,7 +27,6 @@
+ 	Installed version	Versão instalada
+ 	Latest version	Última versão
+ 	Newest release	Lançamento mais recente
+-	Discord	Discord
+ 	GitHub	GitHub
+ 	Website	Site
+ 	Classic apps	Aplicativos clássicos
+@@ -61,7 +60,7 @@
  	Reinstall	Reinstalar
  	Uninstall…	Desinstalar…
  	All releases	Todos os lançamentos
@@ -151920,7 +152390,7 @@ index b82015ed7cc9a539ddc66f9d38d49c527ea61e9d..91273101101726f52fa1096da35dd00e
  	Dismiss	Dispensar
  	Update and restart	Atualizar e reiniciar
  	A new version is available. Would you like to relaunch with the updated version?	Uma nova versão está disponível. Reiniciar com a nova versão?
-@@ -71,7 +71,7 @@
+@@ -71,7 +70,7 @@
  	Released {date}	Lançado em {date}
  	Open on GitHub	Abrir no GitHub
  	Close	Fechar
@@ -151929,21 +152399,29 @@ index b82015ed7cc9a539ddc66f9d38d49c527ea61e9d..91273101101726f52fa1096da35dd00e
  	Only when I ask	Apenas quando eu pedir
  	Automatically download and install updates	Baixar e instalar atualizações automaticamente
  	Notify me when an installed app has an update	Notificar quando um aplicativo instalado tiver atualização
-@@ -83,11 +83,11 @@
+@@ -83,11 +82,10 @@
  	Running in the background	Execução em segundo plano
  	Keep running in the tray when the window is closed	Continuar na bandeja do sistema ao fechar a janela
  	Show the window on the current desktop	Mostrar a janela na área de trabalho atual
 -	Start KIO Launcher when I log in	Iniciar o KIO Launcher ao fazer login
 +	Start Bogo Launcher when I log in	Iniciar o Bogo Launcher ao fazer login
  	Community	Comunidade
- 	Questions, ideas and news from the ArtCraft team	Dúvidas, ideias e novidades da equipe ArtCraft
+-	Questions, ideas and news from the ArtCraft team	Dúvidas, ideias e novidades da equipe ArtCraft
  	Appearance	Aparência
 -	Quit KIO Launcher	Sair do KIO Launcher
 +	Quit Bogo Launcher	Sair do Bogo Launcher
  	Done	Concluído
  	Uninstall {name}?	Desinstalar {name}?
  	The app will be moved to the Trash. Your documents and settings stay.	O aplicativo será movido para a Lixeira. Seus documentos e configurações serão mantidos.
-@@ -122,7 +122,7 @@
+@@ -112,7 +110,6 @@
+ 	Apps you hid	Aplicativos que você ocultou
+ 	Checked {ago} · using {sources}	Verificado {ago} · via {sources}
+ 	{a} and {b}	{a} e {b}
+-	Join the Discord	Entrar no Discord
+ 	Learn more	Saiba mais
+ 	Minimize	Minimizar
+ 	Maximize	Maximizar
+@@ -122,7 +119,7 @@
  	Open link	Abrir link
  	Update	Atualizar
  	{name} icon	Ícone do {name}
@@ -151952,7 +152430,16 @@ index b82015ed7cc9a539ddc66f9d38d49c527ea61e9d..91273101101726f52fa1096da35dd00e
  	Cancel update	Cancelar atualização
  	Stop waiting; the update can be started again later	Parar de aguardar; a atualização pode ser iniciada novamente depois
  	Download again	Baixar novamente
-@@ -200,7 +200,7 @@ month	Dec	dez.
+@@ -179,8 +176,6 @@ month	Dec	dez.
+ 	Installing for {platform}	Instalando para {platform}
+ 	Downloads for {platform}	Downloads para {platform}
+ 	No downloads for this system	Nenhum download disponível para este sistema
+-	Join the ArtCraft community on Discord	Entre na comunidade ArtCraft no Discord
+-	ArtCraft on {name}	ArtCraft no {name}
+ 	Couldn't open {name}: {e}	Não foi possível abrir {name}: {e}
+ 	Download cancelled	Download cancelado
+ 	Available to install	Disponível para instalar
+@@ -200,7 +195,7 @@ month	Dec	dez.
  	Version {version} installed	Versão {version} instalada
  	Version {latest}	Versão {latest}
  	No release published yet	Nenhum lançamento publicado ainda
@@ -151961,7 +152448,15 @@ index b82015ed7cc9a539ddc66f9d38d49c527ea61e9d..91273101101726f52fa1096da35dd00e
  	App	Aplicativo
  	Latest	Última
  	Released	Lançado
-@@ -234,7 +234,7 @@ month	Dec	dez.
+@@ -221,7 +216,6 @@ month	Dec	dez.
+ 	Downloads the new version, replaces this one and opens it again	Baixa a nova versão, substitui a atual e abre novamente
+ 	Couldn't check for updates: {f}	Não foi possível verificar atualizações: {f}
+ 	GitHub repository	Repositório no GitHub
+-	ArtCraft	ArtCraft
+ 	Update 1 app	Atualizar 1 aplicativo
+ 	Update all ({count})	Atualizar todos ({count})
+ 	⊞  Grid	⊞  Grade
+@@ -234,7 +228,7 @@ month	Dec	dez.
  	Full changelog	Histórico completo de alterações
  	link	link
  	No apps match	Nenhum aplicativo encontrado
@@ -151970,7 +152465,7 @@ index b82015ed7cc9a539ddc66f9d38d49c527ea61e9d..91273101101726f52fa1096da35dd00e
  	{name} {v} is available	{name} {v} está disponível
  	{count} updates are available	{count} atualizações estão disponíveis
  	These notes weren't fetched (GitHub's request limit was reached). They're on the release page.	Estas notas não foram carregadas (o limite de requisições do GitHub foi atingido). Elas estão na página de lançamentos.
-@@ -285,7 +285,7 @@ filter	Installed	Instalados
+@@ -285,7 +279,7 @@ filter	Installed	Instalados
  @id	launcher.notes	Novidades
  @id	launcher.dismiss	Dispensar
  @id	settings.open	Configurações
@@ -151979,7 +152474,15 @@ index b82015ed7cc9a539ddc66f9d38d49c527ea61e9d..91273101101726f52fa1096da35dd00e
  @id	view.grid	Grade
  @id	view.table	Tabela
  @id	filter.all	Todos
-@@ -309,11 +309,11 @@ filter	Installed	Instalados
+@@ -299,7 +293,6 @@ filter	Installed	Instalados
+ @id	sort.installed	Versão instalada
+ @id	sort.latest	Última versão
+ @id	sort.released	Lançamento mais recente
+-@id	help.discord	Discord
+ @id	help.github	GitHub
+ @id	help.website	Site
+ @id	update.check	Verificar atualizações
+@@ -309,15 +302,12 @@ filter	Installed	Instalados
  @id	linux.preferred_kind	Instalar novos aplicativos como
  @id	tray.close_to_tray	Continuar na bandeja do sistema ao fechar a janela
  @id	tray.show_on_current_desktop	Mostrar a janela na área de trabalho atual
@@ -151991,9 +152494,13 @@ index b82015ed7cc9a539ddc66f9d38d49c527ea61e9d..91273101101726f52fa1096da35dd00e
 -	Show KIO Launcher	Mostrar KIO Launcher
 +	Show Bogo Launcher	Mostrar Bogo Launcher
  	Check for Updates	Verificar atualizações
- 	Visit getartcraft.com	Visitar getartcraft.com
- 	ArtCraft on GitHub	ArtCraft no GitHub
-@@ -331,5 +331,5 @@ filter	Installed	Instalados
+-	Visit getartcraft.com	Visitar getartcraft.com
+-	ArtCraft on GitHub	ArtCraft no GitHub
+-	Join the ArtCraft Discord	Entrar no Discord da ArtCraft
+ 	App details	Detalhes do aplicativo
+ 	Close (Esc)	Fechar (Esc)
+ 	Features	Recursos
+@@ -331,5 +321,5 @@ filter	Installed	Instalados
  	Next picture (→)	Próxima imagem (→)
  	Loading pictures…	Carregando imagens…
  	Pictures couldn't be loaded. Reopen this page to try again.	Não foi possível carregar as imagens. Abra a página novamente para tentar de novo.
@@ -152002,7 +152509,7 @@ index b82015ed7cc9a539ddc66f9d38d49c527ea61e9d..91273101101726f52fa1096da35dd00e
 +@plural	Bogo Launcher · {n} update available|Bogo Launcher · {n} updates available	Bogo Launcher · {n} atualização disponível|Bogo Launcher · {n} atualizações disponíveis
 +	No font for this language was found on this system. Install a font for this language and restart Bogo Launcher.	Nenhuma fonte para este idioma foi encontrada no sistema. Instale uma fonte adequada e reinicie o Bogo Launcher.
 diff --git a/crates/ui-egui/src/i18n/ru.tsv b/crates/ui-egui/src/i18n/ru.tsv
-index 72837ce4a1394cfe9abdd94698a7c23ac1929fe0..de96e8de3b6c4353e8002aebc714a291af92a689 100644
+index 72837ce4a1394cfe9abdd94698a7c23ac1929fe0..b99c67453d91d3015d91903f87c59335b1c3501c 100644
 --- a/crates/ui-egui/src/i18n/ru.tsv
 +++ b/crates/ui-egui/src/i18n/ru.tsv
 @@ -1,4 +1,4 @@
@@ -152011,7 +152518,7 @@ index 72837ce4a1394cfe9abdd94698a7c23ac1929fe0..de96e8de3b6c4353e8002aebc714a291
  # Format: context<TAB>source<TAB>translation
  # Empty context = plain UI string (tl!, t).
  # @id = command-id keyed (tr_id).
-@@ -6,20 +6,20 @@
+@@ -6,20 +6,19 @@
  # @msg = status/error message template (message, msg).
  # Other context = disambiguation for tr_ctx.
  #
@@ -152027,7 +152534,6 @@ index 72837ce4a1394cfe9abdd94698a7c23ac1929fe0..de96e8de3b6c4353e8002aebc714a291
 +# Left in English on purpose: product name "Bogo Launcher" (and its "Launcher" tag), suite
 +# name "Bogo App Suite",
 +# app names (Bogo Photo, Bogo Light, Bogo Film, Bogo Design, Bogo Vector, Bogo PDF, Bogo Effect,
-+# Bogo Word, Bogo Deck, Bogo Grid, Bogo CAD, Bogo Sound, Bogo UI), "GitHub", "Discord", "Website".
  # Shortcut keys keep their key-cap names (Shift, Alt, Ctrl, Cmd, Esc).
  # Trailing "…" (U+2026) must be preserved. Placeholders {name}, {n}, {version}, {count}, {v},
  # {what}, {unit}, {real}, {e} must appear in translation.
@@ -152038,7 +152544,15 @@ index 72837ce4a1394cfe9abdd94698a7c23ac1929fe0..de96e8de3b6c4353e8002aebc714a291
  	Open Source Tools for Creatives, Makers, and Builders	Инструменты с открытым кодом для творцов, мастеров и создателей
  	Settings	Настройки
  	Check for updates	Проверить обновления
-@@ -71,7 +71,7 @@
+@@ -38,7 +37,6 @@
+ 	Installed version	Установленная версия
+ 	Latest version	Последняя версия
+ 	Newest release	Новый релиз
+-	Discord	Discord
+ 	GitHub	GitHub
+ 	Website	Веб-сайт
+ 	Classic apps	Классические приложения
+@@ -71,7 +69,7 @@
  	Reinstall	Переустановить
  	Uninstall…	Удалить…
  	All releases	Все релизы
@@ -152047,7 +152561,7 @@ index 72837ce4a1394cfe9abdd94698a7c23ac1929fe0..de96e8de3b6c4353e8002aebc714a291
  	Dismiss	Закрыть
  	Update and restart	Обновить и перезапустить
  	A new version is available. Would you like to relaunch with the updated version?	Доступна новая версия. Перезапустить с обновленной версией?
-@@ -81,7 +81,7 @@
+@@ -81,7 +79,7 @@
  	Released {date}	Релиз {date}
  	Open on GitHub	Открыть на GitHub
  	Close	Закрыть
@@ -152056,21 +152570,29 @@ index 72837ce4a1394cfe9abdd94698a7c23ac1929fe0..de96e8de3b6c4353e8002aebc714a291
  	Only when I ask	Только по запросу
  	Automatically download and install updates	Автоматически скачивать и устанавливать обновления
  	Notify me when an installed app has an update	Уведомлять, когда у установленного приложения есть обновление
-@@ -93,11 +93,11 @@
+@@ -93,11 +91,10 @@
  	Running in the background	Работа в фоне
  	Keep running in the tray when the window is closed	Оставаться в трее при закрытии окна
  	Show the window on the current desktop	Показывать окно на текущем рабочем столе
 -	Start KIO Launcher when I log in	Запускать KIO Launcher при входе в систему
 +	Start Bogo Launcher when I log in	Запускать Bogo Launcher при входе в систему
  	Community	Сообщество
- 	Questions, ideas and news from the ArtCraft team	Вопросы, идеи и новости от команды ArtCraft
+-	Questions, ideas and news from the ArtCraft team	Вопросы, идеи и новости от команды ArtCraft
  	Appearance	Внешний вид
 -	Quit KIO Launcher	Выйти из KIO Launcher
 +	Quit Bogo Launcher	Выйти из Bogo Launcher
  	Done	Готово
  	Uninstall {name}?	Удалить {name}?
  	The app will be moved to the Trash. Your documents and settings stay.	Приложение будет перемещено в Корзину. Ваши документы и настройки сохранятся.
-@@ -132,7 +132,7 @@
+@@ -122,7 +119,6 @@
+ 	Apps you hid	Приложения, которые вы скрыли
+ 	Checked {ago} · using {sources}	Проверено {ago} · через {sources}
+ 	{a} and {b}	{a} и {b}
+-	Join the Discord	Присоединиться к Discord
+ 	Learn more	Подробнее
+ 	Minimize	Свернуть
+ 	Maximize	Развернуть
+@@ -132,7 +128,7 @@
  	Open link	Открыть ссылку
  	Update	Обновить
  	{name} icon	Значок {name}
@@ -152079,7 +152601,16 @@ index 72837ce4a1394cfe9abdd94698a7c23ac1929fe0..de96e8de3b6c4353e8002aebc714a291
  	Cancel update	Отменить обновление
  	Stop waiting; the update can be started again later	Не ждать; обновление можно будет запустить позже
  	Download again	Скачать заново
-@@ -210,7 +210,7 @@ month	Dec	дек.
+@@ -189,8 +185,6 @@ month	Dec	дек.
+ 	Installing for {platform}	Установка для {platform}
+ 	Downloads for {platform}	Скачивание для {platform}
+ 	No downloads for this system	Нет загрузок для этой системы
+-	Join the ArtCraft community on Discord	Присоединиться к сообществу ArtCraft в Discord
+-	ArtCraft on {name}	ArtCraft в {name}
+ 	Couldn't open {name}: {e}	Не удалось открыть {name}: {e}
+ 	Download cancelled	Скачивание отменено
+ 	Available to install	Доступно для установки
+@@ -210,7 +204,7 @@ month	Dec	дек.
  	Version {version} installed	Версия {version} установлена
  	Version {latest}	Версия {latest}
  	No release published yet	Релиз ещё не опубликован
@@ -152088,7 +152619,15 @@ index 72837ce4a1394cfe9abdd94698a7c23ac1929fe0..de96e8de3b6c4353e8002aebc714a291
  	App	Приложение
  	Latest	Последняя
  	Released	Релиз
-@@ -243,7 +243,7 @@ month	Dec	дек.
+@@ -230,7 +224,6 @@ month	Dec	дек.
+ 	Downloads the new version, replaces this one and opens it again	Скачивает новую версию, заменяет текущую и открывает её заново
+ 	Couldn't check for updates: {f}	Не удалось проверить обновления: {f}
+ 	GitHub repository	Репозиторий GitHub
+-	ArtCraft	ArtCraft
+ 	Update 1 app	Обновить 1 приложение
+ 	Update all ({count})	Обновить все ({count})
+ 	⊞  Grid	⊞  Сетка
+@@ -243,7 +236,7 @@ month	Dec	дек.
  	Full changelog	Полный список изменений
  	link	ссылка
  	No apps match	Нет подходящих приложений
@@ -152097,7 +152636,7 @@ index 72837ce4a1394cfe9abdd94698a7c23ac1929fe0..de96e8de3b6c4353e8002aebc714a291
  	{name} {v} is available	Доступно обновление {name} {v}
  	{count} updates are available	Доступны обновления ({count})
  	These notes weren't fetched (GitHub's request limit was reached). They're on the release page.	Заметки не были загружены (достигнут лимит запросов GitHub). Они есть на странице релиза.
-@@ -294,7 +294,7 @@ filter	Installed	Установлены
+@@ -294,7 +287,7 @@ filter	Installed	Установлены
  @id	launcher.notes	Что нового
  @id	launcher.dismiss	Закрыть
  @id	settings.open	Настройки
@@ -152106,7 +152645,15 @@ index 72837ce4a1394cfe9abdd94698a7c23ac1929fe0..de96e8de3b6c4353e8002aebc714a291
  @id	view.grid	Сетка
  @id	view.table	Таблица
  @id	filter.all	Все
-@@ -317,11 +317,11 @@ filter	Installed	Установлены
+@@ -307,7 +300,6 @@ filter	Installed	Установлены
+ @id	sort.installed	Установленная версия
+ @id	sort.latest	Последняя версия
+ @id	sort.released	Новый релиз
+-@id	help.discord	Discord
+ @id	help.github	GitHub
+ @id	help.website	Веб-сайт
+ @id	update.check	Проверить обновления
+@@ -317,15 +309,12 @@ filter	Installed	Установлены
  @id	linux.preferred_kind	Устанавливать новые приложения как
  @id	tray.close_to_tray	Оставаться в трее при закрытии окна
  @id	tray.show_on_current_desktop	Показывать окно на текущем рабочем столе
@@ -152118,9 +152665,13 @@ index 72837ce4a1394cfe9abdd94698a7c23ac1929fe0..de96e8de3b6c4353e8002aebc714a291
 -	Show KIO Launcher	Показать KIO Launcher
 +	Show Bogo Launcher	Показать Bogo Launcher
  	Check for Updates	Проверить обновления
- 	Visit getartcraft.com	Открыть getartcraft.com
- 	ArtCraft on GitHub	ArtCraft на GitHub
-@@ -339,5 +339,5 @@ filter	Installed	Установлены
+-	Visit getartcraft.com	Открыть getartcraft.com
+-	ArtCraft on GitHub	ArtCraft на GitHub
+-	Join the ArtCraft Discord	Присоединиться к Discord ArtCraft
+ 	App details	О приложении
+ 	Close (Esc)	Закрыть (Esc)
+ 	Features	Возможности
+@@ -339,5 +328,5 @@ filter	Installed	Установлены
  	Next picture (→)	Следующее изображение (→)
  	Loading pictures…	Загрузка изображений…
  	Pictures couldn't be loaded. Reopen this page to try again.	Не удалось загрузить изображения. Откройте страницу снова, чтобы повторить попытку.
@@ -152210,7 +152761,7 @@ index ced884b08e0216a634682f49f33c414ed8b1a085..65dce9e9e637f08834ae169637e43051
      assert_eq!(cat.message("Couldn't open : x"), None);
      assert_eq!(cat.message("Something else"), None);
 diff --git a/crates/ui-egui/src/i18n/vi.tsv b/crates/ui-egui/src/i18n/vi.tsv
-index 9d4d74ab83584e08ea137af8dba1ce638786f52e..6466148eb2106b6bd35f0fdf46a9169ddf7e78f1 100644
+index 9d4d74ab83584e08ea137af8dba1ce638786f52e..ee45abc64c46b3b08360ffe6ff87adb5e349c6fa 100644
 --- a/crates/ui-egui/src/i18n/vi.tsv
 +++ b/crates/ui-egui/src/i18n/vi.tsv
 @@ -1,7 +1,7 @@
@@ -152222,7 +152773,15 @@ index 9d4d74ab83584e08ea137af8dba1ce638786f52e..6466148eb2106b6bd35f0fdf46a9169d
  	Open Source Tools for Creatives, Makers, and Builders	Công cụ nguồn mở dành cho người sáng tạo, chế tác và xây dựng
  	Settings	Cài đặt
  	Check for updates	Kiểm tra bản cập nhật
-@@ -55,7 +55,7 @@
+@@ -21,7 +21,6 @@
+ 	Installed version	Phiên bản đã cài
+ 	Latest version	Phiên bản mới nhất
+ 	Newest release	Bản phát hành mới nhất
+-	Discord	Discord
+ 	GitHub	GitHub
+ 	Website	Trang web
+ 	Classic apps	Ứng dụng cổ điển
+@@ -55,7 +54,7 @@
  	Reinstall	Cài đặt lại
  	Uninstall…	Gỡ cài đặt…
  	All releases	Tất cả bản phát hành
@@ -152231,7 +152790,7 @@ index 9d4d74ab83584e08ea137af8dba1ce638786f52e..6466148eb2106b6bd35f0fdf46a9169d
  	Dismiss	Bỏ qua
  	Update and restart	Cập nhật và khởi động lại
  	A new version is available. Would you like to relaunch with the updated version?	Đã có phiên bản mới. Bạn có muốn khởi động lại bằng phiên bản đã cập nhật không?
-@@ -65,7 +65,7 @@
+@@ -65,7 +64,7 @@
  	Released {date}	Phát hành {date}
  	Open on GitHub	Mở trên GitHub
  	Close	Đóng
@@ -152240,21 +152799,29 @@ index 9d4d74ab83584e08ea137af8dba1ce638786f52e..6466148eb2106b6bd35f0fdf46a9169d
  	Only when I ask	Chỉ khi tôi yêu cầu
  	Automatically download and install updates	Tự động tải và cài đặt bản cập nhật
  	Notify me when an installed app has an update	Thông báo khi có bản cập nhật cho ứng dụng đã cài
-@@ -77,11 +77,11 @@
+@@ -77,11 +76,10 @@
  	Running in the background	Chạy nền
  	Keep running in the tray when the window is closed	Tiếp tục chạy trong khay hệ thống khi đóng cửa sổ
  	Show the window on the current desktop	Hiển thị cửa sổ trên màn hình làm việc hiện tại
 -	Start KIO Launcher when I log in	Khởi chạy KIO Launcher khi tôi đăng nhập
 +	Start Bogo Launcher when I log in	Khởi chạy Bogo Launcher khi tôi đăng nhập
  	Community	Cộng đồng
- 	Questions, ideas and news from the ArtCraft team	Câu hỏi, ý tưởng và tin tức từ nhóm ArtCraft
+-	Questions, ideas and news from the ArtCraft team	Câu hỏi, ý tưởng và tin tức từ nhóm ArtCraft
  	Appearance	Giao diện
 -	Quit KIO Launcher	Thoát KIO Launcher
 +	Quit Bogo Launcher	Thoát Bogo Launcher
  	Done	Xong
  	Uninstall {name}?	Gỡ cài đặt {name}?
  	The app will be moved to the Trash. Your documents and settings stay.	Ứng dụng sẽ được chuyển vào Thùng rác. Tài liệu và cài đặt của bạn được giữ lại.
-@@ -115,7 +115,7 @@
+@@ -105,7 +103,6 @@
+ 	Apps you hid	Ứng dụng bạn đã ẩn
+ 	Checked {ago} · using {sources}	Đã kiểm tra {ago} · dùng {sources}
+ 	{a} and {b}	{a} và {b}
+-	Join the Discord	Tham gia Discord
+ 	Learn more	Tìm hiểu thêm
+ 	Minimize	Thu nhỏ
+ 	Maximize	Phóng to
+@@ -115,7 +112,7 @@
  	Open link	Mở liên kết
  	Update	Cập nhật
  	{name} icon	Biểu tượng {name}
@@ -152263,7 +152830,16 @@ index 9d4d74ab83584e08ea137af8dba1ce638786f52e..6466148eb2106b6bd35f0fdf46a9169d
  	Cancel update	Hủy cập nhật
  	Stop waiting; the update can be started again later	Dừng chờ; bạn có thể bắt đầu lại bản cập nhật sau
  	Download again	Tải lại
-@@ -187,7 +187,7 @@ month	Dec	tháng 12
+@@ -166,8 +163,6 @@ month	Dec	tháng 12
+ 	Installing for {platform}	Cài đặt cho {platform}
+ 	Downloads for {platform}	Tệp tải cho {platform}
+ 	No downloads for this system	Không có bản tải cho hệ thống này
+-	Join the ArtCraft community on Discord	Tham gia cộng đồng ArtCraft trên Discord
+-	ArtCraft on {name}	ArtCraft trên {name}
+ 	Couldn't open {name}: {e}	Không thể mở {name}: {e}
+ 	Download cancelled	Đã hủy tải
+ 	Available to install	Có thể cài đặt
+@@ -187,7 +182,7 @@ month	Dec	tháng 12
  	Version {version} installed	Đã cài phiên bản {version}
  	Version {latest}	Phiên bản {latest}
  	No release published yet	Chưa có bản phát hành
@@ -152272,7 +152848,15 @@ index 9d4d74ab83584e08ea137af8dba1ce638786f52e..6466148eb2106b6bd35f0fdf46a9169d
  	App	Ứng dụng
  	Latest	Mới nhất
  	Released	Ngày phát hành
-@@ -222,7 +222,7 @@ month	Dec	tháng 12
+@@ -209,7 +204,6 @@ month	Dec	tháng 12
+ 	Couldn't check for updates: {f}	Không thể kiểm tra bản cập nhật: {f}
+ 	Website (coming soon)	Trang web (sắp ra mắt)
+ 	GitHub repository	Kho mã nguồn trên GitHub
+-	ArtCraft	ArtCraft
+ 	Update 1 app	Cập nhật 1 ứng dụng
+ 	Update all ({count})	Cập nhật tất cả ({count})
+ 	⊞  Grid	⊞  Lưới
+@@ -222,7 +216,7 @@ month	Dec	tháng 12
  	Full changelog	Nhật ký thay đổi đầy đủ
  	link	liên kết
  	No apps match	Không có ứng dụng phù hợp
@@ -152281,7 +152865,7 @@ index 9d4d74ab83584e08ea137af8dba1ce638786f52e..6466148eb2106b6bd35f0fdf46a9169d
  	{name} {v} is available	Đã có {name} {v}
  	{count} updates are available	Có {count} bản cập nhật
  	These notes weren't fetched (GitHub's request limit was reached). They're on the release page.	Không tải được ghi chú này do đã đạt giới hạn yêu cầu GitHub. Bạn có thể xem trên trang phát hành.
-@@ -275,7 +275,7 @@ filter	Installed	Đã cài đặt
+@@ -275,7 +269,7 @@ filter	Installed	Đã cài đặt
  @id	launcher.notes	Có gì mới
  @id	launcher.dismiss	Bỏ qua
  @id	settings.open	Cài đặt
@@ -152290,7 +152874,15 @@ index 9d4d74ab83584e08ea137af8dba1ce638786f52e..6466148eb2106b6bd35f0fdf46a9169d
  @id	view.grid	Lưới
  @id	view.table	Bảng
  @id	filter.all	Tất cả
-@@ -299,12 +299,12 @@ filter	Installed	Đã cài đặt
+@@ -289,7 +283,6 @@ filter	Installed	Đã cài đặt
+ @id	sort.installed	Phiên bản đã cài
+ @id	sort.latest	Phiên bản mới nhất
+ @id	sort.released	Bản phát hành mới nhất
+-@id	help.discord	Discord
+ @id	help.github	GitHub
+ @id	help.website	Trang web
+ @id	update.check	Kiểm tra bản cập nhật
+@@ -299,12 +292,9 @@ filter	Installed	Đã cài đặt
  @id	linux.preferred_kind	Định dạng cài ứng dụng mới
  @id	tray.close_to_tray	Tiếp tục chạy trong khay hệ thống khi đóng cửa sổ
  @id	tray.show_on_current_desktop	Hiển thị cửa sổ trên màn hình làm việc hiện tại
@@ -152300,15 +152892,15 @@ index 9d4d74ab83584e08ea137af8dba1ce638786f52e..6466148eb2106b6bd35f0fdf46a9169d
 -	Show KIO Launcher	Hiển thị KIO Launcher
 +	Show Bogo Launcher	Hiển thị Bogo Launcher
  	Check for Updates	Kiểm tra bản cập nhật
- 	Visit getartcraft.com	Truy cập getartcraft.com
- 	ArtCraft on GitHub	ArtCraft trên GitHub
- 	Join the ArtCraft Discord	Tham gia Discord của ArtCraft
+-	Visit getartcraft.com	Truy cập getartcraft.com
+-	ArtCraft on GitHub	ArtCraft trên GitHub
+-	Join the ArtCraft Discord	Tham gia Discord của ArtCraft
 -@plural	KIO Launcher · {n} update available|KIO Launcher · {n} updates available	KIO Launcher · có {n} bản cập nhật
 -	No font for this language was found on this system. Install a font for this language and restart KIO Launcher.	Không tìm thấy phông chữ cho ngôn ngữ này trên hệ thống. Hãy cài phông chữ phù hợp rồi khởi động lại KIO Launcher.
 +@plural	Bogo Launcher · {n} update available|Bogo Launcher · {n} updates available	Bogo Launcher · có {n} bản cập nhật
 +	No font for this language was found on this system. Install a font for this language and restart Bogo Launcher.	Không tìm thấy phông chữ cho ngôn ngữ này trên hệ thống. Hãy cài phông chữ phù hợp rồi khởi động lại Bogo Launcher.
 diff --git a/crates/ui-egui/src/i18n/zh-CN.tsv b/crates/ui-egui/src/i18n/zh-CN.tsv
-index b00c14c6348c788ccf030cd805e3ea3a9ba736d4..0efdfe1a08ee5283bd90062c449b7c8c16d1b8df 100644
+index b00c14c6348c788ccf030cd805e3ea3a9ba736d4..34e53940211faa80c64da706a4e3afbcaffd5909 100644
 --- a/crates/ui-egui/src/i18n/zh-CN.tsv
 +++ b/crates/ui-egui/src/i18n/zh-CN.tsv
 @@ -1,12 +1,12 @@
@@ -152328,7 +152920,15 @@ index b00c14c6348c788ccf030cd805e3ea3a9ba736d4..0efdfe1a08ee5283bd90062c449b7c8c
  	Open Source Tools for Creatives, Makers, and Builders	为创作者和开发者打造的开源工具
  	Settings	设置
  	Check for updates	检查更新
-@@ -55,7 +55,7 @@
+@@ -25,7 +25,6 @@
+ 	Installed version	已安装版本
+ 	Latest version	最新版本
+ 	Newest release	发布日期
+-	Discord	Discord
+ 	GitHub	GitHub
+ 	Website	网站
+ 	Classic apps	经典应用
+@@ -55,7 +54,7 @@
  	Reinstall	重新安装
  	Uninstall…	卸载…
  	All releases	所有版本
@@ -152337,7 +152937,7 @@ index b00c14c6348c788ccf030cd805e3ea3a9ba736d4..0efdfe1a08ee5283bd90062c449b7c8c
  	Dismiss	忽略
  	Update and restart	更新并重启
  	A new version is available. Would you like to relaunch with the updated version?	有新版本可用。是否使用更新后的版本重新启动？
-@@ -65,7 +65,7 @@
+@@ -65,7 +64,7 @@
  	Released {date}	发布于 {date}
  	Open on GitHub	在 GitHub 上打开
  	Close	关闭
@@ -152346,21 +152946,30 @@ index b00c14c6348c788ccf030cd805e3ea3a9ba736d4..0efdfe1a08ee5283bd90062c449b7c8c
  	Only when I ask	仅手动检查
  	Automatically download and install updates	自动下载并安装更新
  	Notify me when an installed app has an update	已安装应用有更新时通知我
-@@ -77,11 +77,11 @@
+@@ -77,11 +76,10 @@
  	Running in the background	后台运行
  	Keep running in the tray when the window is closed	关闭窗口后继续在系统托盘中运行
  	Show the window on the current desktop	在当前桌面显示窗口
 -	Start KIO Launcher when I log in	登录时启动 KIO Launcher
 +	Start Bogo Launcher when I log in	登录时启动 Bogo Launcher
  	Community	社区
- 	Questions, ideas and news from the ArtCraft team	与 ArtCraft 团队交流问题、想法和动态
+-	Questions, ideas and news from the ArtCraft team	与 ArtCraft 团队交流问题、想法和动态
  	Appearance	外观
 -	Quit KIO Launcher	退出 KIO Launcher
 +	Quit Bogo Launcher	退出 Bogo Launcher
  	Done	完成
  	Uninstall {name}?	卸载 {name}？
  	The app will be moved to the Trash. Your documents and settings stay.	应用将移到废纸篓。你的文档和设置会保留。
-@@ -130,7 +130,7 @@ month	Dec	12月
+@@ -112,8 +110,6 @@ month	Dec	12月
+ 	Installing for {platform}	安装平台：{platform}
+ 	Downloads for {platform}	下载平台：{platform}
+ 	No downloads for this system	此系统暂无可用下载
+-	Join the ArtCraft community on Discord	加入 Discord 上的 ArtCraft 社区
+-	ArtCraft on {name}	ArtCraft 的 {name} 主页
+ 	Available to install	可安装
+ 	Available	可用
+ 	Installed · up to date	已安装 · 已是最新
+@@ -130,7 +126,7 @@ month	Dec	12月
  	Version {version} installed	已安装版本 {version}
  	Version {latest}	版本 {latest}
  	No release published yet	尚未发布版本
@@ -152369,7 +152978,15 @@ index b00c14c6348c788ccf030cd805e3ea3a9ba736d4..0efdfe1a08ee5283bd90062c449b7c8c
  	App	应用
  	Latest	最新
  	Released	发布日期
-@@ -163,7 +163,7 @@ month	Dec	12月
+@@ -150,7 +146,6 @@ month	Dec	12月
+ 	Downloads the new version, replaces this one and opens it again	下载新版本，替换当前版本并重新打开
+ 	Couldn't check for updates: {f}	无法检查更新：{f}
+ 	GitHub repository	GitHub 仓库
+-	ArtCraft	ArtCraft
+ 	Update 1 app	更新 1 个应用
+ 	Update all ({count})	全部更新（{count}）
+ 	⊞  Grid	⊞  网格
+@@ -163,7 +158,7 @@ month	Dec	12月
  	Full changelog	完整更新日志
  	link	链接
  	No apps match	没有匹配的应用
@@ -152378,7 +152995,7 @@ index b00c14c6348c788ccf030cd805e3ea3a9ba736d4..0efdfe1a08ee5283bd90062c449b7c8c
  	{name} {v} is available	{name} {v} 已可更新
  	{count} updates are available	有 {count} 个可用更新
  	These notes weren't fetched (GitHub's request limit was reached). They're on the release page.	未能获取更新说明（已达到 GitHub 请求上限）。可前往版本发布页面查看。
-@@ -194,7 +194,7 @@ filter	Installed	已安装
+@@ -194,7 +189,7 @@ filter	Installed	已安装
  @id	launcher.notes	更新内容
  @id	launcher.dismiss	忽略
  @id	settings.open	设置
@@ -152387,7 +153004,15 @@ index b00c14c6348c788ccf030cd805e3ea3a9ba736d4..0efdfe1a08ee5283bd90062c449b7c8c
  @id	view.grid	网格
  @id	view.table	表格
  @id	filter.all	全部
-@@ -217,7 +217,7 @@ filter	Installed	已安装
+@@ -207,7 +202,6 @@ filter	Installed	已安装
+ @id	sort.installed	已安装版本
+ @id	sort.latest	最新版本
+ @id	sort.released	发布日期
+-@id	help.discord	Discord
+ @id	help.github	GitHub
+ @id	help.website	网站
+ @id	update.check	检查更新
+@@ -217,23 +211,19 @@ filter	Installed	已安装
  @id	linux.preferred_kind	新应用安装格式
  @id	tray.close_to_tray	关闭窗口后继续在系统托盘中运行
  @id	tray.show_on_current_desktop	在当前桌面显示窗口
@@ -152396,22 +153021,25 @@ index b00c14c6348c788ccf030cd805e3ea3a9ba736d4..0efdfe1a08ee5283bd90062c449b7c8c
  @id	appearance.theme	外观
  	Update	更新
  	New	新
-@@ -228,12 +228,12 @@ filter	Installed	已安装
+ 	Classic	经典
+-	Join the Discord	加入 Discord
+ 	Minimize	最小化
+ 	Maximize	最大化
  	Restore	还原
  	Show in Finder	在访达中显示
  	Show in Explorer	在资源管理器中显示
 -	Show KIO Launcher	显示 KIO Launcher
 +	Show Bogo Launcher	显示 Bogo Launcher
  	Check for Updates	检查更新
- 	Visit getartcraft.com	访问 getartcraft.com
- 	ArtCraft on GitHub	ArtCraft 的 GitHub 主页
- 	Join the ArtCraft Discord	加入 ArtCraft Discord 社区
+-	Visit getartcraft.com	访问 getartcraft.com
+-	ArtCraft on GitHub	ArtCraft 的 GitHub 主页
+-	Join the ArtCraft Discord	加入 ArtCraft Discord 社区
 -@plural	KIO Launcher · {n} update available|KIO Launcher · {n} updates available	KIO Launcher · 有 {n} 个可用更新
 +@plural	Bogo Launcher · {n} update available|Bogo Launcher · {n} updates available	Bogo Launcher · 有 {n} 个可用更新
  @plural	{n} app|{n} apps	{n} 个应用
  photocraft	Image editing	图像编辑
  vectorcraft	Vector illustration	矢量插画
-@@ -250,7 +250,7 @@ soundcraft	Recording, editing and mixing audio	音频录制、编辑与混音
+@@ -250,7 +240,7 @@ soundcraft	Recording, editing and mixing audio	音频录制、编辑与混音
  figcraft	Interface design and prototyping	界面设计与原型制作
  
  	Show in Files	在文件管理器中显示
@@ -152420,14 +153048,14 @@ index b00c14c6348c788ccf030cd805e3ea3a9ba736d4..0efdfe1a08ee5283bd90062c449b7c8c
  	Download cancelled	下载已取消
  	Automatically	自动
  	Checked {ago} · using {sources}	上次检查：{ago} · 来源：{sources}
-@@ -317,4 +317,4 @@ figcraft	Interface design and prototyping	界面设计与原型制作
+@@ -317,4 +307,4 @@ figcraft	Interface design and prototyping	界面设计与原型制作
  	Like {name}	类似 {name}
  	Website (coming soon)	网站（即将推出）
  @id	sort.inspired	灵感来源
 -	No font for this language was found on this system. Install a font for this language and restart KIO Launcher.	系统找不到此语言适用的字体。请安装适用字体，然后重新启动 KIO Launcher。
 +	No font for this language was found on this system. Install a font for this language and restart Bogo Launcher.	系统找不到此语言适用的字体。请安装适用字体，然后重新启动 Bogo Launcher。
 diff --git a/crates/ui-egui/src/i18n/zh-TW.tsv b/crates/ui-egui/src/i18n/zh-TW.tsv
-index b40232a08d6bd9209743b27913328b0c72449c78..d0ff339955064c3e8d1ae36d49e6466c230008cd 100644
+index b40232a08d6bd9209743b27913328b0c72449c78..419d8760e471650fa4f15b03e9a50ddf29b7d91d 100644
 --- a/crates/ui-egui/src/i18n/zh-TW.tsv
 +++ b/crates/ui-egui/src/i18n/zh-TW.tsv
 @@ -1,7 +1,7 @@
@@ -152439,7 +153067,15 @@ index b40232a08d6bd9209743b27913328b0c72449c78..d0ff339955064c3e8d1ae36d49e6466c
  	Open Source Tools for Creatives, Makers, and Builders	為創作者、製作者與開發者打造的開放原始碼工具
  	Settings	設定
  	Check for updates	檢查更新
-@@ -55,7 +55,7 @@
+@@ -21,7 +21,6 @@
+ 	Installed version	已安裝版本
+ 	Latest version	最新版本
+ 	Newest release	最新發行版本
+-	Discord	Discord
+ 	GitHub	GitHub
+ 	Website	網站
+ 	Classic apps	經典應用程式
+@@ -55,7 +54,7 @@
  	Reinstall	重新安裝
  	Uninstall…	解除安裝…
  	All releases	所有發行版本
@@ -152448,7 +153084,7 @@ index b40232a08d6bd9209743b27913328b0c72449c78..d0ff339955064c3e8d1ae36d49e6466c
  	Dismiss	關閉
  	Update and restart	更新並重新啟動
  	A new version is available. Would you like to relaunch with the updated version?	已有新版本。要以更新後的版本重新啟動嗎？
-@@ -65,7 +65,7 @@
+@@ -65,7 +64,7 @@
  	Released {date}	發行日期：{date}
  	Open on GitHub	在 GitHub 開啟
  	Close	關閉
@@ -152457,21 +153093,29 @@ index b40232a08d6bd9209743b27913328b0c72449c78..d0ff339955064c3e8d1ae36d49e6466c
  	Only when I ask	僅在我要求時
  	Automatically download and install updates	自動下載並安裝更新
  	Notify me when an installed app has an update	已安裝的應用程式有更新時通知我
-@@ -77,11 +77,11 @@
+@@ -77,11 +76,10 @@
  	Running in the background	在背景執行
  	Keep running in the tray when the window is closed	關閉視窗後繼續在系統匣執行
  	Show the window on the current desktop	在目前的桌面顯示視窗
 -	Start KIO Launcher when I log in	登入時啟動 KIO Launcher
 +	Start Bogo Launcher when I log in	登入時啟動 Bogo Launcher
  	Community	社群
- 	Questions, ideas and news from the ArtCraft team	ArtCraft 團隊的問答、想法與消息
+-	Questions, ideas and news from the ArtCraft team	ArtCraft 團隊的問答、想法與消息
  	Appearance	外觀
 -	Quit KIO Launcher	結束 KIO Launcher
 +	Quit Bogo Launcher	結束 Bogo Launcher
  	Done	完成
  	Uninstall {name}?	要解除安裝 {name} 嗎？
  	The app will be moved to the Trash. Your documents and settings stay.	應用程式將移至垃圾桶。您的文件與設定會保留。
-@@ -115,7 +115,7 @@
+@@ -105,7 +103,6 @@
+ 	Apps you hid	您隱藏的應用程式
+ 	Checked {ago} · using {sources}	上次檢查：{ago} · 使用 {sources}
+ 	{a} and {b}	{a} 與 {b}
+-	Join the Discord	加入 Discord
+ 	Learn more	瞭解更多
+ 	Minimize	最小化
+ 	Maximize	最大化
+@@ -115,7 +112,7 @@
  	Open link	開啟連結
  	Update	更新
  	{name} icon	{name} 圖示
@@ -152480,7 +153124,16 @@ index b40232a08d6bd9209743b27913328b0c72449c78..d0ff339955064c3e8d1ae36d49e6466c
  	Cancel update	取消更新
  	Stop waiting; the update can be started again later	停止等候；稍後可重新開始更新
  	Download again	重新下載
-@@ -187,7 +187,7 @@ month	Dec	12 月
+@@ -166,8 +163,6 @@ month	Dec	12 月
+ 	Installing for {platform}	安裝 {platform} 版本
+ 	Downloads for {platform}	{platform} 的下載項目
+ 	No downloads for this system	沒有適用於此系統的下載項目
+-	Join the ArtCraft community on Discord	在 Discord 加入 ArtCraft 社群
+-	ArtCraft on {name}	{name} 上的 ArtCraft
+ 	Couldn't open {name}: {e}	無法開啟 {name}：{e}
+ 	Download cancelled	已取消下載
+ 	Available to install	可安裝
+@@ -187,7 +182,7 @@ month	Dec	12 月
  	Version {version} installed	已安裝版本 {version}
  	Version {latest}	版本 {latest}
  	No release published yet	尚未發行任何版本
@@ -152489,7 +153142,15 @@ index b40232a08d6bd9209743b27913328b0c72449c78..d0ff339955064c3e8d1ae36d49e6466c
  	App	應用程式
  	Latest	最新
  	Released	發行日期
-@@ -222,7 +222,7 @@ month	Dec	12 月
+@@ -209,7 +204,6 @@ month	Dec	12 月
+ 	Couldn't check for updates: {f}	無法檢查更新：{f}
+ 	Website (coming soon)	網站（即將推出）
+ 	GitHub repository	GitHub 原始碼儲存庫
+-	ArtCraft	ArtCraft
+ 	Update 1 app	更新 1 個應用程式
+ 	Update all ({count})	全部更新（{count}）
+ 	⊞  Grid	⊞  格狀
+@@ -222,7 +216,7 @@ month	Dec	12 月
  	Full changelog	完整更新紀錄
  	link	連結
  	No apps match	沒有符合條件的應用程式
@@ -152498,7 +153159,7 @@ index b40232a08d6bd9209743b27913328b0c72449c78..d0ff339955064c3e8d1ae36d49e6466c
  	{name} {v} is available	{name} {v} 已推出
  	{count} updates are available	有 {count} 項可用更新
  	These notes weren't fetched (GitHub's request limit was reached). They're on the release page.	已達 GitHub 請求上限，無法取得這些說明。您可前往版本頁面查看。
-@@ -275,7 +275,7 @@ filter	Installed	已安裝
+@@ -275,7 +269,7 @@ filter	Installed	已安裝
  @id	launcher.notes	新功能
  @id	launcher.dismiss	關閉
  @id	settings.open	設定
@@ -152507,7 +153168,15 @@ index b40232a08d6bd9209743b27913328b0c72449c78..d0ff339955064c3e8d1ae36d49e6466c
  @id	view.grid	格狀
  @id	view.table	表格
  @id	filter.all	全部
-@@ -299,12 +299,12 @@ filter	Installed	已安裝
+@@ -289,7 +283,6 @@ filter	Installed	已安裝
+ @id	sort.installed	已安裝版本
+ @id	sort.latest	最新版本
+ @id	sort.released	最新發行版本
+-@id	help.discord	Discord
+ @id	help.github	GitHub
+ @id	help.website	網站
+ @id	update.check	檢查更新
+@@ -299,12 +292,9 @@ filter	Installed	已安裝
  @id	linux.preferred_kind	新應用程式安裝格式
  @id	tray.close_to_tray	關閉視窗後繼續在系統匣執行
  @id	tray.show_on_current_desktop	在目前的桌面顯示視窗
@@ -152517,9 +153186,9 @@ index b40232a08d6bd9209743b27913328b0c72449c78..d0ff339955064c3e8d1ae36d49e6466c
 -	Show KIO Launcher	顯示 KIO Launcher
 +	Show Bogo Launcher	顯示 Bogo Launcher
  	Check for Updates	檢查更新
- 	Visit getartcraft.com	前往 getartcraft.com
- 	ArtCraft on GitHub	GitHub 上的 ArtCraft
- 	Join the ArtCraft Discord	加入 ArtCraft Discord
+-	Visit getartcraft.com	前往 getartcraft.com
+-	ArtCraft on GitHub	GitHub 上的 ArtCraft
+-	Join the ArtCraft Discord	加入 ArtCraft Discord
 -@plural	KIO Launcher · {n} update available|KIO Launcher · {n} updates available	KIO Launcher · 有 {n} 項可用更新
 -	No font for this language was found on this system. Install a font for this language and restart KIO Launcher.	系統找不到此語言適用的字型。請安裝適用字型，然後重新啟動 KIO Launcher。
 +@plural	Bogo Launcher · {n} update available|Bogo Launcher · {n} updates available	Bogo Launcher · 有 {n} 項可用更新
@@ -152603,7 +153272,7 @@ index 2620e860377b0cc79110d8898a205d9b4cfd4b1b..21d7f41618fee356afaf2170bf629430
          warn: hex(0x8a5800),
          bad: hex(0xb3261e),
 diff --git a/crates/ui-egui/src/views.rs b/crates/ui-egui/src/views.rs
-index 004f45a34fdf173062a9c8cd90ab08d61452440a..0203f553a727ddf0bf6025afd3fa006ca7735120 100644
+index 004f45a34fdf173062a9c8cd90ab08d61452440a..5f5e677e2ce31eb569fe7e5a1740fce3e13b380c 100644
 --- a/crates/ui-egui/src/views.rs
 +++ b/crates/ui-egui/src/views.rs
 @@ -80,7 +80,7 @@ impl LauncherUi {
@@ -152615,7 +153284,17 @@ index 004f45a34fdf173062a9c8cd90ab08d61452440a..0203f553a727ddf0bf6025afd3fa006c
              ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                  if bar == TitleBar::Custom {
                      widgets::window_buttons(ui, h);
-@@ -117,9 +117,9 @@ impl LauncherUi {
+@@ -92,9 +92,6 @@ impl LauncherUi {
+                     self.check_now();
+                 }
+                 ui.add_space(6.0);
+-                if widgets::nav_link(ui, tl!("Discord"), tl!("Join the ArtCraft community on Discord"), h, false).clicked() {
+-                    ui.ctx().open_url(egui::OpenUrl::new_tab(artcraft_launcher_core::catalog::DISCORD_URL));
+-                }
+                 ui.add_space(6.0);
+                 widgets::rule(ui, h);
+                 ui.add_space(6.0);
+@@ -117,9 +114,9 @@ impl LauncherUi {
                          ui.add_space(16.0);
                          widgets::tag(ui, tl!("Launcher"), t.invert_bg, t.invert_fg);
                      }
@@ -152627,7 +153306,7 @@ index 004f45a34fdf173062a9c8cd90ab08d61452440a..0203f553a727ddf0bf6025afd3fa006c
                      }
                  });
              });
-@@ -143,7 +143,7 @@ impl LauncherUi {
+@@ -143,7 +140,7 @@ impl LauncherUi {
                          widgets::tag(ui, tl!("Update"), t.accent, Color32::WHITE);
                          ui.add_space(4.0);
                          ui.label(
@@ -152636,8 +153315,47 @@ index 004f45a34fdf173062a9c8cd90ab08d61452440a..0203f553a727ddf0bf6025afd3fa006c
                                  .family(theme::medium())
                                  .color(t.ink_strong),
                          );
+@@ -316,16 +313,9 @@ impl LauncherUi {
+             Some(p) => fmt(tl!("Downloads for {platform}"), &[("platform", &p.label())]),
+             None => tl!("No downloads for this system").into(),
+         };
+-        use artcraft_launcher_core::catalog::{DISCORD_URL, GITHUB_URL, SOCIAL, WEBSITE_URL};
+-        let links = [(tl!("Discord"), DISCORD_URL), (tl!("GitHub"), GITHUB_URL), (tl!("Website"), WEBSITE_URL)];
+-        let (icon, link_gap) = (13.0, 16.0);
+-        // The links and icons on the right keep their size; the status on the left gets what is
+-        // left and is cut short with "…", never drawn under them. A narrow window drops the
+-        // platform label first, so the status keeps room to be read.
+         let spacing = ui.spacing().item_spacing.x;
+-        let links_w: f32 =
+-            links.iter().map(|(text, _)| widgets::hud_galley(ui, &format!("{text} ↗"), t.muted).size().x + link_gap).sum::<f32>() - link_gap;
+-        let icons_w = SOCIAL.len() as f32 * (icon + 8.0);
++        let links_w = 0.0;
++        let icons_w = 0.0;
+         let platform_w = widgets::hud_galley(ui, &platform, t.faint).size().x + 16.0 + spacing;
+         let left_w = ui.available_width() - icons_w - 12.0 - links_w - 16.0 - 3.0 * spacing;
+         let show_platform = left_w - platform_w >= FOOTER_MIN_STATUS_W;
+@@ -334,19 +324,6 @@ impl LauncherUi {
+                 widgets::hud(ui, &platform, t.faint);
+                 ui.add_space(16.0);
+             }
+-            // Right to left, so this reads: Website · GitHub · Discord, then the social icons.
+-            ui.scope(|ui| {
+-                ui.spacing_mut().item_spacing.x = 0.0;
+-                widgets::social_icons(ui, icon);
+-            });
+-            ui.add_space(12.0);
+-            ui.scope(|ui| {
+-                ui.spacing_mut().item_spacing.x = link_gap;
+-                for (text, url) in links {
+-                    widgets::hud_link(ui, text, url);
+-                }
+-            });
+-            ui.add_space(16.0);
+             ui.with_layout(egui::Layout::left_to_right(egui::Align::Center), |ui| {
+                 // While GitHub is rate limited, saying so matters more than when we last checked.
+                 let avail = ui.available_width();
 diff --git a/crates/ui-egui/src/widgets.rs b/crates/ui-egui/src/widgets.rs
-index 1f5562ebc06b8f4bb2e8624bc36c35ad89d34639..33d5b0139beaea8499f6619f80de18f02799205e 100644
+index 1f5562ebc06b8f4bb2e8624bc36c35ad89d34639..8a3eb841cae6e2760d22721ed8bb82e56b8c6982 100644
 --- a/crates/ui-egui/src/widgets.rs
 +++ b/crates/ui-egui/src/widgets.rs
 @@ -23,7 +23,7 @@ pub fn tone_color(t: &Tokens, tone: Tone) -> Color32 {
@@ -152658,8 +153376,46 @@ index 1f5562ebc06b8f4bb2e8624bc36c35ad89d34639..33d5b0139beaea8499f6619f80de18f0
      job.wrap = egui::text::TextWrapping::truncate_at_width(max_width.min(ui.available_width()).max(0.0));
      let galley = ui.painter().layout_job(job);
      let elided = galley.elided;
+@@ -496,24 +496,6 @@ pub fn more_menu<R>(ui: &mut Ui, add_contents: impl FnOnce(&mut Ui) -> R) {
+ 
+ /// ArtCraft's social accounts as a row of small monochrome icons (faint, brighter on hover).
+ /// In a right-to-left layout they still read left to right.
+-pub fn social_icons(ui: &mut Ui, size: f32) {
+-    let t = Tokens::get(ui.ctx());
+-    let rtl = ui.layout().prefer_right_to_left();
+-    let services = artcraft_launcher_core::catalog::SOCIAL;
+-    let ordered: Vec<&(&str, &str)> = if rtl { services.iter().rev().collect() } else { services.iter().collect() };
+-    for (name, url) in ordered {
+-        let Some(icon) = crate::icons::social(name) else { continue };
+-        let pad = 4.0;
+-        let (rect, resp) = ui.allocate_exact_size(vec2(size + 2.0 * pad, size + 2.0 * pad), Sense::click());
+-        let color = if resp.hovered() { t.ink_strong } else { t.faint };
+-        egui::Image::new(icon).tint(color).paint_at(ui, rect.shrink(pad));
+-        resp.widget_info(|| egui::WidgetInfo::labeled(egui::WidgetType::Link, true, *name));
+-        let resp = resp.on_hover_text(crate::i18n::fmt(tl!("ArtCraft on {name}"), &[("name", name)])).on_hover_cursor(egui::CursorIcon::PointingHand);
+-        if resp.clicked() {
+-            ui.ctx().open_url(egui::OpenUrl::new_tab(*url));
+-        }
+-    }
+-}
+ 
+ /// An app's name as the site sets it: Archivo, with "Craft" in the app's colour.
+ pub fn wordmark(ui: &mut Ui, app: &artcraft_launcher_core::CraftApp, size: f32) -> Response {
+diff --git a/crates/ui-egui/tests/chinese.rs b/crates/ui-egui/tests/chinese.rs
+index 945803fb030976f02585d6a9f48cc1daeeb3d829..c916a8a1cef8ae837e19b21efc8072c83cb1dcf6 100644
+--- a/crates/ui-egui/tests/chinese.rs
++++ b/crates/ui-egui/tests/chinese.rs
+@@ -180,7 +180,7 @@ fn simplified_chinese_switches_persists_and_keeps_install_actions() {
+     h.get_by_label("完成").click();
+     h.run_steps(3);
+     h.get_by_label("图像编辑");
+-    h.get_by_label_contains("上次检查：3 分钟前 · 来源：ArtCraft API");
++    h.get_by_label_contains("上次检查：3 分钟前 · 来源：Bogo catalog");
+     h.get_by_label("更新至 0.5.0");
+     // Product names stay in English.
+     h.get_by_label("Launcher");
 diff --git a/crates/ui-egui/tests/french.rs b/crates/ui-egui/tests/french.rs
-index 4cbad7447ce526292b47762c1ad7c1f555dfe162..43ece4ef1cca27d03b4eaa41af3d2e5c36413f46 100644
+index 4cbad7447ce526292b47762c1ad7c1f555dfe162..6729ad9beea4e5f088a6fd224224ee4d5de424f4 100644
 --- a/crates/ui-egui/tests/french.rs
 +++ b/crates/ui-egui/tests/french.rs
 @@ -75,7 +75,7 @@ fn events() -> Vec<Event> {
@@ -152680,16 +153436,26 @@ index 4cbad7447ce526292b47762c1ad7c1f555dfe162..43ece4ef1cca27d03b4eaa41af3d2e5c
      h.get_by_label("Retouche d'images");
      h.get_by_label("Mettre à jour vers 0.5.0");
      h.get_by_label_contains("Vérification de la somme de contrôle…");
-     h.get_by_label_contains("Vérifié il y a 3 min · via ArtCraft API");
+-    h.get_by_label_contains("Vérifié il y a 3 min · via ArtCraft API");
 -    h.get_by_label("KIO Light mis à jour vers 0.5.0");
++    h.get_by_label_contains("Vérifié il y a 3 min · via Bogo catalog");
 +    h.get_by_label("Bogo Light mis à jour vers 0.5.0");
  
      let mut table = harness(ViewMode::Table);
      table.run_steps(8);
 diff --git a/crates/ui-egui/tests/german.rs b/crates/ui-egui/tests/german.rs
-index 84637bcb5bc920e4ed50be0ae16ab7ba2cc7f527..8205448983a534980101dc317373428884ed73fb 100644
+index 84637bcb5bc920e4ed50be0ae16ab7ba2cc7f527..30c47ac81ef585e4d1a0adeb340297576def8d76 100644
 --- a/crates/ui-egui/tests/german.rs
 +++ b/crates/ui-egui/tests/german.rs
+@@ -168,7 +168,7 @@ fn german_switches_persists_and_keeps_install_actions() {
+     h.get_by_label("Fertig").click();
+     h.run_steps(3);
+     h.get_by_label("Bildbearbeitung");
+-    h.get_by_label_contains("Zuletzt geprüft: vor 3 Min. · über ArtCraft API");
++    h.get_by_label_contains("Zuletzt geprüft: vor 3 Min. · über Bogo catalog");
+     h.get_by_label("Auf 0.5.0 aktualisieren");
+     // Product names stay in English.
+     h.get_by_label("Launcher");
 @@ -192,7 +192,7 @@ fn german_switches_persists_and_keeps_install_actions() {
          for label in ["Grid", "Table", "Settings", "Check for updates"] {
              let rect = web.get_by_label(artcraft_launcher_ui_egui::i18n::t(label)).rect();
@@ -152700,7 +153466,7 @@ index 84637bcb5bc920e4ed50be0ae16ab7ba2cc7f527..8205448983a534980101dc3173734288
                      assert!(!rect.intersects(text.rect()), "{width}: {label} overlaps {rect:?}");
                  }
 diff --git a/crates/ui-egui/tests/hungarian.rs b/crates/ui-egui/tests/hungarian.rs
-index 1a0475e38fc6a8270709890e4570a1be632365fe..40925e73ae76185ad47c126ebe8289337edd2edd 100644
+index 1a0475e38fc6a8270709890e4570a1be632365fe..181e7c11e48b819f6ab3f0efc98e5631c40b8bd6 100644
 --- a/crates/ui-egui/tests/hungarian.rs
 +++ b/crates/ui-egui/tests/hungarian.rs
 @@ -83,7 +83,7 @@ fn events() -> Vec<Event> {
@@ -152721,14 +153487,72 @@ index 1a0475e38fc6a8270709890e4570a1be632365fe..40925e73ae76185ad47c126ebe828933
      h.get_by_label("Képszerkesztés");
      h.get_by_label("Frissítés: 0.5.0");
      h.get_by_label_contains("Ellenőrzőösszeg ellenőrzése…");
-     h.get_by_label_contains("Ellenőrizve: 3 perce · ArtCraft API");
+-    h.get_by_label_contains("Ellenőrizve: 3 perce · ArtCraft API");
 -    h.get_by_label("KIO Light frissítve. Verzió: 0.5.0");
++    h.get_by_label_contains("Ellenőrizve: 3 perce · Bogo catalog");
 +    h.get_by_label("Bogo Light frissítve. Verzió: 0.5.0");
  
      let mut table = harness(ViewMode::Table);
      table.run_steps(8);
+@@ -152,7 +152,7 @@ fn check_settings_layout() {
+         h.run_steps(8);
+         let screen = egui::Rect::from_min_size(egui::Pos2::ZERO, egui::vec2(width, height));
+         let done = h.get_by_label("Kész").rect();
+-        let quit = h.get_by_label("Kilépés az ArtCraft Launcherből").rect();
++        let quit = h.get_by_label("Kilépés a Bogo Launcherből").rect();
+         assert!(screen.contains_rect(done), "{width}x{height}: Done is clipped: {done:?}");
+         assert!(screen.contains_rect(quit), "{width}x{height}: Quit is clipped: {quit:?}");
+         assert!(!done.intersects(quit));
+@@ -160,27 +160,16 @@ fn check_settings_layout() {
+         assert!(screen.contains_rect(title), "{width}x{height}: title is clipped: {title:?}");
+         h.get_by_label("Rendszerbeállítás szerint").scroll_to_me();
+         h.run_steps(8);
+-        // The footer has the same services, and the cards behind the modal have Webhely and GitHub
+-        // links as one 14px line of text; keep only the settings body's buttons (34px) and icons (24px).
+-        let discord = h.get_by_label("Csatlakozás a Discordhoz").rect();
++        // Appearance controls still scroll above the fixed functional actions.
+         let theme = h.get_by_label("Rendszerbeállítás szerint").rect();
+-        assert!(screen.contains_rect(discord), "community links must be reachable by scrolling");
+         assert!(theme.bottom() < done.top(), "appearance controls must scroll above the fixed actions");
+-        let mut links = vec![discord];
+-        for label in ["Webhely", "GitHub", "X", "Instagram", "LinkedIn", "YouTube", "TikTok"] {
+-            let candidates: Vec<_> = h
+-                .query_all_by_label(label)
+-                .map(|n| n.rect())
+-                .filter(|r| r.top() >= discord.top() - 1.0 && r.bottom() < theme.top() && r.height() > 20.0)
+-                .collect();
+-            assert_eq!(candidates.len(), 1, "{width}x{height}: settings link {label}: {candidates:?}");
+-            links.extend(candidates);
++        for label in ["Csatlakozás a Discordhoz", "X", "Instagram", "LinkedIn", "YouTube", "TikTok"] {
++            assert_eq!(h.query_all_by_label(label).count(), 0, "retired community widget: {label}");
+         }
+-        for (i, r) in links.iter().enumerate() {
+-            assert!(screen.contains_rect(*r), "{width}x{height}: link is clipped: {r:?}");
+-            for other in links.iter().skip(i + 1) {
+-                assert!(!r.intersects(*other), "{width}x{height}: links overlap: {r:?}, {other:?}");
+-            }
++        // Official card links behind the modal remain small text, not settings buttons.
++        for label in ["Webhely", "GitHub"] {
++            let candidates: Vec<_> = h.query_all_by_label(label).map(|node| node.rect()).filter(|rect| rect.height() > 20.0).collect();
++            assert!(candidates.is_empty(), "{width}x{height}: retired settings link {label}: {candidates:?}");
+         }
+         snapshot(&mut h, &format!("settings-hu-{width}x{height}-bottom"));
+         h.get_by_label("Nyelv").scroll_to_me();
+diff --git a/crates/ui-egui/tests/japanese.rs b/crates/ui-egui/tests/japanese.rs
+index b21b88cfe180168d8668321f386788e9d2166ff2..140ff4c9e0b269f070c43cdad25586a1f24d0e8e 100644
+--- a/crates/ui-egui/tests/japanese.rs
++++ b/crates/ui-egui/tests/japanese.rs
+@@ -181,7 +181,7 @@ fn japanese_switches_persists_and_keeps_install_actions() {
+     h.get_by_label("完了").click();
+     h.run_steps(3);
+     h.get_by_label("画像編集");
+-    h.get_by_label_contains("最終確認: 3 分前 · 取得元: ArtCraft API");
++    h.get_by_label_contains("最終確認: 3 分前 · 取得元: Bogo catalog");
+     h.get_by_label("0.5.0 に更新");
+     // Product names stay in English.
+     h.get_by_label("Launcher");
 diff --git a/crates/ui-egui/tests/polish.rs b/crates/ui-egui/tests/polish.rs
-index 853b4e4b2be2e7effae3476a0d4937c35f90e2bb..4d7d9c7235f66d66621fdaa42439f518dc1886d7 100644
+index 853b4e4b2be2e7effae3476a0d4937c35f90e2bb..3ef18d54c35a880ec446995d9fcac1d3a2983a82 100644
 --- a/crates/ui-egui/tests/polish.rs
 +++ b/crates/ui-egui/tests/polish.rs
 @@ -75,7 +75,7 @@ fn events() -> Vec<Event> {
@@ -152749,14 +153573,15 @@ index 853b4e4b2be2e7effae3476a0d4937c35f90e2bb..4d7d9c7235f66d66621fdaa42439f518
      h.get_by_label("Edycja zdjęć");
      h.get_by_label("Zaktualizuj do 0.5.0");
      h.get_by_label_contains("Weryfikowanie sumy kontrolnej…");
-     h.get_by_label_contains("Ostatnio sprawdzono 3 min temu · przy użyciu ArtCraft API");
+-    h.get_by_label_contains("Ostatnio sprawdzono 3 min temu · przy użyciu ArtCraft API");
 -    h.get_by_label("Zaktualizowano KIO Light do wersji 0.5.0");
++    h.get_by_label_contains("Ostatnio sprawdzono 3 min temu · przy użyciu Bogo catalog");
 +    h.get_by_label("Zaktualizowano Bogo Light do wersji 0.5.0");
  
      let mut table = harness(ViewMode::Table);
      table.run_steps(8);
 diff --git a/crates/ui-egui/tests/portuguese.rs b/crates/ui-egui/tests/portuguese.rs
-index 07a14ae06eac8b2579f615c4c0086c29aec2e508..8b7bff52a21499676fe0a5fcdfc657678a9ff3cb 100644
+index 07a14ae06eac8b2579f615c4c0086c29aec2e508..6a4cd0882293ec2815d4fa3a836e6c64e3a193be 100644
 --- a/crates/ui-egui/tests/portuguese.rs
 +++ b/crates/ui-egui/tests/portuguese.rs
 @@ -72,7 +72,7 @@ fn events() -> Vec<Event> {
@@ -152777,14 +153602,15 @@ index 07a14ae06eac8b2579f615c4c0086c29aec2e508..8b7bff52a21499676fe0a5fcdfc65767
      h.get_by_label("Edição de imagens");
      h.get_by_label("Atualizar para 0.5.0");
      h.get_by_label_contains("Conferindo a soma de verificação…");
-     h.get_by_label_contains("Verificado há 3 min · via ArtCraft API");
+-    h.get_by_label_contains("Verificado há 3 min · via ArtCraft API");
 -    h.get_by_label("KIO Light atualizado para 0.5.0");
++    h.get_by_label_contains("Verificado há 3 min · via Bogo catalog");
 +    h.get_by_label("Bogo Light atualizado para 0.5.0");
  
      let mut table = harness(ViewMode::Table);
      table.run_steps(8);
 diff --git a/crates/ui-egui/tests/russian.rs b/crates/ui-egui/tests/russian.rs
-index 2650f45e72d9ad5a645e9d0e0f073f012bd59aff..e43a5a12b0221075c44dc6b47517328d97c256f3 100644
+index 2650f45e72d9ad5a645e9d0e0f073f012bd59aff..3e665316fbf3547bc77bf72ac5592bd086203154 100644
 --- a/crates/ui-egui/tests/russian.rs
 +++ b/crates/ui-egui/tests/russian.rs
 @@ -75,7 +75,7 @@ fn events() -> Vec<Event> {
@@ -152805,14 +153631,15 @@ index 2650f45e72d9ad5a645e9d0e0f073f012bd59aff..e43a5a12b0221075c44dc6b47517328d
      h.get_by_label("Редактирование изображений");
      h.get_by_label("Обновить до 0.5.0");
      h.get_by_label_contains("Проверка контрольной суммы…");
-     h.get_by_label_contains("Проверено 3 минуты назад · через ArtCraft API");
+-    h.get_by_label_contains("Проверено 3 минуты назад · через ArtCraft API");
 -    h.get_by_label("Приложение KIO Light обновлено до 0.5.0");
++    h.get_by_label_contains("Проверено 3 минуты назад · через Bogo catalog");
 +    h.get_by_label("Приложение Bogo Light обновлено до 0.5.0");
  
      let mut table = harness(ViewMode::Table);
      table.run_steps(8);
 diff --git a/crates/ui-egui/tests/spanish.rs b/crates/ui-egui/tests/spanish.rs
-index d6d0a1fd72ef6bce416b76bdda7393518756f0ed..4d4006bfb34f9dd36c50c6898a37ff0ce5eb7c24 100644
+index d6d0a1fd72ef6bce416b76bdda7393518756f0ed..ce99cec24f0944c7c7a0f372988a066062ed568d 100644
 --- a/crates/ui-egui/tests/spanish.rs
 +++ b/crates/ui-egui/tests/spanish.rs
 @@ -75,7 +75,7 @@ fn events() -> Vec<Event> {
@@ -152833,16 +153660,26 @@ index d6d0a1fd72ef6bce416b76bdda7393518756f0ed..4d4006bfb34f9dd36c50c6898a37ff0c
      h.get_by_label("Edición de imágenes");
      h.get_by_label("Actualizar a 0.5.0");
      h.get_by_label_contains("Verificando la suma de comprobación…");
-     h.get_by_label_contains("Comprobado hace 3 min · con ArtCraft API");
+-    h.get_by_label_contains("Comprobado hace 3 min · con ArtCraft API");
 -    h.get_by_label("KIO Light actualizada a 0.5.0");
++    h.get_by_label_contains("Comprobado hace 3 min · con Bogo catalog");
 +    h.get_by_label("Bogo Light actualizada a 0.5.0");
  
      let mut table = harness(ViewMode::Table);
      table.run_steps(8);
 diff --git a/crates/ui-egui/tests/ui.rs b/crates/ui-egui/tests/ui.rs
-index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..5a9ba42e664ffed423c9b0489b3187f1a84ff086 100644
+index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..6292d71c1ce3a941adbd2c96a963bb574d55746b 100644
 --- a/crates/ui-egui/tests/ui.rs
 +++ b/crates/ui-egui/tests/ui.rs
+@@ -294,7 +294,7 @@ fn grid_shows_every_status_and_installs_on_click() {
+     h.get_by_label_contains("0.4.1 installed → 0.5.0 released");
+     // The window has no title bar of its own here (the web build, and the tests).
+     assert!(h.query_by_label("Close").is_none());
+-    assert!(h.query_all_by_label_contains("Discord").count() >= 2); // header link and footer link
++    assert_eq!(h.query_all_by_label_contains("Discord").count(), 0); // retired header/footer promotion
+     assert!(h.query_all_by_label("Coming soon").count() >= 1);
+     h.get_by_label_contains("48 MB of 131 MB");
+     h.get_by_label("Update all (2)").click();
 @@ -389,8 +389,8 @@ fn a_kept_update_names_its_version_and_an_up_to_date_app_is_not_downloaded_again
      h.get_by_label("Retry update to 0.6.0").click();
      h.run_steps(2);
@@ -152945,7 +153782,20 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..5a9ba42e664ffed423c9b0489b3187f1
  }
  
  #[test]
-@@ -604,7 +604,7 @@ fn the_uninstall_prompt_keeps_its_own_size_after_a_taller_dialog() {
+@@ -590,9 +590,10 @@ fn settings_link_to_discord() {
+     h.get_by_label("Settings").click();
+     h.run_steps(4);
+     snapshot(&mut h, "settings-dark");
+-    h.get_by_label("Questions, ideas and news from the ArtCraft team");
++    h.get_by_label("Done"); // Settings really opened, rather than making absence vacuous.
++    assert!(h.query_by_label("Questions, ideas and news from the ArtCraft team").is_none());
+     // The header button and the one in Settings.
+-    assert!(h.query_all_by_label_contains("Discord").count() >= 2);
++    assert_eq!(h.query_all_by_label_contains("Discord").count(), 0);
+ }
+ 
+ #[test]
+@@ -604,7 +605,7 @@ fn the_uninstall_prompt_keeps_its_own_size_after_a_taller_dialog() {
      h.run_steps(4);
      h.get_by_label("Done").click();
      h.run_steps(3);
@@ -152954,8 +153804,25 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..5a9ba42e664ffed423c9b0489b3187f1
      h.get_all_by_label("…").next().unwrap().click();
      h.run_steps(3);
      h.get_by_label("Uninstall…").click();
-@@ -636,10 +636,10 @@ fn links_to_the_website_github_and_each_apps_pages() {
-     // The table's … menu has the app's website and GitHub repo.
+@@ -624,23 +625,19 @@ fn the_uninstall_prompt_keeps_its_own_size_after_a_taller_dialog() {
+ fn links_to_the_website_github_and_each_apps_pages() {
+     let (mut h, _) = harness(ViewMode::Grid, egui::Theme::Dark, true);
+     h.run_steps(6);
+-    // Footer: website, GitHub and Discord.
+-    for label in ["Website", "GitHub", "Discord"] {
+-        assert!(h.query_all_by_label(label).count() >= 1, "{label}");
+-    }
+-    // Cards: every app links to its repo and to its own page on getartcraft.com (plus the footer's).
+-    let shown_cards = h.query_all_by_label("GitHub").count() - 1;
+-    let shown_sites = h.query_all_by_label("Website").count() - 1;
++    // Official Bogo product links remain; retired community widgets do not.
++    assert_eq!(h.query_all_by_label("Discord").count(), 0);
++    let shown_cards = h.query_all_by_label("GitHub").count();
++    let shown_sites = h.query_all_by_label("Website").count();
+     assert!(shown_cards >= 13, "{shown_cards}");
+-    assert_eq!(shown_sites, 13, "every app has a website page");
+-    // The table's … menu has the app's website and GitHub repo.
++    assert_eq!(shown_sites, 13, "every Bogo app retains its official website page");
      let (mut h, _) = harness(ViewMode::Table, egui::Theme::Dark, true);
      h.run_steps(6);
 -    h.get_all_by_label("…").nth(7).unwrap().click(); // KIO Word
@@ -152963,11 +153830,48 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..5a9ba42e664ffed423c9b0489b3187f1
      h.run_steps(3);
      h.get_by_label("GitHub repository");
 -    // The footer's Website link and KIO Word's now-live one in the menu.
-+    // The footer's Website link and Bogo Word's now-live one in the menu.
-     assert!(h.query_all_by_label_contains("Website").count() >= 2);
+-    assert!(h.query_all_by_label_contains("Website").count() >= 2);
++    assert!(h.query_all_by_label_contains("Website").count() >= 1);
++    assert_eq!(h.query_all_by_label("Discord").count(), 0);
  }
  
-@@ -780,7 +780,7 @@ fn the_launcher_updates_itself_and_quits_to_restart() {
+ /// Clicks the `n`th widget labelled `label` and returns the URL the app asked to open.
+@@ -673,24 +670,20 @@ fn all_opened(h: &mut Harness<'_, Option<LauncherUi>>, label: &str) -> Vec<Strin
+ fn links_open_the_right_pages() {
+     let (mut h, _) = harness(ViewMode::Grid, egui::Theme::Dark, true);
+     h.run_steps(6);
+-    assert_eq!(click_opens(&mut h, "Discord").as_deref(), Some("https://discord.gg/artcraft"));
+-    // The footer opens KIO's source/homepage, and cards open the selected program page.
++    assert_eq!(click_opens(&mut h, "Discord"), None);
+     let github = all_opened(&mut h, "GitHub");
+-    assert!(github.len() >= 2, "the footer and app card both retain source links: {github:?}");
+-    assert!(github.iter().all(|url| url == "https://github.com/qptywoei777-rgb/kio-native-apps"), "{github:?}");
++    assert!(github.len() >= 13, "official Bogo product source links remain: {github:?}");
++    assert!(github.iter().all(|url| url == "https://github.com/qptywoei-sudo/bogo-native-apps"), "{github:?}");
+     let sites = all_opened(&mut h, "Website");
+-    assert!(sites.contains(&"https://kio-library.vercel.app".to_string()), "{sites:?}");
+-    assert!(sites.contains(&"https://kio-library.vercel.app/?program=photo".to_string()), "{sites:?}");
+-    // Social icons in the footer.
+-    assert_eq!(click_opens(&mut h, "X").as_deref(), Some("https://x.com/get_artcraft"));
+-    assert_eq!(click_opens(&mut h, "YouTube").as_deref(), Some("https://www.youtube.com/@OfficialArtcraftStudios"));
+-    assert_eq!(click_opens(&mut h, "TikTok").as_deref(), Some("https://www.tiktok.com/@artcraft.studios"));
+-    assert_eq!(click_opens(&mut h, "Instagram").as_deref(), Some("https://www.instagram.com/officialartcraftstudios"));
+-    assert_eq!(click_opens(&mut h, "LinkedIn").as_deref(), Some("https://www.linkedin.com/company/artcraft-ai"));
+-    // The … menu.
++    assert!(!sites.contains(&"https://kio-library.vercel.app".to_string()), "the removed footer homepage must not remain: {sites:?}");
++    assert!(sites.contains(&"https://kio-library.vercel.app/?program=photo".to_string()), "official product page remains: {sites:?}");
++    for label in ["X", "YouTube", "TikTok", "Instagram", "LinkedIn"] {
++        assert_eq!(h.query_all_by_label(label).count(), 0, "retired social widget: {label}");
++        assert_eq!(click_opens(&mut h, label), None);
++    }
+     h.get_all_by_label("…").next().unwrap().click();
+     h.run_steps(3);
+-    assert_eq!(click_opens(&mut h, "All releases").as_deref(), Some("https://github.com/qptywoei777-rgb/kio-native-apps/releases"));
++    assert_eq!(click_opens(&mut h, "All releases").as_deref(), Some("https://github.com/qptywoei-sudo/bogo-native-apps/releases"));
+ }
+ 
+ #[test]
+@@ -780,7 +773,7 @@ fn the_launcher_updates_itself_and_quits_to_restart() {
          None,
      );
      h.run_steps(6);
@@ -152976,7 +153880,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..5a9ba42e664ffed423c9b0489b3187f1
      h.get_by_label("Update and restart").click();
      h.run_steps(2);
      assert!(sent.borrow().contains(&Command::UpdateLauncher));
-@@ -804,7 +804,7 @@ fn launcher_update_prompts_to_relaunch_with_updated_version() {
+@@ -804,7 +797,7 @@ fn launcher_update_prompts_to_relaunch_with_updated_version() {
      let (mut h, _) = harness_with(ev, ViewMode::Grid, egui::Theme::Dark, true, 1.0);
      h.run_steps(6);
      // Dialog pops up on launch with the update prompt
@@ -152985,7 +153889,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..5a9ba42e664ffed423c9b0489b3187f1
      h.get_by_label("A new version is available. Would you like to relaunch with the updated version?");
      h.get_by_label("What's new");
      // Clicking "Later" dismisses the modal dialog
-@@ -840,7 +840,7 @@ fn feed_announcements_and_alerts_show_until_dismissed() {
+@@ -840,7 +833,7 @@ fn feed_announcements_and_alerts_show_until_dismissed() {
      let sent = Rc::new(RefCell::new(Vec::new()));
      let mut evs = events();
      evs.push(Event::Notices {
@@ -152994,7 +153898,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..5a9ba42e664ffed423c9b0489b3187f1
          alerts: vec![notice("x1", "Security update", Some("https://getartcraft.com/security"))],
      });
      let mut backend = Some(Fake { events: evs, sent, manage: true, pictures: Rc::default(), asked: Vec::new(), clock: Rc::new(Cell::new(NOW)) });
-@@ -867,11 +867,11 @@ fn feed_announcements_and_alerts_show_until_dismissed() {
+@@ -867,11 +860,11 @@ fn feed_announcements_and_alerts_show_until_dismissed() {
      assert!(h.query_by_label("Security update").is_none());
      assert!(h.state().as_ref().unwrap().settings.dismissed_notices.contains("x1"));
      // The announcement stays inline until dismissed.
@@ -153008,7 +153912,20 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..5a9ba42e664ffed423c9b0489b3187f1
      assert!(h.state().as_ref().unwrap().settings.dismissed_notices.contains("a1"));
  }
  
-@@ -1027,9 +1027,9 @@ fn clicking_a_card_opens_its_details_drawer() {
+@@ -967,10 +960,10 @@ fn the_footer_names_the_services_behind_what_is_on_screen() {
+             h.get_by_label_contains("Checked ").accesskit_node().label().or_else(|| h.get_by_label_contains("Checked ").accesskit_node().value());
+         label.unwrap_or_default()
+     };
+-    assert_eq!(footer(Vec::new()), "Checked 3 min ago · using ArtCraft API");
++    assert_eq!(footer(Vec::new()), "Checked 3 min ago · using Bogo catalog");
+     let from_github =
+         vec![Event::Latest { app: "wordcraft".into(), latest: LatestRelease::Found(release("wordcraft", "0.3.1", NOW)), from: Origin::GitHub }];
+-    assert_eq!(footer(from_github), "Checked 3 min ago · using ArtCraft API and GitHub");
++    assert_eq!(footer(from_github), "Checked 3 min ago · using Bogo catalog and GitHub");
+ }
+ 
+ #[test]
+@@ -1027,9 +1020,9 @@ fn clicking_a_card_opens_its_details_drawer() {
      let (mut h, _sent) = harness(ViewMode::Grid, egui::Theme::Dark, true);
      h.run_steps(8);
      // Every app has a page: a card of each generation opens one.
@@ -153021,7 +153938,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..5a9ba42e664ffed423c9b0489b3187f1
      h.run_steps(10);
      snapshot(&mut h, "details-dark");
      h.get_by_label_contains("The image editor you already know how to use");
-@@ -1055,7 +1055,7 @@ fn clicking_a_card_opens_its_details_drawer() {
+@@ -1055,7 +1048,7 @@ fn clicking_a_card_opens_its_details_drawer() {
  fn details_drawer_in_the_light_theme() {
      let (mut h, _sent) = harness(ViewMode::Grid, egui::Theme::Light, true);
      h.run_steps(8);
@@ -153030,7 +153947,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..5a9ba42e664ffed423c9b0489b3187f1
      h.run_steps(10);
      snapshot(&mut h, "details-light");
      h.get_by_label_contains("The image editor you already know how to use");
-@@ -1070,26 +1070,26 @@ fn opening_a_page_asks_for_its_pictures_once_and_only_while_it_lacks_some() {
+@@ -1070,26 +1063,26 @@ fn opening_a_page_asks_for_its_pictures_once_and_only_while_it_lacks_some() {
      let (mut h, sent) = harness(ViewMode::Grid, egui::Theme::Dark, true);
      h.run_steps(8);
      assert_eq!(fetches(&sent, "photocraft"), 0, "nothing is fetched before a page is opened");
@@ -153061,7 +153978,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..5a9ba42e664ffed423c9b0489b3187f1
      h.run_steps(10);
      assert_eq!(fetches(&sent, "pdfcraft"), 0);
  }
-@@ -1099,7 +1099,7 @@ fn a_frame_stands_in_for_the_pictures_until_they_arrive() {
+@@ -1099,7 +1092,7 @@ fn a_frame_stands_in_for_the_pictures_until_they_arrive() {
      let pictures = Rc::new(Cell::new(Pictures::Silent));
      let (mut h, sent) = harness_pictures(events(), ViewMode::Grid, egui::Theme::Dark, true, 1.0, pictures.clone());
      h.run_steps(8);
@@ -153070,7 +153987,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..5a9ba42e664ffed423c9b0489b3187f1
      h.run_steps(10);
      snapshot(&mut h, "details-loading-dark");
      h.get_by_label("Loading pictures…");
-@@ -1122,7 +1122,7 @@ fn offline_the_frame_says_so_and_opening_the_page_again_retries() {
+@@ -1122,7 +1115,7 @@ fn offline_the_frame_says_so_and_opening_the_page_again_retries() {
      let pictures = Rc::new(Cell::new(Pictures::Offline));
      let (mut h, sent) = harness_pictures(events(), ViewMode::Grid, egui::Theme::Light, true, 1.0, pictures.clone());
      h.run_steps(8);
@@ -153079,7 +153996,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..5a9ba42e664ffed423c9b0489b3187f1
      h.run_steps(10);
      snapshot(&mut h, "details-offline-light");
      h.get_by_label("Pictures couldn't be loaded. Reopen this page to try again.");
-@@ -1133,7 +1133,7 @@ fn offline_the_frame_says_so_and_opening_the_page_again_retries() {
+@@ -1133,7 +1126,7 @@ fn offline_the_frame_says_so_and_opening_the_page_again_retries() {
      pictures.set(Pictures::Online);
      h.key_press(egui::Key::Escape);
      h.run_steps(10);
@@ -153088,7 +154005,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..5a9ba42e664ffed423c9b0489b3187f1
      h.run_steps(10);
      assert_eq!(fetches(&sent, "photocraft"), 2);
      h.get_by_label("Enlarge picture");
-@@ -1145,7 +1145,7 @@ fn the_enlarged_view_shows_a_frame_for_a_picture_still_missing() {
+@@ -1145,7 +1138,7 @@ fn the_enlarged_view_shows_a_frame_for_a_picture_still_missing() {
      let pictures = Rc::new(Cell::new(Pictures::SecondFails));
      let (mut h, _sent) = harness_pictures(events(), ViewMode::Grid, egui::Theme::Dark, true, 1.0, pictures);
      h.run_steps(8);
@@ -153097,7 +154014,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..5a9ba42e664ffed423c9b0489b3187f1
      h.run_steps(10);
      h.get_by_label("Enlarge picture").click();
      h.run_steps(3);
-@@ -1164,8 +1164,8 @@ fn the_enlarged_view_shows_a_frame_for_a_picture_still_missing() {
+@@ -1164,8 +1157,8 @@ fn the_enlarged_view_shows_a_frame_for_a_picture_still_missing() {
  fn a_page_without_pictures_has_no_gallery() {
      let (mut h, _sent) = harness(ViewMode::Grid, egui::Theme::Dark, true);
      h.run_steps(8);
@@ -153108,7 +154025,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..5a9ba42e664ffed423c9b0489b3187f1
      h.run_steps(10);
      snapshot(&mut h, "details-no-pictures-dark");
      h.get_by_label_contains("The open-source PDF workbench.");
-@@ -1178,7 +1178,7 @@ fn a_page_without_pictures_has_no_gallery() {
+@@ -1178,7 +1171,7 @@ fn a_page_without_pictures_has_no_gallery() {
  fn the_lead_picture_can_be_enlarged() {
      let (mut h, _sent) = harness(ViewMode::Grid, egui::Theme::Dark, true);
      h.run_steps(8);
@@ -153117,7 +154034,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..5a9ba42e664ffed423c9b0489b3187f1
      h.run_steps(10);
      // The drawer has one "Close (Esc)"; the enlarged view adds its own.
      assert_eq!(h.query_all_by_label("Close (Esc)").count(), 1);
-@@ -1200,7 +1200,7 @@ fn the_lead_picture_can_be_enlarged() {
+@@ -1200,7 +1193,7 @@ fn the_lead_picture_can_be_enlarged() {
      assert!(h.query_by_label_contains("The image editor you already know").is_none());
  }
  
@@ -153126,7 +154043,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..5a9ba42e664ffed423c9b0489b3187f1
  /// pressed more often than there are pictures, both ways, to wrap around the list and to do nothing on a
  /// page that has one or none; the enlarged view is opened wherever there is a picture to enlarge.
  #[test]
-@@ -1252,7 +1252,7 @@ fn every_page_opens_and_pages_through_its_pictures() {
+@@ -1252,7 +1245,7 @@ fn every_page_opens_and_pages_through_its_pictures() {
  fn the_drawer_and_the_enlarged_picture_survive_any_window_size() {
      let (mut h, _sent) = harness(ViewMode::Grid, egui::Theme::Dark, true);
      h.run_steps(8);
@@ -153135,7 +154052,19 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..5a9ba42e664ffed423c9b0489b3187f1
      h.run_steps(10);
      let sizes = [(1180.0, 900.0), (720.0, 500.0), (480.0, 320.0), (320.0, 200.0), (120.0, 90.0), (40.0, 30.0), (4000.0, 2400.0)];
      for zoom in [false, true] {
-@@ -1338,7 +1338,7 @@ fn narrow_header_keeps_the_view_switch_clear_of_brand_text() {
+@@ -1315,9 +1308,9 @@ fn the_rate_limit_notice_never_runs_under_the_footer_links() {
+         for label in ["Website", "GitHub", "Discord", "X", "YouTube", "TikTok", "Instagram", "LinkedIn"] {
+             right.extend(h.query_all_by_label(label).map(|n| n.rect()).filter(|r| (r.center().y - notice.center().y).abs() < 12.0));
+         }
+-        assert_eq!(right.len(), 8, "{width}: {right:?}");
++        assert_eq!(right.len(), 0, "{width}: retired footer promotions remain: {right:?}");
+         let platform = h.query_by_label_contains("Installing for").map(|n| n.rect());
+-        assert_eq!(platform.is_some(), width > 720.0, "{width}: the platform label shows unless the window is narrow");
++        assert!(platform.is_some(), "{width}: removing promotions leaves room for the functional platform label");
+         right.extend(platform);
+         for r in right {
+             assert!(!r.intersects(notice), "{width}: notice {notice:?} overlaps {r:?}");
+@@ -1338,7 +1331,7 @@ fn narrow_header_keeps_the_view_switch_clear_of_brand_text() {
                  for label in ["Grid", "Table", "Settings", "Check for updates"] {
                      let rect = h.get_by_label(label).rect();
                      assert!(rect.left() >= 0.0 && rect.right() <= width, "{bar:?} {width}: {label} {rect:?}");
@@ -153144,7 +154073,7 @@ index 74f0c98ba2597eb42acdeb8d53499cd64a9f899e..5a9ba42e664ffed423c9b0489b3187f1
                          if let Some(text) = h.query_by_label(label) {
                              assert!(!rect.intersects(text.rect()), "{bar:?} {width}: {label} overlaps {rect:?}");
                          }
-@@ -1352,7 +1352,7 @@ fn narrow_header_keeps_the_view_switch_clear_of_brand_text() {
+@@ -1352,7 +1345,7 @@ fn narrow_header_keeps_the_view_switch_clear_of_brand_text() {
                  }
                  if width == 1180.0 {
                      h.get_by_label("Launcher");

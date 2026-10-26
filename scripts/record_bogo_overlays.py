@@ -19,6 +19,7 @@ from bogo_assets import ASSETS, originals
 from bogo_qa_profiles import transform_qa_source
 from bogo_windows_upgrade import transform_windows_upgrade
 from bogo_packaging import transform_packaging_source
+from bogo_release_identity import release_version, approved_promotion_transition, promotion_transition_records
 
 ROOT = full.ROOT
 
@@ -83,19 +84,31 @@ def main():
         transform_windows_upgrade(source, app)
         transform_packaging_source(source, app)
         intermediate = inventory(lock, source)
-        rust_paths = [source / r for r in sorted(before.keys() | intermediate.keys()) if r.endswith('.rs') and before.get(r) != intermediate.get(r)]
+        rust_paths = []
+        for relative in sorted(before.keys() | intermediate.keys()):
+            if not relative.endswith('.rs') or before.get(relative) == intermediate.get(relative):
+                continue
+            if relative.startswith('crates/engine/'):
+                if not approved_promotion_transition(app, relative, before.get(relative), intermediate.get(relative)):
+                    raise ValueError('Unreviewed protected engine transition before formatting: ' + relative)
+                # Preserve every unrelated original engine byte, including its
+                # formatting. These exact approved output hashes are parsed and
+                # tested without reformatting document/media implementations.
+                continue
+            rust_paths.append(source / relative)
         if rust_paths:
             subprocess.run(['rustup', 'run', lock['rust'], 'rustfmt', '--edition', '2024', '--config', 'skip_children=true', *rust_paths], check=True)
         after = inventory(lock, source)
         changed = [r for r in sorted(before.keys() | after.keys()) if before.get(r) != after.get(r)]
-        if not changed or any(r.endswith(('Cargo.toml', 'Cargo.lock', 'LICENSE-MIT', 'LICENSE-APACHE', 'NOTICE')) or r.startswith(('crates/engine/', 'crates/doc/', 'crates/model/', 'vendor/', 'contributors/')) for r in changed):
+        if not changed or any((r.endswith(('Cargo.toml', 'Cargo.lock', 'LICENSE-MIT', 'LICENSE-APACHE', 'NOTICE')) or r.startswith(('crates/engine/', 'crates/doc/', 'crates/model/', 'vendor/', 'contributors/'))) and not approved_promotion_transition(app, r, before.get(r), after.get(r)) for r in changed):
             raise ValueError('Bogo overlay changed a protected engine/dependency/license path')
         subprocess.run(['git', 'add', '--force', '--all'], cwd=source, check=True)
         patch = subprocess.check_output(['git', 'diff', '--cached', '--binary', '--full-index', 'HEAD'], cwd=source)
         out = ROOT / 'patches/bogo' / (app + '.patch')
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_bytes(patch)
-        row = {'id': app, 'name': 'Bogo ' + NAMES[app], 'version': lock['upstreamVersion'] + '-bogo.1', 'assetPrefix': 'Bogo-' + NAMES[app], 'bundleId': lock['bundleId'], 'legacyVersion': lock['version'], 'baseLock': 'manifests/launcher.lock.json' if app == 'launcher' else 'manifests/full-native-apps.json', 'baseLockSha256': full.digest(ROOT / ('manifests/launcher.lock.json' if app == 'launcher' else 'manifests/full-native-apps.json')), 'baseSourceTreeSha256': base_tree, 'sourceTreeSha256': full.source_fingerprint(lock, source), 'patch': out.relative_to(ROOT).as_posix(), 'patchSha256': full.digest(out), 'patchBytes': len(patch), 'files': [{'path': r, 'before': before.get(r), 'after': after.get(r)} for r in changed], 'compatibility': {'bundleIdRetained': True, 'msiUpgradeCodeRetained': True, 'profileAndPortableStorageRetained': True, 'originalEngineDependenciesLicensesRetained': True}, 'nativeBuild': 'not-yet-executed'}
+        transitions = promotion_transition_records(app)
+        row = {'id': app, 'name': 'Bogo ' + NAMES[app], 'version': release_version(lock['upstreamVersion']), 'assetPrefix': 'Bogo-' + NAMES[app], 'bundleId': lock['bundleId'], 'legacyVersion': lock['version'], 'baseLock': 'manifests/launcher.lock.json' if app == 'launcher' else 'manifests/full-native-apps.json', 'baseLockSha256': full.digest(ROOT / ('manifests/launcher.lock.json' if app == 'launcher' else 'manifests/full-native-apps.json')), 'baseSourceTreeSha256': base_tree, 'sourceTreeSha256': full.source_fingerprint(lock, source), 'patch': out.relative_to(ROOT).as_posix(), 'patchSha256': full.digest(out), 'patchBytes': len(patch), 'files': [{'path': r, 'before': before.get(r), 'after': after.get(r)} for r in changed], 'retiredPromotionSourceTransitions': transitions, 'compatibility': {'bundleIdRetained': True, 'msiUpgradeCodeRetained': True, 'profileAndPortableStorageRetained': True, 'originalEngineDependenciesLicensesRetained': True, 'engineSourceByteIdentical': not transitions, 'reviewedAuxiliaryEngineSourceChanges': len(transitions)}, 'nativeBuild': 'not-yet-executed'}
         from bogo_native import audit_windows_transition
         row['windowsInstallerIdentity'] = audit_windows_transition(lock, source, before_xml=subprocess.check_output(['git', 'show', 'HEAD:packaging/windows/' + lock['binaries']['app'] + '.wxs'], cwd=source).decode())
         catalog['applications'] = [r for r in catalog['applications'] if r['id'] != app] + [row]

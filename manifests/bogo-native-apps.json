@@ -13,17 +13,17 @@
     {
       "id": "cad",
       "name": "Bogo CAD",
-      "version": "0.7.0-bogo.1",
+      "version": "0.7.0-bogo.2",
       "assetPrefix": "Bogo-CAD",
       "bundleId": "com.kio.cad",
       "legacyVersion": "0.7.0-kio.1",
       "baseLock": "manifests/full-native-apps.json",
       "baseLockSha256": "0c71246652db45818401d22d1267c79f84e01294c4e18f12ac83f536c6ed2a58",
       "baseSourceTreeSha256": "611e020369e25c1427ef3bdb3b2794cbae070d373dd66dcbd28a5a691e2380d7",
-      "sourceTreeSha256": "aac350c02696fa75522d899ec3f4b812c50ed32f78cf068a691b864d583b0ddf",
+      "sourceTreeSha256": "4548a85abb71daec49dd9ba9f3a0824ee54c7f023174fbde1d9921b5890a2795",
       "patch": "patches/bogo/cad.patch",
-      "patchSha256": "dad7a5efad21b93cc8aaacd9b03a2e3a5f3fd691c864dcc343990c5238b24e24",
-      "patchBytes": 4931126,
+      "patchSha256": "be62b9bcecc5989fc6721d9763034dec258dee8ff7d68ed8a7e9d7b2b761211a",
+      "patchBytes": 4943427,
       "files": [
         {
           "path": "apps/cadcraft-web/index.html",
@@ -84,8 +84,8 @@
             "bytes": 6932
           },
           "after": {
-            "sha256": "87eee79d925e6fbd2ff39d92c96813f1144d62d10e44b5c9addcbfb8a37e22de",
-            "bytes": 6939
+            "sha256": "45fa2103493feecadd8ef934ac2ba6dee4d2d8a655bfd758542d54171e92b997",
+            "bytes": 6519
           }
         },
         {
@@ -334,8 +334,118 @@
             "bytes": 21368
           },
           "after": {
-            "sha256": "c13a06a092198eb79267131f0e6154170369924af3ea459337cc1a8bf0f5fdd4",
-            "bytes": 21448
+            "sha256": "bc231d25784526b7fd8b25cd5df5b767999bc4feabfda77435668a5180422b12",
+            "bytes": 20988
+          }
+        },
+        {
+          "path": "crates/ui-egui/src/i18n/ar.tsv",
+          "before": {
+            "sha256": "dd2419c6e3ab5303fbb55a746c190d23b6687fa3be543d40bbc0eab592653155",
+            "bytes": 60189
+          },
+          "after": {
+            "sha256": "3755bb91fe80976ff64c0b36679bc33b131b1a1e048c2c69c4055a7e885a7cf5",
+            "bytes": 59910
+          }
+        },
+        {
+          "path": "crates/ui-egui/src/i18n/cs.tsv",
+          "before": {
+            "sha256": "e9e5bc6f395cdc61709d57dec2deb95ecc1a803243bac09d6eae829122d7b70a",
+            "bytes": 48866
+          },
+          "after": {
+            "sha256": "79ecfa479d17458669f8aec53ef1ee071f2bc035568f1730a4e36d0d63628c84",
+            "bytes": 48624
+          }
+        },
+        {
+          "path": "crates/ui-egui/src/i18n/de.tsv",
+          "before": {
+            "sha256": "0f2406c8d95f07c82b54964e218ccc089c0624b98698ccc6a9b08edf41a4c150",
+            "bytes": 43543
+          },
+          "after": {
+            "sha256": "3356dcbc5bf87acc57dfedfd76c3e120a59cea9ef2704fbdb6c8b6cdd2822925",
+            "bytes": 43303
+          }
+        },
+        {
+          "path": "crates/ui-egui/src/i18n/es.tsv",
+          "before": {
+            "sha256": "e4ca554d7384e6aec090b5f6914016ed94924bc39c5cb6df32d153e5a62e0e99",
+            "bytes": 52964
+          },
+          "after": {
+            "sha256": "19e2771109f84d49d14cd13857a5edbb20995062a1d8609e85cbc84d45a9fb9a",
+            "bytes": 52726
+          }
+        },
+        {
+          "path": "crates/ui-egui/src/i18n/fr.tsv",
+          "before": {
+            "sha256": "d569c8b9206c22fb54f0d98412320ed2bd99eb64ea4453e0ab6ba228ca9e817b",
+            "bytes": 42870
+          },
+          "after": {
+            "sha256": "1308c255165c207688ed740a067bb738afc54e631b503005fd97862b37f4d0a7",
+            "bytes": 42615
+          }
+        },
+        {
+          "path": "crates/ui-egui/src/i18n/it.tsv",
+          "before": {
+            "sha256": "75042adaf32e4c9b6dc9956a20298e1997f4d18134f781b54b85496db766d32a",
+            "bytes": 51785
+          },
+          "after": {
+            "sha256": "22d80fb5173c443e2eeec59c6938459440ed248fc15db45a17b73f4780d353b1",
+            "bytes": 51552
+          }
+        },
+        {
+          "path": "crates/ui-egui/src/i18n/ko.tsv",
+          "before": {
+            "sha256": "0f63bfe08db6f1d4c3a09021063e01caecc50cbd14c124ba3dd26ec5ac6b9511",
+            "bytes": 49350
+          },
+          "after": {
+            "sha256": "05f0949d78d0bc2553bf95bad0eae4c026d486798e21dc56701b132364234201",
+            "bytes": 49092
+          }
+        },
+        {
+          "path": "crates/ui-egui/src/i18n/pt_br.tsv",
+          "before": {
+            "sha256": "cf5522b0b6c93a0ce68b60c68e14a28339d30f1387b2562708153390fa91fbae",
+            "bytes": 52645
+          },
+          "after": {
+            "sha256": "508fd466dca262b6d0082c7c9f426071405d6867bb28eefe56f8aee8aec1148c",
+            "bytes": 52416
+          }
+        },
+        {
+          "path": "crates/ui-egui/src/i18n/ru.tsv",
+          "before": {
+            "sha256": "e0529d51c7f3aefe33382ba15510f838791f99fc6d7b166e7533c4b47adba493",
+            "bytes": 56956
+          },
+          "after": {
+            "sha256": "2c7192db3402a074e3134f860e1ffcefba320ac36c971813874f4db26422a8bf",
+            "bytes": 56639
+          }
+        },
+        {
+          "path": "crates/ui-egui/src/i18n/sv.tsv",
+          "before": {
+            "sha256": "f57f674e07f268ab36c45c25b6fe7a3e7e9d6b6d0179cfcdffa72c97578d3612",
+            "bytes": 48440
+          },
+          "after": {
+            "sha256": "91f03234046328c68034846e623b2f2a0e06ec6b0f5ef9d60220f8a03c2f7b58",
+            "bytes": 48189
           }
         },
         {
@@ -347,6 +457,28 @@
           "after": {
             "sha256": "97f2e5509dedbc2840fd35db7c11414eed3c64c35a69f26c1588f1ee96484010",
             "bytes": 39634
+          }
+        },
+        {
+          "path": "crates/ui-egui/src/i18n/uk.tsv",
+          "before": {
+            "sha256": "03d2f18c248282a35b273abe07d4f2e52dc0f5cfa1fcec17681258c627b9f70c",
+            "bytes": 76596
+          },
+          "after": {
+            "sha256": "add20eebe46cbadafb43e2866ccae25d8446fa34fc940de9ef6c60b28244b749",
+            "bytes": 76291
+          }
+        },
+        {
+          "path": "crates/ui-egui/src/i18n/zh.tsv",
+          "before": {
+            "sha256": "61ddf63d44c111f077be4da1abf86843b0fc96f2b1a796c4e517f523f5417059",
+            "bytes": 40896
+          },
+          "after": {
+            "sha256": "ec0df4309cf594712e76a6d1014e2b15bf7889ee9aea59b677b4a189773004e9",
+            "bytes": 40660
           }
         },
         {
@@ -548,11 +680,14 @@
           }
         }
       ],
+      "retiredPromotionSourceTransitions": [],
       "compatibility": {
         "bundleIdRetained": true,
         "msiUpgradeCodeRetained": true,
         "profileAndPortableStorageRetained": true,
-        "originalEngineDependenciesLicensesRetained": true
+        "originalEngineDependenciesLicensesRetained": true,
+        "engineSourceByteIdentical": true,
+        "reviewedAuxiliaryEngineSourceChanges": 0
       },
       "nativeBuild": "not-yet-executed",
       "windowsInstallerIdentity": {
@@ -580,18 +715,29 @@
     {
       "id": "design",
       "name": "Bogo Design",
-      "version": "0.8.0-bogo.1",
+      "version": "0.8.0-bogo.2",
       "assetPrefix": "Bogo-Design",
       "bundleId": "com.kio.design",
       "legacyVersion": "0.8.0-kio.1",
       "baseLock": "manifests/full-native-apps.json",
       "baseLockSha256": "0c71246652db45818401d22d1267c79f84e01294c4e18f12ac83f536c6ed2a58",
       "baseSourceTreeSha256": "a4de1e98deeaa920ce93c4696452da16377b7badb1a086fd3e2616e8eeb3e897",
-      "sourceTreeSha256": "a392a9bf8a66c2a971aa414dfb3faa46ddd8a6788c3dde25fd26b0945660f5f3",
+      "sourceTreeSha256": "120208dc3cfa6f3f7a24264deba136f84d433b10258d22d25974c3fe40bccd75",
       "patch": "patches/bogo/design.patch",
-      "patchSha256": "a283a87d056a9c9cb1f1118a7322e24c30c0361683a7e1af8dd08ebef804a64f",
-      "patchBytes": 5179191,
+      "patchSha256": "d78b606592928e8bf7f69d530494078e23cc92b51afdd741aac6618bd2921bd3",
+      "patchBytes": 5216916,
       "files": [
+        {
+          "path": "apps/designcraft-cli/src/main.rs",
+          "before": {
+            "sha256": "9a543f30a107b3e0f010a08dca91d0c79778b3085ea46d9cf98c67ec0d7ed225",
+            "bytes": 21932
+          },
+          "after": {
+            "sha256": "e83576b74a1cd22c08e25f34208651781f5144b90cd7c677d6adebae0baf5d48",
+            "bytes": 21757
+          }
+        },
         {
           "path": "apps/designcraft-web/index.html",
           "before": {
@@ -632,8 +778,8 @@
             "bytes": 5720
           },
           "after": {
-            "sha256": "e552531c4fece11995b42078089474cf32207e94d31cb434080e477ee743c479",
-            "bytes": 5723
+            "sha256": "03e330e1a6cfd2b86636e684017555c63eedd4d84063c4e4f731a7bb4f9a4e29",
+            "bytes": 5485
           }
         },
         {
@@ -821,14 +967,47 @@
           }
         },
         {
+          "path": "crates/engine/src/cmd/inspect.rs",
+          "before": {
+            "sha256": "f8d05d83968e55964907464b7cc9f99e12ac018c696ceae8c88ede2796048fee",
+            "bytes": 5607
+          },
+          "after": {
+            "sha256": "7286dc35bb9d261757625157c0646a2d3c2935b9d43df32aa5ad8c2cee177ffc",
+            "bytes": 5368
+          }
+        },
+        {
+          "path": "crates/engine/src/links.rs",
+          "before": {
+            "sha256": "1012dee41e72f8832fa324a296dcc6cccdd2df7b61d28c42706ce4a5d204d8a8",
+            "bytes": 1769
+          },
+          "after": {
+            "sha256": "a865611c97bae5a9c85b744fed71e8b4f57fa2c542a66d05dc549338ddcdb008",
+            "bytes": 514
+          }
+        },
+        {
+          "path": "crates/mcp/src/server.rs",
+          "before": {
+            "sha256": "5eb9779b49d5d7fd3547c4be9ccb58173ee45680135a2d3f54c70c43fa88b2d4",
+            "bytes": 8188
+          },
+          "after": {
+            "sha256": "4c5b990ba0442e806fee40702027e3ded22997199f9ce176fddd3b006046e196",
+            "bytes": 7859
+          }
+        },
+        {
           "path": "crates/ui-egui/src/about.rs",
           "before": {
             "sha256": "f4b76a82113c1f20df94b565a8b3c7c524b987e9b8187e47359627ebaec9193e",
             "bytes": 10439
           },
           "after": {
-            "sha256": "939db2e13f6a0150a40834113103de1c4ccf16e817dcf669e8f4c88a16470ad3",
-            "bytes": 10551
+            "sha256": "ba6aae94c9ffd4b5e77b1d5b5de123940b25dc3053a16ba11e1e2899836454e3",
+            "bytes": 5048
           }
         },
         {
@@ -838,8 +1017,8 @@
             "bytes": 44974
           },
           "after": {
-            "sha256": "1edcbd980e1c93f4b3c8350fdc86aaca8c71dd3aa5c8352f966959773f86681b",
-            "bytes": 44976
+            "sha256": "e6e403ef85c418b541a173a99b3ee02ad6c7f364f05e9e491394b2d29ad68548",
+            "bytes": 42401
           }
         },
         {
@@ -849,8 +1028,8 @@
             "bytes": 204156
           },
           "after": {
-            "sha256": "385b4d60f25bc6a2500350ad786d99df3353d40193b9f55e9390508ed4831fab",
-            "bytes": 204192
+            "sha256": "3218e036ce9de8f8a0e8aeeb0c7c57008436e41aabb829729768ab8d221541b2",
+            "bytes": 202576
           }
         },
         {
@@ -860,8 +1039,8 @@
             "bytes": 81654
           },
           "after": {
-            "sha256": "06f055cc722b7c9f2d195bedb827601bdff92a88f3fd4b9e68b1c6c43da6e86e",
-            "bytes": 81666
+            "sha256": "2d939f3cc93f66dfa64b2570e2a0a61c45e7980c44628757b4d6686779d3bc22",
+            "bytes": 80955
           }
         },
         {
@@ -871,8 +1050,8 @@
             "bytes": 70102
           },
           "after": {
-            "sha256": "08f0b8669513ec6387415198af69a929549415a7a06dea6b81ad8f2ac7576b6e",
-            "bytes": 70114
+            "sha256": "6008aca1cda9079cd9378beae1c5c9fe85505540cb4725a1906ff0000562c7f5",
+            "bytes": 69487
           }
         },
         {
@@ -882,8 +1061,8 @@
             "bytes": 88357
           },
           "after": {
-            "sha256": "a8569d7c094e8f4bbb518ab340c282012ed9d6a060a1c93034ae559b38fd393a",
-            "bytes": 88373
+            "sha256": "cb3f80558c683ccc7d57b7bbc5d469d2bee5d3fd6a982219d29bb6758f6909cb",
+            "bytes": 87548
           }
         },
         {
@@ -893,8 +1072,8 @@
             "bytes": 49430
           },
           "after": {
-            "sha256": "e2411959ee049811fbb90f9c1c88302e01821513779a22eec045e6e9d97f716d",
-            "bytes": 49436
+            "sha256": "9d08240a87c99cce439030b3abe54b780c92f0f37f85381dece09695af98ae36",
+            "bytes": 49001
           }
         },
         {
@@ -904,8 +1083,8 @@
             "bytes": 92700
           },
           "after": {
-            "sha256": "a7ec8bed479f42d4ee0ef0d72281b729bdd2369827d9f52b72382769635aab42",
-            "bytes": 92712
+            "sha256": "306e8e5aae160cc49242bd9dc7a2d1718e2edba7450dbc8465ec71b39a7994b7",
+            "bytes": 91924
           }
         },
         {
@@ -926,8 +1105,8 @@
             "bytes": 185910
           },
           "after": {
-            "sha256": "2d46dd8ee2792692c25fd6ba38cc447c3f031dede4d92b03150b21bc61f24bc6",
-            "bytes": 185914
+            "sha256": "92dc41c3e061174064a1a85eae6c999d6785ec5a0e4f48f5d3f63b2b41fdaf80",
+            "bytes": 184276
           }
         },
         {
@@ -1063,11 +1242,39 @@
           }
         }
       ],
+      "retiredPromotionSourceTransitions": [
+        {
+          "path": "crates/engine/src/cmd/inspect.rs",
+          "before": {
+            "sha256": "f8d05d83968e55964907464b7cc9f99e12ac018c696ceae8c88ede2796048fee",
+            "bytes": 5607
+          },
+          "after": {
+            "sha256": "7286dc35bb9d261757625157c0646a2d3c2935b9d43df32aa5ad8c2cee177ffc",
+            "bytes": 5368
+          },
+          "scope": "user-requested retired promotion metadata or built-in sample URL; document/media functions and legal notices preserved"
+        },
+        {
+          "path": "crates/engine/src/links.rs",
+          "before": {
+            "sha256": "1012dee41e72f8832fa324a296dcc6cccdd2df7b61d28c42706ce4a5d204d8a8",
+            "bytes": 1769
+          },
+          "after": {
+            "sha256": "a865611c97bae5a9c85b744fed71e8b4f57fa2c542a66d05dc549338ddcdb008",
+            "bytes": 514
+          },
+          "scope": "user-requested retired promotion metadata or built-in sample URL; document/media functions and legal notices preserved"
+        }
+      ],
       "compatibility": {
         "bundleIdRetained": true,
         "msiUpgradeCodeRetained": true,
         "profileAndPortableStorageRetained": true,
-        "originalEngineDependenciesLicensesRetained": true
+        "originalEngineDependenciesLicensesRetained": true,
+        "engineSourceByteIdentical": false,
+        "reviewedAuxiliaryEngineSourceChanges": 2
       },
       "nativeBuild": "not-yet-executed",
       "windowsInstallerIdentity": {
@@ -1095,17 +1302,17 @@
     {
       "id": "vector",
       "name": "Bogo Vector",
-      "version": "0.11.0-bogo.1",
+      "version": "0.11.0-bogo.2",
       "assetPrefix": "Bogo-Vector",
       "bundleId": "com.kio.vector",
       "legacyVersion": "0.11.0-kio.1",
       "baseLock": "manifests/full-native-apps.json",
       "baseLockSha256": "0c71246652db45818401d22d1267c79f84e01294c4e18f12ac83f536c6ed2a58",
       "baseSourceTreeSha256": "ff899cf09200e163a0e2a1e6de2119ad76caf39c3f46398354b5aa77daa08a97",
-      "sourceTreeSha256": "c9a89898b2c86290146c088f5436ba7f95e29d225495a9d7a07ace569d4e28a4",
+      "sourceTreeSha256": "48d62e620b68a00be8c65bb5a0065747be7169112c252640e9fd954b0c0ac2ee",
       "patch": "patches/bogo/vector.patch",
-      "patchSha256": "07dcc5f047d585fe0c84d5bc1553ce2816cbb361ac5b70e17d309217bb54aa85",
-      "patchBytes": 6249353,
+      "patchSha256": "ce31e148556a2b1f98dc92b78a937eeb847ec3950ed13bfeee3f34acc44b580d",
+      "patchBytes": 6276719,
       "files": [
         {
           "path": "apps/vectorcraft-cli/src/perf.rs",
@@ -1369,14 +1576,25 @@
           }
         },
         {
+          "path": "crates/engine/src/cmd/help.rs",
+          "before": {
+            "sha256": "89a83c76479c2f6946caf652e0bbf713fefbdb4f1cec86db689fbf585364ceaf",
+            "bytes": 2206
+          },
+          "after": {
+            "sha256": "36520d4c4893e2cb952a10b8518e30a8e25934b2021188d62f6dce6c6e83d173",
+            "bytes": 538
+          }
+        },
+        {
           "path": "crates/ui-egui/src/canvas.rs",
           "before": {
             "sha256": "fbb3dff8f0996b7872f8023ee7f8aad050324b66f64020d040a16f416aa7a1e8",
             "bytes": 258175
           },
           "after": {
-            "sha256": "75c65da5d1a0dee1124bf9f2c9a444a6bf2e91d87f646ddccf576e3cf4a79793",
-            "bytes": 258174
+            "sha256": "e88adf9d785eb4c8d5c96fd57bed083de4fd6ca0f0ad4212a768e65b1363301f",
+            "bytes": 257993
           }
         },
         {
@@ -1386,8 +1604,8 @@
             "bytes": 73248
           },
           "after": {
-            "sha256": "b41b0945397c4cac93a291ff8b718f9b0dfdbfdb9802fd5ebc6b4a5b2fb5fe0a",
-            "bytes": 73257
+            "sha256": "a091e83b89560494d827cd0306f076d56efd528e5f41a7a6404e745111b6df4d",
+            "bytes": 72989
           }
         },
         {
@@ -1397,8 +1615,8 @@
             "bytes": 4534
           },
           "after": {
-            "sha256": "93130a7d3cbe14120c5b94470cc15bc26d0b6f2902470a6cf5839b8936a862be",
-            "bytes": 4533
+            "sha256": "5b9b6215bc774e457dd67d665d4be655e216396354d9a430719225e911012c54",
+            "bytes": 875
           }
         },
         {
@@ -1408,8 +1626,8 @@
             "bytes": 2973
           },
           "after": {
-            "sha256": "50f208f56e3566ec8cf2cc137c39075af5bb0a07d9bf1c8a335fd3251014bae6",
-            "bytes": 2977
+            "sha256": "cf22fcaf1dab4a6e203308df392c0ec0a2462fa832ffd6e9e07d7ba08dd1a5dd",
+            "bytes": 2876
           }
         },
         {
@@ -1496,8 +1714,8 @@
             "bytes": 234971
           },
           "after": {
-            "sha256": "244306c1d1ed57e102eb0da78c59da41323fe4314b44b6aaf938f86d3e72d11d",
-            "bytes": 235051
+            "sha256": "684d7229cc83cf5a5ca38b750fcda955f4c47fc09a29ef91bd42e615b4ae8bd5",
+            "bytes": 234678
           }
         },
         {
@@ -1507,8 +1725,8 @@
             "bytes": 224821
           },
           "after": {
-            "sha256": "643e1c4dc0e185c2cc60d6df1d300c5d7c6e45d9b52a35ae0d7ba81d1f9cf3aa",
-            "bytes": 224891
+            "sha256": "645810aa83f20a83902bacddd2b2715c01c33d1ed893579453dde627afc5e3bc",
+            "bytes": 224518
           }
         },
         {
@@ -1518,8 +1736,8 @@
             "bytes": 237856
           },
           "after": {
-            "sha256": "f094cc8bd348cf64e95a4e93383a1e14ed7adbe3663a4ddc4ed1c48d29448e5d",
-            "bytes": 237938
+            "sha256": "d8182f5b56f891374aed4fd341ac78b16df3a214ba8b0b9f520e9948b4a12b2b",
+            "bytes": 237563
           }
         },
         {
@@ -1529,8 +1747,8 @@
             "bytes": 252926
           },
           "after": {
-            "sha256": "5184c4026990a44ec7cd737a9f5702792237018ecb1d18331b758967b00f5653",
-            "bytes": 253015
+            "sha256": "d9f2384bc327063f2370c78ff761cc942df0123999955ed9d88ef8684bdd86e5",
+            "bytes": 252640
           }
         },
         {
@@ -1540,8 +1758,8 @@
             "bytes": 245012
           },
           "after": {
-            "sha256": "bcb41632bbd5a75a6f87fb1ec6c4f747e1ef4c75a1d591b8304063c3ad3ca7b3",
-            "bytes": 245097
+            "sha256": "4a3066a00a7be6f82dfe7084a7f62756d5bf5f2dc6205a48f04b17cae39f39b7",
+            "bytes": 244706
           }
         },
         {
@@ -1551,8 +1769,8 @@
             "bytes": 220522
           },
           "after": {
-            "sha256": "8a45e0d00cc90b7bcf9ad1adc76f4b2ff2f8e5837f041bf426e9fde6bea72182",
-            "bytes": 220592
+            "sha256": "12ca126db7acd423cdfc4150a4765f1e50d06e40d4da75abd1487944718e00e8",
+            "bytes": 220213
           }
         },
         {
@@ -1562,8 +1780,8 @@
             "bytes": 255439
           },
           "after": {
-            "sha256": "fa9a9f70fe32151906f7f047c3ff9e5cbe62e08aae9a778ef1af6980df307dee",
-            "bytes": 255509
+            "sha256": "75d3525712ac8248641afcbb457a38587b8911fca38e58e9a6b711bf2c1bdb1d",
+            "bytes": 255133
           }
         },
         {
@@ -1573,8 +1791,8 @@
             "bytes": 223644
           },
           "after": {
-            "sha256": "e18c42b6a27b2b3e0619cdda0d699af478a52dd1d8551f62f88b3645f0bb9d22",
-            "bytes": 223714
+            "sha256": "dfce5d87ca6dc25f60ec4fb6268a065d19d4f58b3e197d1a76ebb20bdad5af6e",
+            "bytes": 223337
           }
         },
         {
@@ -1584,8 +1802,8 @@
             "bytes": 230044
           },
           "after": {
-            "sha256": "4fd30cae7104e654d0d005498347e509a146f8e55a1e24ec4ae318d60fc5ef3c",
-            "bytes": 230118
+            "sha256": "e81b01d0d9d2e7c37affc0da37a79fe20d3d2a501dde85a4b595da997895296a",
+            "bytes": 229743
           }
         },
         {
@@ -1595,8 +1813,8 @@
             "bytes": 194982
           },
           "after": {
-            "sha256": "97ce77abfcb9e2077cf213f5ad8d219cd2c82e7f9f9ad375135844eaff587366",
-            "bytes": 195041
+            "sha256": "322ea0fe3f13a3d5e53c447020d028aa412c18da3a8826e5e1a4cfab4a79db75",
+            "bytes": 194596
           }
         },
         {
@@ -1606,8 +1824,8 @@
             "bytes": 310049
           },
           "after": {
-            "sha256": "2e9edd9a92dd8ae00219349a8e1a29d89c267a13f0100f5709648517c2774868",
-            "bytes": 310119
+            "sha256": "952a2e2b4e9d44f6af2b26bfbb20447deb5cc61abb7701a6cb56480385d1f2f9",
+            "bytes": 309646
           }
         },
         {
@@ -1628,8 +1846,8 @@
             "bytes": 306050
           },
           "after": {
-            "sha256": "8624c1d3789e5b2997e60dd1651e8da1e3b8b0b38c16b510306037ed4336561b",
-            "bytes": 306120
+            "sha256": "624f19cad94e927c1bfbfd39723aad47116d0afbde2d280be2ae3a14460e49fb",
+            "bytes": 305664
           }
         },
         {
@@ -1639,8 +1857,8 @@
             "bytes": 231979
           },
           "after": {
-            "sha256": "5563cd872d017a13a16712ecce18dd592923e6f824ec3b2a0d0585fa35ac05c8",
-            "bytes": 232049
+            "sha256": "4db1ee28f1f390aca36cf0284341e9fb6611a03eaf629481e973abacee792439",
+            "bytes": 231673
           }
         },
         {
@@ -1650,8 +1868,8 @@
             "bytes": 149541
           },
           "after": {
-            "sha256": "2100a62f64df9d210930e90127744865403ba3cf93a275c50e46951e1e6d74b7",
-            "bytes": 149595
+            "sha256": "77ac1606c5b7d80ac17f8d5a64991fc9fef9851f7308d69b67aa74950e589e66",
+            "bytes": 149249
           }
         },
         {
@@ -1661,8 +1879,8 @@
             "bytes": 146069
           },
           "after": {
-            "sha256": "75e6c682c055d90ba3395a8fbf7331c1205b2b56c6ebe68357c58ef810f451b4",
-            "bytes": 146107
+            "sha256": "e0ee5fa5c7f0e14f908eda6ef3f1486381853e091c3f22bf2abc39355ed5e069",
+            "bytes": 145651
           }
         },
         {
@@ -1683,8 +1901,8 @@
             "bytes": 223498
           },
           "after": {
-            "sha256": "0fc8cb6ac7dcd806a8b0c76553ab18bf97f01acf8e63a09a0956ac4fe5cb1421",
-            "bytes": 223510
+            "sha256": "2bf3bf9081b11f11c37b3ee0247b3afeee168608a1245805307bd3131e7227b6",
+            "bytes": 223001
           }
         },
         {
@@ -1738,8 +1956,8 @@
             "bytes": 32107
           },
           "after": {
-            "sha256": "062896427de63970db72a00d8c907fef49112be684e05fcdd42ca12a44784637",
-            "bytes": 32112
+            "sha256": "de1790a2007f2f8000a2cceb72b09bc3aaccf101a0b78f03bb88e39921590ea1",
+            "bytes": 32113
           }
         },
         {
@@ -1762,6 +1980,17 @@
           "after": {
             "sha256": "1b90ad4afecd391e53f9cef99598e799884f8feafcda46a5e97a5709765bc7dc",
             "bytes": 16183
+          }
+        },
+        {
+          "path": "crates/ui-egui/src/titlebar.rs",
+          "before": {
+            "sha256": "491799fbc614c94341217f5e5cd2a7f09ac6bb0ae1041e288761f0aa8d3d7224",
+            "bytes": 16870
+          },
+          "after": {
+            "sha256": "cbac5f5b4d8feed2b614fea7c008aaca7111f1634e4176a0f4c6f5c6d357541c",
+            "bytes": 16873
           }
         },
         {
@@ -1875,11 +2104,27 @@
           }
         }
       ],
+      "retiredPromotionSourceTransitions": [
+        {
+          "path": "crates/engine/src/cmd/help.rs",
+          "before": {
+            "sha256": "89a83c76479c2f6946caf652e0bbf713fefbdb4f1cec86db689fbf585364ceaf",
+            "bytes": 2206
+          },
+          "after": {
+            "sha256": "36520d4c4893e2cb952a10b8518e30a8e25934b2021188d62f6dce6c6e83d173",
+            "bytes": 538
+          },
+          "scope": "user-requested retired promotion metadata or built-in sample URL; document/media functions and legal notices preserved"
+        }
+      ],
       "compatibility": {
         "bundleIdRetained": true,
         "msiUpgradeCodeRetained": true,
         "profileAndPortableStorageRetained": true,
-        "originalEngineDependenciesLicensesRetained": true
+        "originalEngineDependenciesLicensesRetained": true,
+        "engineSourceByteIdentical": false,
+        "reviewedAuxiliaryEngineSourceChanges": 1
       },
       "nativeBuild": "not-yet-executed",
       "windowsInstallerIdentity": {
@@ -1896,17 +2141,17 @@
     {
       "id": "film",
       "name": "Bogo Film",
-      "version": "0.8.0-bogo.1",
+      "version": "0.8.0-bogo.2",
       "assetPrefix": "Bogo-Film",
       "bundleId": "com.kio.film",
       "legacyVersion": "0.8.0-kio.1",
       "baseLock": "manifests/full-native-apps.json",
       "baseLockSha256": "0c71246652db45818401d22d1267c79f84e01294c4e18f12ac83f536c6ed2a58",
       "baseSourceTreeSha256": "ca4bd84dca182c4a7580d41d90c5593804c6302e60c7cce315586d61ed053bac",
-      "sourceTreeSha256": "ea818978490de9fc5b4296220e57f40234a4f9444850375ba33e503e8826dfcf",
+      "sourceTreeSha256": "2631d91e6d67760a58c5904211d4b20c8c364e1cb0cdb52596cd1ac193374d3f",
       "patch": "patches/bogo/film.patch",
-      "patchSha256": "0bbc35e4c464957a8f2b95b6ed8c2c4fd5b4db35eed62a3fd13f104ce7f8fe00",
-      "patchBytes": 5375531,
+      "patchSha256": "7e0e00767d1b02676d533138e27da4050f2d77e28978ccf13abe92e729df60f3",
+      "patchBytes": 5401907,
       "files": [
         {
           "path": "apps/filmcraft-cli/src/main.rs",
@@ -2025,8 +2270,8 @@
             "bytes": 8020
           },
           "after": {
-            "sha256": "27a3020f1cb3fc424d38177929c98531fd2ab7a5cc46d1adf7ef7bc86b5312a8",
-            "bytes": 8022
+            "sha256": "4212ee416f6004663b0a1d1d9da632eadacf2ab40c160f54644dc096b3d0dc98",
+            "bytes": 7856
           }
         },
         {
@@ -2269,14 +2514,25 @@
           }
         },
         {
+          "path": "crates/ui-egui/src/header.rs",
+          "before": {
+            "sha256": "86ff3c89f0aed055843f3542faf6051d3b3dfe8c64cffb8a9a9f371bd9ec3aad",
+            "bytes": 10272
+          },
+          "after": {
+            "sha256": "13462138f3af903cf7917871d96fb263ff11885358bdce5cb3e8b27f3edd6e77",
+            "bytes": 9273
+          }
+        },
+        {
           "path": "crates/ui-egui/src/i18n/de.tsv",
           "before": {
             "sha256": "5ec837ad121e6c082c813b50978e8c6d3c20785678079c23df64189f9ce81146",
             "bytes": 14320
           },
           "after": {
-            "sha256": "05c9dd3d311be43c2d5992e26ff3533affad46b4427322a8d19429e8b01a3d1e",
-            "bytes": 14335
+            "sha256": "16c034dbce6e21c9901a7e0cb8f696fbc4f1a86f805c2f69e1bdeadb040b400a",
+            "bytes": 14075
           }
         },
         {
@@ -2286,8 +2542,8 @@
             "bytes": 154994
           },
           "after": {
-            "sha256": "b86e4a6ef9ca57826da5045c81b5b2b39cbfa90f22ab3440792fec2031357969",
-            "bytes": 155041
+            "sha256": "1ecce6ba17390d58533479c1dc225fb92ee009c3d1e00119289242b6f57e929a",
+            "bytes": 154396
           }
         },
         {
@@ -2297,8 +2553,8 @@
             "bytes": 156387
           },
           "after": {
-            "sha256": "68a71c9c1b84a921af3e0a94421a327ebd4afd579157a1cc9c008d7323cb5675",
-            "bytes": 156430
+            "sha256": "791264e6697cbbacde6028da0a4fce2b22afea7a6011c92ef7e0c3f354c0ad36",
+            "bytes": 155778
           }
         },
         {
@@ -2308,8 +2564,8 @@
             "bytes": 138163
           },
           "after": {
-            "sha256": "619c2c6b790cc4c2d343227b136b7cf92a21811cf7abd8d8f0197d89321241c4",
-            "bytes": 138207
+            "sha256": "599e115d8dc1c362eebfe266ae57860201740857849c21996e0cf92b69f9e391",
+            "bytes": 137574
           }
         },
         {
@@ -2319,8 +2575,8 @@
             "bytes": 150617
           },
           "after": {
-            "sha256": "be45f06e2f3a85038855d7c1ab12f280755024d98187cd718d58ababe0242139",
-            "bytes": 150663
+            "sha256": "2323898f4d55ec06fca1eb5d308537f8d55d0abeaa28a389200eb9220a0697c6",
+            "bytes": 150025
           }
         },
         {
@@ -2330,8 +2586,8 @@
             "bytes": 171838
           },
           "after": {
-            "sha256": "d870794c6059436bafc16d7a882b43b27ebef4e3d853cfcffbeb5a339c6ccdd3",
-            "bytes": 171883
+            "sha256": "c1757ba6e015540671a9b234b6d5ff4958bf9adc7686dc5962975314c7ab9ec0",
+            "bytes": 171188
           }
         },
         {
@@ -2341,8 +2597,8 @@
             "bytes": 146126
           },
           "after": {
-            "sha256": "13119d420054974df5c0363f146c7cf20754dae41f5e83889ed2dc2941f09dc1",
-            "bytes": 146171
+            "sha256": "1d3299583040a6c0dd68a5f3ea34cb08305160dc72a5faea160176a803715797",
+            "bytes": 145544
           }
         },
         {
@@ -2363,8 +2619,8 @@
             "bytes": 151570
           },
           "after": {
-            "sha256": "4def2d3da8977795f5a4b02c4c321a163f8033418adc944809f07100e282686e",
-            "bytes": 151613
+            "sha256": "9afb13a70439737250d93fb17b3d95ee7d0bdd673e663cce13ed6c5e44d45e3c",
+            "bytes": 150974
           }
         },
         {
@@ -2374,8 +2630,8 @@
             "bytes": 19024
           },
           "after": {
-            "sha256": "5fb2ce4408b2b70ef6b6d66dbbd36fad561bb4c7b4cf0425029b1b7c595dd06c",
-            "bytes": 19035
+            "sha256": "713f2c3b0f8250132353b22cdbe7aaa213ab2c2617033ef6672974591373c61f",
+            "bytes": 18849
           }
         },
         {
@@ -2385,8 +2641,8 @@
             "bytes": 19016
           },
           "after": {
-            "sha256": "a66f54101984ad83f977a08420e717e75237b38105f861ee12d2f50c6c1a09ab",
-            "bytes": 19027
+            "sha256": "2e089498216a7c8c35e298376e12f30dce0f9184a16504f8033807754026387c",
+            "bytes": 18846
           }
         },
         {
@@ -2396,8 +2652,8 @@
             "bytes": 132413
           },
           "after": {
-            "sha256": "40ed5a1c25b258d717a1be79fd28bb136be815ffd6311e8a8b620bfc481bee07",
-            "bytes": 132458
+            "sha256": "ec26a31a06a933f41e5a8780fc4119eec0544660339d9f267ebcd5ee98fbb85f",
+            "bytes": 131861
           }
         },
         {
@@ -2418,8 +2674,8 @@
             "bytes": 11338
           },
           "after": {
-            "sha256": "1c5023b1466da66e1b795bac0882c3f026646cb861ba4b1cafe5021c0d2375cb",
-            "bytes": 11341
+            "sha256": "8cef350d181e837d3e207ee3199b95170b15e99b874fb2e4c390051e0b7bf9c1",
+            "bytes": 11045
           }
         },
         {
@@ -2429,8 +2685,8 @@
             "bytes": 57332
           },
           "after": {
-            "sha256": "e0b13589dc756002e2af7663be11d0070e242733162959c4e68ed856639c1e00",
-            "bytes": 57337
+            "sha256": "b749c51f3879ffb539588176e9eb6ca18e2e3def43fa71f447ee86d5c117d6e7",
+            "bytes": 56995
           }
         },
         {
@@ -2440,8 +2696,8 @@
             "bytes": 24466
           },
           "after": {
-            "sha256": "87fd37d53039db3ec3134b231af6ce40a99ee50496e86417f6115deb0afb2430",
-            "bytes": 24470
+            "sha256": "906949725f16781aff7248c6a253e25a6ba7addd78aca3809ff36f19f220adb3",
+            "bytes": 22754
           }
         },
         {
@@ -2478,14 +2734,25 @@
           }
         },
         {
+          "path": "crates/ui-egui/src/panels/import_mode.rs",
+          "before": {
+            "sha256": "d39fe941b4b47066e5237f39f9c3c623be7b346c23661cbb1273903fbe7f5000",
+            "bytes": 6381
+          },
+          "after": {
+            "sha256": "394f1607d034352d1fde8117f2c75bc8ae7663cce25c4454ade90a445a9f0c55",
+            "bytes": 4603
+          }
+        },
+        {
           "path": "crates/ui-egui/src/panels/keyboard.rs",
           "before": {
             "sha256": "218b384ed9842ea009e5fb0dbed68d2f3f5e979abdfdfc006d7e601d01b2a0c3",
             "bytes": 28987
           },
           "after": {
-            "sha256": "a589347f47ddae7ab72fa56a41ade22fcaf9a0b07398e6208f8b41a97d5a28f8",
-            "bytes": 28989
+            "sha256": "65efbaa076c095df59d0578caa2453e61db832a42e784e7cd78dd2815738d9c8",
+            "bytes": 28777
           }
         },
         {
@@ -2552,6 +2819,17 @@
           "after": {
             "sha256": "893e6c34910d62564c1a82e4159c110e314696649bcc4598743613e4ff3e8796",
             "bytes": 35612
+          }
+        },
+        {
+          "path": "crates/ui-egui/tests/links_ui.rs",
+          "before": {
+            "sha256": "cc216fd170470aef66532dc8a08d229083fb19cf231f78a05cf433d76c1273a1",
+            "bytes": 4450
+          },
+          "after": {
+            "sha256": "3ece225fb395853cc2981c6a96c59e5f5e4c965d6cf98017608e285ed8b8f560",
+            "bytes": 3653
           }
         },
         {
@@ -2687,11 +2965,14 @@
           }
         }
       ],
+      "retiredPromotionSourceTransitions": [],
       "compatibility": {
         "bundleIdRetained": true,
         "msiUpgradeCodeRetained": true,
         "profileAndPortableStorageRetained": true,
-        "originalEngineDependenciesLicensesRetained": true
+        "originalEngineDependenciesLicensesRetained": true,
+        "engineSourceByteIdentical": true,
+        "reviewedAuxiliaryEngineSourceChanges": 0
       },
       "nativeBuild": "not-yet-executed",
       "windowsInstallerIdentity": {
@@ -2719,17 +3000,17 @@
     {
       "id": "light",
       "name": "Bogo Light",
-      "version": "0.8.0-bogo.1",
+      "version": "0.8.0-bogo.2",
       "assetPrefix": "Bogo-Light",
       "bundleId": "com.kio.light",
       "legacyVersion": "0.8.0-kio.1",
       "baseLock": "manifests/full-native-apps.json",
       "baseLockSha256": "0c71246652db45818401d22d1267c79f84e01294c4e18f12ac83f536c6ed2a58",
       "baseSourceTreeSha256": "37b75e4199495ab0cc5366682f38dbb599fbe798dba65f961f14a582027b1776",
-      "sourceTreeSha256": "613536a50ac31a3a807756698cab12b0a2216425bfb0c9039526939a177f54bb",
+      "sourceTreeSha256": "5c267d08778b8a0ce2633bbfac789aadcce5152365bbe2d108c06977f0be4fe3",
       "patch": "patches/bogo/light.patch",
-      "patchSha256": "701a2b8c0decc0cfb702918991345474255644709937240b4a4f32b16dff41dd",
-      "patchBytes": 5602919,
+      "patchSha256": "02a91a03f7f127fb2f203a1f315a145af353fc090d2bfa69041c27b6bf0820bd",
+      "patchBytes": 5617476,
       "files": [
         {
           "path": "apps/lightcraft-cli/src/main.rs",
@@ -3021,8 +3302,8 @@
             "bytes": 140098
           },
           "after": {
-            "sha256": "f3af5c2eaa827ee02f858c9bc38a4d86b2bd7e4ae02d7bd63b640dd06d04574f",
-            "bytes": 140176
+            "sha256": "c9f3aceefc9cfe18ae4da281f96125f307dc1f7986d6640b3d3b3ae1437c528c",
+            "bytes": 139906
           }
         },
         {
@@ -3043,8 +3324,8 @@
             "bytes": 107858
           },
           "after": {
-            "sha256": "94b2f1773dcbd880fe4ad1126a4efba975ef427cd4642c8653bac481b6c4339a",
-            "bytes": 107906
+            "sha256": "975da0f410d0436eb814b41742a7ffebe2227152db04f1d7c030ad199181cecf",
+            "bytes": 107633
           }
         },
         {
@@ -3065,8 +3346,8 @@
             "bytes": 107229
           },
           "after": {
-            "sha256": "d0b8c362633053476764e18ff70e4ca4a78d290192f5012c3fa6f2ae0b15a1b4",
-            "bytes": 107277
+            "sha256": "48182d62b76f1a74af70a90aef72375802686acba0562ee4891a9b048caaceac",
+            "bytes": 107001
           }
         },
         {
@@ -3087,8 +3368,8 @@
             "bytes": 111413
           },
           "after": {
-            "sha256": "55778fff7f39fdb1f75b0d0e0d0582aa524b04608c4b6cccbc6f66211e7241c3",
-            "bytes": 111460
+            "sha256": "c2e0cfe43c77b94f99d6eebeef1ec788d9b7b74b2172df6b97ed91f53aeffa9a",
+            "bytes": 111182
           }
         },
         {
@@ -3109,8 +3390,8 @@
             "bytes": 106340
           },
           "after": {
-            "sha256": "893c540313ec945f092faebabc9d88b237fac7eae4eede1863b8c0fe7295d075",
-            "bytes": 106388
+            "sha256": "482630fc99d3c1bb8275d10b999019b6a583c3c18a36be1af513bc84ebba84a8",
+            "bytes": 106121
           }
         },
         {
@@ -3131,8 +3412,8 @@
             "bytes": 187335
           },
           "after": {
-            "sha256": "f6322d0a2fa94334accfb09f0114259ded8a53a31ac0134f445632093dd0472d",
-            "bytes": 187415
+            "sha256": "a5c4cad21e4ad9ccd980613b0f720a4a3867c481f424110b4a7fe1e0459e032c",
+            "bytes": 187076
           }
         },
         {
@@ -3153,8 +3434,8 @@
             "bytes": 187780
           },
           "after": {
-            "sha256": "0bca92ae8cd0d1947309ae921c060667a83d6a909b49031b5218db0076ee4b85",
-            "bytes": 187860
+            "sha256": "6f1e4b6e39326edd2007e49d631683750876678237ac608782c99bce27d723f4",
+            "bytes": 187533
           }
         },
         {
@@ -3175,8 +3456,8 @@
             "bytes": 95978
           },
           "after": {
-            "sha256": "0a095434ea39386beb1d14b68fd7fa0c8cf620d352ae92a6004c39f05e330723",
-            "bytes": 96026
+            "sha256": "8a04910b71de9c5da0661b89ef494ea2f39afb587b5ee56d9e9b92a3112eee41",
+            "bytes": 95778
           }
         },
         {
@@ -3197,8 +3478,8 @@
             "bytes": 95222
           },
           "after": {
-            "sha256": "546698630dccd803d0d8332354b3b3af0359586a7d1f8ae778d7700ed1ba6a69",
-            "bytes": 95270
+            "sha256": "c515ea7f20054d51c645c54a752988dbcbee23e57681ca91e812d493161bdc28",
+            "bytes": 95022
           }
         },
         {
@@ -3274,8 +3555,19 @@
             "bytes": 2135
           },
           "after": {
-            "sha256": "cec09a2d97c99457bf8f40621858a87bd7b2f7acf23e90ee87d486abf662d19c",
-            "bytes": 2138
+            "sha256": "dce29750530fde633c69f6ca6e101bc847baed321a136ca28850303ec7bc70c8",
+            "bytes": 1824
+          }
+        },
+        {
+          "path": "crates/ui-egui/src/menubar.rs",
+          "before": {
+            "sha256": "b20bc0eff506fbab7f323a392dec44de29054cf15b6c74b611a029637a9cdd75",
+            "bytes": 72296
+          },
+          "after": {
+            "sha256": "561abfc1be06c40a715778f3358c380d82818bf3b566f7a3de665e9bba8cfd3e",
+            "bytes": 72030
           }
         },
         {
@@ -3285,8 +3577,8 @@
             "bytes": 111640
           },
           "after": {
-            "sha256": "12b98c628b16bfdb924aec595441f9138acc83129d76c2fe470050529fd4f1d8",
-            "bytes": 111647
+            "sha256": "780caeab7f59177ad3f29ab93cf5375fc157dd6641b4929ea825735f9105045a",
+            "bytes": 111059
           }
         },
         {
@@ -3329,8 +3621,8 @@
             "bytes": 114055
           },
           "after": {
-            "sha256": "bb30b816d75643bfaf924ccda3eb88d47c5c7c84886525c1bb555fcd1f5ce141",
-            "bytes": 114063
+            "sha256": "0c20fbf75412bc0595f220d1d8040b7f2a1727126a34abf20aa3f74448bf63e7",
+            "bytes": 112761
           }
         },
         {
@@ -3408,6 +3700,17 @@
           "after": {
             "sha256": "ff8b10302f0cad3e8ded53251a4cfea8f763219e60fe6bd57762e0a533fcb372",
             "bytes": 59779
+          }
+        },
+        {
+          "path": "crates/ui-egui/src/panels/topbar.rs",
+          "before": {
+            "sha256": "5ec1302b0bab5a4f82db213efffd52177bdcf77706f95fa78f0415ae80d84c97",
+            "bytes": 12678
+          },
+          "after": {
+            "sha256": "40e3ad4d3294a8309f2c2afacdcc6723b5cac95ed8f9c975d83a446ae89d221c",
+            "bytes": 12570
           }
         },
         {
@@ -3598,11 +3901,14 @@
           }
         }
       ],
+      "retiredPromotionSourceTransitions": [],
       "compatibility": {
         "bundleIdRetained": true,
         "msiUpgradeCodeRetained": true,
         "profileAndPortableStorageRetained": true,
-        "originalEngineDependenciesLicensesRetained": true
+        "originalEngineDependenciesLicensesRetained": true,
+        "engineSourceByteIdentical": true,
+        "reviewedAuxiliaryEngineSourceChanges": 0
       },
       "nativeBuild": "not-yet-executed",
       "windowsInstallerIdentity": {
@@ -3628,17 +3934,17 @@
     {
       "id": "pdf",
       "name": "Bogo PDF",
-      "version": "0.8.0-bogo.1",
+      "version": "0.8.0-bogo.2",
       "assetPrefix": "Bogo-PDF",
       "bundleId": "com.kio.pdf",
       "legacyVersion": "0.8.0-kio.2",
       "baseLock": "manifests/full-native-apps.json",
       "baseLockSha256": "0c71246652db45818401d22d1267c79f84e01294c4e18f12ac83f536c6ed2a58",
       "baseSourceTreeSha256": "50c345f28ac941ae8d4e7dfa7ecc41dc4b1642d4dd57319b7ddf020ce8db8bfe",
-      "sourceTreeSha256": "5fd8b3894e23e94ba22752d2e761a0fbe0a5efb22f700b2ca9ded9e412a49ced",
+      "sourceTreeSha256": "defc4a545f2d1dbc038551be74e6144a59776095941aa00f09c3d142d080ac23",
       "patch": "patches/bogo/pdf.patch",
-      "patchSha256": "28e66def4e87ec36b2d1567462b24ae6361d7d7502a52f891f052b1d8087d0dc",
-      "patchBytes": 6177993,
+      "patchSha256": "fe87870fa6f3faf3b956fb2ba1ddfa17a0ce584587ca2f6dde68f740dee84cc7",
+      "patchBytes": 6201668,
       "files": [
         {
           "path": "apps/pdfcraft-cli/build.rs",
@@ -3649,6 +3955,17 @@
           "after": {
             "sha256": "d0db1f7586d9456ef2852672edd56ec91d563a7402dd5a624857325560de2886",
             "bytes": 1382
+          }
+        },
+        {
+          "path": "apps/pdfcraft-cli/src/main.rs",
+          "before": {
+            "sha256": "a18249d9adaa83aae81fb03208e48ad2641b24b927de942d89253e8df0c10f96",
+            "bytes": 46659
+          },
+          "after": {
+            "sha256": "2046d6c8b7bb9f3b21fd78129c47578de97734b89037408662419bfa7da72d3b",
+            "bytes": 46351
           }
         },
         {
@@ -3990,6 +4307,28 @@
           }
         },
         {
+          "path": "crates/engine/src/commands.rs",
+          "before": {
+            "sha256": "e99e9c0d201f66b3b1d2390c165b87eb4a9079f930d12a1ab680aba364b8d690",
+            "bytes": 28340
+          },
+          "after": {
+            "sha256": "e715e8621f291d1f0aef5858c9333e58716ad3f4560e726991cc14cc6410018e",
+            "bytes": 28015
+          }
+        },
+        {
+          "path": "crates/engine/src/links.rs",
+          "before": {
+            "sha256": "3e872d1cab6c6255dbbd496512009162f7faeecb41fcabe89b2fcbe18049b398",
+            "bytes": 36972
+          },
+          "after": {
+            "sha256": "aef0b7a128c30b404dab05ff59b5ab4b678010312c97e800ee8a2ebc8998056d",
+            "bytes": 36562
+          }
+        },
+        {
           "path": "crates/ui-egui/src/bogo_qa.rs",
           "before": null,
           "after": {
@@ -4006,6 +4345,17 @@
           "after": {
             "sha256": "260c900a42954466e431bc9592e970f72932403d9d7de2921fd684874569ba18",
             "bytes": 269469
+          }
+        },
+        {
+          "path": "crates/ui-egui/src/chrome.rs",
+          "before": {
+            "sha256": "c9656f4af2512771608d99024efac5093e70bb9520b9c22766d6c9c13a275972",
+            "bytes": 45803
+          },
+          "after": {
+            "sha256": "1de44e6d5aa6cdc58b5cc81bdd5f8447cd09f18f46bcbda47d357190a1312852",
+            "bytes": 45312
           }
         },
         {
@@ -4059,8 +4409,8 @@
             "bytes": 14078
           },
           "after": {
-            "sha256": "7a195fe2621fed1d3adc3973e8ae0b6c77e1c87df8b540711b006a6075bc5dd7",
-            "bytes": 14081
+            "sha256": "d1824e83ee60797f7f6b0a74079d2078713645ac4dbcd8b1eef0e22dca226b1a",
+            "bytes": 13104
           }
         },
         {
@@ -4070,8 +4420,8 @@
             "bytes": 155691
           },
           "after": {
-            "sha256": "b4b8aedbb416c864afed97068e5702553732673695e15798eea540cc38be4c9e",
-            "bytes": 155740
+            "sha256": "7017b8930f04c607ca704ea6cd3fd2a2303b1b78328e4ab37190fbdd9fb33cf3",
+            "bytes": 155337
           }
         },
         {
@@ -4081,8 +4431,8 @@
             "bytes": 181662
           },
           "after": {
-            "sha256": "8a4fa338b54d78af95a8fadc98b59f9d6b72c16c705c7fffc97cbac8959d4486",
-            "bytes": 181707
+            "sha256": "1ee5c74de38ac7e37df5b7c50f0cdda8b8f27b479bf26433ef403461d67e7d02",
+            "bytes": 181238
           }
         },
         {
@@ -4092,8 +4442,8 @@
             "bytes": 135298
           },
           "after": {
-            "sha256": "0925d83cc6ceb8dc63459e852ce844e9b7a37497aaae21501740944a9e26880c",
-            "bytes": 135344
+            "sha256": "9c14a149b269f9451c909266bb1291e6e8b63496f4a28402c0307e291ffef1ca",
+            "bytes": 134991
           }
         },
         {
@@ -4103,8 +4453,8 @@
             "bytes": 132812
           },
           "after": {
-            "sha256": "ac39228e2a56d1bf931a5b8d2273e0eabad2a060533ca8f062afd815e62c4909",
-            "bytes": 132862
+            "sha256": "7be17abbbf927734eed29ffd8692912516076bf022b16f68a942242fb1ce2612",
+            "bytes": 132532
           }
         },
         {
@@ -4114,8 +4464,8 @@
             "bytes": 197420
           },
           "after": {
-            "sha256": "c18244e744021ef2539b1cef0b9c7e18512e54a76558c607734e0dce70ffc2a0",
-            "bytes": 197467
+            "sha256": "b5a01b5d9006637c9750575519f26b7adcd433b9ed95837398acd6aa2b1b1991",
+            "bytes": 197001
           }
         },
         {
@@ -4125,8 +4475,8 @@
             "bytes": 148128
           },
           "after": {
-            "sha256": "65f96ef71aa99326ac76197628ccefac90efe5f070f297f7353e59ecc16653df",
-            "bytes": 148181
+            "sha256": "82637ee4c4e76e6a4e28ac965402349fc3c4b7586cd958afc70bd1ba7aa1705d",
+            "bytes": 147848
           }
         },
         {
@@ -4136,8 +4486,8 @@
             "bytes": 136341
           },
           "after": {
-            "sha256": "f5f6628f7e4d1d7e3f616652f9fa3d449f689fd9c2ea6ff4e3f148d0fc92ec58",
-            "bytes": 136390
+            "sha256": "13685e3e9ed70db9da28e277013ee648fb75eb53ae350e2b3b63e446aad89e91",
+            "bytes": 136048
           }
         },
         {
@@ -4147,8 +4497,8 @@
             "bytes": 135557
           },
           "after": {
-            "sha256": "f8e6188d29e512fcb17df8d1bd0c3244c7bec92159e64a445f42e203f435020a",
-            "bytes": 135599
+            "sha256": "7d1f48cdbe47552e7e773c4f9f2ee264ff88f81a2a999d73782b87f5ff6fea77",
+            "bytes": 135240
           }
         },
         {
@@ -4158,8 +4508,8 @@
             "bytes": 131115
           },
           "after": {
-            "sha256": "91349782fff643949823799a7b3580c2460a95b86a1e9d47102e7c18debad6cd",
-            "bytes": 131164
+            "sha256": "5916917f33d51e881434f9818e71edddafdaf1e0df0f740ccd1d72d29669b3ed",
+            "bytes": 130830
           }
         },
         {
@@ -4169,8 +4519,8 @@
             "bytes": 147651
           },
           "after": {
-            "sha256": "8dca4ecad9f99d37fa5ccaf4acac3a92ca6e2d7ab9be6b3a906c42b78d06b544",
-            "bytes": 147700
+            "sha256": "68db9b9ec558b97e10286a9c6e1832be61762d2c8d98403aea319a5b5c786144",
+            "bytes": 147334
           }
         },
         {
@@ -4180,8 +4530,8 @@
             "bytes": 178440
           },
           "after": {
-            "sha256": "65b44fc1c6b3c75b2ce0057f1f02863a56d0f0585f1c6e2bc121159b7ff136e5",
-            "bytes": 178488
+            "sha256": "ea10fdf33687afb0f6754a2abaa3a655d70dd530aafb62839d5619411fb20abe",
+            "bytes": 178052
           }
         },
         {
@@ -4191,8 +4541,8 @@
             "bytes": 156101
           },
           "after": {
-            "sha256": "e8a792cbeaf20bbf9e8a559258265d734098deea54e6bf34e147c274eba90971",
-            "bytes": 156154
+            "sha256": "64f69dba60c3f192aada24ad2431acf60cc6c510f60d6897c1251340e830789e",
+            "bytes": 155750
           }
         },
         {
@@ -4213,8 +4563,8 @@
             "bytes": 128788
           },
           "after": {
-            "sha256": "fc946295e2e0dd810633ce91238f3ca3b7bc2e37e68ba6801f1fbde3dcee99a4",
-            "bytes": 128837
+            "sha256": "c94cc3d6f52cd514385060cdd11eca6e3c9440404aa602698a3dfbf9f0d574b8",
+            "bytes": 128492
           }
         },
         {
@@ -4224,8 +4574,8 @@
             "bytes": 132677
           },
           "after": {
-            "sha256": "376db18747cd0f18c1b8bcab218d9c42630ea0a74be04f8a478e7fcf2f3bee89",
-            "bytes": 132726
+            "sha256": "839e598f21899b0d42c67ff7d4b77b93489404d685d42d5520f30f79cbb83413",
+            "bytes": 132390
           }
         },
         {
@@ -4235,8 +4585,8 @@
             "bytes": 172749
           },
           "after": {
-            "sha256": "2738a0c4aaa1b7b53c1784815864e34904601d04e7f8a4430815bc1b74ff4727",
-            "bytes": 172792
+            "sha256": "762b80dce1c57a9646f320a3bd0d71227910d71d3781fbb5be8700b65a639075",
+            "bytes": 172319
           }
         },
         {
@@ -4246,8 +4596,8 @@
             "bytes": 126986
           },
           "after": {
-            "sha256": "a8faa71496b3a4ff20078b8a1352a3cb670adc28d908d4849f3488f3c56cf55b",
-            "bytes": 127032
+            "sha256": "5870d813d540fadec63972d9077b506e78d9238cd20e0323ea05aa530bb49519",
+            "bytes": 126693
           }
         },
         {
@@ -4257,8 +4607,8 @@
             "bytes": 224273
           },
           "after": {
-            "sha256": "dbfc5cc420fcc09dabf5dd4e22af4ff6c11299f57d30798537a096c11a518e50",
-            "bytes": 224312
+            "sha256": "b8e52d4367cba28340c1f8994fc7963eda0675a0e885b1259cad0b2bc76e2fde",
+            "bytes": 223780
           }
         },
         {
@@ -4268,8 +4618,8 @@
             "bytes": 129307
           },
           "after": {
-            "sha256": "703d943bcc23ed58fd67239f362036043d9ec58ff13d932903021792f93bf1e9",
-            "bytes": 129356
+            "sha256": "e0216f0b7c7efac4c1d3a2d27b85f7735fff794b77b44d0faae0769b949187e4",
+            "bytes": 129019
           }
         },
         {
@@ -4279,8 +4629,8 @@
             "bytes": 182033
           },
           "after": {
-            "sha256": "72cbf9c0388dad4032049c31f3aca6eafc554c4c826bd5bb0cd443f8ad66cce3",
-            "bytes": 182082
+            "sha256": "8c8bc6e45c76e0203dce4e8a059ceb004bed6b27ac0ef12c6ecf509c8aca846e",
+            "bytes": 181630
           }
         },
         {
@@ -4290,8 +4640,8 @@
             "bytes": 113159
           },
           "after": {
-            "sha256": "ebd7799044374ee397311b6cfef6d9069577be26a8c5815ff5cf9d45be285d1d",
-            "bytes": 113204
+            "sha256": "d31427bcec6c797f1b031df7f5ef0f5473b0070f4dab8dee90b0d5e39b0bad10",
+            "bytes": 112897
           }
         },
         {
@@ -4301,8 +4651,8 @@
             "bytes": 108522
           },
           "after": {
-            "sha256": "cf78146f7322c41e131622341122ab04c19924732d4c7441a6e4b3364517ea59",
-            "bytes": 108567
+            "sha256": "ecccaf969205f3554bdc986890178b8939bf0eb3d51091c917700ff1354df074",
+            "bytes": 108265
           }
         },
         {
@@ -4405,6 +4755,17 @@
           }
         },
         {
+          "path": "crates/ui-egui/src/widgets.rs",
+          "before": {
+            "sha256": "3a4668e9fbb040491fe6fca3a707498165de3ec37b731adfa21d4ae3d1a3983f",
+            "bytes": 43276
+          },
+          "after": {
+            "sha256": "4bc868be085d74e5843a9b1a464691d2df2c75c002b3b6b299bd997d79c24641",
+            "bytes": 42820
+          }
+        },
+        {
           "path": "crates/ui-egui/tests/accessibility.rs",
           "before": {
             "sha256": "d1efba1943699436e59d8fc008390b2e8f41dd93ff6c387a0f6c71087ac1af0f",
@@ -4466,8 +4827,8 @@
             "bytes": 57209
           },
           "after": {
-            "sha256": "6a067959be7dc8988d51e145af78098c1fc85310bf2c94fc7ffc51c5c6e75162",
-            "bytes": 57212
+            "sha256": "689dc67e55d107264776973eb00461e5972d30ded8681f28edd4851f5e35f984",
+            "bytes": 57246
           }
         },
         {
@@ -4477,8 +4838,8 @@
             "bytes": 4182
           },
           "after": {
-            "sha256": "b1dbdaee3d786d0453cd24fbf7c8a3c483fa3563ae5bdd7a5ce4c056c4fa0b7b",
-            "bytes": 4184
+            "sha256": "9a7c5b8daa40e0a2c2402e5b9e7ac8f5ba9ea10cb6f2f52089a944f93a7d083f",
+            "bytes": 3259
           }
         },
         {
@@ -4647,11 +5008,39 @@
           }
         }
       ],
+      "retiredPromotionSourceTransitions": [
+        {
+          "path": "crates/engine/src/commands.rs",
+          "before": {
+            "sha256": "e99e9c0d201f66b3b1d2390c165b87eb4a9079f930d12a1ab680aba364b8d690",
+            "bytes": 28340
+          },
+          "after": {
+            "sha256": "e715e8621f291d1f0aef5858c9333e58716ad3f4560e726991cc14cc6410018e",
+            "bytes": 28015
+          },
+          "scope": "user-requested retired promotion metadata or built-in sample URL; document/media functions and legal notices preserved"
+        },
+        {
+          "path": "crates/engine/src/links.rs",
+          "before": {
+            "sha256": "3e872d1cab6c6255dbbd496512009162f7faeecb41fcabe89b2fcbe18049b398",
+            "bytes": 36972
+          },
+          "after": {
+            "sha256": "aef0b7a128c30b404dab05ff59b5ab4b678010312c97e800ee8a2ebc8998056d",
+            "bytes": 36562
+          },
+          "scope": "user-requested retired promotion metadata or built-in sample URL; document/media functions and legal notices preserved"
+        }
+      ],
       "compatibility": {
         "bundleIdRetained": true,
         "msiUpgradeCodeRetained": true,
         "profileAndPortableStorageRetained": true,
-        "originalEngineDependenciesLicensesRetained": true
+        "originalEngineDependenciesLicensesRetained": true,
+        "engineSourceByteIdentical": false,
+        "reviewedAuxiliaryEngineSourceChanges": 2
       },
       "nativeBuild": "not-yet-executed",
       "windowsInstallerIdentity": {
@@ -4679,17 +5068,17 @@
     {
       "id": "effect",
       "name": "Bogo Effect",
-      "version": "0.10.0-bogo.1",
+      "version": "0.10.0-bogo.2",
       "assetPrefix": "Bogo-Effect",
       "bundleId": "com.kio.effect",
       "legacyVersion": "0.10.0-kio.1",
       "baseLock": "manifests/full-native-apps.json",
       "baseLockSha256": "0c71246652db45818401d22d1267c79f84e01294c4e18f12ac83f536c6ed2a58",
       "baseSourceTreeSha256": "fc0e0751cc7402fb069d5e914440fa4506b7e2e057ac4a93de1f5a651493ac3f",
-      "sourceTreeSha256": "c0ba72f06589db1a4e6d798eca3c116d6681816b6b226486368bd9d9a595ac3f",
+      "sourceTreeSha256": "75e23fc3d41b87eca73de9bcdbd0e60a752fc68af49f66ea2e2d652c2f3be01a",
       "patch": "patches/bogo/effect.patch",
-      "patchSha256": "04f40a3e049fa45745d23bbe325cc064e482846e718c6620ab6ce47fd7687e75",
-      "patchBytes": 5389300,
+      "patchSha256": "eb11348edfa7aa48fb4e606385a4baa84cf5816a75eea24c6c7016c96f36e980",
+      "patchBytes": 5418204,
       "files": [
         {
           "path": "apps/effectcraft-web/web/index.html",
@@ -4942,14 +5331,58 @@
           }
         },
         {
+          "path": "crates/engine/src/commands/help.rs",
+          "before": {
+            "sha256": "c5ff3919266f4ba7a6bdce09e7e23a5b2001808cfdf80a101a444ff9316b9c66",
+            "bytes": 2517
+          },
+          "after": {
+            "sha256": "c55553616c6f7363f0431a38b1c1e8267eb8a66081789c0459e77d4c8f2e3d4e",
+            "bytes": 385
+          }
+        },
+        {
+          "path": "crates/engine/src/menus.rs",
+          "before": {
+            "sha256": "668abf4c3986d1841a34d5471c11c178ae2c8665e8363312de92dfa26a28cfad",
+            "bytes": 53697
+          },
+          "after": {
+            "sha256": "52d52ec0d8e5fd25827c5987195eae3de956416cccf0ab2c350b8321755e3c71",
+            "bytes": 53232
+          }
+        },
+        {
+          "path": "crates/engine/src/tests.rs",
+          "before": {
+            "sha256": "407dce18ac68a400438d1cd442a1bb3ffcf117c872c8de6e77e2f36acf3f1d7e",
+            "bytes": 38720
+          },
+          "after": {
+            "sha256": "861b6a9ce063871b3496e87f664d12d8f27291e3ef7c63324db8f3f9079fcbcf",
+            "bytes": 38694
+          }
+        },
+        {
+          "path": "crates/engine/src/tests_m137.rs",
+          "before": {
+            "sha256": "d19041cc223e223562eb9de5ac92e4c01eaf915ace2875f6d011687443682b2e",
+            "bytes": 9193
+          },
+          "after": {
+            "sha256": "cd16d30e2854975940ffc2245be4b3f0afee305672602eb2f4e8b57edd981802",
+            "bytes": 9172
+          }
+        },
+        {
           "path": "crates/ui-egui/src/header.rs",
           "before": {
             "sha256": "4bf1e95e66b7682b6d22ccc61d2e33a62b6c9b1209a4828763f0f775777124ab",
             "bytes": 36729
           },
           "after": {
-            "sha256": "6dd1736bece1fd78ee024b22f4dfd3b4395309f5e2ee98ceea46e3575b83891f",
-            "bytes": 36819
+            "sha256": "7caff9e409fc4c0352407eac3ff17544abaf1a67deab61f613d71304adf20515",
+            "bytes": 35180
           }
         },
         {
@@ -4959,8 +5392,8 @@
             "bytes": 470454
           },
           "after": {
-            "sha256": "5070dd2eaf2d48ac152f6f6abf1bb08dbff38b6be6b39667fca913a3364c6e89",
-            "bytes": 470614
+            "sha256": "14c4d8320ddd3e3e054d0fab6fea68e7ec31b5a581703e0e601cec49f8a258a1",
+            "bytes": 465930
           }
         },
         {
@@ -4970,8 +5403,8 @@
             "bytes": 251726
           },
           "after": {
-            "sha256": "a523aa44d6c18440b1ff977170e1e8b3198c452c42d73751c834e50a53428dda",
-            "bytes": 251817
+            "sha256": "1b4b7491ff3af3181f67de8d31b2cb160a76de5384973c4c3033fb153858b77f",
+            "bytes": 246872
           }
         },
         {
@@ -5003,8 +5436,8 @@
             "bytes": 43855
           },
           "after": {
-            "sha256": "1c72741a687fc3a21edf0528a1509b4c80aed1e608a1c59cdac645d6ec012571",
-            "bytes": 43859
+            "sha256": "bfb793c6d5d8e03904b384a24882e8f38709607ae6a151ab722a21ccd91d1648",
+            "bytes": 42089
           }
         },
         {
@@ -5036,8 +5469,8 @@
             "bytes": 28195
           },
           "after": {
-            "sha256": "ecd80d48deec698b36a9f30cef46b2681c556f109424a014fed9c61fb83aa862",
-            "bytes": 28201
+            "sha256": "4a08420fe00e2ea79d470ec48f45c260aa87b5e02f21bdaf73baef63eb9c019a",
+            "bytes": 25669
           }
         },
         {
@@ -5148,6 +5581,17 @@
           "after": {
             "sha256": "9ca6efe2135d6df7c551e755ca4d5421589dafc59a826a9c94f1c586209632b7",
             "bytes": 25978
+          }
+        },
+        {
+          "path": "crates/ui-egui/tests/ui_panels.rs",
+          "before": {
+            "sha256": "9e874d787c2f3fe3ffae657477b6facb1ef65268f6a4f2056c047a54e4d8f8fa",
+            "bytes": 27657
+          },
+          "after": {
+            "sha256": "4a233a27442a8483d6dcd915b8573e3bec544e89a49bfc02789e63a41e225658",
+            "bytes": 27386
           }
         },
         {
@@ -5305,11 +5749,63 @@
           }
         }
       ],
+      "retiredPromotionSourceTransitions": [
+        {
+          "path": "crates/engine/src/commands/help.rs",
+          "before": {
+            "sha256": "c5ff3919266f4ba7a6bdce09e7e23a5b2001808cfdf80a101a444ff9316b9c66",
+            "bytes": 2517
+          },
+          "after": {
+            "sha256": "c55553616c6f7363f0431a38b1c1e8267eb8a66081789c0459e77d4c8f2e3d4e",
+            "bytes": 385
+          },
+          "scope": "user-requested retired promotion metadata or built-in sample URL; document/media functions and legal notices preserved"
+        },
+        {
+          "path": "crates/engine/src/menus.rs",
+          "before": {
+            "sha256": "668abf4c3986d1841a34d5471c11c178ae2c8665e8363312de92dfa26a28cfad",
+            "bytes": 53697
+          },
+          "after": {
+            "sha256": "52d52ec0d8e5fd25827c5987195eae3de956416cccf0ab2c350b8321755e3c71",
+            "bytes": 53232
+          },
+          "scope": "user-requested retired promotion metadata or built-in sample URL; document/media functions and legal notices preserved"
+        },
+        {
+          "path": "crates/engine/src/tests.rs",
+          "before": {
+            "sha256": "407dce18ac68a400438d1cd442a1bb3ffcf117c872c8de6e77e2f36acf3f1d7e",
+            "bytes": 38720
+          },
+          "after": {
+            "sha256": "861b6a9ce063871b3496e87f664d12d8f27291e3ef7c63324db8f3f9079fcbcf",
+            "bytes": 38694
+          },
+          "scope": "user-requested retired promotion metadata or built-in sample URL; document/media functions and legal notices preserved"
+        },
+        {
+          "path": "crates/engine/src/tests_m137.rs",
+          "before": {
+            "sha256": "d19041cc223e223562eb9de5ac92e4c01eaf915ace2875f6d011687443682b2e",
+            "bytes": 9193
+          },
+          "after": {
+            "sha256": "cd16d30e2854975940ffc2245be4b3f0afee305672602eb2f4e8b57edd981802",
+            "bytes": 9172
+          },
+          "scope": "user-requested retired promotion metadata or built-in sample URL; document/media functions and legal notices preserved"
+        }
+      ],
       "compatibility": {
         "bundleIdRetained": true,
         "msiUpgradeCodeRetained": true,
         "profileAndPortableStorageRetained": true,
-        "originalEngineDependenciesLicensesRetained": true
+        "originalEngineDependenciesLicensesRetained": true,
+        "engineSourceByteIdentical": false,
+        "reviewedAuxiliaryEngineSourceChanges": 4
       },
       "nativeBuild": "not-yet-executed",
       "windowsInstallerIdentity": {
@@ -5326,17 +5822,17 @@
     {
       "id": "ui",
       "name": "Bogo UI",
-      "version": "0.6.0-bogo.1",
+      "version": "0.6.0-bogo.2",
       "assetPrefix": "Bogo-UI",
       "bundleId": "com.kio.ui",
       "legacyVersion": "0.6.0-kio.1",
       "baseLock": "manifests/full-native-apps.json",
       "baseLockSha256": "0c71246652db45818401d22d1267c79f84e01294c4e18f12ac83f536c6ed2a58",
       "baseSourceTreeSha256": "83136d3ba3f3fdb13238945261f528fa3051c86e1513b84d716fda421d62401b",
-      "sourceTreeSha256": "a58a6875b595362c87632bc4215b315c1011a326c1790e0bc761b0184dad7026",
+      "sourceTreeSha256": "d960ed01fa5d4ead6637e657581f7f920d241c67c0a7bd25ea36660deb626f37",
       "patch": "patches/bogo/ui.patch",
-      "patchSha256": "08546c917a1eea0c79acdc65672d86c0fba6bddb13f024e45a4c715e895bbcbb",
-      "patchBytes": 5613546,
+      "patchSha256": "90371bac5fb0c85d414b1e0089e8e17c746c57d8c62e260bbe22ea252b3d0a38",
+      "patchBytes": 5614665,
       "files": [
         {
           "path": "apps/figcraft-web/index.html",
@@ -5680,8 +6176,8 @@
             "bytes": 25805
           },
           "after": {
-            "sha256": "a719ffc2af8ccb86530994aa9b685ad65e17368ee89ff22feca60d6c9589efc1",
-            "bytes": 25795
+            "sha256": "2f3febf8ccb7d8b7e5ecf849ee0d75af43f6152af4b0263f7c1f5e5c928d1324",
+            "bytes": 25561
           }
         },
         {
@@ -5693,6 +6189,17 @@
           "after": {
             "sha256": "00d156cc3968592b183c06a68954aefcaa364bfc64dc4a6f6a17c16ca153caf6",
             "bytes": 23159
+          }
+        },
+        {
+          "path": "crates/ui-egui/src/lib.rs",
+          "before": {
+            "sha256": "97752e091fcc5bce141b38260d72276a527dc6e105c0fbfb5dc74c2b342533fa",
+            "bytes": 52317
+          },
+          "after": {
+            "sha256": "bd771c2dca3992a3e06d2e9707b05ad9a6a5912a839ba8a939f05e469e90f079",
+            "bytes": 52284
           }
         },
         {
@@ -5927,11 +6434,14 @@
           }
         }
       ],
+      "retiredPromotionSourceTransitions": [],
       "compatibility": {
         "bundleIdRetained": true,
         "msiUpgradeCodeRetained": true,
         "profileAndPortableStorageRetained": true,
-        "originalEngineDependenciesLicensesRetained": true
+        "originalEngineDependenciesLicensesRetained": true,
+        "engineSourceByteIdentical": true,
+        "reviewedAuxiliaryEngineSourceChanges": 0
       },
       "nativeBuild": "not-yet-executed",
       "windowsInstallerIdentity": {
@@ -5948,17 +6458,17 @@
     {
       "id": "word",
       "name": "Bogo Word",
-      "version": "0.7.0-bogo.1",
+      "version": "0.7.0-bogo.2",
       "assetPrefix": "Bogo-Word",
       "bundleId": "com.kio.word",
       "legacyVersion": "0.7.0-kio.2",
       "baseLock": "manifests/full-native-apps.json",
       "baseLockSha256": "0c71246652db45818401d22d1267c79f84e01294c4e18f12ac83f536c6ed2a58",
       "baseSourceTreeSha256": "58d8ab31fb2c18e3201ca3feb19a808ccc75b8e551709c0569138c8d0282f507",
-      "sourceTreeSha256": "c2d5776e8e92230bdb72bb7146c7973f7a46f76069a7645aa51911e4de8ec774",
+      "sourceTreeSha256": "17460d65604444780f3580a36d08f97a247282108753a07daa0b54c70441e2c3",
       "patch": "patches/bogo/word.patch",
-      "patchSha256": "645730a747c49bdcbefb445a447760b151fc5e2326af9845f6c89f42595b4714",
-      "patchBytes": 4574877,
+      "patchSha256": "86412268fa40ec3aa5eabb57cc7daa00dcbf6031175ef2f4bce11cc223b49545",
+      "patchBytes": 4610838,
       "files": [
         {
           "path": "apps/wordcraft/build.rs",
@@ -6189,14 +6699,36 @@
           }
         },
         {
+          "path": "crates/engine/src/sample.rs",
+          "before": {
+            "sha256": "73fce0485c70d7508facb488f5c9f281cb74fd19567f7392d8b530e40ca29f9f",
+            "bytes": 9948
+          },
+          "after": {
+            "sha256": "d56afdb642465682f693f36c930283cd2ae19b851754b85213b1caf1b5ce4290",
+            "bytes": 9944
+          }
+        },
+        {
+          "path": "crates/mcp/src/server.rs",
+          "before": {
+            "sha256": "5aa8f5ef46b53db70b95dff309b76085255171dfb962c470815b035cfb5af2c7",
+            "bytes": 7920
+          },
+          "after": {
+            "sha256": "33c958cd1aea175e311d3b3ada01d870a328a723ba4c9440b8cddc0fde8aefd0",
+            "bytes": 7741
+          }
+        },
+        {
           "path": "crates/ui-egui/src/backstage.rs",
           "before": {
             "sha256": "6f53ec4e12bb407ddd54e020712c0325c5b4677b5edae23a9d16f6c9d774c15e",
             "bytes": 32605
           },
           "after": {
-            "sha256": "122c63d9a419dbfe1298f2536451cf8cf059a4e6dd71d55e077974306b758c64",
-            "bytes": 32421
+            "sha256": "dafbb67f69d020ba865bf9ff027a62a3f8d3efd5f79c0c09c9112b7898a51f54",
+            "bytes": 32245
           }
         },
         {
@@ -6217,8 +6749,8 @@
             "bytes": 31014
           },
           "after": {
-            "sha256": "e70d23672a1cbcec6725cccead66f664420bfb535da060d3e446ea82403d3980",
-            "bytes": 31009
+            "sha256": "431bd9bce33b9dca3b13d1075abb5c115845027ec66c865cade39aee5fe85dcf",
+            "bytes": 30015
           }
         },
         {
@@ -6228,8 +6760,8 @@
             "bytes": 170642
           },
           "after": {
-            "sha256": "af318ae66ccf836f4d49a2f79fdfff13fd8877eadf13ce2a4566aa4fb7aae449",
-            "bytes": 170647
+            "sha256": "779ddc63bb2a2be5f72ad06aa25f4417a8f8358e637e0aa743c6d2427387333b",
+            "bytes": 170516
           }
         },
         {
@@ -6250,8 +6782,8 @@
             "bytes": 147169
           },
           "after": {
-            "sha256": "fd7ea87c7ab7903e9f6419876e4a2be461448a00caec435053c8782faa2e815c",
-            "bytes": 147206
+            "sha256": "bfe8da75806e5df88505d2987f499365f053d1d2d94df72d92c64a9c58846fef",
+            "bytes": 146697
           }
         },
         {
@@ -6261,8 +6793,8 @@
             "bytes": 85858
           },
           "after": {
-            "sha256": "c8e6d9f0d2f37f2f2c38b2fa22370675b078352f6acef54cfbc9cc7cbc2c9614",
-            "bytes": 85896
+            "sha256": "cb5e42ce2e7add505b30abecb73baf98af59738d223614bb4c53429a7d6282eb",
+            "bytes": 85465
           }
         },
         {
@@ -6272,8 +6804,8 @@
             "bytes": 87057
           },
           "after": {
-            "sha256": "e78bec73032670b0c6d852267d6ec88296c73905c7d909d902a737f6ca2e85f3",
-            "bytes": 87095
+            "sha256": "6c078240f5a7b1d4b56aa99d939e45dd75ab5799d2a603ac874fb151027d5a00",
+            "bytes": 86670
           }
         },
         {
@@ -6283,8 +6815,8 @@
             "bytes": 102336
           },
           "after": {
-            "sha256": "3f451293bb1a2aa036f20355b7fcb5020cf98127684ee3bfa096220251e88e24",
-            "bytes": 102374
+            "sha256": "8637a3b5023b09299aa761c58f672f05592e9695ad95337555e5df947554f704",
+            "bytes": 101947
           }
         },
         {
@@ -6294,8 +6826,8 @@
             "bytes": 81299
           },
           "after": {
-            "sha256": "4fa00d1512a451f712c0633aa89542413071badc9ab1fb942f744ded73c6389d",
-            "bytes": 81336
+            "sha256": "791e13b6eeaa54ba4af7206e62bb511453bb7a0e239a51dd8868c5d5aac43ffd",
+            "bytes": 80929
           }
         },
         {
@@ -6305,8 +6837,8 @@
             "bytes": 91650
           },
           "after": {
-            "sha256": "55faae0aee28df97f01323c1d3a71108bb9cff9b9c852c88b9b6cf3bef1e90c1",
-            "bytes": 91686
+            "sha256": "aa86ad10bd3cb8851e655384c9d730d4ce7cff8b3ab9d7b5570208ea7d7e4e16",
+            "bytes": 91260
           }
         },
         {
@@ -6316,8 +6848,8 @@
             "bytes": 106497
           },
           "after": {
-            "sha256": "34b0403e43cc5ba409fc8eaf2ecedc4a1a1ba1f6e1a2c44c251ac09f26634dc8",
-            "bytes": 106535
+            "sha256": "c4a9dfaf78a2422962c3f2999beea002f832dcef096fe1b37fa94d480ff51f56",
+            "bytes": 106101
           }
         },
         {
@@ -6327,8 +6859,8 @@
             "bytes": 101814
           },
           "after": {
-            "sha256": "806153be1696b2748dfbafd1d34fbfb984ec0754a8232112588e6e751c637706",
-            "bytes": 101852
+            "sha256": "2765f3d4ae72dc903072639d2ab5b31df2f2b651311ddfbce1f92fdc91554d37",
+            "bytes": 101428
           }
         },
         {
@@ -6338,8 +6870,8 @@
             "bytes": 91721
           },
           "after": {
-            "sha256": "f94662228aee9e3f68d95fab304028aea1cbd1b885d513df6c83f45d1919a615",
-            "bytes": 91758
+            "sha256": "6c24fdfd2155ad175f9758a70070810455dfe89014c067dd47c9e77fa1c7307e",
+            "bytes": 91318
           }
         },
         {
@@ -6349,8 +6881,8 @@
             "bytes": 102362
           },
           "after": {
-            "sha256": "569885bffaad3dfc5fcc44d6c9c2488ec8c3f5342812a3c297cc3315836db8e5",
-            "bytes": 102401
+            "sha256": "c1c8afd923aa300e73cb8664b088265ae7bc3423c06eb316ba0e527922b02245",
+            "bytes": 101954
           }
         },
         {
@@ -6360,8 +6892,8 @@
             "bytes": 86571
           },
           "after": {
-            "sha256": "09eea96166443ed838d9fedeab013927d3048aeaf59b39596c48c7a561d645bc",
-            "bytes": 86609
+            "sha256": "357204dd548fb73449bc9bd6545dea722d38bc0800ad434f13307d9e40fd03fb",
+            "bytes": 86185
           }
         },
         {
@@ -6371,8 +6903,8 @@
             "bytes": 142642
           },
           "after": {
-            "sha256": "ccbf1e2f67a9a79dc9ff71669e481188c93c7cb6a72139d4d6c8de8ae237397c",
-            "bytes": 142679
+            "sha256": "9cfd5daee3265c50fdface20bb36a3d7ae419d0e82342a93a5c5e47036b4f866",
+            "bytes": 142168
           }
         },
         {
@@ -6382,8 +6914,8 @@
             "bytes": 81649
           },
           "after": {
-            "sha256": "f29b79222bb5c3a6093625a952cb162963ab29974da6ec5a6221825d4385fd46",
-            "bytes": 81687
+            "sha256": "b65c1b6f4c6e24b901d339f8d493a090abda4f2a47c852dde500aed9f9732302",
+            "bytes": 81251
           }
         },
         {
@@ -6393,8 +6925,8 @@
             "bytes": 112477
           },
           "after": {
-            "sha256": "dca520c7b01ac06d2199aa0facc4d46c2c30df15b85aeefbd7e149e0c21ef8b5",
-            "bytes": 112515
+            "sha256": "f7fa0b0b6614ebb1b57739c1ed37a37e51f9c49a7da5dde9d4fc0d9fe40193a4",
+            "bytes": 112005
           }
         },
         {
@@ -6415,8 +6947,8 @@
             "bytes": 100953
           },
           "after": {
-            "sha256": "f7235fda70a917cda640c74aa85bb93c77b73836023199eec35e42825480151f",
-            "bytes": 100990
+            "sha256": "9754cb2c6f4961f34758aa3f7f24f534ef7cf7906583fe216f6212133eec6a21",
+            "bytes": 100573
           }
         },
         {
@@ -6426,8 +6958,8 @@
             "bytes": 118081
           },
           "after": {
-            "sha256": "e126a973735f7c02dd806a8141f062c20d0b88719f259292974ecb48e0310d25",
-            "bytes": 118120
+            "sha256": "7f84ff892114f139befc66d0a52996a002cbbf7777bded1ed52baf876e59a657",
+            "bytes": 117628
           }
         },
         {
@@ -6437,8 +6969,8 @@
             "bytes": 76102
           },
           "after": {
-            "sha256": "0c7015c4f11bfc35973a0c8b659ac95f2a7cd2def9e38a23764147e3aa4ddab5",
-            "bytes": 76140
+            "sha256": "1c24004edf9defc08fba14cb3b3e1bd181f4e11c4fc8bbee8869cd2281dafdbd",
+            "bytes": 75733
           }
         },
         {
@@ -6448,8 +6980,19 @@
             "bytes": 76427
           },
           "after": {
-            "sha256": "206fa6ba50138e116186cb8dc27a627de7c6bd50fdf61fe5d6dbc83d548631d7",
-            "bytes": 76464
+            "sha256": "6f0a8cc2a9182638bdadb19eb57188ff5d56d7303d3e302a4d569835f5a67bbf",
+            "bytes": 76057
+          }
+        },
+        {
+          "path": "crates/ui-egui/src/keytips.rs",
+          "before": {
+            "sha256": "fc45e707617d1b1238c83eea8c80a6d636f0f162b460632be5fbad3b369fd3e8",
+            "bytes": 50166
+          },
+          "after": {
+            "sha256": "00c6af59f75e8ed0ed9eb7d47bfb49b4b2f71f4ee1bfdde40dd25cd72de13211",
+            "bytes": 50128
           }
         },
         {
@@ -6459,8 +7002,8 @@
             "bytes": 243308
           },
           "after": {
-            "sha256": "0f7f3ce4edd841a29bafe25bb863e0a63fe090a7f2472ea763c4d90a7c7b8279",
-            "bytes": 243317
+            "sha256": "f191ef0f987b49bced121e93a51f3bdcfd726ce3c4e2e60210e024817f1af1bc",
+            "bytes": 243123
           }
         },
         {
@@ -6470,8 +7013,8 @@
             "bytes": 39566
           },
           "after": {
-            "sha256": "2c8dae7fc5ff9a4910be30b765cef25f509caf0154e9d49ee2aaf36774f944cd",
-            "bytes": 39576
+            "sha256": "95210275946d6a7bdeac7b59ffa6fafa0255d9b58ed0b9321e84b02c472974b2",
+            "bytes": 39482
           }
         },
         {
@@ -6481,8 +7024,8 @@
             "bytes": 140968
           },
           "after": {
-            "sha256": "8ad0acd60416ae5e4153575bbc48c60d0d242004c13e76970d4e0ab60c01f97b",
-            "bytes": 140962
+            "sha256": "06dd316601cf7ae88fc0f5a4ba6ea777295de59dc80ac8a0d460a46b62ab94ba",
+            "bytes": 140875
           }
         },
         {
@@ -6607,11 +7150,27 @@
           }
         }
       ],
+      "retiredPromotionSourceTransitions": [
+        {
+          "path": "crates/engine/src/sample.rs",
+          "before": {
+            "sha256": "73fce0485c70d7508facb488f5c9f281cb74fd19567f7392d8b530e40ca29f9f",
+            "bytes": 9948
+          },
+          "after": {
+            "sha256": "d56afdb642465682f693f36c930283cd2ae19b851754b85213b1caf1b5ce4290",
+            "bytes": 9944
+          },
+          "scope": "user-requested retired promotion metadata or built-in sample URL; document/media functions and legal notices preserved"
+        }
+      ],
       "compatibility": {
         "bundleIdRetained": true,
         "msiUpgradeCodeRetained": true,
         "profileAndPortableStorageRetained": true,
-        "originalEngineDependenciesLicensesRetained": true
+        "originalEngineDependenciesLicensesRetained": true,
+        "engineSourceByteIdentical": false,
+        "reviewedAuxiliaryEngineSourceChanges": 1
       },
       "nativeBuild": "not-yet-executed",
       "windowsInstallerIdentity": {
@@ -6639,17 +7198,17 @@
     {
       "id": "sound",
       "name": "Bogo Sound",
-      "version": "0.7.0-bogo.1",
+      "version": "0.7.0-bogo.2",
       "assetPrefix": "Bogo-Sound",
       "bundleId": "com.kio.sound",
       "legacyVersion": "0.7.0-kio.1",
       "baseLock": "manifests/full-native-apps.json",
       "baseLockSha256": "0c71246652db45818401d22d1267c79f84e01294c4e18f12ac83f536c6ed2a58",
       "baseSourceTreeSha256": "1b44d6f85665c5512aaa997b837d1ba5f77e24a81cc0e771289d11d7c41edddd",
-      "sourceTreeSha256": "899e2fa17800135450ab37a8bad48a9c25beedd8865a8cf0cc6e6be03da50cde",
+      "sourceTreeSha256": "c422cbeeacca2b22c9fe09184201cf5c01ad9c7ef6849bbad97b7ad6186e0ca7",
       "patch": "patches/bogo/sound.patch",
-      "patchSha256": "ca3029be755cde2df11f4754dcbaca3e8d50a13d59e8bd019e3f784ac5107676",
-      "patchBytes": 4496271,
+      "patchSha256": "bdedccd21fa1e5fc4ab3f72f7761d6e9bc899ca1cce73a63bc2ae4c574c9a0d3",
+      "patchBytes": 4496187,
       "files": [
         {
           "path": "apps/soundcraft-web/index.html",
@@ -6908,8 +7467,8 @@
             "bytes": 34978
           },
           "after": {
-            "sha256": "9f3a231b43d2f8e17a0b3595c8e505b10fe8b39eeb0d71dc736879baef057f0d",
-            "bytes": 35132
+            "sha256": "c0afb4a2595855b4e940ae58e52dd9db6f639310a2789f88295a1be6b8e8933b",
+            "bytes": 34809
           }
         },
         {
@@ -7067,11 +7626,14 @@
           }
         }
       ],
+      "retiredPromotionSourceTransitions": [],
       "compatibility": {
         "bundleIdRetained": true,
         "msiUpgradeCodeRetained": true,
         "profileAndPortableStorageRetained": true,
-        "originalEngineDependenciesLicensesRetained": true
+        "originalEngineDependenciesLicensesRetained": true,
+        "engineSourceByteIdentical": true,
+        "reviewedAuxiliaryEngineSourceChanges": 0
       },
       "nativeBuild": "not-yet-executed",
       "windowsInstallerIdentity": {
@@ -7099,18 +7661,29 @@
     {
       "id": "deck",
       "name": "Bogo Deck",
-      "version": "0.7.0-bogo.1",
+      "version": "0.7.0-bogo.2",
       "assetPrefix": "Bogo-Deck",
       "bundleId": "com.kio.deck",
       "legacyVersion": "0.7.0-kio.2",
       "baseLock": "manifests/full-native-apps.json",
       "baseLockSha256": "0c71246652db45818401d22d1267c79f84e01294c4e18f12ac83f536c6ed2a58",
       "baseSourceTreeSha256": "f75f76714c6bfecd468cd4cdd8a03d2a693dcef438762bd8fa987839336d001c",
-      "sourceTreeSha256": "f3ac9faffcd3492488e2090e10535cfa8250e43adf43e2bd2bda3b4ab4786a9d",
+      "sourceTreeSha256": "0f5e082c4163b6bafc0cfc032cf863190b545ecfd452f70512bbfea65d521430",
       "patch": "patches/bogo/deck.patch",
-      "patchSha256": "a8f5a8b6f3055ffdfc7025f171002bc4554651e3527b9ee4c3627c911d2608c0",
-      "patchBytes": 4429815,
+      "patchSha256": "b5fac943e6d1a8c64d2c6179b683369b243dcf3a94576af016e924a7a937ce90",
+      "patchBytes": 4435044,
       "files": [
+        {
+          "path": "apps/deckcraft-cli/src/main.rs",
+          "before": {
+            "sha256": "f69e4811efc63112e4445daae92c98f3b7b5c350d30d0d2e3521305856e91d2f",
+            "bytes": 15267
+          },
+          "after": {
+            "sha256": "7c7d9f6aa90c8517d724a0c8abf8f844ee3e8f06cbda143414fb5f3a434a6eef",
+            "bytes": 14915
+          }
+        },
         {
           "path": "apps/deckcraft/build.rs",
           "before": {
@@ -7326,14 +7899,25 @@
           }
         },
         {
+          "path": "crates/mcp/src/server.rs",
+          "before": {
+            "sha256": "d7ee36ab2931754e47242bc03919cb4af04e79d487da8e3052e06b95bab05421",
+            "bytes": 8258
+          },
+          "after": {
+            "sha256": "36438f468237269c9cadeea9d7a2eaab10bfdf42bfd2a9c365150a18a0f9d910",
+            "bytes": 7937
+          }
+        },
+        {
           "path": "crates/ui-egui/src/backstage.rs",
           "before": {
             "sha256": "1f82f7c10253733f6ab964527f3699250b99206b65caa78d8e73af6342ca1d4d",
             "bytes": 54821
           },
           "after": {
-            "sha256": "045d14c31884ee9f3fb4bce9106b2b9460375b25650ed9e3ee9489d0477dcd96",
-            "bytes": 54804
+            "sha256": "b1c1203fba5836e9ca3a9894c54612cc5f9e44e47111f9adbda998c02b18d5ca",
+            "bytes": 54539
           }
         },
         {
@@ -7354,8 +7938,8 @@
             "bytes": 39652
           },
           "after": {
-            "sha256": "221d1d7a8df0b018431fa8e9e3b83483cd9397778f212080d35b60e1c08a7426",
-            "bytes": 39657
+            "sha256": "b6d9f3c231dec7b36bdca82f4021a6371d7f494ae3bbae28ced1ecf4d815bb83",
+            "bytes": 39474
           }
         },
         {
@@ -7365,8 +7949,8 @@
             "bytes": 60932
           },
           "after": {
-            "sha256": "0e2627075fc425c76f8c0e27c33375060d4f9bf8773b2b5ced9c72ec93d1950d",
-            "bytes": 60935
+            "sha256": "8d0874122b2aa0478d00ae09d961f6c8b8466f15e7e10a99e37f300e9298091b",
+            "bytes": 60665
           }
         },
         {
@@ -7557,11 +8141,14 @@
           }
         }
       ],
+      "retiredPromotionSourceTransitions": [],
       "compatibility": {
         "bundleIdRetained": true,
         "msiUpgradeCodeRetained": true,
         "profileAndPortableStorageRetained": true,
-        "originalEngineDependenciesLicensesRetained": true
+        "originalEngineDependenciesLicensesRetained": true,
+        "engineSourceByteIdentical": true,
+        "reviewedAuxiliaryEngineSourceChanges": 0
       },
       "nativeBuild": "not-yet-executed",
       "windowsInstallerIdentity": {
@@ -7589,17 +8176,17 @@
     {
       "id": "grid",
       "name": "Bogo Grid",
-      "version": "0.7.0-bogo.1",
+      "version": "0.7.0-bogo.2",
       "assetPrefix": "Bogo-Grid",
       "bundleId": "com.kio.grid",
       "legacyVersion": "0.7.0-kio.1",
       "baseLock": "manifests/full-native-apps.json",
       "baseLockSha256": "0c71246652db45818401d22d1267c79f84e01294c4e18f12ac83f536c6ed2a58",
       "baseSourceTreeSha256": "276ac49a394849de1f27ddf20ed6a0d226a055563ba99c0d6ba092b9ed2016ba",
-      "sourceTreeSha256": "af375284fec65cbe2d7d538672d1bd1cde485c5c9a6064aae1a2a342281e03b6",
+      "sourceTreeSha256": "352afaec1306e026bc73ea5148415f3aaff581d3e767a6dc49816c2ae0af55c2",
       "patch": "patches/bogo/grid.patch",
-      "patchSha256": "ebb2b5b1cdd0963c343fe544c6243f61694ce169ae65067bab71fae8c7cd5eb1",
-      "patchBytes": 4514157,
+      "patchSha256": "4aadfb2991c99bc7cce88abeff475b2702d542f4acb616fa956190bceee22caf",
+      "patchBytes": 4514884,
       "files": [
         {
           "path": "apps/gridcraft/build.rs",
@@ -7630,8 +8217,8 @@
             "bytes": 15285
           },
           "after": {
-            "sha256": "1812aedf5774c124745c72b6fc45ed3f65031ea131530a232fb4aa7c6eaafbf9",
-            "bytes": 15287
+            "sha256": "3733cacde36049382583f209eb164940e2e9cd840bffc84f0f68195a15e099f2",
+            "bytes": 15011
           }
         },
         {
@@ -7847,8 +8434,8 @@
             "bytes": 127881
           },
           "after": {
-            "sha256": "bd48501c585778b9b57faa8f3f280337c8c6f66d9c3728d99fe2fd2ca357fb4a",
-            "bytes": 127887
+            "sha256": "ce5659d10512830f330745bc0dbd7844da37e7beeb5db48c70623f78c785a949",
+            "bytes": 127552
           }
         },
         {
@@ -8193,11 +8780,14 @@
           }
         }
       ],
+      "retiredPromotionSourceTransitions": [],
       "compatibility": {
         "bundleIdRetained": true,
         "msiUpgradeCodeRetained": true,
         "profileAndPortableStorageRetained": true,
-        "originalEngineDependenciesLicensesRetained": true
+        "originalEngineDependenciesLicensesRetained": true,
+        "engineSourceByteIdentical": true,
+        "reviewedAuxiliaryEngineSourceChanges": 0
       },
       "nativeBuild": "not-yet-executed",
       "windowsInstallerIdentity": {
@@ -8225,17 +8815,17 @@
     {
       "id": "launcher",
       "name": "Bogo Launcher",
-      "version": "0.4.1-bogo.1",
+      "version": "0.4.1-bogo.2",
       "assetPrefix": "Bogo-Launcher",
       "bundleId": "com.kio.launcher",
       "legacyVersion": "0.4.1-kio.2",
       "baseLock": "manifests/launcher.lock.json",
       "baseLockSha256": "46fa9e82194ee555f1ed72acf5b54709738d3d9db2c4a30b03995850d6e70237",
       "baseSourceTreeSha256": "d0c47781d861fa777ae4c9b931e870f5013b435039791a91b14923583c55b318",
-      "sourceTreeSha256": "fd6f9942fff7daf821456ed4f12320f238287a9280f478dbff1995e865d75af7",
+      "sourceTreeSha256": "7323302a5863a1102f04135b97baa75106cfb2e4a5d90464802a6ba59a6da3e5",
       "patch": "patches/bogo/launcher.patch",
-      "patchSha256": "92d46684908dffe2056a7a42215391a33be2f18932e9fd506244c9a7448164eb",
-      "patchBytes": 11947214,
+      "patchSha256": "a340cb6b7cbc669a3e55065e827117b2a4fb0c4345f240c6b3ba0a225f3461b9",
+      "patchBytes": 11991305,
       "files": [
         {
           "path": "apps/artcraft-launcher-web/index.html",
@@ -8288,8 +8878,8 @@
             "bytes": 43259
           },
           "after": {
-            "sha256": "e6056ba13166f100cba1b9590894e1a2799233139c9ce4856a6b6f963b432ec6",
-            "bytes": 43443
+            "sha256": "dfcc6840e0e11b9853b911853d533a43e4d9cecfbf1493b5383870a62974eb5f",
+            "bytes": 43447
           }
         },
         {
@@ -8310,8 +8900,8 @@
             "bytes": 6825
           },
           "after": {
-            "sha256": "2cdf8c885435a0eaf4ab231a4dab2e5cc4ea2a4a1f3ca133af3618e94d9bb6a6",
-            "bytes": 6834
+            "sha256": "f2621165e677272a4eb69d7bcd0cf9619c00b570662006070fb13cf18e31ecf3",
+            "bytes": 6155
           }
         },
         {
@@ -8637,8 +9227,8 @@
             "bytes": 10178
           },
           "after": {
-            "sha256": "9e4f853ea3fc5f490fe2fec0102d5d8b61aeed1b14ed01447a3721071a1a7f29",
-            "bytes": 11483
+            "sha256": "9303864993faf1d59025f400d9b85449d6d64dfab9672a2fbdb62c9dbc793303",
+            "bytes": 11071
           }
         },
         {
@@ -8703,8 +9293,8 @@
             "bytes": 7712
           },
           "after": {
-            "sha256": "fa5542098cb2b33a4a8dc9e690a7156cb75b46e71772ec8fc4ac63eb0f79f555",
-            "bytes": 7714
+            "sha256": "b5477a7fd40a144cb68b55fd45c7297187b08960184e0f212f61be947c4eab29",
+            "bytes": 7710
           }
         },
         {
@@ -8887,7 +9477,7 @@
             "bytes": 30564
           },
           "after": {
-            "sha256": "0f7d6c5c28d3371ccd988a03528de0546037c4d201f2ed6e00d1862f3e13c76c",
+            "sha256": "241713bb24d8af8e9b7c37b61c511a91176352fbc2a435f3a8de2ad329c8613d",
             "bytes": 30565
           }
         },
@@ -8898,8 +9488,8 @@
             "bytes": 20392
           },
           "after": {
-            "sha256": "1d02d81220f836353af9fbaf8654f6e66bf3c85837c64f483ed27d914d870870",
-            "bytes": 20398
+            "sha256": "465835d8ccc85a076cac3370e38dc3b5ce0c28cb6ed3af916e07dfcb627516b4",
+            "bytes": 19010
           }
         },
         {
@@ -8909,8 +9499,8 @@
             "bytes": 15630
           },
           "after": {
-            "sha256": "dad5785ab738a0b36cb73000aae5d8293353ffa52c9e494407f35c6545e85454",
-            "bytes": 15658
+            "sha256": "c5084296ac3eeaeb063e8050b2beba646c29ab3e552de4dc06d7522b3dcb5031",
+            "bytes": 15184
           }
         },
         {
@@ -8920,8 +9510,8 @@
             "bytes": 16542
           },
           "after": {
-            "sha256": "9f30068028f3179e0befe9962844b2164dccb7781ef208f3915d180aa953ebc6",
-            "bytes": 16585
+            "sha256": "f462c88e9378b94e6ae8b71ea7fe5daad95e8bd2940e18e10f12875a5e021ac5",
+            "bytes": 16027
           }
         },
         {
@@ -8931,8 +9521,8 @@
             "bytes": 13530
           },
           "after": {
-            "sha256": "81df06a1284a03bf98078291109fce29150d4a2ffe9eb542065ca189f065219d",
-            "bytes": 13556
+            "sha256": "f5b8fc7eda755a24aaa1948ef146766633011b111c728482e3fb3f8738f57690",
+            "bytes": 13106
           }
         },
         {
@@ -8942,8 +9532,8 @@
             "bytes": 16116
           },
           "after": {
-            "sha256": "3f6a8a67129eccf4d4d7b93e60a616c60cea2807f65b5ad876e16b9c9d545e11",
-            "bytes": 16160
+            "sha256": "f1e87a33d63c6e98a10be5be4e9081c3dc2aaeb4e20e3af369b801478c014aff",
+            "bytes": 15630
           }
         },
         {
@@ -8953,8 +9543,8 @@
             "bytes": 16926
           },
           "after": {
-            "sha256": "2804ba0f162007a199b9f640a858e982fc5799a298dddcddc8eb0843d8461f19",
-            "bytes": 16969
+            "sha256": "dff61a58692599f0f78cb5d0f6cebb583d921cc2da5ea88928f536f5d8a05fdd",
+            "bytes": 16479
           }
         },
         {
@@ -8964,8 +9554,8 @@
             "bytes": 17439
           },
           "after": {
-            "sha256": "5ce57f82c15a36c27d9937e739567d8394380ad12590a349eece322443906d03",
-            "bytes": 17480
+            "sha256": "283dd80c49aaea51f55c3cd4d289e4f5c5c62b8ab60e6437dafa98bc7612a8bf",
+            "bytes": 16789
           }
         },
         {
@@ -8975,8 +9565,8 @@
             "bytes": 18806
           },
           "after": {
-            "sha256": "bec81cbc97da52ca049039dcc387a2691b5631ab149186d9bca1b50a295b7290",
-            "bytes": 18848
+            "sha256": "0bc0e0734d434432d40bdc6bf7b30a781f527a95eb896fdb0da8e52b65b04f6d",
+            "bytes": 18277
           }
         },
         {
@@ -8986,8 +9576,8 @@
             "bytes": 14805
           },
           "after": {
-            "sha256": "ca92cb20b73a514b707a20aac978f6731f5506637a88495befb27f917b36cbaf",
-            "bytes": 14830
+            "sha256": "97b575000907b7b7a5ddcb276daddd40e7f6366de5029c0766a924caa6608b05",
+            "bytes": 14380
           }
         },
         {
@@ -9008,8 +9598,8 @@
             "bytes": 16785
           },
           "after": {
-            "sha256": "5d8bc3206e67d0c7d55adbc1562842db849860a1b643abaffe85d994ea16a000",
-            "bytes": 16829
+            "sha256": "bd0bf5e0434632be7ccb40d5dab17407012f0c80f672a67f2700d35e5dfebdea",
+            "bytes": 16333
           }
         },
         {
@@ -9019,8 +9609,8 @@
             "bytes": 15626
           },
           "after": {
-            "sha256": "8ed5a967d8b5de2a16a9471161e17cc67692489ee6b18035511ec93dd150d7c2",
-            "bytes": 15653
+            "sha256": "51e24966a263903321876058202c20c55821c52da6dfdc379caaa2b59d6da17b",
+            "bytes": 15196
           }
         },
         {
@@ -9030,8 +9620,8 @@
             "bytes": 21251
           },
           "after": {
-            "sha256": "568190f5cbf0aeb3e62cb5681032d7647cbadeda19f946ee8999c72d93fc5c32",
-            "bytes": 21295
+            "sha256": "1e2a3ff0104e1a3b4f473811430a8951cc208e659cb485f2ad49be70be46297e",
+            "bytes": 20632
           }
         },
         {
@@ -9052,8 +9642,8 @@
             "bytes": 16180
           },
           "after": {
-            "sha256": "46fac763512ea4013004c1cf604a3ae8b9ee385a88cc015580662a4e9ee88b13",
-            "bytes": 16205
+            "sha256": "915ce03890fc5e328c284dcb5d127c0c0a73c90985907b7e57c8182a03facc83",
+            "bytes": 15721
           }
         },
         {
@@ -9063,8 +9653,8 @@
             "bytes": 13923
           },
           "after": {
-            "sha256": "b8a47cc83cef1f1e3308549e29a03cf6e799700a3704fec871f529c9f4bb7215",
-            "bytes": 13952
+            "sha256": "4e3a827ac54678c28bd5463f926ec8a9fcc8bc9ba974315097781ffbffa794da",
+            "bytes": 13482
           }
         },
         {
@@ -9074,8 +9664,8 @@
             "bytes": 13819
           },
           "after": {
-            "sha256": "01ceee8a8956c1b43bc95ce80f65938f5c8b8e1c7fcfc37378a2ae1d0582a3f4",
-            "bytes": 13844
+            "sha256": "50c856f007adb56a2d5d4ce1d16bfe44ec9b696890a8e46b6973af907515a0ab",
+            "bytes": 13399
           }
         },
         {
@@ -9107,8 +9697,8 @@
             "bytes": 53373
           },
           "after": {
-            "sha256": "b4d1029d1e763afa4d4b13d057420b13e26e13f2e9a70c7f4d0193e37857a237",
-            "bytes": 53367
+            "sha256": "08239da360f8e1138eaa7355b9c4f1cdebaa8bdb81d8df5fa710e8f8cafea0d8",
+            "bytes": 51897
           }
         },
         {
@@ -9118,8 +9708,19 @@
             "bytes": 25152
           },
           "after": {
-            "sha256": "0b6e234e8ca90f8ba97360094509fc6e0e76ef1f2349c0c5bac6733127fef64a",
-            "bytes": 25200
+            "sha256": "2d9f26525dff8f619fc79a20f1120c3dc86b93e623eabc4365ef57e0329204fd",
+            "bytes": 24157
+          }
+        },
+        {
+          "path": "crates/ui-egui/tests/chinese.rs",
+          "before": {
+            "sha256": "3d18318506b23f1e2f36214445b1732f7340bc995a46db77feeb0d9656d734fc",
+            "bytes": 8746
+          },
+          "after": {
+            "sha256": "1fe7ed07032450b0915fcdebc33b33c3edc499d8352a0354630cd49fb890ab21",
+            "bytes": 8746
           }
         },
         {
@@ -9129,7 +9730,7 @@
             "bytes": 5155
           },
           "after": {
-            "sha256": "dab2f9c814184f3212061f9203e0f922ace15216783897de722ae577f2bb40fe",
+            "sha256": "268d949193876240940971320891c94d0198605e7344ded833324638211cafac",
             "bytes": 5158
           }
         },
@@ -9140,7 +9741,7 @@
             "bytes": 8436
           },
           "after": {
-            "sha256": "bd2ccaae27d2f084bd6b0c21234f18521b7b4e1f40f727e1cc550fa716963bf8",
+            "sha256": "484b68ade95583806adca7342b7b606ded3b5c35ef28f195e14938ded1c8556b",
             "bytes": 8437
           }
         },
@@ -9151,8 +9752,19 @@
             "bytes": 8540
           },
           "after": {
-            "sha256": "e066f5c1b12a8ca3e8f3d65402f12f6a6e5dbd9aed6f214e2574ea2b35ad3d23",
-            "bytes": 8543
+            "sha256": "8e4998efd5ca499341d739ef63f0a406e9b3aae978942846b56f9b4c802f66c0",
+            "bytes": 7988
+          }
+        },
+        {
+          "path": "crates/ui-egui/tests/japanese.rs",
+          "before": {
+            "sha256": "db2f84e8d4a0c5be0468877829c7fe0cff2de6cb0ae5131d3e4018d81658db14",
+            "bytes": 8829
+          },
+          "after": {
+            "sha256": "0f4875360154ce565dec70040b6a57f57f29038f14a28dd67a5cbb1f2e95f103",
+            "bytes": 8829
           }
         },
         {
@@ -9162,7 +9774,7 @@
             "bytes": 5164
           },
           "after": {
-            "sha256": "9f880656130fdaacfc2cf0bccbc94c5d3d5a5c24d42813e4e173d927a4d74f8c",
+            "sha256": "2752ff19c633c16ab3ee3f8aeb627780fac5cef6abfb1d74f4045907d98aec9b",
             "bytes": 5167
           }
         },
@@ -9173,7 +9785,7 @@
             "bytes": 4481
           },
           "after": {
-            "sha256": "95cf4e5567f3a4b2df857b5417b5af89b01e488867b56931975e22b999a50cc5",
+            "sha256": "9ff472e2237b1892e7df2960c2e3593039a79ecd199b0613fe680d9c7cfee5ed",
             "bytes": 4484
           }
         },
@@ -9184,7 +9796,7 @@
             "bytes": 5268
           },
           "after": {
-            "sha256": "eb410c31c522a38212754195078f96c3393945b09db2ef6238d1754ab730d370",
+            "sha256": "2d0d012b69d8d4561707acc1a1c48d07704981f2eb357e15fde385dced4914be",
             "bytes": 5271
           }
         },
@@ -9195,7 +9807,7 @@
             "bytes": 5146
           },
           "after": {
-            "sha256": "fce083981f7662203bd7303a253483e741b3ba5f20833877d700e01b9ea1d6fd",
+            "sha256": "4b60be062e0fe0c62b0b84397135b4f715b5d6e199c4f2344ab117af8ee1860c",
             "bytes": 5149
           }
         },
@@ -9206,8 +9818,8 @@
             "bytes": 65718
           },
           "after": {
-            "sha256": "562468f8885dc6143a67d50a3ec1680fc6c75384ed320bcd825e6637640b92cb",
-            "bytes": 65770
+            "sha256": "d866dd7d7bacd1ee5d251513233859d506fcea3d6ece7672778599ba08d5ed44",
+            "bytes": 65269
           }
         },
         {
@@ -9354,11 +9966,14 @@
           }
         }
       ],
+      "retiredPromotionSourceTransitions": [],
       "compatibility": {
         "bundleIdRetained": true,
         "msiUpgradeCodeRetained": true,
         "profileAndPortableStorageRetained": true,
-        "originalEngineDependenciesLicensesRetained": true
+        "originalEngineDependenciesLicensesRetained": true,
+        "engineSourceByteIdentical": true,
+        "reviewedAuxiliaryEngineSourceChanges": 0
       },
       "nativeBuild": "not-yet-executed",
       "windowsInstallerIdentity": {
@@ -9375,17 +9990,17 @@
     {
       "id": "photo",
       "name": "Bogo Photo",
-      "version": "0.9.0-bogo.1",
+      "version": "0.9.0-bogo.2",
       "assetPrefix": "Bogo-Photo",
       "bundleId": "com.kio.photo",
       "legacyVersion": "0.9.0-kio.1",
       "baseLock": "manifests/full-native-apps.json",
       "baseLockSha256": "0c71246652db45818401d22d1267c79f84e01294c4e18f12ac83f536c6ed2a58",
       "baseSourceTreeSha256": "8269234e10fabbd02128ca1139b12ec3998abdf1598fa2ce5371a463daea90b7",
-      "sourceTreeSha256": "3f4318c9b0bccd0af475843a3f15cb28986f9ab1b46ca7ee45d75d40d38d461b",
+      "sourceTreeSha256": "80baf7823313b5f31268fcf90c5bff236cc42c6c9539f6edfa114e20e9208ff0",
       "patch": "patches/bogo/photo.patch",
-      "patchSha256": "3b7cabf1df257232bb221db8281cd03a1122e972cca6a9c309ad01e99ed0445d",
-      "patchBytes": 5911379,
+      "patchSha256": "144559e6d45454ad99e8ef3f1b7f9e45fa77c0b65a2372fcbc723f4fd325a848",
+      "patchBytes": 5945208,
       "files": [
         {
           "path": "apps/photocraft-cli/build.rs",
@@ -9721,8 +10336,8 @@
             "bytes": 426221
           },
           "after": {
-            "sha256": "b5735b7c4771a3cc779c8cca99f32deb7ad77bd34d911a821c92e3034113147c",
-            "bytes": 426436
+            "sha256": "f621aca04d3988fa1e409504566c2686f84d182a9c08156fcfaea49fd2275fb3",
+            "bytes": 426269
           }
         },
         {
@@ -9743,8 +10358,8 @@
             "bytes": 57709
           },
           "after": {
-            "sha256": "bacb48dc478d10ad8201a196e026fecb3fb3cae3aeee2b58826abe9d495af3e0",
-            "bytes": 57711
+            "sha256": "18c16cdb6e2c5af574dfb01efc85507c48784fb40cc85a16d54c3ab57b5bfd72",
+            "bytes": 57477
           }
         },
         {
@@ -9787,8 +10402,8 @@
             "bytes": 149125
           },
           "after": {
-            "sha256": "c10db4a26c91b907c2c12cb90064a6761bc0a80cd3a70d966f22fb9239e9d62e",
-            "bytes": 149165
+            "sha256": "30775b03f252e8fb7c73000f1b6823d42131b0e8b746fb7570cd49631401b6b6",
+            "bytes": 148809
           }
         },
         {
@@ -9798,8 +10413,8 @@
             "bytes": 127189
           },
           "after": {
-            "sha256": "8c4ef5dd29ea7a8c1209853ac70ee723f621fc9027397cf6394a388f93300b05",
-            "bytes": 127228
+            "sha256": "80cf70a8ed1c95f3d8b291efc7e0e96e1b5c039684fa54fb64887c8db854760f",
+            "bytes": 126879
           }
         },
         {
@@ -9809,8 +10424,8 @@
             "bytes": 224366
           },
           "after": {
-            "sha256": "094b669a609c2ab77fae3bfab86a1f4644963a5b56a44acccb6e83d06acde8bc",
-            "bytes": 224409
+            "sha256": "0129447e62210d4632299c005341d0e0962b4d4967171803eedc92c5845c362a",
+            "bytes": 224086
           }
         },
         {
@@ -9820,8 +10435,8 @@
             "bytes": 120433
           },
           "after": {
-            "sha256": "8fffd782fed13f39f1d63e6ddd515805321e76748bb2dea7fa224ed26eae219c",
-            "bytes": 120472
+            "sha256": "43d959814c21c05a416bbd975546b89a787f25aa59db1c2f8db79970c97134cc",
+            "bytes": 120195
           }
         },
         {
@@ -9831,8 +10446,8 @@
             "bytes": 134386
           },
           "after": {
-            "sha256": "ae99bc5e96000d3bf18486f445c7e0f73cd4b1d2654dfd8cf3958646e32ac823",
-            "bytes": 134425
+            "sha256": "d95559ad000cf88203a915bb75618318f38138cadc6a665ca04f7078be047e46",
+            "bytes": 134144
           }
         },
         {
@@ -9842,8 +10457,8 @@
             "bytes": 168493
           },
           "after": {
-            "sha256": "9bef28734d1f65d95a9aa9f9a4a74b47ad27328898abbc77547b62b3c7c96725",
-            "bytes": 168532
+            "sha256": "7ebbd0b47824aed75281b19eb3e95294f54f13b1e316aa9fab709501423e2eec",
+            "bytes": 168096
           }
         },
         {
@@ -9853,8 +10468,8 @@
             "bytes": 116994
           },
           "after": {
-            "sha256": "57971f9aa50543dea5a773cdee898c0780c8d22396ceec25b9be10b2be128ef6",
-            "bytes": 117032
+            "sha256": "50edcda0d5e56db86a5f515398dde4b121ae3ed635f29a14cb2c6db26fb44396",
+            "bytes": 116756
           }
         },
         {
@@ -9864,8 +10479,8 @@
             "bytes": 161223
           },
           "after": {
-            "sha256": "a2a5c4ec4f783120f3d412b6e926994420b2b4f8e648024eee27bf36cdd00944",
-            "bytes": 161270
+            "sha256": "5d98fad83ce487e3cb0b183b82e37423990b23b2e9dfc2d09b8a35e9711d595d",
+            "bytes": 160859
           }
         },
         {
@@ -9875,8 +10490,8 @@
             "bytes": 165650
           },
           "after": {
-            "sha256": "6b7dac372102a2cb7815937dc76638b1ef92ffe60f7294109ff70c8f6975abee",
-            "bytes": 165688
+            "sha256": "96a16e1c47fabdc0f9d678090293f0fe889fd2a5b7e3854fb9980b6ac5745ae5",
+            "bytes": 165354
           }
         },
         {
@@ -9886,8 +10501,8 @@
             "bytes": 131062
           },
           "after": {
-            "sha256": "b7a63a5db6d1b89ba25dad2c1f992388942266ceabaedf7e43d048e0d5a8976f",
-            "bytes": 131100
+            "sha256": "d58e5438b82e5aa32488f4f5fd5d61bbf8ff0740b17aadc071280cfdc85b506b",
+            "bytes": 130881
           }
         },
         {
@@ -9908,8 +10523,8 @@
             "bytes": 148374
           },
           "after": {
-            "sha256": "27798439b60fd8ce8021cf46c425d56fd780a89fa3d657bae4522ddd8c7448e8",
-            "bytes": 148417
+            "sha256": "a12d12dbd1131d34fb1d23ac77653a45323d9a89d81060f85dad84d3db469bb5",
+            "bytes": 148074
           }
         },
         {
@@ -9919,8 +10534,8 @@
             "bytes": 148163
           },
           "after": {
-            "sha256": "ce0a0797b93bcc07336dcaa04076650715b6b6babf9e9c2c7a2617bf1a042e7c",
-            "bytes": 148205
+            "sha256": "88c542aea077962a389d5eef7dcd7454252a524f264e941ae996256a9260f93b",
+            "bytes": 147852
           }
         },
         {
@@ -9930,8 +10545,8 @@
             "bytes": 155726
           },
           "after": {
-            "sha256": "080c66a9722632bae78b25db2c58c9b78f3d9a780250fd44425eca83db6c0fa6",
-            "bytes": 155769
+            "sha256": "a17f1015d6811bac7b4812b9986a576593728465c167b5877da64bba682e6524",
+            "bytes": 155427
           }
         },
         {
@@ -9941,8 +10556,8 @@
             "bytes": 170613
           },
           "after": {
-            "sha256": "28d2fb6f7c72bebc86d10cb1189117ea64ef2e3bf3820a29cc1978aa3e62a2ca",
-            "bytes": 170653
+            "sha256": "810b2729013c4a7d8d3299ecdd914c2f5ea1869b8e993853583de469cbabf650",
+            "bytes": 170381
           }
         },
         {
@@ -9952,8 +10567,8 @@
             "bytes": 163711
           },
           "after": {
-            "sha256": "9be377ed15a2dfa20870e882b08bfa1d371ee816b7b315f0a426b2f4ba193810",
-            "bytes": 163756
+            "sha256": "26e43dd521e35386fee72d5056d9b5502a37963cc634c6f2b25859016c194008",
+            "bytes": 163306
           }
         },
         {
@@ -9963,8 +10578,8 @@
             "bytes": 150769
           },
           "after": {
-            "sha256": "e9e1a41a57477c80aabf170a111fb6fa936effd42e5e1ecd3e575d4e21665fb5",
-            "bytes": 150811
+            "sha256": "d48c2c3c75b6b4d33602f143e2dedca965ea2eebc9b616ba3de2a4af5dfb82bc",
+            "bytes": 150468
           }
         },
         {
@@ -9974,8 +10589,8 @@
             "bytes": 209186
           },
           "after": {
-            "sha256": "35db31bfd0c16be19529dfe4ab2951664953008e49e47fb9dd6d64cffa58acc0",
-            "bytes": 209226
+            "sha256": "5e6785ed0d43f4c921ba429a24a4fbcd2838c356460c734524b7f45f2371b0b3",
+            "bytes": 208930
           }
         },
         {
@@ -9985,8 +10600,8 @@
             "bytes": 144420
           },
           "after": {
-            "sha256": "f26395594a0ea8d1cc4b2fcfb27680301ffd62d5a0ad6125028cbfe936e931d3",
-            "bytes": 144460
+            "sha256": "601d6aa5a195edf68c6e1ba2809ce9f8956c12b4eca45b1670c7c4bb67dbb074",
+            "bytes": 144193
           }
         },
         {
@@ -9996,8 +10611,8 @@
             "bytes": 102600
           },
           "after": {
-            "sha256": "7def25e5150598feaab06779a238c9327b9ce660c3726f40b793a7b2db1b18cc",
-            "bytes": 102638
+            "sha256": "afa120c2aa1eb387ad83236e87dd6f6db95462172d82f09f23fb2b6d8d3569bb",
+            "bytes": 102449
           }
         },
         {
@@ -10007,8 +10622,8 @@
             "bytes": 102955
           },
           "after": {
-            "sha256": "d55db303820ff0bec122558becec3fb6dea6b0985cee7899c292de39d5744de1",
-            "bytes": 102993
+            "sha256": "6c3ebc693c9af480734af09a5c76e20625c8590b0caeb9d5379753fba7fd4a43",
+            "bytes": 102721
           }
         },
         {
@@ -10051,8 +10666,8 @@
             "bytes": 5863
           },
           "after": {
-            "sha256": "cfb04f96551c34a22c57f956ac64dc47bc24b238547cdf58fd6faae6c353e388",
-            "bytes": 5863
+            "sha256": "87245f334645af20950d976f38fd51b6eef7f5e1c8938d06a6e2dabfa1eca1a2",
+            "bytes": 2278
           }
         },
         {
@@ -10062,8 +10677,8 @@
             "bytes": 115192
           },
           "after": {
-            "sha256": "4a09cc49ceeeec0d3b3dda6d88617e3f71efe0dd3f7a3ad8b330a6fa043ee8b8",
-            "bytes": 115196
+            "sha256": "f913af7bf68d23634a0442c12b78b2e5fe4489afa3dfff6bb84e46a0a39d7642",
+            "bytes": 114759
           }
         },
         {
@@ -10106,8 +10721,8 @@
             "bytes": 328659
           },
           "after": {
-            "sha256": "b91fcde59d8336f8af62ce06c2d854b1519d1ff32524b41f59046b2d228b55a2",
-            "bytes": 328668
+            "sha256": "53e7a2bbf48a2e6d0f29a4750736ec31d24fbe76f7ecef7af13deeb328d191d7",
+            "bytes": 327738
           }
         },
         {
@@ -10174,6 +10789,17 @@
           "after": {
             "sha256": "019b222831f4b0c4041c536a5b7ab2082e3079505e592f141dfb42ccc2bcecf6",
             "bytes": 77577
+          }
+        },
+        {
+          "path": "crates/ui-egui/src/titlebar.rs",
+          "before": {
+            "sha256": "abcf49a91d493a8afb69cc69c7871bb2c1837c67895bc82ce4403a3e27a9d3f5",
+            "bytes": 46202
+          },
+          "after": {
+            "sha256": "912305fa46b6b426665273e6a03a9ec5bc103461df5c6395cbd8a8fe994c2cbb",
+            "bytes": 46194
           }
         },
         {
@@ -10342,11 +10968,14 @@
           }
         }
       ],
+      "retiredPromotionSourceTransitions": [],
       "compatibility": {
         "bundleIdRetained": true,
         "msiUpgradeCodeRetained": true,
         "profileAndPortableStorageRetained": true,
-        "originalEngineDependenciesLicensesRetained": true
+        "originalEngineDependenciesLicensesRetained": true,
+        "engineSourceByteIdentical": true,
+        "reviewedAuxiliaryEngineSourceChanges": 0
       },
       "nativeBuild": "not-yet-executed",
       "windowsInstallerIdentity": {
