@@ -15,6 +15,15 @@ import smoke_bogo_windows as smoke
 
 
 class WindowsSmokeInputs(unittest.TestCase):
+    def test_msi_guids_compare_exact_uuid_identity_with_balanced_optional_braces(self):
+        guid = 'F98E3616-1291-59D9-AEFD-8E055186CBD4'
+        self.assertEqual(smoke.canonical_guid(guid), smoke.canonical_guid('{' + guid.lower() + '}'))
+        self.assertEqual(smoke.canonical_guid(guid.lower()), guid)
+        self.assertNotEqual(smoke.canonical_guid(guid), smoke.canonical_guid('48194C34-8826-5C1A-9A37-764B83BD695E'))
+        for invalid in (None, '', '{' + guid, guid + '}', '{{' + guid + '}}', ' ' + guid, guid + ' ', guid.replace('-', ''), 'urn:uuid:' + guid, guid + '-extra', guid[:-1] + 'G'):
+            with self.subTest(invalid=invalid), self.assertRaises(ValueError):
+                smoke.canonical_guid(invalid)
+
     def test_exact_fourteen_published_upgrade_pins_keep_each_actual_upgrade_code(self):
         pins = json.loads((ROOT / 'manifests/bogo-legacy-upgrade-inputs.json').read_text(encoding='utf-8'))
         self.assertEqual(pins['repository'], 'qptywoei777-rgb/kio-native-apps')
@@ -38,6 +47,18 @@ class WindowsSmokeInputs(unittest.TestCase):
             struct.pack_into('<I', bad, 18, len(raw) + 1)
             with self.assertRaisesRegex(ValueError, 'bounds'):
                 smoke.ico_frames(bad)
+
+    def test_runtime_png_is_exactly_the_compiled_native_viewport_source_for_all_fourteen(self):
+        with tempfile.TemporaryDirectory() as directory:
+            for app in bogo.NAMES:
+                output = Path(directory) / app
+                output.mkdir()
+                png, sha = smoke.runtime_source_png(app, output)
+                self.assertEqual(smoke.digest(png), sha)
+                lock = bogo.load_lock(app)
+                path = 'assets/app-icon/hicolor/256x256/apps/com.kio.' + app + '.png'
+                expected = next(row['after'] for row in lock['bogoOverlay']['files'] if row['path'] == path)
+                self.assertEqual(expected, {'sha256': sha, 'bytes': png.stat().st_size})
 
     def test_actual_pe_identity_rejects_wrong_architecture_and_console_images(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -76,6 +97,8 @@ class WindowsSmokeInputs(unittest.TestCase):
             values = {'GITHUB_ACTIONS': 'true', 'RUNNER_OS': 'Windows', 'RUNNER_ENVIRONMENT': 'github-hosted', 'GITHUB_REPOSITORY': 'qptywoei-sudo/bogo-native-apps', 'GITHUB_WORKFLOW': 'Bogo native applications (manual verification)', 'GITHUB_REF': 'refs/heads/codex/bogo-native-rebrand-20261026', 'RUNNER_TEMP': str(base)}
             with patch.object(smoke.sys, 'platform', 'win32'), patch.dict(os.environ, values, clear=True):
                 self.assertEqual(smoke.ephemeral_output(base / 'fresh', True), base / 'fresh')
+                with patch.dict(os.environ, {'GITHUB_WORKFLOW': 'Bogo Windows artifact acceptance (manual)'}):
+                    self.assertEqual(smoke.ephemeral_output(base / 'fresh', True), base / 'fresh')
                 for key, value in (('RUNNER_ENVIRONMENT', 'self-hosted'), ('GITHUB_REPOSITORY', 'someone/else'), ('GITHUB_REF', 'refs/heads/main'), ('GITHUB_WORKFLOW', 'Unreviewed workflow')):
                     with self.subTest(key=key), patch.dict(os.environ, {key: value}):
                         with self.assertRaises(ValueError):

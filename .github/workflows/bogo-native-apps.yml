@@ -101,6 +101,11 @@ jobs:
       - run: ${{ matrix.python }} scripts/bogo_native.py package --app ${{ matrix.app }} --platform ${{ matrix.platform }}
       - run: ${{ matrix.python }} scripts/bogo_native.py verify --app ${{ matrix.app }} --platform ${{ matrix.platform }} --directory dist/${{ matrix.app }}-${{ matrix.platform }}
       - if: matrix.platform == 'windows-x64'
+        name: Fetch the locked standalone icon verification dependencies
+        env:
+          RUSTUP_TOOLCHAIN: 1.95.0
+        run: cargo fetch --locked --manifest-path tools/runtime-icon-reference/Cargo.toml --target x86_64-pc-windows-msvc
+      - if: matrix.platform == 'windows-x64'
         name: Install, upgrade, inspect PE icons and launch installed and portable apps
         env:
           BOGO_QA_OUTPUT: ${{ runner.temp }}/bogo-windows-smoke-${{ matrix.app }}

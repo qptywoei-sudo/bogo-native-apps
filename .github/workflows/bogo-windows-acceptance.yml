@@ -1,0 +1,110 @@
+name: Bogo Windows artifact acceptance (manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_run_id:
+        description: Exact manual bogo-native-apps.yml build run ID
+        type: string
+        required: true
+      expected_build_sha:
+        description: Exact lowercase 40-character SHA built by that run
+        type: string
+        required: true
+      app:
+        description: Successful native build inputs; fresh full acceptance is required
+        type: choice
+        options: [all, cad, design, vector, film, light, pdf, effect, ui, word, sound, deck, grid, launcher, photo]
+        default: all
+        required: true
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  PYTHONUTF8: '1'
+
+concurrency:
+  group: bogo-windows-acceptance-${{ inputs.build_run_id }}-${{ inputs.app }}
+  cancel-in-progress: false
+
+jobs:
+  select:
+    if: github.repository == 'qptywoei-sudo/bogo-native-apps' && github.ref == 'refs/heads/codex/bogo-native-rebrand-20261026' && github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.matrix.outputs.value }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+      - run: python3 -m unittest discover -s tests -p test_bogo_ci_artifact.py -v
+      - id: matrix
+        env:
+          BOGO_APP: ${{ inputs.app }}
+          BOGO_BUILD_RUN: ${{ inputs.build_run_id }}
+          BOGO_BUILD_SHA: ${{ inputs.expected_build_sha }}
+        run: |
+          python3 - <<'PY'
+          import os, sys
+          sys.path.insert(0, 'scripts')
+          import bogo_ci_artifact as acceptance
+          acceptance.reviewed.positive_id(os.environ['BOGO_BUILD_RUN'])
+          acceptance.exact_sha(os.environ['BOGO_BUILD_SHA'])
+          import json
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
+              output.write('value=' + json.dumps(acceptance.matrix(os.environ['BOGO_APP']), separators=(',', ':')) + '\n')
+          PY
+  acceptance:
+    name: Updated Windows acceptance for ${{ matrix.app }}
+    needs: select
+    runs-on: windows-2022
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix: ${{ fromJSON(needs.select.outputs.matrix) }}
+    defaults:
+      run:
+        shell: bash
+    env:
+      BOGO_APP: ${{ matrix.app }}
+      BOGO_BUILD_RUN: ${{ inputs.build_run_id }}
+      BOGO_BUILD_SHA: ${{ inputs.expected_build_sha }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+      - name: Authenticate completed build and upload; prior smoke failure requires fresh full acceptance
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BOGO_ARTIFACT_ROOT: ${{ runner.temp }}/bogo-acceptance-input-${{ matrix.app }}
+        run: python scripts/bogo_ci_artifact.py collect --app "$BOGO_APP" --run-id "$BOGO_BUILD_RUN" --expected-build-sha "$BOGO_BUILD_SHA" --output "$BOGO_ARTIFACT_ROOT"
+      - name: Install the exact standalone icon verifier toolchain
+        run: rustup toolchain install 1.95.0 --profile minimal
+      - name: Fetch only the locked icon reference dependency closure
+        env:
+          RUSTUP_TOOLCHAIN: 1.95.0
+        run: cargo fetch --locked --manifest-path tools/runtime-icon-reference/Cargo.toml --target x86_64-pc-windows-msvc
+      - name: Run current own-window icon, install, upgrade and portable acceptance without recompiling
+        env:
+          BOGO_ARTIFACT_ROOT: ${{ runner.temp }}/bogo-acceptance-input-${{ matrix.app }}
+          BOGO_QA_OUTPUT: ${{ runner.temp }}/bogo-acceptance-smoke-${{ matrix.app }}
+        run: python scripts/smoke_bogo_windows.py --app "$BOGO_APP" --directory "$BOGO_ARTIFACT_ROOT/candidate" --output "$BOGO_QA_OUTPUT" --allow-ephemeral-install
+      - name: Bind actual smoke result to original build SHA and current harness SHA
+        if: always()
+        env:
+          BOGO_ARTIFACT_ROOT: ${{ runner.temp }}/bogo-acceptance-input-${{ matrix.app }}
+          BOGO_QA_OUTPUT: ${{ runner.temp }}/bogo-acceptance-smoke-${{ matrix.app }}
+        run: python scripts/bogo_ci_artifact.py record --app "$BOGO_APP" --directory "$BOGO_ARTIFACT_ROOT" --smoke-directory "$BOGO_QA_OUTPUT"
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        if: always()
+        with:
+          name: bogo-${{ matrix.app }}-windows-acceptance
+          path: |
+            ${{ runner.temp }}/bogo-acceptance-input-${{ matrix.app }}/authenticated-build.json
+            ${{ runner.temp }}/bogo-acceptance-input-${{ matrix.app }}/acceptance.json
+            ${{ runner.temp }}/bogo-acceptance-smoke-${{ matrix.app }}/
+          if-no-files-found: error
+          retention-days: 14

@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "imageVersion": "0.25.10",
+  "imageChecksum": "85ab80394333c02fe689eaf900ab500fbd0c2213da414687ebf995a65d5a6104",
+  "eframeVersion": "0.36.2",
+  "eframeChecksum": "55ad41fac6e3149abb4866e93df37dbd33baa95db525c3368c944584e95a5dc2",
+  "eframeAlgorithmSourceSha256": "d76215e82d50052569c0b48c6a4ad38c5051c08c77846637a2ec9c321311e989",
+  "winitVersion": "0.30.13",
+  "winitChecksum": "a6755fa58a9f8350bd1e472d4c3fcc25f824ec358933bba33306d0b63df5978d",
+  "winitAlgorithmSourceSha256": "89dd2f1e567852327cdc20adfb78ce12404f9ecc6786178d4caffe425a8d96c5",
+  "reviewedApplicationLocks": {
+    "ui": "927ab98bf28199b5f407edb250accbfd55d512a8d98206a331bc0795fcaa3569",
+    "design": "375c8357571e7a3b1ab5a8fdee530c324005c8e015c3d2baf41b51a401b57193",
+    "launcher": "e7497238b5026a38c01268b9887ee106c8452a950d0e81be402a521a223acac1",
+    "film": "f81cd5110692a17cc546b5693c7970b2716ca5706a5cff31681870cc955f239b",
+    "effect": "975228a3c1d4834d2b2c127cb3f524526e54afcc1ac96e744353b994eae00c3f",
+    "pdf": "4b378b35f2f982f4befdbe90e8dfa1ad03ccdb13da9e87857087d19daff4fc64",
+    "cad": "f4fae3426d67e7b81b358d966b7539f209f65554de47ab5bea3ed77f6ac903d0",
+    "word": "4cd08e46c389033f3f3d031026c3f674f74765899790e9f05b475557377bff68",
+    "light": "5e9e1bf4775d733e3dba407a01dd5623262480c612488f66e332cd39d7211e96",
+    "sound": "65a3e7a64c5e8b65ddf47c121f1c5cd02888dc2b8678b3ad8dcb4b42cd7d9009",
+    "vector": "86f72db5ac2e3e36c8c78f63f9feb1e127deb78f33dbb676f2d304e031ee16ff",
+    "photo": "19ac704a3a1da36733bb1d62c857880d46201f9a5228d92733e7676d9e499100",
+    "deck": "cf3e9843995e891715587c6a1c162863052e18bc37d70718015ca31452796b9d",
+    "grid": "cf9d5d467a0298265ff866b05d806f503785c15de1689c69a666cc04bf01b84f"
+  },
+  "referenceCargoLockSha256": "6ca12385e2dcbe9a36823b0ccef74c97c93efaccbaefb4ef1dd387e2b55ebfd6",
+  "referenceRustSourceSha256": "e33227e1e3bdd5896210fac1a87d4ec536c62ea8de9536725bcef574accd9c9f",
+  "algorithm": "image::imageops::resize(Lanczos3), PNG write_to, CreateIconFromResourceEx(true,0x00030000,width,height,LR_DEFAULTCOLOR)",
+  "rustToolchain": "1.95.0",
+  "referenceCargoManifestSha256": "3abe81a833fa35c26f47f420545214e5398d1733d47eb98b36accb9976d0111e",
+  "reviewedWinitPackages": [
+    {
+      "version": "0.30.13",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "a6755fa58a9f8350bd1e472d4c3fcc25f824ec358933bba33306d0b63df5978d"
+    },
+    {
+      "version": "0.30.13",
+      "source": "git+https://github.com/skylartaylor/winit.git?rev=3d51077fd1a966f84df9ef287839dc84fd5b4ca7#3d51077fd1a966f84df9ef287839dc84fd5b4ca7",
+      "checksum": null
+    },
+    {
+      "version": "0.30.13",
+      "source": null,
+      "checksum": null
+    }
+  ],
+  "reviewedWinitVariantIconSourcesIdentical": true
+}

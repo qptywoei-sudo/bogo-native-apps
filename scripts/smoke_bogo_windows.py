@@ -6,12 +6,14 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import struct
 import subprocess
 import sys
 import time
 import urllib.request
+import uuid
 import zipfile
 
 import bogo_native as bogo
@@ -24,6 +26,12 @@ def require(condition, message):
 
 def digest(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def canonical_guid(value):
+    pattern = r'[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
+    require(isinstance(value, str) and re.fullmatch('(?:' + pattern + r'|\{' + pattern + r'\})', value), 'Invalid Windows Installer GUID: expected a complete UUID with balanced optional braces')
+    return str(uuid.UUID(value[1:-1] if value.startswith('{') else value)).upper()
 
 
 def ico_frames(data):
@@ -164,7 +172,33 @@ def child_environment(directory):
     return environment
 
 
-def gui_startup(executable, environment, log):
+def runtime_source_png(app, output):
+    assets = bogo.ROOT / 'assets/bogo-program-icons'
+    icons = json.loads((assets / 'native-icons.json').read_text(encoding='utf-8'))['items']
+    icon = next(row for row in icons if row['id'] == app)
+    icns = (assets / (app + '.icns')).read_bytes()
+    require(hashlib.sha256(icns).hexdigest() == icon['icns']['sha256'], 'Approved ICNS resource changed')
+    require(icns[:4] == b'icns' and struct.unpack_from('>I', icns, 4)[0] == len(icns), 'Invalid ICNS directory')
+    chunks, offset = [], 8
+    while offset < len(icns):
+        require(offset + 8 <= len(icns), 'Truncated ICNS chunk')
+        length = struct.unpack_from('>I', icns, offset + 4)[0]
+        require(8 <= length <= len(icns) - offset, 'Invalid ICNS chunk bounds')
+        if icns[offset:offset + 4] == b'ic08':
+            chunks.append(icns[offset + 8:offset + length])
+        offset += length
+    require(len(chunks) == 1 and chunks[0][:8] == b'\x89PNG\r\n\x1a\n' and struct.unpack_from('>II', chunks[0], 16) == (256, 256), 'Expected one approved 256 px runtime source PNG')
+    source_path = 'assets/app-icon/hicolor/256x256/apps/com.kio.' + app + '.png'
+    expected = next(row['after'] for row in bogo.load_lock(app)['bogoOverlay']['files'] if row['path'] == source_path)
+    raw = chunks[0]
+    require(hashlib.sha256(raw).hexdigest() == expected['sha256'] and len(raw) == expected['bytes'], 'Runtime PNG differs from the exact compiled viewport source overlay')
+    path = Path(output) / 'approved-runtime-source.png'
+    require(not path.exists(), 'Runtime source evidence already exists')
+    path.write_bytes(raw)
+    return path, expected['sha256']
+
+
+def gui_startup(executable, environment, log, app, runtime_png, runtime_png_sha256):
     from ctypes import wintypes
     user = ctypes.WinDLL('user32', use_last_error=True)
     callback_type = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
@@ -212,6 +246,16 @@ def gui_startup(executable, environment, log):
             user.SetForegroundWindow(own['windowHandle'])
             time.sleep(1)
             require(user.GetForegroundWindow() == own['windowHandle'], 'Own GUI did not become foreground; refusing to capture unrelated/occluded screen pixels')
+            from bogo_runtime_icons import check_runtime_icons, application_lock_for
+            runtime_icons = check_runtime_icons(own['windowHandle'], process.pid,
+                bogo.ROOT / 'assets/bogo-program-icons' / (app + '.ico'),
+                digest(bogo.ROOT / 'assets/bogo-program-icons' / (app + '.ico')),
+                Path(log).with_suffix('.runtime-icons'), runtime_png=runtime_png,
+                approved_runtime_png_sha256=runtime_png_sha256,
+                application_cargo_lock=application_lock_for(app))
+            current_owner = wintypes.DWORD()
+            user.GetWindowThreadProcessId(own['windowHandle'], ctypes.byref(current_owner))
+            require(current_owner.value == process.pid and user.GetForegroundWindow() == own['windowHandle'], 'Own foreground window changed during icon verification; screenshot refused')
             rectangle = wintypes.RECT()
             user.GetClientRect.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.RECT)]
             require(user.GetClientRect(own['windowHandle'], ctypes.byref(rectangle)), 'Cannot obtain own GUI client rectangle')
@@ -225,7 +269,7 @@ def gui_startup(executable, environment, log):
             require(screenshot.is_file() and screenshot.stat().st_size > 1024, 'Own native GUI screenshot was not captured')
             capture['sha256'] = digest(screenshot)
             capture['themeAssessment'] = 'actual native-window pixels retained for visual review; palette counts alone do not establish all UI states'
-            return {'pid': process.pid, 'visibleWindows': list(windows), 'started': True, 'screenshot': capture, 'scope': 'new process in ephemeral CI VM; installed EXE bytes and PE icon checked separately'}
+            return {'pid': process.pid, 'visibleWindows': list(windows), 'started': True, 'screenshot': capture, 'runtimeIcons': runtime_icons, 'scope': 'new process in ephemeral CI VM; own window/taskbar/Alt+Tab icon-source pixels checked, PE icons checked separately; existing user pins not modified or claimed'}
         finally:
             if process.poll() is None:
                 for row in windows:
@@ -287,7 +331,7 @@ def shortcuts(name, legacy_name, executable, expected_ico, output, authored, pro
 
 def ephemeral_output(output, explicit):
     require(sys.platform == 'win32' and os.environ.get('GITHUB_ACTIONS') == 'true' and os.environ.get('RUNNER_OS') == 'Windows' and os.environ.get('RUNNER_ENVIRONMENT') == 'github-hosted' and explicit, 'Actual install smoke requires explicit opt-in on an ephemeral GitHub-hosted Windows runner')
-    require(os.environ.get('GITHUB_REPOSITORY') == 'qptywoei-sudo/bogo-native-apps' and os.environ.get('GITHUB_WORKFLOW') in ('Full native Bogo applications (reviewed branch dispatch)', 'Bogo native applications (manual verification)'), 'Actual install smoke requires the reviewed repository/workflow context')
+    require(os.environ.get('GITHUB_REPOSITORY') == 'qptywoei-sudo/bogo-native-apps' and os.environ.get('GITHUB_WORKFLOW') in ('Full native Bogo applications (reviewed branch dispatch)', 'Bogo native applications (manual verification)', 'Bogo Windows artifact acceptance (manual)'), 'Actual install smoke requires the reviewed repository/workflow context')
     require(os.environ.get('GITHUB_REF') == 'refs/heads/codex/bogo-native-rebrand-20261026', 'Actual install smoke requires the reviewed Bogo feature branch')
     base = Path(os.environ['RUNNER_TEMP'])
     require(base.is_absolute() and base.is_dir(), 'RUNNER_TEMP must be an existing absolute runner directory')
@@ -323,15 +367,19 @@ def main():
     report = {'schema': 1, 'app': args.app, 'version': lock['version'], 'platform': 'windows-x64', 'ephemeralRunnerOnly': True, 'steps': [], 'status': 'running', 'scope': 'actual old/new MSI install+upgrade, installed/portable GUI execution, actual PE icons; no publisher certificate claimed'}
     installed_codes = []
     try:
+        from bogo_msi_art import verify_msi_art
+        report['installerArtwork'] = verify_msi_art(current, args.app, output / 'installer-artwork')
+        runtime_png, runtime_png_sha256 = runtime_source_png(args.app, output)
         pin = old['windowsMsi']
         require(pin['url'].startswith('https://github.com/qptywoei777-rgb/kio-native-apps/releases/download/' + args.app + '-v'), 'Legacy input outside exact app releases')
         urllib.request.urlretrieve(pin['url'], old_file)
         require(old_file.stat().st_size == pin['bytes'] and digest(old_file) == pin['sha256'], 'Downloaded old MSI differs from its actual published pin')
         prior, new = msi_properties(old_file), msi_properties(current)
+        report['msiIdentityBeforeInstall'] = {'legacy': prior, 'bogo': new, 'pinnedUpgradeCode': old['upgradeCode']}
         require(prior['ProductName'] == old['name'] and prior['Manufacturer'] == 'KIO', 'Legacy MSI product/publisher differs')
         require(new['ProductName'] == lock['name'] and new['Manufacturer'] == 'Bogo', 'New MSI product/publisher differs')
-        require(prior['UpgradeCode'].upper() == new['UpgradeCode'].upper() == old['upgradeCode'].upper(), 'Actual old/new MSI UpgradeCode continuity failed')
-        require(prior['ProductCode'] != new['ProductCode'], 'A real new MSI ProductCode is required')
+        require(canonical_guid(prior['UpgradeCode']) == canonical_guid(new['UpgradeCode']) == canonical_guid(old['upgradeCode']), 'Actual old/new MSI UpgradeCode continuity failed')
+        require(canonical_guid(prior['ProductCode']) != canonical_guid(new['ProductCode']), 'A real new MSI ProductCode is required')
         require(product_state(prior['ProductCode']) == -1 and product_state(new['ProductCode']) == -1, 'Refusing smoke against a pre-existing Windows installation')
         destination = output / 'installed'
         appdata = child_environment(output / 'isolated-user')
@@ -356,7 +404,7 @@ def main():
         report['actualMsiUpgrade']['legacyCustomInstallDirectoryPreservedWithoutOverride'] = True
         report['shortcuts'] = shortcuts(lock['name'], old['name'], installed, bogo.ROOT / 'assets/bogo-program-icons' / (args.app + '.ico'), output, msi_shortcuts(current), new['ProductCode'])
         report['installedExe'] = {'path': str(installed), 'sha256': digest(installed), 'pe': pe_identity(installed), 'versionInfo': file_version(installed), 'icon': extract_primary_icon(installed, bogo.ROOT / 'assets/bogo-program-icons' / (args.app + '.ico'), output / 'installed-primary-icon.ico')}
-        report['installedGui'] = gui_startup(installed, appdata, output / 'installed-gui.log')
+        report['installedGui'] = gui_startup(installed, appdata, output / 'installed-gui.log', args.app, runtime_png, runtime_png_sha256)
         unpack = output / 'portable'
         with zipfile.ZipFile(portable) as archive:
             for name in archive.namelist():
@@ -367,7 +415,7 @@ def main():
         require(len(candidates) == 1 and digest(candidates[0]) == digest(installed), 'Portable and installed GUI bytes differ')
         binary = candidates[0]
         report['portableExe'] = {'path': str(binary), 'sha256': digest(binary), 'pe': pe_identity(binary), 'versionInfo': file_version(binary), 'icon': extract_primary_icon(binary, bogo.ROOT / 'assets/bogo-program-icons' / (args.app + '.ico'), output / 'portable-primary-icon.ico')}
-        report['portableGui'] = gui_startup(binary, child_environment(output / 'portable-user'), output / 'portable-gui.log')
+        report['portableGui'] = gui_startup(binary, child_environment(output / 'portable-user'), output / 'portable-gui.log', args.app, runtime_png, runtime_png_sha256)
         require(all(path.exists() and digest(path) == sha for path, sha in sentinels), 'Synthetic existing profile data changed')
         report['syntheticProfileCanariesPreserved'] = True
         report['profileScope'] = 'isolated APPDATA/LOCALAPPDATA continuity fixtures in disposable VM; real-user profile migration is separately source-audited'
