@@ -245,8 +245,10 @@ class ExactManagedTreeAndPreferences(unittest.TestCase):
         fields=('st_dev','st_ino','st_size','st_mtime_ns','st_ctime_ns','st_mode','st_nlink','st_file_attributes')
         values={key:getattr(before,key,None)for key in fields}
         after=SimpleNamespace(**dict(values,st_ino=before.st_ino+1))
-        with mock.patch.object(v.os,'fstat',return_value=after),self.assertRaisesRegex(v.Rejected,'File changed while opening')as caught:
-            v.read_owned(self.root,'managed/0001.bin',8)
+        with self.assertRaisesRegex(v.Rejected,'File changed while opening')as caught:
+            # POSIX's original cross-stat tuple remains strict. Windows now
+            # compares the stronger same-native-API fields in separate tests.
+            v._require_same_file(before,after,'File changed while opening','managed/0001.bin','after-open-fstat')
         proof=caught.exception.file_identity_diagnostic
         self.assertEqual(proof['phase'],'after-open-fstat');self.assertEqual(proof['before']['st_ino'],before.st_ino)
         self.assertEqual(proof['after']['st_ino'],before.st_ino+1);self.assertTrue(proof['identityGateUnchanged'])
@@ -263,6 +265,125 @@ class ExactManagedTreeAndPreferences(unittest.TestCase):
             absent=v.capture_preimage(self.root,self.windows_root)
             with self.assertRaisesRegex(v.Rejected,'another installation'):
                 v.verify_preimage(self.root,r'C:\another-install',absent)
+
+
+class WindowsNativeIdentity(unittest.TestCase):
+    def setUp(self):
+        self.temp=tempfile.TemporaryDirectory(prefix='owned-native-identity-',dir=HERE)
+        self.root=Path(self.temp.name);self.path=self.root/'public-code.bin';self.path.write_bytes(b'public owned code')
+        self.before=self.path.lstat()
+        self.identity={'volumeSerial':123,'fileId128':'0123456789abcdef'*2,'creation100ns':133000000000000000,
+                       'write100ns':133000000000000010,'change100ns':133000000000000020,'attributes':32,
+                       'size':self.before.st_size,'links':1,'deletePending':False,'directory':False}
+
+    def tearDown(self):self.temp.cleanup()
+
+    def api(self,mutate_index=None,field=None,value=None):
+        api=mock.Mock();sequence=[]
+        for index in range(6):
+            row=dict(self.identity)
+            if index==mutate_index:row[field]=value
+            sequence.append(row)
+        def snapshot(*args):return sequence.pop(0)
+        api.path_snapshot.side_effect=snapshot;api.fd_snapshot.side_effect=snapshot
+        return api
+
+    def kernel(self):
+        kernel=mock.Mock();kernel.CreateFileW.return_value=55;kernel.CloseHandle.return_value=1;kernel.GetFileType.return_value=1
+        def info(handle,kind,pointer,length):
+            record=pointer._obj
+            if kind==0:
+                self.assertEqual(length,40);record.CreationTime=133000000000000000;record.LastWriteTime=133000000000000010
+                record.ChangeTime=133000000000000020;record.FileAttributes=32
+            elif kind==1:
+                self.assertEqual(length,24);record.EndOfFile=17;record.NumberOfLinks=1;record.Directory=0;record.DeletePending=0
+            elif kind==18:
+                self.assertEqual(length,24);record.VolumeSerialNumber=123
+                for i in range(16):record.FileId[i]=i+1
+            else:self.fail('Unexpected metadata query class')
+            return 1
+        def final(handle,buffer,capacity,flags):
+            self.assertEqual(capacity,32768);self.assertEqual(flags,0)
+            buffer.value='\\\\?\\D:\\owned\\public-code.bin';return len(buffer.value)
+        kernel.GetFileInformationByHandleEx.side_effect=info;kernel.GetFinalPathNameByHandleW.side_effect=final
+        return kernel
+
+    def test_same_native_api_is_used_before_path_open_fd_after_path_and_fd(self):
+        api=self.api();data,stat_before=v._read_windows_owned(self.path,'public-code.bin',100,self.before,api=api)
+        self.assertEqual(data,b'public owned code');self.assertEqual(stat_before,self.before)
+        self.assertEqual([call[0]for call in api.method_calls],['path_snapshot','fd_snapshot','fd_snapshot','path_snapshot','fd_snapshot','path_snapshot'])
+
+    def test_volume_id_creation_write_change_size_and_attribute_changes_all_fail(self):
+        changes={'volumeSerial':124,'fileId128':'f'*32,'creation100ns':133000000000000001,
+                 'write100ns':133000000000000011,'change100ns':133000000000000021,'size':18,'attributes':128}
+        for field,value in changes.items():
+            for phase in range(1,6):
+                with self.subTest(field=field,phase=phase),self.assertRaises(v.Rejected)as caught:
+                    v._read_windows_owned(self.path,'public-code.bin',100,self.before,api=self.api(phase,field,value))
+                self.assertIn('nativeFileIdentity',str(caught.exception))
+                proof=caught.exception.file_identity_diagnostic;self.assertTrue(proof['allNativeFieldsCompared'])
+                self.assertNotIn(str(self.root),json.dumps(proof));self.assertLessEqual(len(json.dumps(proof)),4096)
+
+    def test_reparse_hardlink_directory_delete_pending_invalid_fields_fail(self):
+        for field,value in [('links',2),('attributes',0x420),('directory',True),('deletePending',True),
+                            ('fileId128','0'*32),('volumeSerial',0),('creation100ns',0),('change100ns',0)]:
+            with self.subTest(field=field),self.assertRaises(v.Rejected):
+                v._read_windows_owned(self.path,'public-code.bin',100,self.before,api=self.api(1,field,value))
+        with self.assertRaises(v.Rejected):v._read_windows_owned(self.path,'public-code.bin',1,self.before,api=self.api())
+
+    def test_readonly_native_call_contract_and_borrowed_fd_is_never_closed(self):
+        kernel=self.kernel();handle=mock.Mock(return_value=77);api=v._WindowsFileAPI(kernel=kernel,os_handle=handle)
+        path=r'D:\owned\public-code.bin';left=api.path_snapshot(path);right=api.fd_snapshot(42,path)
+        self.assertEqual(left,right);handle.assert_called_once_with(42)
+        kernel.CreateFileW.assert_called_once_with(path,0x80,7,None,3,0x00200000,None)
+        kernel.CloseHandle.assert_called_once_with(55)
+        self.assertEqual([call.args[1]for call in kernel.GetFileInformationByHandleEx.call_args_list],[0,1,18,0,1,18])
+        self.assertEqual(v.ctypes.sizeof(v._FileBasicInfo),40);self.assertEqual(v.ctypes.sizeof(v._FileStandardInfo),24)
+        self.assertEqual(v.ctypes.sizeof(v._FileIdInfo),24)
+        self.assertFalse(any('SetFile' in call[0]or'DeleteFile'in call[0]for call in kernel.method_calls))
+
+    def test_native_query_failure_foreign_path_and_non_disk_have_no_fallback(self):
+        for mode in('query','foreign','unc','nondisk','invalidhandle'):
+            kernel=self.kernel();api=v._WindowsFileAPI(kernel=kernel,os_handle=lambda fd:77)
+            if mode=='query':kernel.GetFileInformationByHandleEx.side_effect=None;kernel.GetFileInformationByHandleEx.return_value=0
+            elif mode in('foreign','unc'):
+                def final(h,b,c,f):b.value='\\\\?\\C:\\foreign\\file'if mode=='foreign'else'\\\\?\\UNC\\host\\file';return len(b.value)
+                kernel.GetFinalPathNameByHandleW.side_effect=final
+            elif mode=='nondisk':kernel.GetFileType.return_value=3
+            else:kernel.CreateFileW.return_value=v.ctypes.c_void_p(-1).value
+            with self.subTest(mode=mode),self.assertRaises(v.Rejected):api.path_snapshot(r'D:\owned\public-code.bin')
+
+    def test_actual_windows_native_handles_or_closed_nonwindows_platform(self):
+        if os.name=='nt':
+            api=v._windows_file_api();native_before=api.path_snapshot(self.path)
+            data,observed=v.read_owned(self.root,'public-code.bin',100)
+            self.assertEqual(data,b'public owned code');self.assertEqual(api.path_snapshot(self.path),native_before)
+            print(json.dumps({'actualWindowsSameApiRead':True,'relativePath':'public-code.bin','identity':native_before},sort_keys=True))
+        else:
+            with self.assertRaisesRegex(v.Rejected,'requires Windows'):v._WindowsFileAPI()
+
+    def test_actual_owned_path_replacement_before_open_is_rejected(self):
+        if os.name=='nt':api=v._WindowsFileAPI()
+        else:
+            # Real filesystem identities through a fixture adapter on POSIX;
+            # Windows executes the actual GetFileInformationByHandleEx branch.
+            def metadata(st):
+                return dict(self.identity,volumeSerial=st.st_dev,fileId128=st.st_ino.to_bytes(16,'little').hex(),
+                            size=st.st_size,write100ns=st.st_mtime_ns//100,change100ns=st.st_ctime_ns//100)
+            api=mock.Mock();api.path_snapshot.side_effect=lambda p:metadata(Path(p).lstat())
+            api.fd_snapshot.side_effect=lambda fd,p:metadata(os.fstat(fd))
+        original=api.path_snapshot;replacement=self.root/'replacement.bin';replacement.write_bytes(self.path.read_bytes())
+        os.utime(replacement,ns=(self.before.st_atime_ns,self.before.st_mtime_ns))
+        first=True
+        def raced(path):
+            nonlocal first
+            value=original(path)
+            if first:first=False;replacement.replace(self.path)
+            return value
+        with mock.patch.object(api,'path_snapshot',side_effect=raced),self.assertRaisesRegex(v.Rejected,'File changed while opening')as caught:
+            v._read_windows_owned(self.path,'public-code.bin',100,self.before,api=api)
+        self.assertNotEqual(caught.exception.file_identity_diagnostic['nativeBefore']['fileId128'],
+                            caught.exception.file_identity_diagnostic['nativeAfter']['fileId128'])
 
 
 class CliPreimageAndFactory(unittest.TestCase):

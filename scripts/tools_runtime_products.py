@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import hashlib
 import argparse
+import ctypes
 import hmac
 import importlib.util
 import json
@@ -126,6 +127,149 @@ def _require_same_file(before, after, message, relative, phase):
         raise error
 
 
+class _FileBasicInfo(ctypes.Structure):
+    _fields_=[('CreationTime',ctypes.c_int64),('LastAccessTime',ctypes.c_int64),
+              ('LastWriteTime',ctypes.c_int64),('ChangeTime',ctypes.c_int64),('FileAttributes',ctypes.c_uint32)]
+
+
+class _FileStandardInfo(ctypes.Structure):
+    _fields_=[('AllocationSize',ctypes.c_int64),('EndOfFile',ctypes.c_int64),('NumberOfLinks',ctypes.c_uint32),
+              ('DeletePending',ctypes.c_ubyte),('Directory',ctypes.c_ubyte)]
+
+
+class _FileIdInfo(ctypes.Structure):
+    _fields_=[('VolumeSerialNumber',ctypes.c_uint64),('FileId',ctypes.c_ubyte*16)]
+
+
+def _validate_native_identity(value):
+    keys={'volumeSerial','fileId128','creation100ns','write100ns','change100ns','attributes','size','links','deletePending','directory'}
+    require(type(value)is dict and set(value)==keys,'Native file identity shape differs')
+    require(type(value['volumeSerial'])is int and 0<value['volumeSerial']<2**64
+            and isinstance(value['fileId128'],str) and re.fullmatch(r'[0-9a-f]{32}',value['fileId128'])is not None
+            and int(value['fileId128'],16)!=0,'Native volume/128-bit file ID unavailable')
+    require(all(type(value[k])is int and value[k]>0 for k in('creation100ns','write100ns','change100ns')),
+            'Native creation/write/metadata-change time unavailable')
+    require(type(value['attributes'])is int and 0<=value['attributes']<2**32
+            and not(value['attributes']&0x400),'Native reparse point refused')
+    require(type(value['size'])is int and value['size']>=0 and type(value['links'])is int and value['links']==1,
+            'Native size/hardlink guard failed')
+    require(value['deletePending']is False and value['directory']is False,'Native nonplain/delete-pending file refused')
+    return value
+
+
+class _WindowsFileAPI:
+    """Read-only, same API identity domain; never close a borrowed CRT handle.
+
+    Microsoft primary contracts: winbase/{FILE_ID_INFO, FILE_BASIC_INFO,
+    FILE_STANDARD_INFO, GetFileInformationByHandleEx}; fileapi/CreateFileW.
+    No SetFileInformation, write/delete access, privilege or ACL changes.
+    """
+    READ_ATTRIBUTES=0x80
+    SHARE_READ_WRITE_DELETE=7
+    OPEN_EXISTING=3
+    OPEN_REPARSE_POINT=0x00200000
+
+    def __init__(self,*,kernel=None,os_handle=None):
+        if kernel is None:
+            require(os.name=='nt','Windows native metadata API requires Windows')
+            kernel=ctypes.WinDLL('kernel32',use_last_error=True)
+        if os_handle is None:
+            import msvcrt
+            os_handle=msvcrt.get_osfhandle
+        self.kernel=kernel;self.os_handle=os_handle
+        kernel.CreateFileW.argtypes=[ctypes.c_wchar_p,ctypes.c_uint32,ctypes.c_uint32,ctypes.c_void_p,
+                                    ctypes.c_uint32,ctypes.c_uint32,ctypes.c_void_p]
+        kernel.CreateFileW.restype=ctypes.c_void_p
+        kernel.CloseHandle.argtypes=[ctypes.c_void_p];kernel.CloseHandle.restype=ctypes.c_int
+        kernel.GetFileType.argtypes=[ctypes.c_void_p];kernel.GetFileType.restype=ctypes.c_uint32
+        kernel.GetFileInformationByHandleEx.argtypes=[ctypes.c_void_p,ctypes.c_int,ctypes.c_void_p,ctypes.c_uint32]
+        kernel.GetFileInformationByHandleEx.restype=ctypes.c_int
+        kernel.GetFinalPathNameByHandleW.argtypes=[ctypes.c_void_p,ctypes.c_wchar_p,ctypes.c_uint32,ctypes.c_uint32]
+        kernel.GetFinalPathNameByHandleW.restype=ctypes.c_uint32
+        require((ctypes.sizeof(_FileBasicInfo),ctypes.sizeof(_FileStandardInfo),ctypes.sizeof(_FileIdInfo))==(40,24,24),
+                'Native metadata structure ABI differs')
+
+    def checked(self,value,label):
+        if not value:
+            code=ctypes.get_last_error() if hasattr(ctypes,'get_last_error') else 0
+            raise Rejected('Windows native '+label+' failed; errorCode='+str(code))
+        return value
+
+    def handle_snapshot(self,handle,path):
+        require(type(handle)is int and 0<handle<2**(ctypes.sizeof(ctypes.c_void_p)*8)
+                and handle!=ctypes.c_void_p(-1).value,'Native read handle invalid')
+        require(self.kernel.GetFileType(handle)==1,'Native handle is not a disk file')
+        basic=_FileBasicInfo();standard=_FileStandardInfo();ident=_FileIdInfo()
+        for kind,record in((0,basic),(1,standard),(18,ident)):
+            self.checked(self.kernel.GetFileInformationByHandleEx(handle,kind,ctypes.byref(record),ctypes.sizeof(record)),
+                         'GetFileInformationByHandleEx/'+str(kind))
+        buffer=ctypes.create_unicode_buffer(32768)
+        length=self.checked(self.kernel.GetFinalPathNameByHandleW(handle,buffer,len(buffer),0),'GetFinalPathNameByHandleW')
+        require(length<len(buffer),'Native final path exceeds bound')
+        final=buffer.value
+        require(final.startswith('\\\\?\\') and not final.startswith('\\\\?\\UNC\\'),'Native final path is not a local DOS path')
+        require(ntpath.normcase(ntpath.normpath(final[4:]))==ntpath.normcase(ntpath.normpath(str(path))),
+                'Native final path escaped the literal owned installation path')
+        return _validate_native_identity({'volumeSerial':int(ident.VolumeSerialNumber),'fileId128':bytes(ident.FileId).hex(),
+            'creation100ns':int(basic.CreationTime),'write100ns':int(basic.LastWriteTime),'change100ns':int(basic.ChangeTime),
+            'attributes':int(basic.FileAttributes),'size':int(standard.EndOfFile),'links':int(standard.NumberOfLinks),
+            'deletePending':bool(standard.DeletePending),'directory':bool(standard.Directory)})
+
+    def path_snapshot(self,path):
+        handle=self.kernel.CreateFileW(str(path),self.READ_ATTRIBUTES,self.SHARE_READ_WRITE_DELETE,None,
+                                       self.OPEN_EXISTING,self.OPEN_REPARSE_POINT,None)
+        self.checked(handle and handle!=ctypes.c_void_p(-1).value,'CreateFileW/readonly-attributes')
+        try:return self.handle_snapshot(handle,path)
+        finally:self.checked(self.kernel.CloseHandle(handle),'CloseHandle/owned-metadata-handle')
+
+    def fd_snapshot(self,fd,path):
+        return self.handle_snapshot(int(self.os_handle(fd)),path)
+
+
+_WINDOWS_FILE_API=None
+
+
+def _windows_file_api():
+    # Cache API bindings only. Every path/handle metadata snapshot stays fresh.
+    global _WINDOWS_FILE_API
+    if _WINDOWS_FILE_API is None:_WINDOWS_FILE_API=_WindowsFileAPI()
+    return _WINDOWS_FILE_API
+
+
+def _require_same_native(before,after,message,relative,phase,python_before,python_after):
+    _validate_native_identity(before);_validate_native_identity(after)
+    if before!=after:
+        fields=('st_dev','st_ino','st_size','st_mtime_ns','st_ctime_ns','st_mode','st_nlink','st_file_attributes')
+        diagnostic={'phase':phase,'relativePath':safe_relative(relative)[:120],'api':'GetFileInformationByHandleEx',
+                    'nativeBefore':before,'nativeAfter':after,'allNativeFieldsCompared':True,
+                    'pythonBefore':{k:getattr(python_before,k,None)for k in fields},
+                    'pythonAfter':{k:getattr(python_after,k,None)for k in fields}}
+        text=json.dumps(diagnostic,separators=(',',':'),sort_keys=True)
+        require(len(text)<=4096,'Native identity diagnostic exceeds bound')
+        error=Rejected(message+'; nativeFileIdentity='+text);error.file_identity_diagnostic=diagnostic;raise error
+
+
+def _read_windows_owned(path,relative,maximum,before,*,api=None):
+    api=api if api is not None else _windows_file_api()
+    native_before=_validate_native_identity(api.path_snapshot(path))
+    require(native_before['size']==before.st_size and native_before['size']<=maximum,'Native source size/bound differs')
+    flags=os.O_RDONLY|getattr(os,'O_BINARY',0)|getattr(os,'O_NOFOLLOW',0)
+    with os.fdopen(os.open(path,flags),'rb')as stream:
+        _require_same_native(native_before,api.fd_snapshot(stream.fileno(),path),'File changed while opening',relative,
+                             'after-open-native-fd',before,os.fstat(stream.fileno()))
+        data=stream.read(maximum+1);require(len(data)<=maximum,'File exceeds read bound')
+        _require_same_native(native_before,api.fd_snapshot(stream.fileno(),path),'File changed during read',relative,
+                             'after-read-native-fd',before,os.fstat(stream.fileno()))
+        _require_same_native(native_before,api.path_snapshot(path),'File replaced during read',relative,
+                             'after-read-native-path',before,_regular_unlinked(path))
+        _require_same_native(native_before,api.fd_snapshot(stream.fileno(),path),'File changed after path read',relative,
+                             'after-path-native-fd',before,os.fstat(stream.fileno()))
+    after=_regular_unlinked(path)
+    _require_same_native(native_before,api.path_snapshot(path),'File replaced after close',relative,
+                         'after-close-native-path',before,after)
+    return data,before
+
+
 def _regular_unlinked(path):
     st = path.lstat()
     require(stat.S_ISREG(st.st_mode) and not stat.S_ISLNK(st.st_mode)
@@ -146,6 +290,7 @@ def read_owned(root, relative, maximum):
     path = root.joinpath(*relative.split('/'))
     before = _regular_unlinked(path)
     require(before.st_size <= maximum, 'File exceeds read bound')
+    if os.name=='nt':return _read_windows_owned(path,relative,maximum,before)
     flags = os.O_RDONLY | getattr(os, 'O_BINARY', 0) | getattr(os, 'O_NOFOLLOW', 0)
     with os.fdopen(os.open(path, flags), 'rb') as stream:
         _require_same_file(before,os.fstat(stream.fileno()),'File changed while opening',relative,'after-open-fstat')
