@@ -29,6 +29,11 @@ on:
 permissions:
   contents: read
 
+# File manifests and translated source are UTF-8 on every operating system.
+# Raw archive/icon SHA-256 validation continues to operate on unchanged bytes.
+env:
+  PYTHONUTF8: '1'
+
 concurrency:
   group: bogo-native-${{ inputs.app }}-${{ github.ref }}
   cancel-in-progress: false

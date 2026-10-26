@@ -16,7 +16,7 @@ import bogo_brand as brand
 
 class BogoNativeIdentity(unittest.TestCase):
     def test_all_fourteen_exact_overlays_preserve_legacy_source_locks(self):
-        catalog = json.loads(bogo.CATALOG.read_text())
+        catalog = json.loads(bogo.CATALOG.read_text(encoding='utf-8'))
         self.assertEqual(len(catalog['applications']), 14)
         self.assertEqual({r['id'] for r in catalog['applications']}, set(brand.NAMES))
         for app in brand.NAMES:
@@ -30,7 +30,7 @@ class BogoNativeIdentity(unittest.TestCase):
 
     def test_native_ico_contains_all_shell_resolutions_and_icns_retains_original_1024(self):
         assets = ROOT / 'assets/bogo-program-icons'
-        rows = json.loads((assets / 'native-icons.json').read_text())['items']
+        rows = json.loads((assets / 'native-icons.json').read_text(encoding='utf-8'))['items']
         self.assertEqual(len(rows), 14)
         original_hashes = set()
         for row in rows:
@@ -79,7 +79,7 @@ class BogoNativeIdentity(unittest.TestCase):
     def test_launcher_bundles_every_editor_original_in_its_actual_program_list(self):
         lock = bogo.load_lock('launcher')
         files = {item['path']: item['after'] for item in lock['bogoOverlay']['files']}
-        originals = {r['id']: r['sha256'] for r in json.loads((ROOT / 'assets/bogo-program-icons/manifest.json').read_text())['items']}
+        originals = {r['id']: r['sha256'] for r in json.loads((ROOT / 'assets/bogo-program-icons/manifest.json').read_text(encoding='utf-8'))['items']}
         for app in brand.NAMES:
             if app == 'launcher':
                 continue

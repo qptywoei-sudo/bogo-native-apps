@@ -33,11 +33,11 @@ class PublishedArtworkTests(unittest.TestCase):
                     self.assertEqual(len(names), 1)
                     path.parent.mkdir(parents=True)
                     path.write_bytes(z.read(names[0]))
-                before = path.read_text()
+                before = path.read_text(encoding='utf-8')
                 draw = re.findall(r'^.*\$g\.DrawImage.*$', before, re.M)
                 artwork_inputs = re.findall(r'^.*(?:FromFile|New-InstallerArt \(|New-PanelBitmap\().*$', before, re.M)
                 self.assertEqual(art.transform_packaging_source(root, app), ['packaging/windows/package.ps1'])
-                after = path.read_text()
+                after = path.read_text(encoding='utf-8')
                 self.assertEqual(draw, re.findall(r'^.*\$g\.DrawImage.*$', after, re.M))
                 self.assertEqual(artwork_inputs, re.findall(r'^.*(?:FromFile|New-InstallerArt \(|New-PanelBitmap\().*$', after, re.M))
                 if app == 'light':
@@ -52,7 +52,7 @@ class PublishedArtworkTests(unittest.TestCase):
                         self.assertIn("FromHtml('#F1D3BD')", after)
                 with self.assertRaises(ValueError):
                     art.transform_packaging_source(root, app)
-                self.assertEqual(path.read_text(), after)
+                self.assertEqual(path.read_text(encoding='utf-8'), after)
 
 
 if __name__ == '__main__':

@@ -58,14 +58,14 @@ class PublishedSourceOverlayTests(unittest.TestCase):
             self.assertEqual(len(changed), 9)
             for name, data in before.items():
                 self.assertEqual((root / name).read_bytes(), data)
-            catalog = (root / changed[0]).read_text()
+            catalog = (root / changed[0]).read_text(encoding='utf-8')
             for old in bogo.LEGACY_NAMES.values():
                 self.assertIn('"' + old + '"', catalog)
             self.assertIn('"Bogo CAD"', catalog)
-            registry = (root / 'crates/core/src/kio_registry.rs').read_text()
+            registry = (root / 'crates/core/src/kio_registry.rs').read_text(encoding='utf-8')
             self.assertIn('full_version.split_once("-bogo.").or_else(|| full_version.split_once("-kio."))', registry)
             self.assertIn('both_measured_release_families_remain_bound', registry)
-            install = (root / 'crates/native/src/install.rs').read_text()
+            install = (root / 'crates/native/src/install.rs').read_text(encoding='utf-8')
             self.assertIn('std::fs::rename(&backup, &old)', install)
             self.assertIn('previous application remains at', install)
             self.assertIn('app.legacy_name(), "KIO"', install)
@@ -80,7 +80,7 @@ class PublishedSourceOverlayTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = self.source('light', temporary)
             paths = bogo.transform_light_editor_discovery(root)
-            text = (root / paths[0]).read_text()
+            text = (root / paths[0]).read_text(encoding='utf-8')
             self.assertIn('bogo_mac_candidates(env("HOME").as_deref()).into_iter().chain(mac_candidates', text)
             self.assertIn('KIO\\Photo', text)
             self.assertIn('Bogo Photo.exe', text)
@@ -91,7 +91,7 @@ class PublishedSourceOverlayTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = self.source('pdf', temporary)
             paths = bogo.transform_pdf_updates(root)
-            app, ui = [(root / name).read_text() for name in paths]
+            app, ui = [(root / name).read_text(encoding='utf-8') for name in paths]
             self.assertIn('offers_only_the_exact_published_kio_pdf_release_page', app)
             self.assertIn('old_and_new_pdf_release_names_cannot_be_mixed', app)
             self.assertIn('Some("com.kio.pdf")', app)
@@ -103,18 +103,18 @@ class PublishedSourceOverlayTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = self.source('launcher', temporary)
             bogo.transform_launcher(root, {'id': 'launcher', 'bundleId': 'com.kio.launcher'})
-            catalog = (root / 'crates/core/src/catalog.rs').read_text()
+            catalog = (root / 'crates/core/src/catalog.rs').read_text(encoding='utf-8')
             self.assertNotIn(bogo.LEGACY_REPOSITORY, catalog)
             self.assertIn(bogo.BOGO_REPOSITORY, catalog)
-            registry = (root / 'crates/core/src/kio_registry.rs').read_text()
+            registry = (root / 'crates/core/src/kio_registry.rs').read_text(encoding='utf-8')
             self.assertIn(bogo.BOGO_REGISTRY, registry)
             self.assertIn('if full_version.contains("-bogo.") { REPOSITORY } else { LEGACY_REPOSITORY }', registry)
             self.assertIn('catalog_family', registry)
-            backend = (root / 'crates/native/src/backend.rs').read_text()
+            backend = (root / 'crates/native/src/backend.rs').read_text(encoding='utf-8')
             self.assertIn('registry::catalog_family(&body, true)', backend)
             self.assertIn('registry::catalog_family(&body, false)', backend)
             self.assertIn('http.get_feed(registry::LEGACY_REGISTRY_URL)', backend)
-            self.assertIn('text.to_uppercase().replace("BOGO", "Bogo")', (root / 'crates/ui-egui/src/widgets.rs').read_text())
+            self.assertIn('text.to_uppercase().replace("BOGO", "Bogo")', (root / 'crates/ui-egui/src/widgets.rs').read_text(encoding='utf-8'))
 
 
 if __name__ == '__main__':

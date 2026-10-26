@@ -16,7 +16,7 @@ import smoke_bogo_windows as smoke
 
 class WindowsSmokeInputs(unittest.TestCase):
     def test_exact_fourteen_published_upgrade_pins_keep_each_actual_upgrade_code(self):
-        pins = json.loads((ROOT / 'manifests/bogo-legacy-upgrade-inputs.json').read_text())
+        pins = json.loads((ROOT / 'manifests/bogo-legacy-upgrade-inputs.json').read_text(encoding='utf-8'))
         self.assertEqual(pins['repository'], 'qptywoei777-rgb/kio-native-apps')
         self.assertEqual({row['id'] for row in pins['applications']}, set(bogo.NAMES))
         for row in pins['applications']:
@@ -103,7 +103,7 @@ class WindowsSmokeInputs(unittest.TestCase):
         paths = {relative for relative, _ in bogo.public_files(bogo.load_lock('grid'))}
         for required in ('scripts/smoke_bogo_windows.py', 'tests/test_bogo_windows_smoke.py', 'manifests/bogo-legacy-upgrade-inputs.json', '.github/workflows/full-native-launcher.yml'):
             self.assertIn(required, paths)
-        self.assertTrue({row['patch'] for row in json.loads(bogo.CATALOG.read_text())['applications']}.issubset(paths))
+        self.assertTrue({row['patch'] for row in json.loads(bogo.CATALOG.read_text(encoding='utf-8'))['applications']}.issubset(paths))
 
 
 if __name__ == '__main__':

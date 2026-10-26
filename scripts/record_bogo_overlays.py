@@ -33,7 +33,7 @@ def main():
     args = parser.parse_args()
     selected = list(NAMES) if args.app == 'all' else [args.app]
     catalog_path = ROOT / 'manifests/bogo-native-apps.json'
-    catalog = json.loads(catalog_path.read_text()) if catalog_path.exists() else {'schema': 1, 'brand': 'Bogo', 'palette': PALETTE, 'applications': []}
+    catalog = json.loads(catalog_path.read_text(encoding='utf-8')) if catalog_path.exists() else {'schema': 1, 'brand': 'Bogo', 'palette': PALETTE, 'applications': []}
     list(originals())
     for app in selected:
         lock = launcher.load_lock() if app == 'launcher' else full.load_lock(app)

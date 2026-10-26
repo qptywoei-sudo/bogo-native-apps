@@ -59,13 +59,13 @@ class PublishedInstallerUpgradeTests(unittest.TestCase):
             with self.subTest(app=app), tempfile.TemporaryDirectory() as temporary:
                 root = Path(temporary)
                 path = self.source(app, root)
-                before = ET.fromstring(path.read_text())
-                text = path.read_text().replace('Name="KIO ' + upgrade.APPS[app][1] + '.exe"', 'Name="Bogo ' + upgrade.APPS[app][2] + '.exe"')
+                before = ET.fromstring(path.read_text(encoding='utf-8'))
+                text = path.read_text(encoding='utf-8').replace('Name="KIO ' + upgrade.APPS[app][1] + '.exe"', 'Name="Bogo ' + upgrade.APPS[app][2] + '.exe"')
                 if app == 'pdf':
                     text = text.replace('<FileSearch Name="KIO PDF.lnk" />', '<FileSearch Name="Bogo PDF.lnk" />')
                 path.write_text(text)
                 self.assertEqual(upgrade.transform_windows_upgrade(root, app), ['packaging/windows/' + path.name])
-                after = ET.fromstring(path.read_text())
+                after = ET.fromstring(path.read_text(encoding='utf-8'))
                 receipt = upgrade.validate_additive_searches(before, after, app)
                 self.assertTrue(receipt['originalSearchesUnchanged'])
                 for tag in ('RegistryValue', 'Component', 'ProgId', 'MajorUpgrade'):
@@ -86,9 +86,9 @@ class PublishedInstallerUpgradeTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             path = self.source('cad', root)
-            before = ET.fromstring(path.read_text())
+            before = ET.fromstring(path.read_text(encoding='utf-8'))
             upgrade.transform_windows_upgrade(root, 'cad')
-            after = ET.fromstring(path.read_text())
+            after = ET.fromstring(path.read_text(encoding='utf-8'))
             search = after.find('.//w:RegistrySearch[@Id="BogoPreviousAppFolder"]', upgrade.NS)
             for key, value in [('Root', 'HKCU'), ('Key', 'Software\\Other App'), ('Type', 'raw'), ('Bitness', 'always32')]:
                 altered = copy.deepcopy(after)

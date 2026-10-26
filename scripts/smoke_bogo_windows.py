@@ -313,12 +313,12 @@ def main():
     lock = bogo.load_lock(args.app)
     folder = args.directory.resolve()
     bogo.full.verify(folder, lock, 'windows-x64')
-    pins = json.loads((bogo.ROOT / 'manifests/bogo-legacy-upgrade-inputs.json').read_text())
+    pins = json.loads((bogo.ROOT / 'manifests/bogo-legacy-upgrade-inputs.json').read_text(encoding='utf-8'))
     old = next(row for row in pins['applications'] if row['id'] == args.app)
     old_file = output / 'verified-legacy.msi'
     current = folder / (lock['assetPrefix'] + '-' + lock['version'] + '-windows-x64.msi')
     portable = folder / (lock['assetPrefix'] + '-' + lock['version'] + '-windows-x64.zip')
-    provenance = json.loads((folder / (lock['assetPrefix'] + '-' + lock['version'] + '-windows-x64-provenance.json')).read_text())
+    provenance = json.loads((folder / (lock['assetPrefix'] + '-' + lock['version'] + '-windows-x64-provenance.json')).read_text(encoding='utf-8'))
     expected_binary = provenance['binaries']['app']
     report = {'schema': 1, 'app': args.app, 'version': lock['version'], 'platform': 'windows-x64', 'ephemeralRunnerOnly': True, 'steps': [], 'status': 'running', 'scope': 'actual old/new MSI install+upgrade, installed/portable GUI execution, actual PE icons; no publisher certificate claimed'}
     installed_codes = []

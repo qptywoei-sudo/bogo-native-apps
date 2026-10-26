@@ -34,7 +34,7 @@ def base_lock(app):
 
 def load_lock(app):
     require(app in NAMES, 'Unknown Bogo native app')
-    data = json.loads(CATALOG.read_text())
+    data = json.loads(CATALOG.read_text(encoding='utf-8'))
     require(data['schema'] == 1 and data['brand'] == 'Bogo' and data['palette'] == PALETTE, 'Wrong Bogo native catalog')
     rows = [row for row in data['applications'] if row['id'] == app]
     require(len(rows) == 1, 'Missing or duplicate Bogo native overlay')
@@ -114,7 +114,7 @@ def public_files(lock):
     extra += ['scripts/bogo_windows_upgrade.py', 'tests/test_bogo_windows_upgrade.py', 'docs/legacy-native-readme.md', 'manifests/bogo-native-downloads.json']
     extra += ['scripts/bogo_packaging.py', 'tests/test_bogo_packaging.py']
     extra += ['docs/bogo-ci-verification.md']
-    extra += [row['patch'] for row in json.loads(CATALOG.read_text())['applications']]
+    extra += [row['patch'] for row in json.loads(CATALOG.read_text(encoding='utf-8'))['applications']]
     extra += [p.relative_to(ROOT).as_posix() for p in (ROOT / 'assets/bogo-program-icons').iterdir() if p.is_file()]
     for relative in sorted(set(extra) - seen):
         path = ROOT / full.common.check_public_path(relative)
@@ -158,7 +158,7 @@ def prepare(args, lock):
         full.paths, full.CATALOG = old_paths, old_catalog
     row = lock['bogoOverlay']
     require(full.source_fingerprint(legacy, source) == row['baseSourceTreeSha256'], 'Bogo overlay base tree differs')
-    before_xml = (source / row['windowsInstallerIdentity']['path']).read_text()
+    before_xml = (source / row['windowsInstallerIdentity']['path']).read_text(encoding='utf-8')
     for item in row['files']:
         file = source / item['path']
         identity = item['before']
@@ -170,7 +170,7 @@ def prepare(args, lock):
         require((identity is None and not file.exists()) or (identity is not None and file.is_file() and digest(file) == identity['sha256'] and file.stat().st_size == identity['bytes']), 'Bogo overlay after bytes differ: ' + item['path'])
     require(full.source_fingerprint(lock, source) == row['sourceTreeSha256'], 'Bogo complete source tree differs')
     windows = audit_windows_transition(legacy, source, before_xml)
-    record = json.loads((work / 'prepared.json').read_text())
+    record = json.loads((work / 'prepared.json').read_text(encoding='utf-8'))
     record.update({'lock': lock, 'catalogSha256': digest(CATALOG), 'sourceTreeSha256': row['sourceTreeSha256'], 'bogoOverlay': {'path': row['patch'], 'sha256': row['patchSha256']}, 'windowsInstallerIdentity': windows})
     full.write_json(work / 'prepared.json', record)
     print('Prepared exact Bogo native overlay: ' + lock['name'])

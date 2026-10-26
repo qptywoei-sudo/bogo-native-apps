@@ -145,17 +145,17 @@ class PublishedSourceQAProfiles(unittest.TestCase):
                 self.assertTrue(changed)
                 self.assertFalse(any(path.startswith("crates/engine/") for path in changed))
                 for relative, marker in contracts[app]:
-                    self.assertIn(marker, (root / relative).read_text())
+                    self.assertIn(marker, (root / relative).read_text(encoding='utf-8'))
                 if app == "pdf":
                     # The QA overlay preserves the historical normal settings identity.
-                    text = (root / "apps/pdfcraft/src/main.rs").read_text()
+                    text = (root / "apps/pdfcraft/src/main.rs").read_text(encoding='utf-8')
                     self.assertIn('eframe::storage_dir("KIO PDF")', text)
                 if app == "launcher":
-                    text = (root / "crates/native/src/single_instance.rs").read_text()
+                    text = (root / "crates/native/src/single_instance.rs").read_text(encoding='utf-8')
                     self.assertLess(text.index("crate::bogo_qa::launcher_listener(addr)"), text.index("match ask(addr"))
                     for old in ('const PORT: u16 = 47_514;', 'b"kio-launcher:show"', '"kio-launcher:hello "'):
                         self.assertIn(old, text)
-                    self.assertIn('const DIR: &str = "com.kio.launcher"', (root / "crates/native/src/paths.rs").read_text())
+                    self.assertIn('const DIR: &str = "com.kio.launcher"', (root / "crates/native/src/paths.rs").read_text(encoding='utf-8'))
                 # Every untouched upstream file remains byte-identical.
                 for relative, content in before.items():
                     if relative not in changed:

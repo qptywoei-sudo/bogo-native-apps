@@ -14,7 +14,7 @@ ICNS_SIZES = {'icp4': 16, 'icp5': 32, 'icp6': 64, 'ic07': 128, 'ic08': 256, 'ic0
 
 def originals():
     from PIL import Image
-    manifest = json.loads((ASSETS / 'manifest.json').read_text())
+    manifest = json.loads((ASSETS / 'manifest.json').read_text(encoding='utf-8'))
     rows = manifest['items']
     expected = ('cad', 'design', 'vector', 'film', 'light', 'pdf', 'effect', 'ui', 'word', 'sound', 'deck', 'grid', 'launcher', 'photo')
     if len(rows) != 14 or tuple(r['id'] for r in rows) != expected:
