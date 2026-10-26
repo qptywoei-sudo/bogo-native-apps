@@ -652,6 +652,130 @@ def wait_portable_launcher(process,launcher,cached,source,output,env):
         write_json(path,report)
 
 
+EXTRACTION_LOCALE_METADATA=r'''
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+Add-Type @'
+using System.Runtime.InteropServices;
+public class BogoReadCodePages {
+ [DllImport("kernel32.dll")]public static extern uint GetACP();
+ [DllImport("kernel32.dll")]public static extern uint GetOEMCP();
+ [DllImport("kernel32.dll")]public static extern uint GetConsoleCP();
+ [DllImport("kernel32.dll")]public static extern uint GetConsoleOutputCP();
+}
+'@
+$method=[IO.Compression.ZipFile].GetMethod('ExtractToDirectory',[Type[]]@([string],[string]))
+@{ansiCodePage=[BogoReadCodePages]::GetACP();oemCodePage=[BogoReadCodePages]::GetOEMCP();consoleInputCodePage=[BogoReadCodePages]::GetConsoleCP();consoleOutputCodePage=[BogoReadCodePages]::GetConsoleOutputCP();utf8CodePageConstant=65001;defaultDotNetCodePage=[Text.Encoding]::Default.CodePage;culture=[Globalization.CultureInfo]::CurrentCulture.Name;uiCulture=[Globalization.CultureInfo]::CurrentUICulture.Name;frameworkVersion=[Environment]::Version.ToString();twoStringExtractOverloadAvailable=($null -ne $method);twoStringExtractMethod=if($method){$method.ToString()}else{$null};settingsChanged=$false}|ConvertTo-Json -Compress
+'''
+
+DOTNET_DIAGNOSTIC_EXTRACT=r'''
+$ErrorActionPreference='Stop'
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+$method=[IO.Compression.ZipFile].GetMethod('ExtractToDirectory',[Type[]]@([string],[string]))
+if($null -eq $method){throw 'Normal .NET two-string ExtractToDirectory overload unavailable'}
+if(Test-Path -LiteralPath $env:BOGO_DIAG_DEST){throw 'Diagnostic destination must be new, never overwrite'}
+[IO.Compression.ZipFile]::ExtractToDirectory([string]$env:BOGO_DIAG_ARCHIVE,[string]$env:BOGO_DIAG_DEST)
+@{diagnosticExtractionOnly=$true;downloadedApplicationsExecuted=$false;overload=$method.ToString();completed=$true}|ConvertTo-Json -Compress
+'''
+
+
+def extraction_diagnostic_target(work,label):
+    require(label in('source-tar-replay','normal-dotnet-replay'),'Unapproved extraction diagnostic label')
+    work=Path(work);require(work.is_absolute() and work.is_dir() and not work.is_symlink(),'Diagnostic work parent is not plain/absolute')
+    root=work/'bounded-extraction-diagnostics'
+    if not root.exists():root.mkdir(mode=0o700)
+    require(root.is_dir() and not root.is_symlink() and not(getattr(root.lstat(),'st_file_attributes',0)&0x400),'Diagnostic parent linked')
+    target=root/label;require(not target.exists() and not target.is_symlink(),'Diagnostic extraction would overwrite existing files')
+    return target
+
+
+def known_managed_extraction_readback(root,expected):
+    # Source-authenticated expected names only. Unknown/profile files are never
+    # opened or traversed; these are not the runtime-product acceptance rules.
+    from tools_runtime_products import read_owned,safe_relative
+    root=Path(root);require(root.is_absolute() and not root.is_symlink(),'Known-code readback root not plain/absolute')
+    require(type(expected)is dict and len(expected)<=5000,'Known-code inventory bound exceeded')
+    missing=[];changed=[];unicode=[];exact=0;actual_bytes=0;expected_bytes=0
+    for relative,row in sorted(expected.items()):
+        safe_relative(relative)
+        require(type(row)is dict and set(row)=={'bytes','sha256'} and type(row['bytes'])is int and 0<=row['bytes']<=1024**3
+                and isinstance(row['sha256'],str) and re.fullmatch(r'[0-9a-f]{64}',row['sha256'])is not None,'Invalid source-bound expected file')
+        expected_bytes+=row['bytes'];item={'path':relative,'expectedBytes':row['bytes'],'expectedSha256':row['sha256']}
+        try:data,_=read_owned(root,relative,row['bytes'])
+        except FileNotFoundError:
+            item['status']='missing';missing.append(item)
+        except (OSError,ValueError)as error:
+            item.update(status='not-safe-or-readable',errorType=type(error).__name__);changed.append(item)
+        else:
+            sha=hashlib.sha256(data).hexdigest();actual_bytes+=len(data)
+            item.update(actualBytes=len(data),actualSha256=sha,status='exact'if len(data)==row['bytes'] and sha==row['sha256']else'changed')
+            if item['status']=='exact':exact+=1
+            else:changed.append(item)
+        if not relative.isascii():unicode.append(item)
+    return {'diagnosticOnly':True,'expectedFiles':len(expected),'expectedBytes':expected_bytes,'exactKnownFiles':exact,
+        'actualKnownBytes':actual_bytes,'missingCount':len(missing),'changedOrUnsafeCount':len(changed),
+        'missing':missing[:100],'changedOrUnsafe':changed[:100],'differencesTruncated':len(missing)+len(changed)>100,
+        'allUnicodeExpectedFiles':unicode,'allKnownFilesExact':exact==len(expected),'unknownOrProfileFilesRead':False}
+
+
+def bounded_public_log(path):
+    path=Path(path);st=path.lstat();require(stat.S_ISREG(st.st_mode) and not stat.S_ISLNK(st.st_mode)
+        and st.st_size<=8*1024**2,'Public extractor log exceeds bound or is linked')
+    with path.open('rb')as stream:raw=stream.read(16384)
+    return {'totalBytes':st.st_size,'excerptBytes':len(raw),'excerptSha256':hashlib.sha256(raw).hexdigest(),
+        'utf8ReplacementExcerpt':raw.decode('utf-8',errors='replace'),'rawExcerptBase64':base64.b64encode(raw).decode('ascii'),
+        'truncated':st.st_size>len(raw),'publicExtractorOutputOnly':True}
+
+
+def diagnostic_extractor_process(command,environment,work,label):
+    require(os.name=='nt' and label in('tar-version','source-tar-replay','normal-dotnet-replay'),'Diagnostic process scope differs')
+    work=Path(work);stdout=work/(label+'-public-stdout.tmp');stderr=work/(label+'-public-stderr.tmp')
+    require(not stdout.exists() and not stderr.exists(),'Diagnostic log files must be fresh')
+    with stdout.open('xb')as a,stderr.open('xb')as b:
+        process=subprocess.Popen(command,env=environment,stdout=a,stderr=b,creationflags=subprocess.CREATE_NO_WINDOW)
+        timed_out=False
+        try:code=process.wait(timeout=120)
+        except subprocess.TimeoutExpired:timed_out=True;code=None
+    # No terminate/kill even on a timeout. A diagnostic never replaces the
+    # original failed product operation or grants application acceptance.
+    return {'diagnosticOnly':True,'pid':process.pid,'returncode':code,'timedOut':timed_out,'noConsoleCreationFlag':True,
+        'timeoutSeconds':120,'stdout':bounded_public_log(stdout),'stderr':bounded_public_log(stderr),'processStoppedByChecker':False}
+
+
+def failed_sfx_extraction_diagnostics(assets,cached,work,output,env):
+    from tools_runtime_products import pinned_update_inventory
+    require(os.name=='nt','Extraction diagnostic requires actual Windows')
+    archive=Path(assets)/PINS['windows-update'][1];expected=pinned_update_inventory(archive)
+    require(len(expected)==3905,'Original complete managed inventory differs')
+    cached=Path(cached);local=Path(os.environ['LOCALAPPDATA'])
+    require(cached==local/'KIO Tools'/VERSION/'KIO-Control-Windows/KIOControl.exe','Diagnostic escaped the actual frozen SFX cache')
+    path=output/'windows-sfx-extraction-diagnostics.json'
+    result={'diagnosticOnly':True,'productionSfxFailureRemains':True,'applicationAcceptanceGranted':False,
+        'actualProductOrPackageChanged':False,'archiveBytes':PINS['windows-update'][2],'archiveSha256':PINS['windows-update'][3],
+        'sourceCommit':SOURCE_COMMIT,'normalSettingsChanged':False,'privateProfilesOrUnknownFilesRead':False}
+    try:
+        result['actualFailedCacheKnownFiles']=known_managed_extraction_readback(cached.parent,expected);write_json(path,result)
+        tar=Path(os.environ.get('SystemRoot',r'C:\Windows'))/'System32/tar.exe'
+        require(tar.is_file() and not tar.is_symlink() and not(getattr(tar.lstat(),'st_file_attributes',0)&0x400),'Source system tar not plain')
+        result['systemTarSha256']=digest(tar)
+        result['sourceTarVersion']=diagnostic_extractor_process([str(tar),'--version'],env,work,'tar-version');write_json(path,result)
+        result['normalProcessLocaleMetadata']=powershell(EXTRACTION_LOCALE_METADATA,env);write_json(path,result)
+        tar_target=extraction_diagnostic_target(work,'source-tar-replay')
+        tar_target.mkdir(mode=0o700)
+        result['sourceTarReplay']=diagnostic_extractor_process([str(tar),'-xf',str(archive),'-C',str(tar_target)],env,work,'source-tar-replay')
+        result['sourceTarReplayKnownFiles']=known_managed_extraction_readback(tar_target/'KIO-Control-Windows',expected);write_json(path,result)
+        net_target=extraction_diagnostic_target(work,'normal-dotnet-replay')
+        require(result['normalProcessLocaleMetadata'].get('twoStringExtractOverloadAvailable')is True,'Ordinary framework overload unavailable')
+        net_env=dict(env,BOGO_DIAG_ARCHIVE=str(archive),BOGO_DIAG_DEST=str(net_target))
+        powershell_exe=Path(os.environ.get('SystemRoot',r'C:\Windows'))/'System32/WindowsPowerShell/v1.0/powershell.exe'
+        result['normalDotNetReplay']=diagnostic_extractor_process([str(powershell_exe),'-NoProfile','-NonInteractive','-Command',DOTNET_DIAGNOSTIC_EXTRACT],net_env,work,'normal-dotnet-replay')
+        result['normalDotNetReplayKnownFiles']=known_managed_extraction_readback(net_target/'KIO-Control-Windows',expected)
+        require(digest(archive)==PINS['windows-update'][3] and digest(tar)==result['systemTarSha256'],'Authenticated archive/system tar changed')
+    except Exception as error:
+        result['diagnosticError']={'type':type(error).__name__,'message':str(error)[:1000]}
+    finally:write_json(path,result)
+    return result
+
+
 def windows_window(pid, env, timeout=120, title='Bogo Tools'):
     script=r'''Add-Type @'
 using System;using System.Text;using System.Runtime.InteropServices;
@@ -1191,7 +1315,13 @@ def accept(root, target):
             pid=None
             try:
                 with (work/'portable-private-process.log').open('wb') as log:launcher_process=subprocess.Popen([str(portable)],env=environment,stdout=log,stderr=subprocess.STDOUT)
-                report['checks']['portableLauncher']=wait_portable_launcher(launcher_process,portable,cached,source,output,environment)
+                try:report['checks']['portableLauncher']=wait_portable_launcher(launcher_process,portable,cached,source,output,environment)
+                except Exception:
+                    try:failed_sfx_extraction_diagnostics(assets,cached,work,output,environment)
+                    except Exception as diagnostic_error:
+                        write_json(output/'windows-sfx-diagnostic-error.json',{'diagnosticOnly':True,'productionSfxFailureRemains':True,
+                            'type':type(diagnostic_error).__name__,'message':str(diagnostic_error)[:1000]})
+                    raise # Diagnostics never substitute an extractor or turn the product failure into success.
                 pid=windows_pid(cached,environment)
                 verify_executable(cached,'windows')
                 expected,actual=inventory(update),inventory(cached.parent)
@@ -1205,6 +1335,7 @@ def accept(root, target):
                 report['checks']['portableGui']=windows_probe(cached,pid,source,output,environment,'windows-portable')
             finally:
                 stop_windows_path(cached,environment)
+            raise RuntimeError('R7 extraction diagnostic-only workflow cannot grant product acceptance; review original tar and .NET evidence')
         report['status']='passed'
     except BaseException as error:
         report['status']='failed';report['failure']={'type':type(error).__name__,'message':str(error)[:600]};raise

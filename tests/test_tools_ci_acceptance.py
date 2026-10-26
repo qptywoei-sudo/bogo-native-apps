@@ -17,6 +17,8 @@ import urllib.error
 from unittest.mock import patch
 import zipfile
 import zlib
+import types
+import sys
 
 HERE = Path(__file__).resolve().parent
 SCRIPT = HERE / 'tools-ci-acceptance.py'
@@ -346,6 +348,78 @@ class GuardTests(unittest.TestCase):
         self.assertLess(accept.index("['verify'"),accept.index("report['checks']['portableGui']=windows_probe("))
         self.assertIn("'--source',assets/PINS['source'][1],'--exe',cached",accept)
         self.assertNotIn('installed==expected',upgrade)
+
+
+class ExtractionDiagnosticTests(unittest.TestCase):
+    def setUp(self):
+        self.temp=tempfile.TemporaryDirectory();self.root=Path(self.temp.name).resolve()
+        path=HERE/'tools_runtime_products.py'
+        if not path.is_file():path=HERE.parent/'scripts/tools_runtime_products.py'
+        spec=importlib.util.spec_from_file_location('tools_runtime_products',path);self.helper=importlib.util.module_from_spec(spec);spec.loader.exec_module(self.helper)
+        self.modules=patch.dict(sys.modules,{'tools_runtime_products':self.helper});self.modules.start()
+
+    def tearDown(self):self.modules.stop();self.temp.cleanup()
+
+    def expected(self,rows):return {name:{'bytes':len(body),'sha256':hashlib.sha256(body).hexdigest()}for name,body in rows.items()}
+
+    def test_known_readback_matches_unicode_vendor_and_legal_paths_without_reading_unknown(self):
+        values={'USB드라이버/vendor.exe':b'MZ owned public driver','licenses/시작 안내.txt':b'public legal notice','code.py':b'public code'}
+        for name,body in values.items():p=self.root/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(body)
+        (self.root/'unknown-private.txt').write_bytes(b'Never read this synthetic secret')
+        result=m.known_managed_extraction_readback(self.root,self.expected(values))
+        self.assertTrue(result['allKnownFilesExact']);self.assertEqual(result['exactKnownFiles'],3)
+        self.assertEqual(len(result['allUnicodeExpectedFiles']),2);self.assertFalse(result['unknownOrProfileFilesRead'])
+        self.assertNotIn('synthetic secret',json.dumps(result));self.assertNotIn('unknown-private',json.dumps(result))
+
+    def test_missing_changed_and_hardlinked_expected_files_never_count_as_exact(self):
+        good=b'signed public code';(self.root/'changed').write_bytes(b'wrong');(self.root/'target').write_bytes(good)
+        os.link(self.root/'target',self.root/'linked')
+        result=m.known_managed_extraction_readback(self.root,self.expected({'missing':good,'changed':good,'linked':good}))
+        self.assertFalse(result['allKnownFilesExact']);self.assertEqual(result['missingCount'],1)
+        self.assertEqual(result['changedOrUnsafeCount'],2);self.assertEqual(result['exactKnownFiles'],0)
+        with self.assertRaises(ValueError):m.known_managed_extraction_readback(self.root,self.expected({'../escape':good}))
+
+    def test_diagnostic_targets_are_new_closed_and_never_overwrite_or_alias(self):
+        a=m.extraction_diagnostic_target(self.root,'source-tar-replay');a.mkdir()
+        with self.assertRaises(ValueError):m.extraction_diagnostic_target(self.root,'source-tar-replay')
+        with self.assertRaises(ValueError):m.extraction_diagnostic_target(self.root,'arbitrary-owner-data')
+        if os.name!='nt':
+            alias=self.root/'alias';alias.symlink_to(self.root,target_is_directory=True)
+            with self.assertRaises(ValueError):m.extraction_diagnostic_target(alias,'normal-dotnet-replay')
+
+    def test_public_output_is_byte_bounded_and_preserves_raw_error_without_private_log(self):
+        p=self.root/'public-tar-stderr';data=b'Pathname cannot be converted from UTF-8 to current locale\n'+b'X'*17000;p.write_bytes(data)
+        v=m.bounded_public_log(p);self.assertEqual(v['excerptBytes'],16384);self.assertTrue(v['truncated'])
+        self.assertEqual(__import__('base64').b64decode(v['rawExcerptBase64']),data[:16384])
+        self.assertEqual(v['excerptSha256'],hashlib.sha256(data[:16384]).hexdigest())
+
+    def test_native_source_tar_flags_and_timeout_do_not_terminate_process(self):
+        process=__import__('unittest').mock.Mock();process.pid=42;process.wait.side_effect=subprocess.TimeoutExpired('owned-source-tar',120)
+        def launch(*args,**kwargs):kwargs['stderr'].write(b'public source extraction error');return process
+        with patch.object(m,'os',types.SimpleNamespace(name='nt')),patch.object(m.subprocess,'CREATE_NO_WINDOW',0x08000000,create=True),patch.object(m.subprocess,'Popen',side_effect=launch)as popen:
+            result=m.diagnostic_extractor_process(['system-tar','-xf','authenticated.zip','-C','new-owned'],{'HOME':'ordinary'},self.root,'source-tar-replay')
+        self.assertTrue(result['timedOut']);self.assertFalse(result['processStoppedByChecker'])
+        self.assertEqual(popen.call_args.kwargs['creationflags'],0x08000000)
+        process.wait.assert_called_once_with(timeout=120);process.terminate.assert_not_called();process.kill.assert_not_called()
+
+    def test_dotnet_probe_uses_normal_two_string_api_no_policy_or_locale_change(self):
+        self.assertIn("GetMethod('ExtractToDirectory',[Type[]]@([string],[string]))",m.DOTNET_DIAGNOSTIC_EXTRACT)
+        self.assertIn('[IO.Compression.ZipFile]::ExtractToDirectory([string]$env:BOGO_DIAG_ARCHIVE,[string]$env:BOGO_DIAG_DEST)',m.DOTNET_DIAGNOSTIC_EXTRACT)
+        self.assertIn('destination must be new',m.DOTNET_DIAGNOSTIC_EXTRACT)
+        for forbidden in('ExecutionPolicy','Bypass','SetConsole','SetCulture','Set-MpPreference','Invoke-Expression','Remove-Item','Start-Process'):
+            self.assertNotIn(forbidden,m.DOTNET_DIAGNOSTIC_EXTRACT+m.EXTRACTION_LOCALE_METADATA)
+        self.assertIn('GetACP()',m.EXTRACTION_LOCALE_METADATA);self.assertIn('utf8CodePageConstant=65001',m.EXTRACTION_LOCALE_METADATA)
+
+    def test_diagnostic_cannot_replace_product_failure_with_dotnet_success(self):
+        source=SCRIPT.read_text(encoding='utf-8');tree=ast.parse(source)
+        accept=next(n for n in tree.body if isinstance(n,ast.FunctionDef)and n.name=='accept')
+        handlers=[h for n in ast.walk(accept)if isinstance(n,ast.Try)for h in n.handlers
+                  if any(isinstance(call,ast.Call)and isinstance(call.func,ast.Name)and call.func.id=='failed_sfx_extraction_diagnostics'for call in ast.walk(h))]
+        self.assertEqual(len(handlers),1);self.assertIsInstance(handlers[0].body[-1],ast.Raise)
+        text=ast.get_source_segment(source,next(n for n in tree.body if isinstance(n,ast.FunctionDef)and n.name=='failed_sfx_extraction_diagnostics'))
+        self.assertIn("'productionSfxFailureRemains':True",text);self.assertIn("'applicationAcceptanceGranted':False",text)
+        self.assertIn('pinned_update_inventory(archive)',text);self.assertIn("len(expected)==3905",text)
+        self.assertNotIn('KIOControl.exe\'],',text);self.assertNotIn('windows_probe(',text)
 
 
 class PortableTelemetryTests(unittest.TestCase):
