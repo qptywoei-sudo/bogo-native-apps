@@ -37,6 +37,17 @@ LIGHT_LABEL_AFTER = '''            let label_background = crate::theme::label_ba
             };
             p.rect_filled(cr, 0.0, label_background);'''
 
+PDF_CENTRAL_BEFORE = '''        let t = theme::Tokens::get(&ctx);
+        egui::CentralPanel::default().frame(egui::Frame::NONE.fill(t.pasteboard)).show(ui, |ui| {'''
+PDF_CENTRAL_AFTER = '''        let t = theme::Tokens::get(&ctx);
+        // Home is application chrome; keep the document/combine/docking pasteboard unchanged.
+        let central_fill = if self.mode == Mode::Read && self.active.is_none() && !self.combine_showing() {
+            t.panel
+        } else {
+            t.pasteboard
+        };
+        egui::CentralPanel::default().frame(egui::Frame::NONE.fill(central_fill)).show(ui, |ui| {'''
+
 
 def replacements(app, relative):
     if app == 'light' and relative == 'crates/ui-egui/src/docking.rs':
@@ -45,6 +56,26 @@ def replacements(app, relative):
         return [(LIGHT_LABEL_BEFORE, LIGHT_LABEL_AFTER, 1),
                 ('film_label(name), t.font(10.0), t.text_dim);', 'film_label(name), t.font(10.0), label_ink);', 1),
                 ('&ph.format, t.semibold(8.5), t.text_dim);', '&ph.format, t.semibold(8.5), label_ink);', 1)]
+    if app == 'light' and relative == 'crates/ui-egui/src/panels/bottombar.rs':
+        return [
+            ('ui.painter().rect_filled(pill, 15.0, t.canvas);', 'ui.painter().rect_filled(pill, 15.0, t.button);', 1),
+            ('ui.painter().rect_filled(copy_r, 15.0, if cresp.hovered() { t.hover } else { t.canvas });',
+             'ui.painter().rect_filled(copy_r, 15.0, if cresp.hovered() { t.hover } else { t.button });', 1),
+            ('ui.painter().rect_filled(gear_r, 15.0, if gresp.hovered() { t.hover } else { t.canvas });',
+             'ui.painter().rect_filled(gear_r, 15.0, if gresp.hovered() { t.hover } else { t.button });', 1),
+            ('''        let on = flag == f && f != Flag::None;
+        let c = if on {
+            if f == Flag::Reject { t.reject } else { t.pick }''', '''        let on = flag == f && f != Flag::None;
+        if on {
+            pill_ui.painter().rect_filled(r, 4.0, t.pressed);
+        }
+        let c = if on {
+            if f == Flag::Reject { t.reject } else { t.text }''', 1),
+        ]
+    if app == 'light' and relative == 'crates/ui-egui/src/widgets.rs':
+        return [('if filled { t.star } else { t.icon });', 'if filled && id != "bottom" { t.star } else { t.icon });', 1)]
+    if app == 'pdf' and relative == 'crates/ui-egui/src/lib.rs':
+        return [(PDF_CENTRAL_BEFORE, PDF_CENTRAL_AFTER, 1)]
     if app == 'ui' and relative == 'crates/ui-egui/src/theme.rs':
         pale = 'Color32::from_rgb(0xFF, 0xE7, 0xD4)'
         return [(before, after, 1) for before, after in (

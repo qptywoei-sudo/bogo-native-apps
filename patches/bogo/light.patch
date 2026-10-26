@@ -52106,6 +52106,50 @@ index 7b0d449c699cde3ffbb98daf2c4461bb6ce12cc4..58f1680cd24d0f1cd9cfb6bd1751a2d6
                  register(ui.ctx(), "activity:more", r.rect);
                  toggle = r.clicked();
              }
+diff --git a/crates/ui-egui/src/panels/bottombar.rs b/crates/ui-egui/src/panels/bottombar.rs
+index b986b8995e5c6515ed576941cb504d6f5df8e6c8..a65fe97141df52172e97f8c4231f7a759a193263 100644
+--- a/crates/ui-egui/src/panels/bottombar.rs
++++ b/crates/ui-egui/src/panels/bottombar.rs
+@@ -98,7 +98,7 @@ fn centre(app: &mut LightcraftApp, ui: &mut egui::Ui, full: Rect, from: f32, to:
+     let left = (full.center().x - 60.0 - PILL_W / 2.0).clamp(from, to - w);
+     let active = app.session.active().and_then(|id| app.session.catalog.photo(id).cloned());
+     let pill = Rect::from_min_size(pos2(left, full.center().y - 15.0), vec2(PILL_W, 30.0));
+-    ui.painter().rect_filled(pill, 15.0, t.canvas);
++    ui.painter().rect_filled(pill, 15.0, t.button);
+     let mut pill_ui =
+         ui.new_child(egui::UiBuilder::new().max_rect(pill.shrink2(vec2(10.0, 4.0))).layout(egui::Layout::left_to_right(egui::Align::Center)));
+     pill_ui.spacing_mut().item_spacing.x = 3.0;
+@@ -114,8 +114,11 @@ fn centre(app: &mut LightcraftApp, ui: &mut egui::Ui, full: Rect, from: f32, to:
+         let (r, resp) = pill_ui.allocate_exact_size(vec2(22.0, 22.0), Sense::click());
+         register(pill_ui.ctx(), format!("flag:{id}"), r);
+         let on = flag == f && f != Flag::None;
++        if on {
++            pill_ui.painter().rect_filled(r, 4.0, t.pressed);
++        }
+         let c = if on {
+-            if f == Flag::Reject { t.reject } else { t.pick }
++            if f == Flag::Reject { t.reject } else { t.text }
+         } else if resp.hovered() {
+             t.text
+         } else {
+@@ -135,7 +138,7 @@ fn centre(app: &mut LightcraftApp, ui: &mut egui::Ui, full: Rect, from: f32, to:
+     let copy_r = Rect::from_min_size(pos2(pill.right() + 10.0, pill.top()), vec2(copy_width, 30.0));
+     let cresp = ui.interact(copy_r, egui::Id::new("copy-settings"), Sense::click());
+     register(ui.ctx(), "button:copySettings", copy_r);
+-    ui.painter().rect_filled(copy_r, 15.0, if cresp.hovered() { t.hover } else { t.canvas });
++    ui.painter().rect_filled(copy_r, 15.0, if cresp.hovered() { t.hover } else { t.button });
+     ui.painter().text(copy_r.center(), Align2::CENTER_CENTER, label, t.font(13.0), if active.is_some() { t.text_label } else { t.text_disabled });
+     if cresp.clicked() && active.is_some() {
+         let _ = if has_clip { app.run("develop.paste", json!({})) } else { app.run("develop.copy", json!({})) };
+@@ -145,7 +148,7 @@ fn centre(app: &mut LightcraftApp, ui: &mut egui::Ui, full: Rect, from: f32, to:
+     let gear_r = Rect::from_min_size(pos2(copy_r.right() + 4.0, pill.top()), vec2(30.0, 30.0));
+     let gresp = ui.interact(gear_r, egui::Id::new("copy-gear"), Sense::click());
+     register(ui.ctx(), "icon:copyGear", gear_r);
+-    ui.painter().rect_filled(gear_r, 15.0, if gresp.hovered() { t.hover } else { t.canvas });
++    ui.painter().rect_filled(gear_r, 15.0, if gresp.hovered() { t.hover } else { t.button });
+     paint(ui.painter(), gear_r.shrink(7.0), Icon::Gear, t.icon);
+     if gresp.clicked() {
+         let _ = app.run("dialog.copySettings", json!({}));
 diff --git a/crates/ui-egui/src/panels/denoise.rs b/crates/ui-egui/src/panels/denoise.rs
 index 18274f53ddbc1274a968cf8390c81331be9e5e8e..9ad4b2235b247effe694c06173c0e665a7f977c1 100644
 --- a/crates/ui-egui/src/panels/denoise.rs
@@ -52712,7 +52756,7 @@ index 282f9c70ef21306ad5df6508b9f95c4829a26077..39dba43233dab125d14561d79bc652e9
      let (popup, window) = if dark { (140, 160) } else { (50, 60) };
      v.popup_shadow = egui::epaint::Shadow { offset: [0, 4], blur: 16, spread: 0, color: Color32::from_black_alpha(popup) };
 diff --git a/crates/ui-egui/src/widgets.rs b/crates/ui-egui/src/widgets.rs
-index 1972e346f2b87ad9e74fb80ef8564cd0712f9935..dfa664b18ca9fab10fd88ec29c070aad160ddc29 100644
+index 1972e346f2b87ad9e74fb80ef8564cd0712f9935..f5a65cd4b68e90997102adb4e8bb576e8ab016b3 100644
 --- a/crates/ui-egui/src/widgets.rs
 +++ b/crates/ui-egui/src/widgets.rs
 @@ -47,12 +47,12 @@ pub fn preview_only_variant(reason: &str) -> &str {
@@ -52729,6 +52773,20 @@ index 1972e346f2b87ad9e74fb80ef8564cd0712f9935..dfa664b18ca9fab10fd88ec29c070aad
 +        "Bogo Light can't decode this raw variant yet ({}). You're editing the camera's embedded JPEG preview, which already includes the camera's picture style (e.g. Monochrome) and white balance.",
          preview_only_variant(reason)
      )
+ }
+@@ -609,7 +609,12 @@ pub fn stars(ui: &mut Ui, id: &str, rating: u8, size: f32) -> Option<u8> {
+             ui.painter().rect_filled(r, 4.0, t.hover.gamma_multiply(0.7));
+         }
+         let filled = star_lit(i, rating, hover_n);
+-        paint(ui.painter(), r.shrink(size * 0.12), if filled { Icon::StarFilled } else { Icon::Star }, if filled { t.star } else { t.icon });
++        paint(
++            ui.painter(),
++            r.shrink(size * 0.12),
++            if filled { Icon::StarFilled } else { Icon::Star },
++            if filled && id != "bottom" { t.star } else { t.icon },
++        );
+     }
+     out
  }
 diff --git a/crates/ui-egui/tests/shutdown.rs b/crates/ui-egui/tests/shutdown.rs
 index 9fc9471a6df218c290df982221767b9d169484b4..33d0a3e602892b766d8624662f0f01627ac1c1d3 100644

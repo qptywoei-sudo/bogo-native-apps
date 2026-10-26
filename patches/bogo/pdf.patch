@@ -52072,7 +52072,7 @@ index 95cdd1ac58f9a3c54ea5838568e121abb194ae7a..1c534f21cb08e2a834c5b5d9ad0b0564
      #[cfg(not(target_arch = "wasm32"))]
      ui.add(widgets::checkbox(&mut app.reload_changed_files, tl!("Reload documents when their files change on disk")));
 diff --git a/crates/ui-egui/src/lib.rs b/crates/ui-egui/src/lib.rs
-index c0d9102b4a45efd35183c77b1f1878e04a1a4741..f058a1b2acefd03196cba67dee17b9df5788fcd4 100644
+index c0d9102b4a45efd35183c77b1f1878e04a1a4741..8c4d8e4de4a374f9de06a224fb1107620dd6619a 100644
 --- a/crates/ui-egui/src/lib.rs
 +++ b/crates/ui-egui/src/lib.rs
 @@ -25,6 +25,7 @@ macro_rules! tl_ctx {
@@ -52104,6 +52104,17 @@ index c0d9102b4a45efd35183c77b1f1878e04a1a4741..f058a1b2acefd03196cba67dee17b9df
          if title != self.window_title {
              ctx.send_viewport_cmd(egui::ViewportCommand::Title(title.clone()));
              self.window_title = title;
+@@ -2977,7 +2978,9 @@ impl eframe::App for PdfCraftApp {
+             }
+         }
+         let t = theme::Tokens::get(&ctx);
+-        egui::CentralPanel::default().frame(egui::Frame::NONE.fill(t.pasteboard)).show(ui, |ui| {
++        // Home is application chrome; keep the document/combine/docking pasteboard unchanged.
++        let central_fill = if self.mode == Mode::Read && self.active.is_none() && !self.combine_showing() { t.panel } else { t.pasteboard };
++        egui::CentralPanel::default().frame(egui::Frame::NONE.fill(central_fill)).show(ui, |ui| {
+             if self.mode == Mode::Read {
+                 match self.active {
+                     None if self.combine_showing() => combine_ui::page(self, ui),
 diff --git a/crates/ui-egui/src/ocr_ui.rs b/crates/ui-egui/src/ocr_ui.rs
 index 79ecf5b4e1580723517b3802c304923b8ec08c94..80585afd3cdf910a866b9afde34fd76176cca20c 100644
 --- a/crates/ui-egui/src/ocr_ui.rs
