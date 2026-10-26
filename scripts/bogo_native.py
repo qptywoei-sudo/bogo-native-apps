@@ -113,6 +113,7 @@ def public_files(lock):
     extra += ['scripts/bogo_qa_profiles.py', 'tests/test_bogo_qa_profiles.py']
     extra += ['scripts/bogo_windows_upgrade.py', 'tests/test_bogo_windows_upgrade.py', 'docs/legacy-native-readme.md', 'manifests/bogo-native-downloads.json']
     extra += ['scripts/bogo_packaging.py', 'tests/test_bogo_packaging.py']
+    extra += ['docs/bogo-ci-verification.md']
     extra += [row['patch'] for row in json.loads(CATALOG.read_text())['applications']]
     extra += [p.relative_to(ROOT).as_posix() for p in (ROOT / 'assets/bogo-program-icons').iterdir() if p.is_file()]
     for relative in sorted(set(extra) - seen):
