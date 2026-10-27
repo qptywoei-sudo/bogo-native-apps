@@ -57,7 +57,7 @@ jobs:
           assert source.is_file() and not source.is_symlink() and source.stat().st_size < 131072
           assert tests.is_file() and not tests.is_symlink() and tests.stat().st_size < 131072
           assert hashlib.sha256(source.read_bytes()).hexdigest() == '718136871df5ec36550d4dca50dc8249362ee61c32ed1442f48f76d8844f3629'
-          assert hashlib.sha256(tests.read_bytes()).hexdigest() == '0f2831f7420b06f6b50b53acd13648d1cd0985d929ad93c50e3f997a463c2eaf'
+          assert hashlib.sha256(tests.read_bytes()).hexdigest() == 'daf780977f05ed28b4111db6e60b17637edfb0b7fa32282f68f08117c3383358'
           root = pathlib.Path(os.environ['RUNNER_TEMP']).absolute() / 'bogo-tools-unicode-qa'
           assert not root.exists() and not root.is_symlink()
           allowed = {

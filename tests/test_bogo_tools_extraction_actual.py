@@ -16,6 +16,7 @@ import re
 from pathlib import Path
 import shutil
 import stat
+import struct
 import subprocess
 import tempfile
 import time
@@ -71,6 +72,7 @@ _FIXTURES = _QA / 'fixtures'
 _OUTPUT.mkdir()
 _FIXTURES.mkdir()
 _PROCESS_PROOF = []
+_WIRE_PROOF = []
 ROOT = "KIO-Control-Windows/"
 UNICODE = (
     "USB드라이버/Samsung-USB-Driver-1.9.5.0.exe",
@@ -82,6 +84,49 @@ UNICODE = (
 def literal(value: str) -> str:
     encoded = base64.b64encode(value.encode("utf-16-le")).decode("ascii")
     return "[Text.Encoding]::Unicode.GetString([Convert]::FromBase64String('" + encoded + "'))"
+
+
+def assert_raw_zip_names(data: bytes, requested: list[str]) -> dict:
+    # Inspect physical headers rather than ZipInfo's platform-normalized reader.
+    if len(data) > 2097152 or len(data) < 22 or len(requested) > 6000:
+        raise AssertionError('Synthetic ZIP wire fixture bound')
+    end = struct.unpack_from('<4s4H2LH', data, len(data) - 22)
+    if (end[0] != b'PK\x05\x06' or end[1] != 0 or end[2] != 0 or end[3] != end[4]
+            or end[4] != len(requested) or end[7] != 0 or end[6] + end[5] != len(data) - 22):
+        raise AssertionError('Synthetic ZIP central-directory geometry')
+    position = end[6]
+    names_hash = hashlib.sha256()
+    samples = []
+    for wanted in requested:
+        if position + 46 > len(data) or data[position:position + 4] != b'PK\x01\x02':
+            raise AssertionError('Synthetic ZIP central header missing')
+        flags = struct.unpack_from('<H', data, position + 8)[0]
+        name_length, extra_length, comment_length = struct.unpack_from('<3H', data, position + 28)
+        local_position = struct.unpack_from('<I', data, position + 42)[0]
+        central = data[position + 46:position + 46 + name_length]
+        expected = wanted.encode('utf-8' if flags & 2048 else 'ascii')
+        if central != expected or len(central) != name_length:
+            raise AssertionError('Requested raw name changed before ZIP central header')
+        if local_position + 30 > end[6] or data[local_position:local_position + 4] != b'PK\x03\x04':
+            raise AssertionError('Synthetic ZIP local header missing')
+        local_flags = struct.unpack_from('<H', data, local_position + 6)[0]
+        local_length = struct.unpack_from('<H', data, local_position + 26)[0]
+        local = data[local_position + 30:local_position + 30 + local_length]
+        if local != expected or local_flags != flags:
+            raise AssertionError('Requested raw name changed before ZIP local header')
+        names_hash.update(struct.pack('<I', len(expected)))
+        names_hash.update(expected)
+        if b'\\' in expected:
+            samples.append({'localNameBase64': base64.b64encode(local).decode('ascii'),
+                            'centralNameBase64': base64.b64encode(central).decode('ascii'),
+                            'requestedNameBase64': base64.b64encode(expected).decode('ascii')})
+        position += 46 + name_length + extra_length + comment_length
+        if position > end[6] + end[5]:
+            raise AssertionError('Synthetic ZIP central header overflow')
+    if position != end[6] + end[5] or len(samples) > 4:
+        raise AssertionError('Synthetic ZIP names were not fully verified')
+    return {'headerCount': len(requested), 'allLocalAndCentralNamesExact': True,
+            'namesSha256': names_hash.hexdigest(), 'backslashWireSamples': samples}
 
 
 class ExtractionTests(unittest.TestCase):
@@ -103,12 +148,27 @@ class ExtractionTests(unittest.TestCase):
         if entries is None:
             entries = [("KIOControl.exe", b"synthetic-executable-not-run"), ("data/ascii.txt", b"same")]
             entries += [(name, ("public synthetic " + name).encode()) for name in UNICODE]
+        constructor_changes = []
         with zipfile.ZipFile(self.archive, "w", zipfile.ZIP_DEFLATED) as archive:
             for name, data in entries:
                 entry = zipfile.ZipInfo(name if raw_names else ROOT + name)
+                if raw_names:
+                    # CPython 3.12.10 ZipInfo normalizes Windows separators. A negative
+                    # wire fixture must retain its requested malformed name verbatim.
+                    if entry.filename != name:
+                        constructor_changes.append({'requested': name, 'constructorFilename': entry.filename})
+                    entry.filename = name
+                    entry.orig_filename = name
                 entry.compress_type = zipfile.ZIP_DEFLATED
                 entry.external_attr = (stat.S_IFREG | 0o644) << 16 if attrs is None else attrs
                 archive.writestr(entry, data)
+        if raw_names:
+            wire = assert_raw_zip_names(self.archive.read_bytes(), [name for name, _ in entries])
+            wire.update({'case': self.id(), 'constructorNormalizedCount': len(constructor_changes),
+                         'constructorNormalizedSamples': constructor_changes[:4]})
+            _WIRE_PROOF.append(wire)
+            if len(_WIRE_PROOF) > 32:
+                raise RuntimeError('Raw-fixture proof count exceeded')
         return entries
 
     def invoke(self, expected=None):
@@ -360,6 +420,7 @@ if __name__ == "__main__":
         'credentialEnvRemovedBeforeEveryChild': True, 'childEnvironmentKeyNames': sorted(_CHILD_ENV),
         'executionPolicyOrMachineSettingsChanged': False, 'downloadedProgramsExecuted': False,
         'draftAssetsFetched': False, 'childProcesses': _PROCESS_PROOF,
+        'negativeFixtureWireProof': _WIRE_PROOF,
     }
     (_OUTPUT / 'windows-extraction-tests-report.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
     print(log)
