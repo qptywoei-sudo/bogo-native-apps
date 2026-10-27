@@ -153228,6 +153228,26 @@ index b40232a08d6bd9209743b27913328b0c72449c78..419d8760e471650fa4f15b03e9a50ddf
 -	No font for this language was found on this system. Install a font for this language and restart KIO Launcher.	系統找不到此語言適用的字型。請安裝適用字型，然後重新啟動 KIO Launcher。
 +@plural	Bogo Launcher · {n} update available|Bogo Launcher · {n} updates available	Bogo Launcher · 有 {n} 項可用更新
 +	No font for this language was found on this system. Install a font for this language and restart Bogo Launcher.	系統找不到此語言適用的字型。請安裝適用字型，然後重新啟動 Bogo Launcher。
+diff --git a/crates/ui-egui/src/icons.rs b/crates/ui-egui/src/icons.rs
+index a6d112bed8f4a31ff8063b876a61547a72bdc6f8..acc5d199442554bcf243f8873e6aac94a2fb9957 100644
+--- a/crates/ui-egui/src/icons.rs
++++ b/crates/ui-egui/src/icons.rs
+@@ -25,7 +25,7 @@ pub fn app(id: &str) -> Option<ImageSource<'static>> {
+ /// The ArtCraft wordmark, as supplied: dark ink for light backgrounds, white for dark ones.
+ /// An ArtCraft trademark, not covered by the MIT/Apache license (`docs/brand/LICENSE-brand.txt`).
+ pub fn artcraft_logo(dark_background: bool) -> ImageSource<'static> {
+-    if dark_background { egui::include_image!("../../../assets/app-icon/kio.svg") } else { egui::include_image!("../../../assets/app-icon/kio.svg") }
++    if dark_background { egui::include_image!("../../../assets/app-icon/kio.png") } else { egui::include_image!("../../../assets/app-icon/kio.png") }
+ }
+ 
+ /// The ArtCraft wordmark's width / height (its SVG view box: 1038.05 × 108).
+@@ -45,5 +45,5 @@ pub fn social(service: &str) -> Option<ImageSource<'static>> {
+ 
+ /// The ArtCraft "A" mark in blue, as supplied: the launcher's app icon and getartcraft.com's favicon.
+ pub fn artcraft_mark() -> ImageSource<'static> {
+-    egui::include_image!("../../../assets/app-icon/kio.svg")
++    egui::include_image!("../../../assets/app-icon/kio.png")
+ }
 diff --git a/crates/ui-egui/src/lib.rs b/crates/ui-egui/src/lib.rs
 index 064b24a5703ccd3a830e981a113cad85477c10fa..1763e4b8791aaf1b5373c75bdc8e7e03687d508e 100644
 --- a/crates/ui-egui/src/lib.rs

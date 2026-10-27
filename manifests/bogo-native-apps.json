@@ -9240,10 +9240,10 @@
       "baseLock": "manifests/launcher.lock.json",
       "baseLockSha256": "46fa9e82194ee555f1ed72acf5b54709738d3d9db2c4a30b03995850d6e70237",
       "baseSourceTreeSha256": "d0c47781d861fa777ae4c9b931e870f5013b435039791a91b14923583c55b318",
-      "sourceTreeSha256": "82b6ca6c0591e540d4c56801d476ad082c93db0acc9219ef9e271d4d2493bb88",
+      "sourceTreeSha256": "b02c23004396ba2cbe8a635f416d40fdb96be7071281b428a37a944409c1a92b",
       "patch": "patches/bogo/launcher.patch",
-      "patchSha256": "aa41dc880e1a333ff42ec2340f9f85610570d9c19b1925a5e5c443d71b7a2aed",
-      "patchBytes": 12007886,
+      "patchSha256": "3cbe950efac212ffddfe4bec7fc7546760882ea47b6592bfb7a9af963ed866af",
+      "patchBytes": 12009210,
       "files": [
         {
           "path": "apps/artcraft-launcher-web/index.html",
@@ -10095,6 +10095,17 @@
           "after": {
             "sha256": "50c856f007adb56a2d5d4ce1d16bfe44ec9b696890a8e46b6973af907515a0ab",
             "bytes": 13399
+          }
+        },
+        {
+          "path": "crates/ui-egui/src/icons.rs",
+          "before": {
+            "sha256": "c9dc9c92042dd6b1a54a0675fa0c008021e09fff2b70e044d8704f7cdf834979",
+            "bytes": 2766
+          },
+          "after": {
+            "sha256": "6acfa80e9dc23d2a1cadc96e4312cf8d4d1417ce84d8452ec789591d439b423d",
+            "bytes": 2766
           }
         },
         {
