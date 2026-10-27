@@ -51259,6 +51259,21 @@ index 1006b57d55b9805aa56050352397fde63883a1bd..e14a1cc5bf027b3dbb2761b6379589d3
          system.store(1, Ordering::Relaxed);
          app.apply_prefs(&ctx);
          assert_eq!(app.tokens.kind, ThemeKind::Dark);
+diff --git a/crates/ui-egui/src/panels/timeline.rs b/crates/ui-egui/src/panels/timeline.rs
+index edb5646e4974fa41df2e4be3c39396df9f3d1c09..e6068702e083cf52e2a3ee8a55d98929681d60b3 100644
+--- a/crates/ui-egui/src/panels/timeline.rs
++++ b/crates/ui-egui/src/panels/timeline.rs
+@@ -731,8 +731,8 @@ fn empty_state(app: &mut FilmcraftApp, ui: &mut egui::Ui, rect: Rect) {
+     let b = Rect::from_center_size(rect.center() + vec2(0.0, 20.0), vec2(170.0, 26.0));
+     let resp = ui.interact(b, egui::Id::new("tl-open-demo"), Sense::click());
+     app.auto.add("timeline.openDemo", b, "Open Demo Project");
+-    ui.painter().rect_filled(b, 13.0, if resp.hovered() { t.accent_hover } else { t.accent });
+-    ui.painter().text(b.center(), Align2::CENTER_CENTER, tl!("Open Demo Project"), Tokens::semibold(12.0), Color32::WHITE);
++    ui.painter().rect_filled(b, 13.0, if resp.hovered() { t.pressed } else { t.tab_bg });
++    ui.painter().text(b.center(), Align2::CENTER_CENTER, tl!("Open Demo Project"), Tokens::semibold(12.0), t.icon);
+     if resp.clicked() {
+         let _ = app.session.execute("file.openDemoProject", json!({}));
+     }
 diff --git a/crates/ui-egui/src/panels/tools.rs b/crates/ui-egui/src/panels/tools.rs
 index 34106c6b94f18dcd1e52615ab41a0c1ecd4f50b2..4fa1e329ada74accc3f8fa8180bea9d949fdb7f9 100644
 --- a/crates/ui-egui/src/panels/tools.rs
@@ -51522,6 +51537,206 @@ index 6d05a303ecd914831054587fcb7dd3924df2f217..cf389842e2017ddef6049021fe575276
 -    }
 -    d.snapshot("home");
 +    assert!(d.ids("import.link.").is_empty());
+ }
+diff --git a/crates/ui-egui/tests/monitor_geometry.rs b/crates/ui-egui/tests/monitor_geometry.rs
+index 700657e197fddb53d65f8ade491f8d962bf8b358..1014ae418beccde832a08dca20b4a41200b6452d 100644
+--- a/crates/ui-egui/tests/monitor_geometry.rs
++++ b/crates/ui-egui/tests/monitor_geometry.rs
+@@ -250,3 +250,182 @@ fn source_drag_choices_remain_reachable_at_500_pixels() {
+ fn source_drag_choices_remain_reachable_at_250_pixels() {
+     source_drag_choices(250.0);
+ }
++
++mod bogo_demo_cta {
++    //! Additive actual-production empty-timeline CTA regression; no original tests changed.
++    use egui::epaint::Shape;
++    use egui::{Color32, Event, Id, Modifiers, PointerButton, Pos2, Rect, pos2, vec2};
++    use egui_kittest::Harness;
++    use filmcraft_engine::Session;
++    use filmcraft_ui_egui::{
++        FilmcraftApp,
++        dock::{self, DockNode, PanelKind, SeqTabs},
++        panels::timeline,
++        theme::{self, ThemeKind},
++    };
++    use serde_json::json;
++
++    const NORMAL: Color32 = Color32::from_rgb(0xff, 0xf3, 0xe8);
++    const HOVER: Color32 = Color32::from_rgb(0xff, 0xe7, 0xd4);
++    const INK: Color32 = Color32::from_rgb(0x34, 0x2b, 0x26);
++
++    fn harness(kind: ThemeKind, highlight: &'static str, accessible: bool) -> Harness<'static, FilmcraftApp> {
++        let mut session = Session::default();
++        session.prefs.appearance.highlight_color = highlight.into();
++        session.prefs.appearance.accessible_contrast = accessible;
++        assert!(session.state.active_sequence.is_none());
++        assert!(session.prefs_path.is_none() && session.persistence.is_none(), "test session has no user profile persistence");
++        let mut fonts_ready = false;
++        let mut h = Harness::builder().with_size(vec2(720.0, 360.0)).with_pixels_per_point(1.0).build_ui_state(
++            move |ui, app: &mut FilmcraftApp| {
++                filmcraft_ui_egui::i18n::set_current(filmcraft_ui_egui::i18n::Language::En);
++                // The real production preference application, not a synthetic token table.
++                app.set_theme(ui.ctx(), kind);
++                if !fonts_ready {
++                    // Match production's first-frame font install before painting semibold text.
++                    theme::install(ui.ctx(), &app.tokens);
++                    fonts_ready = true;
++                    ui.ctx().request_repaint();
++                    return;
++                }
++                app.auto.begin_frame();
++                let panel = PanelKind::Timeline;
++                let mut node = DockNode::Tabs { panels: vec![panel], active: 0 };
++                let mut groups = Vec::new();
++                dock::layout(ui, &mut node, ui.max_rect(), &app.tokens, "bogo-demo-cta", &mut groups, &mut app.auto);
++                for group in groups {
++                    dock::draw_group_chrome(ui, &group, panel, &SeqTabs::default(), &app.tokens, &mut app.auto);
++                    // With no active sequence this dispatches the actual private empty_state.
++                    timeline::show(app, ui, group.content);
++                }
++            },
++            FilmcraftApp::new(session),
++        );
++        h.event(Event::PointerGone);
++        h.run_steps(4);
++        h
++    }
++
++    fn cta(h: &Harness<'_, FilmcraftApp>) -> Rect {
++        let entries: Vec<_> = h.state().auto.elements.iter().filter(|e| e.id == "timeline.openDemo").collect();
++        assert_eq!(entries.len(), 1, "one current actual automation element for the production CTA");
++        assert_eq!(entries[0].label, "Open Demo Project");
++        let [x, y, w, height] = entries[0].rect;
++        assert_eq!((w, height), (170.0, 26.0), "production click target geometry is preserved");
++        let rect = Rect::from_min_size(pos2(x, y), vec2(w, height));
++        let response = h.ctx.read_response(Id::new("tl-open-demo")).expect("original actual egui interaction ID");
++        assert_eq!(response.id, Id::new("tl-open-demo"));
++        assert_eq!(response.rect, rect, "automation and actual egui click target must agree");
++        rect
++    }
++
++    fn leaves<'a>(shape: &'a Shape, clip: Rect, out: &mut Vec<(Rect, &'a Shape)>) {
++        if let Shape::Vec(children) = shape {
++            for child in children {
++                leaves(child, clip, out);
++            }
++        } else {
++            out.push((clip, shape));
++        }
++    }
++    fn painted<'a>(h: &'a Harness<'_, FilmcraftApp>) -> Vec<(Rect, &'a Shape)> {
++        let mut out = Vec::new();
++        for clipped in &h.output().shapes {
++            leaves(&clipped.shape, clipped.clip_rect, &mut out);
++        }
++        out
++    }
++    fn top_opaque_rect(h: &Harness<'_, FilmcraftApp>, pos: Pos2) -> Option<(Rect, Color32)> {
++        painted(h)
++            .into_iter()
++            .filter_map(|(clip, shape)| match shape {
++                Shape::Rect(r) if clip.contains(pos) && r.rect.contains(pos) && r.fill.a() == 255 => Some((r.rect, r.fill)),
++                _ => None,
++            })
++            .last()
++    }
++    fn assert_actual_paint(h: &Harness<'_, FilmcraftApp>, expected: Color32) {
++        let rect = cta(h);
++        assert_eq!(
++            top_opaque_rect(h, rect.center()),
++            Some((rect, expected)),
++            "actual last opaque CTA rectangle must use the intended role, in real clip/paint order"
++        );
++        let texts: Vec<_> = painted(h)
++            .into_iter()
++            .filter_map(|(clip, shape)| match shape {
++                Shape::Text(text) if text.galley.text() == "Open Demo Project" => {
++                    let visible = text.visual_bounding_rect().intersect(clip).intersect(rect);
++                    (visible.width() > 0.0 && visible.height() > 0.0).then_some(text)
++                }
++                _ => None,
++            })
++            .collect();
++        assert_eq!(texts.len(), 1, "the real visible button glyph must exist inside the actual CTA clip");
++        let text = texts[0];
++        assert_eq!(text.opacity_factor, 1.0);
++        if let Some(color) = text.override_text_color {
++            assert_eq!(color, INK, "actual glyph override must be readable brown");
++        } else {
++            assert!(!text.galley.job.sections.is_empty());
++            for section in &text.galley.job.sections {
++                let color = if section.format.color == Color32::PLACEHOLDER { text.fallback_color } else { section.format.color };
++                assert_eq!(color, INK, "actual galley section glyph ink must be readable brown");
++            }
++        }
++    }
++
++    #[test]
++    fn bogo_empty_timeline_demo_cta_actual_normal_hover_ink_and_command() {
++        let mut cases = 0;
++        for kind in [ThemeKind::Dark, ThemeKind::Medium, ThemeKind::Light] {
++            for accessible in [false, true] {
++                // Finite representatives: default, saturated custom, both extremes and brand.
++                for highlight in ["", "#e0457b", "#000000", "#ffffff", "#fc7501"] {
++                    let mut h = harness(kind, highlight, accessible);
++                    let before_journal = h.state().session.journal.clone();
++                    let before_revision = h.state().session.revision;
++                    let semantic = (h.state().tokens.accent, h.state().tokens.playhead, h.state().tokens.timecode, h.state().tokens.track_target);
++                    assert_actual_paint(&h, NORMAL);
++                    let rect = cta(&h);
++                    h.event(Event::PointerMoved(rect.center()));
++                    h.run_steps(4);
++                    assert!(h.ctx.read_response(Id::new("tl-open-demo")).unwrap().hovered(), "real pointer event must hover the original CTA");
++                    assert_eq!(cta(&h), rect, "hover preserves actual interaction target");
++                    assert_actual_paint(&h, HOVER);
++                    assert!(h.state().session.state.active_sequence.is_none(), "hover must not open a demo");
++                    assert_eq!(h.state().session.journal, before_journal, "hover must not execute any engine command");
++                    assert_eq!(h.state().session.revision, before_revision, "hover must not edit project data");
++                    assert_eq!(
++                        (h.state().tokens.accent, h.state().tokens.playhead, h.state().tokens.timecode, h.state().tokens.track_target),
++                        semantic,
++                        "saved highlight/media semantic colors are preserved"
++                    );
++                    assert_eq!(h.state().session.prefs.appearance.highlight_color, highlight);
++                    assert_eq!(h.state().session.prefs.appearance.accessible_contrast, accessible);
++                    h.event(Event::PointerGone);
++                    h.run_steps(4);
++                    assert_actual_paint(&h, NORMAL);
++                    // Exercise the actual command once; the30 paint cases share the same handler.
++                    if cases == 0 {
++                        h.event(Event::PointerMoved(rect.center()));
++                        h.run_steps(2);
++                        for pressed in [true, false] {
++                            h.event(Event::PointerButton { pos: rect.center(), button: PointerButton::Primary, pressed, modifiers: Modifiers::NONE });
++                            h.step();
++                        }
++                        assert!(h.state().session.state.active_sequence.is_some(), "real CTA click opens the built-in demo");
++                        assert_eq!(
++                            h.state().session.journal.last(),
++                            Some(&("file.openDemoProject".to_string(), json!({}))),
++                            "original exact command ID and params are preserved"
++                        );
++                        assert_eq!(h.state().session.journal.len(), before_journal.len() + 1, "one actual click executes one original command");
++                    }
++                    cases += 1;
++                }
++            }
++        }
++        assert_eq!(cases, 30, "all3themes ×2contrast settings ×5bounded accent preferences rendered actual normal/hover shapes");
++    }
++}
+diff --git a/crates/ui-egui/tests/ui_keyboard_focus.rs b/crates/ui-egui/tests/ui_keyboard_focus.rs
+index 8685d49338a04ad141846e64c444a9e3ed5f78d5..d71b668729e630a6bc1ee66dd699c7a6b3750602 100644
+--- a/crates/ui-egui/tests/ui_keyboard_focus.rs
++++ b/crates/ui-egui/tests/ui_keyboard_focus.rs
+@@ -58,7 +58,7 @@ fn tab_traversal_and_space_select_only_the_focused_tool_with_visible_focus() {
+     assert!(
+         h.output().shapes.iter().any(|shape| matches!(&shape.shape,
+         egui::Shape::Rect(r) if r.rect == response.rect.shrink(2.0)
+-            && r.stroke.color == h.state().tokens.focus && r.stroke.width > 0.0)),
++            && r.stroke.color == h.state().tokens.chrome_focus && r.stroke.width > 0.0)),
+         "the focused custom-painted tool needs a visible focus outline"
+     );
  }
 diff --git a/packaging/freebsd/package.sh b/packaging/freebsd/package.sh
 index dc3cc1e0ba26ccf2aade43a8c950e8e1d87114a4..1ad002d217f833dfc1810035a20dbc0ea3ef940d 100755

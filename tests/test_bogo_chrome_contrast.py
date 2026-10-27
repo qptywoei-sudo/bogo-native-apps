@@ -415,6 +415,106 @@ def authenticated_launcher_role_sources():
     return result
 
 
+class FilmDemoCtaRoles(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.before = archived_sources('film', (chrome.FILM_DEMO_CTA_PATH,))[chrome.FILM_DEMO_CTA_PATH]
+
+    def test_authenticated_whole_file_inverse_preserves_geometry_ids_actions_and_media(self):
+        self.assertEqual(hashlib.sha256(self.before.encode()).hexdigest(), chrome.FILM_DEMO_CTA_BEFORE_SHA256)
+        after = chrome.transform('film', chrome.FILM_DEMO_CTA_PATH, self.before)
+        self.assertEqual(hashlib.sha256(after.encode()).hexdigest(), chrome.FILM_DEMO_CTA_AFTER_SHA256)
+        restored = after
+        for before, replacement, count in reversed(chrome.replacements('film', chrome.FILM_DEMO_CTA_PATH)):
+            self.assertEqual(restored.count(replacement), count)
+            restored = restored.replace(replacement, before)
+        self.assertEqual(restored, self.before)
+        for pattern in (r'^.*ui\.interact\(.*$', r'^.*app\.auto\.add\(.*$', r'^.*\.execute\(.*$', r'^.*timeline_drop_target.*$', r'^.*pending_timeline_drop.*$'):
+            self.assertEqual(re.findall(pattern, self.before, re.M), re.findall(pattern, after, re.M), pattern)
+        for value in ('egui::Id::new("tl-open-demo")', '"timeline.openDemo"', 'vec2(170.0, 26.0)', 'Tokens::semibold(12.0)', 'file.openDemoProject'):
+            self.assertEqual(self.before.count(value), after.count(value))
+
+    def test_exact_whole_preimage_rejects_unknown_duplicate_already_applied_and_unrelated_mutations(self):
+        for invalid in ('', self.before + self.before, self.before + '\n',
+                        self.before.replace('file.openDemoProject', 'file.mutatedDemoProject'),
+                        chrome.transform('film', chrome.FILM_DEMO_CTA_PATH, self.before)):
+            with self.subTest(bytes=len(invalid)), self.assertRaises(ValueError):
+                chrome.transform('film', chrome.FILM_DEMO_CTA_PATH, invalid)
+
+    def test_real_production_paint_test_is_additive_and_preserves_every_original_ui_assertion(self):
+        before = archived_sources('film', (chrome.FILM_DEMO_TEST_PATH,))[chrome.FILM_DEMO_TEST_PATH]
+        self.assertEqual(hashlib.sha256(before.encode()).hexdigest(), chrome.FILM_DEMO_TEST_BEFORE_SHA256)
+        after = chrome.transform('film', chrome.FILM_DEMO_TEST_PATH, before)
+        self.assertEqual(after, before + chrome.FILM_DEMO_PAINT_TEST)
+        self.assertEqual(after[:len(before)], before)
+        self.assertEqual(after.count('#[test]'), before.count('#[test]') + 1)
+        self.assertEqual(after.count('#[ignore'), before.count('#[ignore'))
+        for invalid in ('', before + '\n', before + before, before.replace('assert_eq!', 'assert_ne!', 1), after):
+            with self.assertRaises(ValueError):
+                chrome.transform('film', chrome.FILM_DEMO_TEST_PATH, invalid)
+        for app in ('cad', 'design', 'vector', 'light', 'pdf', 'effect', 'ui', 'word', 'sound', 'deck', 'grid', 'launcher', 'photo'):
+            self.assertEqual(chrome.transform(app, chrome.FILM_DEMO_TEST_PATH, 'unrelated source'), 'unrelated source')
+
+    def test_actual_regression_uses_painter_clip_real_hover_original_ids_and_command(self):
+        test = chrome.FILM_DEMO_PAINT_TEST
+        for marker in ('timeline::show(app, ui, group.content)', 'h.output().shapes', 'clip.contains(pos)',
+                       'r.fill.a() == 255', 'override_text_color', 'section.format.color',
+                       'Event::PointerMoved(rect.center())', 'Event::PointerGone', 'Id::new("tl-open-demo")',
+                       '"timeline.openDemo"', 'ThemeKind::Dark, ThemeKind::Medium, ThemeKind::Light',
+                       'assert_eq!(cases, 30', 'before_journal', 'before_revision', '"file.openDemoProject"',
+                       'session.prefs_path.is_none() && session.persistence.is_none()',
+                       'theme::install(ui.ctx(), &app.tokens)', 'if !fonts_ready {', 'ui.ctx().request_repaint();'):
+            self.assertIn(marker, test)
+        self.assertLess(test.index('theme::install(ui.ctx(), &app.tokens)'), test.index('timeline::show(app, ui, group.content)'))
+        self.assertNotIn('theme::install(&h.ctx', test)
+        self.assertEqual(test.count('#[test]'), 1)
+        self.assertNotIn('#[ignore', test)
+
+    def test_existing_keyboard_tests_only_update_the_proven_tools_chrome_stroke_role(self):
+        before = archived_sources('film', (chrome.FILM_KEYBOARD_TEST_PATH,))[chrome.FILM_KEYBOARD_TEST_PATH]
+        after = chrome.transform('film', chrome.FILM_KEYBOARD_TEST_PATH, before)
+        self.assertEqual(hashlib.sha256(before.encode()).hexdigest(), chrome.FILM_KEYBOARD_TEST_SHA256[0])
+        self.assertEqual(hashlib.sha256(after.encode()).hexdigest(), chrome.FILM_KEYBOARD_TEST_SHA256[1])
+        rows = chrome.replacements('film', chrome.FILM_KEYBOARD_TEST_PATH)
+        self.assertEqual(len(rows), 1)
+        old, new, count = rows[0]
+        self.assertEqual(count, 1)
+        self.assertEqual(after.replace(new, old, 1), before)
+        self.assertEqual(after.count('#[test]'), before.count('#[test]'))
+        self.assertEqual(after.count('#[ignore'), before.count('#[ignore'))
+        self.assertEqual(after.count('tokens.focus'), 1, 'unmodified dock-tab semantic focus assertion remains')
+        self.assertEqual(after.count('tokens.chrome_focus'), 1, 'only Tools matches its reviewed actual chrome role')
+        for invalid in (before + '\n', before.replace('assert_eq!', 'assert_ne!', 1), before + before, after):
+            with self.assertRaises(ValueError):
+                chrome.transform('film', chrome.FILM_KEYBOARD_TEST_PATH, invalid)
+
+    def test_all_three_themes_have_fixed_readable_roles_independent_of_semantic_accent_preferences(self):
+        import bogo_brand as brand
+        path = 'crates/ui-egui/src/theme.rs'
+        original = archived_sources('film', (path,))[path]
+        themed = brand.theme(original)
+        expected = {'tab_bg': (255, 243, 232), 'pressed': (255, 231, 212), 'icon': (52, 43, 38)}
+        def luminance(rgb):
+            channels = [value / 255 for value in rgb]
+            return sum((value / 12.92 if value <= .04045 else ((value + .055) / 1.055) ** 2.4) * weight
+                       for value, weight in zip(channels, (.2126, .7152, .0722)))
+        for name, rgb in expected.items():
+            declared = {tuple(int(value, 16) for value in match) for match in re.findall(
+                r'\b' + name + r': Color32::from_rgb\(0x([\da-fA-F]{2}), 0x([\da-fA-F]{2}), 0x([\da-fA-F]{2})\)', themed)}
+            self.assertEqual(declared, {rgb}, name)
+        appearance = themed[themed.index('    pub fn with_appearance('):]
+        for name in expected:
+            self.assertNotRegex(appearance, r'\b(?:self|t)\.' + name + r'\s*=')
+        for fill in (expected['tab_bg'], expected['pressed']):
+            high, low = sorted((luminance(fill), luminance(expected['icon'])), reverse=True)
+            self.assertGreaterEqual((high + .05) / (low + .05), 4.5)
+        after = chrome.transform('film', chrome.FILM_DEMO_CTA_PATH, self.before)
+        outside_before = self.before.split('fn empty_state(', 1)
+        outside_after = after.split('fn empty_state(', 1)
+        self.assertEqual(outside_before[0], outside_after[0])
+        self.assertEqual(outside_before[1].split('    if resp.clicked() {', 1)[1], outside_after[1].split('    if resp.clicked() {', 1)[1])
+
+
 class LauncherActualChromeRoles(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

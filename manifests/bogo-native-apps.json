@@ -2172,10 +2172,10 @@
       "baseLock": "manifests/full-native-apps.json",
       "baseLockSha256": "0c71246652db45818401d22d1267c79f84e01294c4e18f12ac83f536c6ed2a58",
       "baseSourceTreeSha256": "ca4bd84dca182c4a7580d41d90c5593804c6302e60c7cce315586d61ed053bac",
-      "sourceTreeSha256": "9481cb99000b3af701f1efdc317656d68e1da942d4ad9d6311c9db3780f6664b",
+      "sourceTreeSha256": "679f848703e725f553bab86c58cd30e7891ff1e05a19d8063d0ac0063cb7a634",
       "patch": "patches/bogo/film.patch",
-      "patchSha256": "07a518f6d2da127e88d8e99891fb8b3506ad06c354c38b19c3e107f00f96479e",
-      "patchBytes": 5406581,
+      "patchSha256": "85f03cf7b6965b8a68b3e00fbe30455b01471f67375880b96991d1da23a3982d",
+      "patchBytes": 5418682,
       "files": [
         {
           "path": "apps/filmcraft-cli/src/main.rs",
@@ -2857,6 +2857,17 @@
           }
         },
         {
+          "path": "crates/ui-egui/src/panels/timeline.rs",
+          "before": {
+            "sha256": "0194819d30fb493375d2eebcad0105fc07e5ec0495af74552ea7a703206eec67",
+            "bytes": 176237
+          },
+          "after": {
+            "sha256": "e3268ead06293db944e3ec1f64c5ff66b17ce5ad0a709d2ac8622eedc5d17eaa",
+            "bytes": 176224
+          }
+        },
+        {
           "path": "crates/ui-egui/src/panels/tools.rs",
           "before": {
             "sha256": "2b29312a1694987d1927d9791693f7bd223018410e88fb1fd478640aa12a4fd3",
@@ -2898,6 +2909,28 @@
           "after": {
             "sha256": "3ece225fb395853cc2981c6a96c59e5f5e4c965d6cf98017608e285ed8b8f560",
             "bytes": 3653
+          }
+        },
+        {
+          "path": "crates/ui-egui/tests/monitor_geometry.rs",
+          "before": {
+            "sha256": "59f451d9de3dd3707888850335f78ae97670e7fcfe0be52e86f5fed6b1ef4399",
+            "bytes": 11417
+          },
+          "after": {
+            "sha256": "e1fdf01bbf89daa2ed5210d648553e74afd7a55f331fb3a80511a4d38d22a38f",
+            "bytes": 20945
+          }
+        },
+        {
+          "path": "crates/ui-egui/tests/ui_keyboard_focus.rs",
+          "before": {
+            "sha256": "02e6850f91ab274a355fced517c0540e4486f1d3ac253d7e702ebf16163b7bbf",
+            "bytes": 4784
+          },
+          "after": {
+            "sha256": "a972eb501f8fc43e1dc86d1a48184897a158abeb2883ee8c185d3d6eae54f340",
+            "bytes": 4791
           }
         },
         {
