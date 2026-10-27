@@ -418,7 +418,16 @@ def authenticated_launcher_role_sources():
 class FilmDemoCtaRoles(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.before = archived_sources('film', (chrome.FILM_DEMO_CTA_PATH,))[chrome.FILM_DEMO_CTA_PATH]
+        lock = bogo.base_lock('film')
+        archive = bogo.full.common.verified_archive(lock['source'], ROOT / '.cache/archives', False)
+        if hashlib.sha256(archive.read_bytes()).hexdigest() != lock['source']['sha256']:
+            raise ValueError('Authenticated Film UI source archive changed')
+        relatives = (chrome.FILM_DEMO_CTA_PATH, chrome.FILM_DEMO_TEST_PATH,
+                     chrome.FILM_KEYBOARD_TEST_PATH, 'crates/ui-egui/src/theme.rs')
+        with tarfile.open(archive) as tar:
+            cls.sources = {relative: tar.extractfile(lock['source']['root'] + '/' + relative).read().decode('utf-8')
+                           for relative in relatives}
+        cls.before = cls.sources[chrome.FILM_DEMO_CTA_PATH]
 
     def test_authenticated_whole_file_inverse_preserves_geometry_ids_actions_and_media(self):
         self.assertEqual(hashlib.sha256(self.before.encode()).hexdigest(), chrome.FILM_DEMO_CTA_BEFORE_SHA256)
@@ -442,7 +451,7 @@ class FilmDemoCtaRoles(unittest.TestCase):
                 chrome.transform('film', chrome.FILM_DEMO_CTA_PATH, invalid)
 
     def test_real_production_paint_test_is_additive_and_preserves_every_original_ui_assertion(self):
-        before = archived_sources('film', (chrome.FILM_DEMO_TEST_PATH,))[chrome.FILM_DEMO_TEST_PATH]
+        before = self.sources[chrome.FILM_DEMO_TEST_PATH]
         self.assertEqual(hashlib.sha256(before.encode()).hexdigest(), chrome.FILM_DEMO_TEST_BEFORE_SHA256)
         after = chrome.transform('film', chrome.FILM_DEMO_TEST_PATH, before)
         self.assertEqual(after, before + chrome.FILM_DEMO_PAINT_TEST)
@@ -471,7 +480,7 @@ class FilmDemoCtaRoles(unittest.TestCase):
         self.assertNotIn('#[ignore', test)
 
     def test_existing_keyboard_tests_only_update_the_proven_tools_chrome_stroke_role(self):
-        before = archived_sources('film', (chrome.FILM_KEYBOARD_TEST_PATH,))[chrome.FILM_KEYBOARD_TEST_PATH]
+        before = self.sources[chrome.FILM_KEYBOARD_TEST_PATH]
         after = chrome.transform('film', chrome.FILM_KEYBOARD_TEST_PATH, before)
         self.assertEqual(hashlib.sha256(before.encode()).hexdigest(), chrome.FILM_KEYBOARD_TEST_SHA256[0])
         self.assertEqual(hashlib.sha256(after.encode()).hexdigest(), chrome.FILM_KEYBOARD_TEST_SHA256[1])
@@ -491,7 +500,7 @@ class FilmDemoCtaRoles(unittest.TestCase):
     def test_all_three_themes_have_fixed_readable_roles_independent_of_semantic_accent_preferences(self):
         import bogo_brand as brand
         path = 'crates/ui-egui/src/theme.rs'
-        original = archived_sources('film', (path,))[path]
+        original = self.sources[path]
         themed = brand.theme(original)
         expected = {'tab_bg': (255, 243, 232), 'pressed': (255, 231, 212), 'icon': (52, 43, 38)}
         def luminance(rgb):
