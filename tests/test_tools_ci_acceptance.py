@@ -187,9 +187,9 @@ class GuardTests(unittest.TestCase):
         self.assertEqual(m.git_blob(b'hello\n'),'ce013625030ba8dba906f756967f9e9ca394464a')
 
     def test_signed_envelope_is_exact_pinned_asset(self):
-        self.assertEqual(m.ENVELOPE_PIN,(679634075,'Bogo-Tools-4.6.23-candidate-update-envelope.json',2898,'04210060a4ec938bdb31d23e8b4219be80207e9e150e94fb0da9cb7033c2b9f1'))
+        self.assertEqual(m.ENVELOPE_PIN,(680108333, 'Bogo-Tools-4.6.23-candidate-update-envelope.json', 2898, 'f1fc8cee82499df155e60b806065a5f2d7c2fc1d541e195a5e5281e0e594d56a'))
         self.assertEqual(m.VERSION,'4.6.23')
-        self.assertEqual(m.SOURCE_COMMIT,'ffb7307aa1368e411f386f166750ac2353cf8a2e')
+        self.assertEqual(m.SOURCE_COMMIT,'bfed87954b869a8d4b3a4dac97f85168a32ba266')
         self.assertEqual(m.PUBLIC_KEY,'JjeL9t/8GSrh2XZ25gawQyI475nXr/rU0li4CoEnfos=')
         for pin in [*m.PINS.values(),m.ENVELOPE_PIN]:
             self.assertEqual(len(pin[3]),64);self.assertGreater(pin[2],0)
@@ -231,7 +231,7 @@ class GuardTests(unittest.TestCase):
         self.assertGreater(checked,5)
 
     def test_only_actual_postpackaging_mac_executable_pin_accepted(self):
-        current='1354fe9ecc12a21a1d0cb9572e71e581c66abc538d0cf49e0e236175274f63e3'
+        current='070f84d29f43dbd4cf942bda0a41eb4e9f0a9778feb6429f376473d29ee27be6'
         historical='e1afd018ddc5915349611b0e899c7de40df0230b3b49bbb380a07e19a944c731'
         self.assertEqual(m.EXE_SHA['macos'],current);self.assertEqual(m.EXE_BYTES['macos'],3666928)
         self.assertEqual(m.executable_metadata(current,3666928,'macos'),{'sha256':current,'bytes':3666928})

@@ -13,39 +13,54 @@ from pathlib import Path, PurePosixPath
 
 VERSION = '4.6.23'
 REPOSITORY = 'qptywoei-sudo/bogo-native-apps'
-RELEASE_ID = 424823883
+RELEASE_ID = 424947403
 SOURCE_REPO = 'qptywoei-sudo/kio-tools-releases'
-SOURCE_COMMIT = 'ffb7307aa1368e411f386f166750ac2353cf8a2e'
-SOURCE_FILES = 441
+SOURCE_COMMIT = 'bfed87954b869a8d4b3a4dac97f85168a32ba266'
+SOURCE_FILES = 442
 MAC_BUNDLE_FILES = 9474
 MASTER_SHA = 'e3196a03cf3d259b5e3662c39206b36339b22986ac910b0e772fb84f7759957b'
 ICO_SHA = '6fc46773734a521752d98e113d45ea9526ce475af5500efec32dab27ca19f72e'
 ICNS_SHA = '83b8e147f108536a5e71745122dd6f57be3f2b52a2d59a57176228479dfe55cf'
 EXE_SHA = {'windows': '4a73a4ae6052804e2bb14ffe1957c447bbedff92a24e6b11c1115cc7c7682ce5',
-           'macos': '1354fe9ecc12a21a1d0cb9572e71e581c66abc538d0cf49e0e236175274f63e3'}
+ 'macos': '070f84d29f43dbd4cf942bda0a41eb4e9f0a9778feb6429f376473d29ee27be6'}
 EXE_BYTES = {'windows':1806336,'macos':3666928}
 # The former e1afd... implementation checkpoint preceded final packaging and
 # signing. Only the exact final executable members of the frozen ZIPs above
 # are accepted here; historical/prepackaging hashes are never a fallback.
 # Asset IDs, names, sizes and hashes were independently read back from this draft.
-PINS = {
- 'source': (679633895, 'Bogo-Tools-4.6.23-source.zip', 7444893, 'bde46ce3a1834353aa1107ff6f29241748e29121a5bf88cf659be1c117972ba1'),
- 'windows': (679633893, 'Bogo-Tools-4.6.23-Windows-Portable.zip', 412317152, '119e718fa69f99ae992ee6cc37c5b7692eb25e2aa8c90c6810aea30e89d5ca4d'),
- 'macos': (679633899, 'Bogo-Tools-4.6.23-Mac-Portable.zip', 434326041, 'efea9cbbf5be135b2d5344330fe24e0ebdf6d18452a7975d1c7c9ee5fb9d9a94'),
- 'windows-update': (679633902, 'Bogo-Tools-4.6.23-Windows-Update.zip', 411769682, '00c669e4952d67b2798989da2de21d59a43359cfd0d510da0c16312c8b2638d9'),
- 'macos-update': (679633894, 'Bogo-Tools-4.6.23-Mac-Update.zip', 434629209, 'b1bf330367cc1793b167d5261fbb5b21d32a24977b73259891d19060b97754b6'),
-}
+PINS = {'source': (680108468,
+            'Bogo-Tools-4.6.23-source.zip',
+            7450240,
+            '3dde19c49d1b4c68e762a1cbb9926fa370f36b7130e560a78dd56d2e28beec70'),
+ 'windows': (680103549,
+             'Bogo-Tools-4.6.23-Windows-Portable.zip',
+             412339039,
+             '8b3985791d8191cf79c31f32475408f73d65f440e9fbcbbf4f53877daa432700'),
+ 'macos': (680099961,
+           'Bogo-Tools-4.6.23-Mac-Portable.zip',
+           434331031,
+           '1891733411138a6d32e89475d15516e9401628c193ba32a86af11aab461f2089'),
+ 'windows-update': (680105259,
+                    'Bogo-Tools-4.6.23-Windows-Update.zip',
+                    411774673,
+                    '13d80abd60b72c63808683e817ed0ec2e778fc502c5a5ec479aade9bcc4e50c5'),
+ 'macos-update': (680101515,
+                  'Bogo-Tools-4.6.23-Mac-Update.zip',
+                  434634199,
+                  '36116a8722fdc690b1849913559cc96bf8719a9cf250213cf36ee4f4c3af4e72')}
 OLD_WINDOWS = ('https://github.com/qptywoei-sudo/kio-tools-releases/releases/download/tools-v4.6.21/KIO-Tools-4.6.21-Windows-Update.zip',
                414591430, 'c753337a986ef2abf4b1a38fbb99ff63ea4218f61e5ea009f3f7fc5dcc4f253b')
 OLD_MACOS = ('https://github.com/qptywoei-sudo/kio-tools-releases/releases/download/tools-v4.6.21/KIO-Tools-4.6.21-Mac-Update.zip',
              437990335, 'c489d8ba1029155afcef587475fbb7336b8b40161fb1eb9a6b8664837f68884e')
 # Root supplies a separately pinned QA-only envelope asset after local signing.
 # Candidate URLs are held, not live; this harness never claims their availability.
-ENVELOPE_PIN = (679634075, 'Bogo-Tools-4.6.23-candidate-update-envelope.json', 2898,
-                '04210060a4ec938bdb31d23e8b4219be80207e9e150e94fb0da9cb7033c2b9f1')
+ENVELOPE_PIN = (680108333,
+ 'Bogo-Tools-4.6.23-candidate-update-envelope.json',
+ 2898,
+ 'f1fc8cee82499df155e60b806065a5f2d7c2fc1d541e195a5e5281e0e594d56a')
 PUBLIC_KEY = 'JjeL9t/8GSrh2XZ25gawQyI475nXr/rU0li4CoEnfos='
 MAC_SIGNER_LEAF_SHA1 = '72287f8a5048cd206db014ead6723c75cd459379'
-PORTABLE_SOURCE_SHA = '4c9dbc3c63da77f8ce77555ded0d2fcd9e0e8aab8c4141305ca2d85d0cdabab2'
+PORTABLE_SOURCE_SHA = '718136871df5ec36550d4dca50dc8249362ee61c32ed1442f48f76d8844f3629'
 
 
 def require(ok, message):

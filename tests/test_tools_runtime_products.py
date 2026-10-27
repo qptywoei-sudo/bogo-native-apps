@@ -398,7 +398,7 @@ class CliPreimageAndFactory(unittest.TestCase):
             z.writestr('windows/GalaxyControl.c',cls.factory_source)
             z.writestr('SOURCE-MANIFEST.json',json.dumps({'files':[{'path':'windows/GalaxyControl.c','sha256':v.sha256(cls.factory_source),'bytes':len(cls.factory_source)}]}))
             z.writestr('agent/mac_bundle_migration.py',b'# owned source fixture\n')
-            for i in range(438):z.writestr(f'owned-source/{i:03d}.txt',b'fixture')
+            for i in range(439):z.writestr(f'owned-source/{i:03d}.txt',b'fixture')
 
     @classmethod
     def tearDownClass(cls):
@@ -487,14 +487,14 @@ class CliPreimageAndFactory(unittest.TestCase):
         self.assertFalse(output.exists())
 
     def test_actual_repinned_source_factory_and_new_runtime_module_are_current(self):
-        self.assertEqual(v.SOURCE_COMMIT,'ffb7307aa1368e411f386f166750ac2353cf8a2e')
+        self.assertEqual(v.SOURCE_COMMIT,'bfed87954b869a8d4b3a4dac97f85168a32ba266')
         self.assertEqual(v.MANAGED_FILE_COUNT,3905)
-        self.assertEqual(v.SOURCE_ZIP_SHA256,'bde46ce3a1834353aa1107ff6f29241748e29121a5bf88cf659be1c117972ba1')
-        self.assertEqual(v.UPDATE_ZIP_SHA256,'00c669e4952d67b2798989da2de21d59a43359cfd0d510da0c16312c8b2638d9')
+        self.assertEqual(v.SOURCE_ZIP_SHA256,'3dde19c49d1b4c68e762a1cbb9926fa370f36b7130e560a78dd56d2e28beec70')
+        self.assertEqual(v.UPDATE_ZIP_SHA256,'13d80abd60b72c63808683e817ed0ec2e778fc502c5a5ec479aade9bcc4e50c5')
         self.assertEqual(v.INI_FACTORY_SOURCE_SHA256,'2b6d16a1ec80403bfba281b4457f4fa01448598951a4dd7a2b00978506b19f46')
         import zipfile
         with zipfile.ZipFile(self.source_archive)as z:
-            self.assertEqual(len(z.namelist()),441)
+            self.assertEqual(len(z.namelist()),442)
             self.assertIn('agent/mac_bundle_migration.py',z.namelist())
         self.assertEqual(len(v.INI_DEFAULT_BYTES),36);self.assertEqual(v.sha256(v.INI_DEFAULT_BYTES),v.INI_DEFAULT_SHA256)
 
