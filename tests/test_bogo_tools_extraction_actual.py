@@ -39,7 +39,7 @@ if (set(_CONTEXT) != {'expectedSha', 'headSha', 'repository', 'runId', 'runAttem
         or _CONTEXT['event'] != 'workflow_dispatch' or _CONTEXT['runnerEnvironment'] != 'github-hosted'
         or not _CONTEXT['runId'].isdigit() or not _CONTEXT['runAttempt'].isdigit()
         or not _CONTEXT['ref'].startswith('refs/heads/codex/')
-        or _CONTEXT['workflowRef'] != _CONTEXT['repository'] + '/.github/workflows/bogo-tools-unicode-proposal.yml@' + _CONTEXT['ref']):
+        or _CONTEXT['workflowRef'] != _CONTEXT['repository'] + '/.github/workflows/bogo-tools-acceptance.yml@' + _CONTEXT['ref']):
     raise RuntimeError('Exact reviewed hosted-workflow context mismatch')
 _source = _inputs.source_cpp
 if _source.is_symlink() or not _source.is_file() or _source.stat().st_size > 131072:

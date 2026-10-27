@@ -1,68 +1,96 @@
-name: Bogo Tools frozen release acceptance
+name: Bogo Tools Unicode extractor proposal tests
 
 on:
   workflow_dispatch:
     inputs:
       expected_sha:
-        description: Exact reviewed workflow commit SHA (40 lowercase hex characters)
+        description: Exact reviewed proposal workflow commit SHA
         required: true
         type: string
 
-permissions:
-  contents: read
+permissions: {}
 
 concurrency:
-  group: bogo-tools-4.6.23-acceptance-${{ github.ref }}
+  group: bogo-tools-unicode-proposal-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  accept:
+  windows-extraction:
     if: github.event_name == 'workflow_dispatch' && github.repository == 'qptywoei-sudo/bogo-native-apps'
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - runner: windows-2022
-            platform: windows
-            python: python
-          - runner: macos-15-intel
-            platform: macos
-            python: python3
-    runs-on: ${{ matrix.runner }}
-    timeout-minutes: 45
-    env:
-      PYTHONUNBUFFERED: '1'
-      PYTHONDONTWRITEBYTECODE: '1'
+    runs-on: windows-2022
+    timeout-minutes: 30
+    permissions:
+      contents: read
     steps:
-      - name: Check reviewed workflow revision
+      - name: Bind the manual run to the reviewed source commit
         shell: bash
         env:
           EXPECTED_SHA: ${{ inputs.expected_sha }}
         run: |
-          ${{ matrix.python }} -c 'import os,re; expected=os.environ["EXPECTED_SHA"]; assert re.fullmatch("[0-9a-f]{40}",expected) and expected==os.environ["GITHUB_SHA"], "Reviewed workflow SHA mismatch"'
+          python -I -B -c 'import os,re; value=os.environ["EXPECTED_SHA"]; assert re.fullmatch("[0-9a-f]{40}",value) and value==os.environ["GITHUB_SHA"], "Reviewed proposal SHA mismatch"; assert os.environ["RUNNER_OS"]=="Windows" and os.environ["RUNNER_ENVIRONMENT"]=="github-hosted", "Fresh hosted Windows required"'
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
+          ref: ${{ github.sha }}
           persist-credentials: false
           fetch-depth: 1
-      - name: Test evidence and isolation guards
-        shell: bash
-        run: ${{ matrix.python }} -m unittest discover -s tests -p test_tools_ci_acceptance.py -v
-      - name: Download and verify frozen draft assets
+      - name: Run all 24 actual Windows fixture tests with credential-free child environments
         shell: bash
         env:
-          GH_TOKEN: ${{ github.token }}
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
         run: |
-          ${{ matrix.python }} scripts/tools-ci-acceptance.py fetch --platform '${{ matrix.platform }}' --root "$RUNNER_TEMP/bogo-tools-acceptance"
-      - name: Accept exact normal app, signed upgrade and own-window evidence
-        shell: bash
-        run: |
-          ${{ matrix.python }} scripts/tools-ci-acceptance.py accept --platform '${{ matrix.platform }}' --root "$RUNNER_TEMP/bogo-tools-acceptance"
-      - name: Upload explicit public evidence only
+          python -I -B - <<'PY'
+          import hashlib, json, os, pathlib, re, subprocess, sys
+          expected = os.environ['EXPECTED_SHA']
+          assert re.fullmatch('[0-9a-f]{40}', expected) and expected == os.environ['GITHUB_SHA']
+          assert os.environ['GITHUB_REPOSITORY'] == 'qptywoei-sudo/bogo-native-apps'
+          assert os.environ['GITHUB_EVENT_NAME'] == 'workflow_dispatch'
+          assert os.environ['RUNNER_ENVIRONMENT'] == 'github-hosted' and os.name == 'nt'
+          context = {
+              'expectedSha': expected, 'headSha': os.environ['GITHUB_SHA'],
+              'repository': os.environ['GITHUB_REPOSITORY'], 'runId': os.environ['GITHUB_RUN_ID'],
+              'runAttempt': os.environ['GITHUB_RUN_ATTEMPT'], 'ref': os.environ['GITHUB_REF'],
+              'workflowRef': os.environ['GITHUB_WORKFLOW_REF'], 'event': os.environ['GITHUB_EVENT_NAME'],
+              'runnerEnvironment': os.environ['RUNNER_ENVIRONMENT'],
+          }
+          source = pathlib.Path('qa/bogo-tools-unicode-proposal/PortableLauncher.cpp').absolute()
+          tests = pathlib.Path('tests/test_bogo_tools_extraction_actual.py').absolute()
+          assert source.is_file() and not source.is_symlink() and source.stat().st_size < 131072
+          assert tests.is_file() and not tests.is_symlink() and tests.stat().st_size < 131072
+          assert hashlib.sha256(source.read_bytes()).hexdigest() == '718136871df5ec36550d4dca50dc8249362ee61c32ed1442f48f76d8844f3629'
+          assert hashlib.sha256(tests.read_bytes()).hexdigest() == '0f2831f7420b06f6b50b53acd13648d1cd0985d929ad93c50e3f997a463c2eaf'
+          root = pathlib.Path(os.environ['RUNNER_TEMP']).absolute() / 'bogo-tools-unicode-qa'
+          assert not root.exists() and not root.is_symlink()
+          allowed = {
+              'systemroot', 'windir', 'comspec', 'pathext', 'path', 'temp', 'tmp',
+              'userprofile', 'localappdata', 'appdata', 'programdata', 'programfiles',
+              'programfiles(x86)', 'programw6432', 'commonprogramfiles', 'commonprogramfiles(x86)',
+              'commonprogramw6432', 'os', 'processor_architecture', 'processor_identifier',
+              'processor_level', 'processor_revision', 'number_of_processors', 'computername',
+              'username', 'userdomain', 'homedrive', 'homepath',
+          }
+          clean = {key: value for key, value in os.environ.items() if key.lower() in allowed}
+          assert not any(any(word in key.lower() for word in ('token', 'secret', 'password', 'credential')) for key in clean)
+          # Only system runtimes process task-owned synthetic fixtures. No draft GET or app launch.
+          command = [sys.executable, '-I', '-B', '-X', 'utf8', str(tests), '--source-cpp', str(source),
+                     '--qa-root', str(root), '--workflow-context', json.dumps(context)]
+          result = subprocess.run(command, env=clean, timeout=1200)
+          report_path = root / 'output/windows-extraction-tests-report.json'
+          assert report_path.is_file() and report_path.stat().st_size <= 262144, 'Missing/big public test report'
+          report = json.loads(report_path.read_text(encoding='utf-8'))
+          assert report['workflowContext'] == context, 'Report workflow identity mismatch'
+          assert result.returncode == 0 and report['passedAll24'] and report['actualWindows'], 'Actual Windows extraction tests failed'
+          assert report['testsRun'] == report['expectedTests'] == 24 and report['failures'] == report['errors'] == report['skipped'] == 0
+          assert report['expectedFailures'] == report['unexpectedSuccesses'] == 0
+          assert report['credentialEnvRemovedBeforeEveryChild'] and not report['draftAssetsFetched'] and not report['downloadedProgramsExecuted']
+          PY
+      - name: Upload only bounded public synthetic-fixture results
         if: always()
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
-          name: bogo-tools-4.6.23-${{ matrix.platform }}-actual-acceptance
-          path: ${{ runner.temp }}/bogo-tools-acceptance/output/
+          name: bogo-tools-unicode-proposal-windows-tests
+          path: |
+            ${{ runner.temp }}/bogo-tools-unicode-qa/output/windows-extraction-tests-report.json
+            ${{ runner.temp }}/bogo-tools-unicode-qa/output/windows-extraction-tests.log
           if-no-files-found: error
           include-hidden-files: false
           retention-days: 14
