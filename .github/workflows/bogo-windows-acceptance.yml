@@ -39,7 +39,7 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-      - run: python3 -m unittest discover -s tests -p test_bogo_ci_artifact.py -v
+      - run: python3 -m unittest discover -s tests -p 'test_bogo_ci_artifact*.py' -v
       - id: matrix
         env:
           BOGO_APP: ${{ inputs.app }}

@@ -164,9 +164,47 @@ class GitHub:
             require(copied == artifact['size_in_bytes'], 'Artifact download was truncated')
 
 
-def validate_run(run, run_id, expected_sha):
+VECTOR_TIMEOUT_INPUT = {'app': 'vector', 'runId': 40399110833, 'attempt': 1, 'headSha': '0a2089a8c2ef0e2835438d0fe2733fd963b61866', 'branch': 'codex/bogo-vector-timeout-20261027', 'repositoryId': 1434181014, 'workflowId': 396907535, 'jobId': 121841617606, 'failedSmokeStep': 11, 'artifactId': 12696439886, 'artifactBytes': 220164187, 'artifactDigest': 'sha256:312a167ccf4965da56ad748a82a56e09e6817a70c4d8bc8a688bd360a1f4c49f', 'version': '0.11.0-bogo.2', 'sourceTreeSha256': '48d62e620b68a00be8c65bb5a0065747be7169112c252640e9fd954b0c0ac2ee', 'overlaySha256': 'ce31e148556a2b1f98dc92b78a937eeb847ec3950ed13bfeee3f34acc44b580d', 'sourceJobId': 121841617688, 'sourceArtifactId': 12688201983, 'sourceArtifactBytes': 190233468, 'sourceArtifactDigest': 'sha256:021b9c04f1d385fe979ef4c63909980c3fea6053710cda36c71cafb4656d7d0b', 'sourceFiles': [{'filename': 'Bogo-Vector-0.11.0-bogo.2-source-SHA256SUMS.txt', 'bytes': 331, 'sha256': '0b6307d7582367d62eeee01b60c748222c662dc0255acf178947a365c82bc659'}, {'filename': 'Bogo-Vector-0.11.0-bogo.2-source-manifest.json', 'bytes': 712, 'sha256': 'd7b7f2a5cfe6d621248bf3790e099cf7989355cfe3f2c045c70d4aa5b62dbaf1'}, {'filename': 'Bogo-Vector-0.11.0-bogo.2-source-provenance.json', 'bytes': 37142, 'sha256': '7ca14d5d0e09ba63b6caaec57b9b08d8e6e66a19a206a2a59111f05d19a5b86d'}, {'filename': 'Bogo-Vector-0.11.0-bogo.2-source.zip', 'bytes': 190428830, 'sha256': '46385c17addf4df7160a27f28497417ea9567eb467fb5814b1294f378bc490b0'}], 'windowsFiles': [{'filename': 'Bogo-Vector-0.11.0-bogo.2-windows-x64-SHA256SUMS.txt', 'bytes': 458, 'sha256': '17e5c5363c29a67425e2bfda3998f495aa31b4a218769ed8ec014e32afbfb521'}, {'filename': 'Bogo-Vector-0.11.0-bogo.2-windows-x64-manifest.json', 'bytes': 934, 'sha256': '37c7c570f723b5593c3eeaf89580f18839886d278333b4357e435555e6cc3ec9'}, {'filename': 'Bogo-Vector-0.11.0-bogo.2-windows-x64-provenance.json', 'bytes': 41305, 'sha256': 'af2e25cdfc8cda02254482f39d9d74fe3c81d604ef76a22a435197e1226af7f0'}, {'filename': 'Bogo-Vector-0.11.0-bogo.2-windows-x64.msi', 'bytes': 100033492, 'sha256': '984a2ece4db57130d75f3ced36de2b53a2f99d76a0e63864b329311367f7f50b'}, {'filename': 'Bogo-Vector-0.11.0-bogo.2-windows-x64.zip', 'bytes': 122186329, 'sha256': '1c78d8a49ad2ca1a60a15c9d5ffb68c9a1cdd7743e175cb9798a66c351e5d659'}], 'builtExecutable': {'bytes': 141417472, 'sha256': '81b8326ee54c1347ec2e229f07fd072418cd5dbfdffd21d0da804fdc2f3f1261'}}
+
+def exact_vector_timeout_input(run, app):
+    p = VECTOR_TIMEOUT_INPUT
+    return (app == p['app'] and run.get('id') == p['runId'] and run.get('head_sha') == p['headSha']
+            and run.get('head_branch') == p['branch'] and run.get('run_attempt') == p['attempt']
+            and run.get('workflow_id') == p['workflowId'] and run.get('status') == 'completed'
+            and run.get('conclusion') == 'failure'
+            and all(run.get(k, {}).get('full_name') == REPOSITORY and run[k].get('id') == p['repositoryId'] for k in ('repository','head_repository')))
+
+
+def approved_input_branch(run, app):
+    # ORIGINAL build input only. Current manual runner_context/ref is unchanged.
+    return run.get('head_branch') == BRANCH or exact_vector_timeout_input(run, app)
+
+
+def vector_timeout_source_binding(run, jobs, artifacts, app, lock, now):
+    if not exact_vector_timeout_input(run, app):
+        return None
+    p = VECTOR_TIMEOUT_INPUT
+    overlay = lock['bogoOverlay']
+    require(lock['id'] == app and lock['version'] == p['version'] and overlay['sourceTreeSha256'] == p['sourceTreeSha256'] and overlay['patchSha256'] == p['overlaySha256'], 'Exact Vector timeout app source/overlay changed')
+    selected = [j for j in jobs if j.get('name') == 'Complete corresponding source for vector']
+    require(len(selected) == 1, 'Exact Vector corresponding-source job missing')
+    j = selected[0]
+    require(j.get('id') == p['sourceJobId'] and j.get('run_id') == run['id'] and j.get('run_attempt') == p['attempt'] and j.get('head_sha') == p['headSha'] and j.get('status') == 'completed' and j.get('conclusion') == 'success' and j.get('labels') == ['ubuntu-24.04'] and j.get('runner_group_name') == 'GitHub Actions', 'Exact Vector source job identity/status differs')
+    required = ['Run python3 scripts/bogo_native.py prepare --app vector', 'Run python3 scripts/bogo_native.py source --app vector', 'Run python3 scripts/bogo_native.py verify --app vector --platform source --directory dist/vector-source', UPLOAD_STEP]
+    require(all(any(s.get('name') == name and s.get('conclusion') == 'success' for s in j.get('steps', [])) for name in required) and all(s.get('status') == 'completed' and s.get('conclusion') == 'success' for s in j.get('steps', [])), 'Vector corresponding-source prepare/verify/upload did not all pass')
+    selected = [a for a in artifacts if a.get('name') == 'bogo-vector-source' and a.get('expired') is False]
+    require(len(selected) == 1, 'Exact current Vector source artifact missing')
+    a = selected[0]
+    require(a.get('id') == p['sourceArtifactId'] and a.get('size_in_bytes') == p['sourceArtifactBytes'] and a.get('digest') == p['sourceArtifactDigest'] and reviewed.utc_time(a.get('expires_at')) > now, 'Exact Vector source API ZIP identity/expiry differs')
+    binding = a.get('workflow_run', {})
+    require(binding.get('id') == run['id'] and binding.get('head_branch') == p['branch'] and binding.get('head_sha') == p['headSha'] and binding.get('repository_id') == run['repository']['id'] and binding.get('head_repository_id') == run['head_repository']['id'], 'Exact Vector source artifact run/repository differs')
+    require(reviewed.utc_time(j['started_at']) <= reviewed.utc_time(a['created_at']) <= reviewed.utc_time(a['updated_at']) <= reviewed.utc_time(j['completed_at']), 'Vector source artifact is outside exact current job window')
+    return {'repository': REPOSITORY, 'buildRunId': run['id'], 'sourceJobId': j['id'], 'sourceArtifact': {k:a[k] for k in ('id','name','size_in_bytes','digest','created_at','updated_at','expires_at')}, 'sourceTreeSha256': p['sourceTreeSha256'], 'overlaySha256': p['overlaySha256'], 'sourceFiles': p['sourceFiles'], 'sourceFilesRehashedByThisWindowsCollector': False, 'finalGateMustVerifyActualSource4': True, 'priorNativeAcceptancePassed': False, 'priorFailureKind': 'original-branch-fence-before-install', 'freshFullAcceptanceRequired': True}
+
+
+def validate_run(run, run_id, expected_sha, app=None):
     require(isinstance(run, dict) and run.get('id') == run_id and run.get('head_sha') == exact_sha(expected_sha), 'Requested build run or commit differs')
-    require(run.get('event') == 'workflow_dispatch' and run.get('head_branch') == BRANCH and run.get('path') == BUILD_WORKFLOW, 'Build is not the exact manual Bogo workflow/ref')
+    require(run.get('event') == 'workflow_dispatch' and approved_input_branch(run, app) and run.get('path') == BUILD_WORKFLOW, 'Build is not the exact manual Bogo workflow/ref')
     for key in ('repository', 'head_repository'):
         row = run.get(key)
         require(isinstance(row, dict) and row.get('full_name') == REPOSITORY and reviewed.integer(row.get('id')), 'Build repository/head is not allowlisted')
@@ -229,6 +267,8 @@ def select_job(jobs, run, app):
     job = selected[0]
     require(job.get('run_id') == run['id'] and job.get('run_attempt') == run['run_attempt'] and job.get('head_sha') == run['head_sha'], 'Native job belongs to another run attempt/commit')
     job_eligibility(job, app)
+    if run.get('head_branch') != BRANCH:
+        require(exact_vector_timeout_input(run, app) and job.get('id') == VECTOR_TIMEOUT_INPUT['jobId'] and job.get('conclusion') == 'failure' and [s.get('number') for s in job['steps'] if s.get('conclusion') == 'failure'] == [VECTOR_TIMEOUT_INPUT['failedSmokeStep']], 'Only the exact Vector original branch-fence failure is eligible for fresh acceptance')
     require(job.get('labels') == ['windows-2022'] and job.get('runner_group_name') == 'GitHub Actions', 'Built artifact did not come from the reviewed hosted Windows target')
     require(reviewed.utc_time(job.get('started_at')) <= reviewed.utc_time(job.get('completed_at')), 'Native job timestamps are invalid')
     return job
@@ -239,8 +279,11 @@ def validate_artifact(artifact, run, job, app, now):
     require(artifact.get('expired') is False and reviewed.utc_time(artifact.get('expires_at')) > now, 'Artifact is expired')
     require(reviewed.integer(artifact.get('size_in_bytes')) and artifact['size_in_bytes'] <= MAX_ARCHIVE and isinstance(artifact.get('digest'), str) and re.fullmatch(r'sha256:[a-f0-9]{64}', artifact['digest']), 'Artifact API ZIP digest/size is missing or invalid')
     binding = artifact.get('workflow_run')
-    require(isinstance(binding, dict) and binding.get('id') == run['id'] and binding.get('head_branch') == BRANCH and binding.get('head_sha') == run['head_sha'] and binding.get('repository_id') == run['repository']['id'] and binding.get('head_repository_id') == run['head_repository']['id'], 'Artifact run/head/repository binding differs')
+    require(isinstance(binding, dict) and binding.get('id') == run['id'] and binding.get('head_branch') == run['head_branch'] and approved_input_branch(run, app) and binding.get('head_sha') == run['head_sha'] and binding.get('repository_id') == run['repository']['id'] and binding.get('head_repository_id') == run['head_repository']['id'], 'Artifact run/head/repository binding differs')
     require(reviewed.utc_time(job['started_at']) <= reviewed.utc_time(artifact.get('created_at')) <= reviewed.utc_time(artifact.get('updated_at')) <= reviewed.utc_time(job['completed_at']), 'Artifact upload is outside the eligible current-attempt job window')
+    if run.get('head_branch') != BRANCH:
+        p = VECTOR_TIMEOUT_INPUT
+        require(exact_vector_timeout_input(run, app) and job.get('id') == p['jobId'] and artifact['id'] == p['artifactId'] and artifact['size_in_bytes'] == p['artifactBytes'] and artifact['digest'] == p['artifactDigest'], 'Exact Vector original Windows artifact ZIP differs')
     expected = API + 'artifacts/' + str(artifact['id'])
     require(artifact.get('url') == expected and artifact.get('archive_download_url') == expected + '/zip', 'Artifact API URLs differ from the exact repository')
     return artifact
@@ -312,7 +355,7 @@ def collect(run_id, expected_sha, app, output, github=None, now=None):
         check_time = now or datetime.now(timezone.utc)
         endpoint = f'repos/{REPOSITORY}/actions/runs/{run_id}'
         report['phase'] = 'build-run-and-workflow'
-        run = validate_run(github.json(endpoint), run_id, expected_sha)
+        run = validate_run(github.json(endpoint), run_id, expected_sha, app)
         workflow = github.json(f'repos/{REPOSITORY}/actions/workflows/{run["workflow_id"]}')
         require(workflow.get('id') == run['workflow_id'] and workflow.get('path') == BUILD_WORKFLOW and workflow.get('state') == 'active', 'Build workflow identity is not active/allowlisted')
         report['phase'] = 'eligible-completed-native-job'
@@ -323,26 +366,36 @@ def collect(run_id, expected_sha, app, output, github=None, now=None):
         selected = [item for item in artifacts if item.get('name') == 'bogo-' + app + '-windows-x64' and item.get('expired') is False]
         require(len(selected) == 1, 'Exactly one named build artifact is required')
         artifact = validate_artifact(selected[0], run, job, app, check_time)
+        source_origin = vector_timeout_source_binding(run, jobs, artifacts, app, lock, check_time)
         archive = destination / 'authenticated-artifact.zip'
         report['phase'] = 'download-and-api-readback'
         github.download(artifact, archive)
         require(archive.is_file() and not archive.is_symlink() and archive.stat().st_size == artifact['size_in_bytes'] and artifact['digest'] == 'sha256:' + sha256(archive), 'Downloaded ZIP differs from the actual API size/digest')
-        current_run = validate_run(github.json(endpoint), run_id, expected_sha)
+        current_run = validate_run(github.json(endpoint), run_id, expected_sha, app)
         require(all(current_run[key] == run[key] for key in ('head_sha', 'run_attempt', 'workflow_id')), 'Build run attempt changed during download')
         current = github.json(f'repos/{REPOSITORY}/actions/artifacts/{artifact["id"]}')
         validate_artifact(current, run, job, app, now or datetime.now(timezone.utc))
         require(current == artifact, 'Artifact API metadata changed during download')
+        if source_origin is not None:
+            source_artifact = next(a for a in artifacts if a['id'] == VECTOR_TIMEOUT_INPUT['sourceArtifactId'])
+            require(github.json(f'repos/{REPOSITORY}/actions/artifacts/{source_artifact["id"]}') == source_artifact, 'Vector source artifact metadata changed during download')
         candidate = destination / 'candidate'
         report['phase'] = 'bounded-native-files-only-extraction'
         extract_candidates(archive, candidate, app, reviewed.expected_files(lock, 'windows-x64'))
         report['phase'] = 'manifest-checksums-and-native-provenance'
         files, provenance = verify_provenance(candidate, lock)
         require(bogo.load_lock(app) == lock and runner_context() == harness, 'Selected source or harness changed during artifact verification')
+        if source_origin is not None:
+            p = VECTOR_TIMEOUT_INPUT
+            actual_files = sorted([{'filename': f.name, 'bytes': f.stat().st_size, 'sha256': sha256(f)} for f in files], key=lambda item: item['filename'])
+            require(actual_files == p['windowsFiles'] and all(provenance['binaries']['app'][k] == v for k, v in p['builtExecutable'].items()), 'Exact measured Vector five-file/executable bytes differ')
         harness_files = {}
         for relative in HARNESS_FILES:
             path = bogo.ROOT / relative
             require(path.is_file() and not path.is_symlink(), 'Required current acceptance harness file is missing')
             harness_files[relative] = sha256(path)
+        if source_origin is not None:
+            report['originalSourceArtifactBinding'] = source_origin
         report.update(status='verified', phase='verified-inputs-only', buildRunId=run_id, buildRunAttempt=run['run_attempt'], buildWorkflow=BUILD_WORKFLOW, job={'id': job['id'], 'name': job['name'], 'status': job['status'], 'conclusion': job['conclusion'], 'eligibility': job_eligibility(job, app)}, artifact={key: artifact[key] for key in ('id', 'name', 'size_in_bytes', 'digest', 'created_at', 'updated_at', 'expires_at')}, sourceTreeSha256=lock['bogoOverlay']['sourceTreeSha256'], overlaySha256=lock['bogoOverlay']['patchSha256'], builtExecutable=provenance['binaries']['app'], harnessFiles=harness_files, files=[{'filename': path.name, 'bytes': path.stat().st_size, 'sha256': sha256(path)} for path in files])
         bogo.full.write_json(report_path, report)
         return report
